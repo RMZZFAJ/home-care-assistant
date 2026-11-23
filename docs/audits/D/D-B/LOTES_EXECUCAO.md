@@ -1774,6 +1774,9 @@ vazio. Consulte o [registro da aplicação](MIGRATIONS.md#retomada-do-arquivamen
 | `20261122215605_l3_bind_balance_draft_admission` | Aplicada | Aplicada |
 | `20261122222145_l3_material_link_filters` | Aplicada | Aplicada |
 | `20261122223500_l3_material_history_decisions` | Aplicada | Aplicada |
+| `20261122232848_l3_residence_schedule_hours` | Aplicada | Aplicada |
+| `20261123000513_l3_schedule_balance_impact` | Aplicada | Aplicada |
+| `20261123001403_l3_reconcile_residence_shift_windows` | Aplicada | Aplicada |
 
 O replay de instalação limpa e evolução da CI passou para `acf440ef`
 com 330 versões. A aplicação das duas migrations subsequentes foi precedida
@@ -2127,9 +2130,11 @@ preservados na raiz, seguindo o mesmo arranjo de L1 e L2.
   iniciada no plantão já preserva a retomada. A área reúne Plantões,
   Balanços e Histórico com as permissões de cada leitura. A ficha tem
   abas próprias para Revisões e Contagens. O cadastro consulta os
-  horários por residência onde já configurados. Restam completar a
+  horários por residência onde já configurados. Alterações de plantão que
+  atingem uma contagem designada exigem encaminhamento explícito e registram
+  a decisão na mesma transação. Restam completar a
   administração dos tipos e a transição das residências sem configuração,
-  os encaminhamentos de alterações e o wizard de contagem com cinco etapas
+  a conferência visual do fluxo e o wizard de contagem com cinco etapas
   e materiais extras.
 - **E09 — Arquivos e verificação.** Em execução. A consulta pública exibe
   registro, correspondência, assinatura e carimbo separadamente. Os detalhes
@@ -2449,10 +2454,12 @@ gravadas conservam os intervalos. O plantão isolado exibe somente a data
 do plantão. A série interna dá suporte às chaves atuais da agenda.
 
 A repetição pode ficar sem data final. O banco registra até 56 dias e
-estende a janela antes de restarem 28 dias. Se houver sobreposição ou
-um horário civil inválido, a extensão inteira é revertida e a agenda
-indica revisão. A próxima tentativa usa a mesma cadência e os horários
-preservados. O encerramento impede a geração posterior. As regras
+estende a janela antes de restarem 28 dias. Se houver sobreposição,
+a extensão é revertida e a agenda indica revisão. A próxima tentativa
+usa a mesma cadência e os horários preservados. Em uma extensão semanal,
+uma ocorrência civil impossível é registrada na auditoria com data e fuso.
+As ocorrências válidas vizinhas são gravadas. O encerramento impede a
+geração posterior. As regras
 atuais de publicação, proposta e recuperação continuam no mesmo contrato.
 Residências ainda sem regras registradas usam o cadastro anterior durante
 a transição.
@@ -2476,6 +2483,38 @@ sessões antes de registrar a requisição. O teste dirigido passou.
 Seis casos em Chromium, Android e iOS emulados passaram sem retentativas.
 Eles exercitaram configurações, fechamento do cadastro sem edição,
 plantão especial, recorrência aberta, conflito e navegação da agenda.
+
+### Alteração de plantão com balanço designado
+
+A alteração, o cancelamento, a aprovação de pedido e o encerramento de
+programação consultam a atribuição vigente e a admissão de contagem.
+O formulário mostra a ficha quando já existe, identifica a pessoa e o
+prazo, e pede motivo e decisão a quem tem autorização familiar. É possível
+manter a contagem quando a cobertura preserva o responsável e todo o
+intervalo da atribuição, designar um plantão elegível no mesmo prazo ou
+aprovar o adiamento dentro da autoridade existente.
+
+O banco confere as versões da atribuição e dos plantões, rejeita destinos
+que também serão cancelados e grava agenda, encaminhamento e histórico de
+forma atômica. Quando é possível manter a atribuição, preserva a admissão e
+atualiza somente a referência à versão do plantão. Se houver troca, preserva
+a ficha e a autoria e encerra a admissão anterior. A nova atribuição pode
+retomar o documento pelos caminhos já autorizados.
+
+Os ajustes da revisão automatizada também tratam conflito de edição dos
+horários da residência, horários especiais incompletos e programação
+semanal sem ocorrências. Em um ciclo fixo o intervalo especial precisa
+conservar as horas de trabalho da escala. A extensão conserva o trabalho
+e o descanso em horas decorridas.
+
+As duas migrations foram aplicadas nos bancos local e remoto após o backup
+cifrado verificado `8e2ccf21-c9f3-4891-a343-6b30451fb774`. A simulação
+vinculada posterior mostrou a fila vazia. Passaram 38 regressões distintas
+de integração com Auth real. Os casos cobrem decisão familiar, destino
+obsoleto, retentativa, preservação da autoria, admissão iniciada entre a
+revisão e a confirmação, recorrência vazia e data civil inexistente. O
+conflito de versão dos horários e o cancelamento com adiamento foram
+exercitados em Chromium, Android emulado e iOS emulado.
 
 ## L4
 

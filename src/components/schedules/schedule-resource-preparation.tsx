@@ -29,6 +29,7 @@ import { useCreationDraft } from "@/components/forms/use-creation-draft";
 import { useScopedRead } from "@/lib/use-scoped-read";
 import { useLiveRevision } from "@/lib/use-live-revision";
 import { holdDialogFocus } from "@/lib/forms/dialog-focus";
+import { scheduleBalanceDecisionReady, scheduleBalanceReview } from "@/lib/schedules/balance-impact";
 import {
   scheduleResourceReferenceSchema,
   checkScheduleResourceReference,
@@ -53,6 +54,7 @@ import { ScheduleResourceSummary } from "./schedule-resource-summary";
 import { ScheduleResourceReferenceFacts } from "./schedule-resource-reference";
 import { ScheduleSummaryContext } from "./schedule-preparation-summary";
 import { ScheduleReviewDetails } from "./schedule-review";
+import { ScheduleBalanceImpact } from "./schedule-balance-impact";
 import type { CreationDraft } from "@/types/creation-drafts";
 import type { ScheduleWorkspace } from "@/types/schedules";
 
@@ -463,10 +465,14 @@ export function ScheduleResourcePreparation({
     seriesSource = reference?.workspace.series[0],
     shiftSource = reference?.workspace.shifts[0],
     changeSource = reference?.workspace.changes[0];
+  const balanceReview = scheduleBalanceReview(fields, reference);
+  const balanceDecision = "balanceImpact" in fields ? fields.balanceImpact : undefined;
+  const balanceReady = scheduleBalanceDecisionReady(balanceReview, balanceDecision);
   const mayConfirm =
     writable &&
     Boolean(reference) &&
     !stale &&
+    balanceReady &&
     Boolean(current) &&
     (fields.form === "type"
       ? Boolean(typeSource)
@@ -506,7 +512,7 @@ export function ScheduleResourcePreparation({
                   ? !changeSource.is_stale &&
                     changeSource.source_snapshot &&
                     changeSource.proposed_snapshot &&
-                    !changeSource.bal_impact.requires_family_decision
+                    (!changeSource.bal_impact.requires_family_decision || balanceReview)
                   : fields.operation === "close"
                     ? changeSource.is_stale
                     : true),
@@ -543,6 +549,7 @@ export function ScheduleResourcePreparation({
     if (
       !canReview ||
       !reference ||
+      !balanceReady ||
       busyRef.current ||
       draft.blocked ||
       pending ||
@@ -1065,6 +1072,8 @@ export function ScheduleResourcePreparation({
                     disabled={!writable || publishing || draft.busy}
                     onClick={() => {
                       setReference(current.reference);
+                      if ("balanceImpact" in fields && fields.balanceImpact)
+                        setFields({ ...fields, balanceImpact: undefined });
                       setPacket(null);
                       setWorking(true);
                       setReviewRejected(false);
@@ -1077,7 +1086,7 @@ export function ScheduleResourcePreparation({
                   </ActionButton>
                 </section>
               ) : null}
-              {!mayConfirm && reference && current && !stale ? (
+              {!mayConfirm && reference && current && !stale && balanceReady ? (
                 <Notice error>
                   O estado do recurso ou sua permissão atual impede esta
                   confirmação. Confira a referência e mantenha seus campos para
@@ -1096,7 +1105,9 @@ export function ScheduleResourcePreparation({
                   <ResourceFields
                     value={fields}
                     onChange={(value) => {
-                      setFields(value);
+                      setFields("balanceImpact" in value && value.balanceImpact &&
+                        !scheduleBalanceReview(value, reference)
+                        ? { ...value, balanceImpact: undefined } : value);
                       setWorking(true);
                     }}
                     data={data}
@@ -1105,9 +1116,16 @@ export function ScheduleResourcePreparation({
                     publishOwn={publishOwn}
                     mayPropose={mayPropose}
                   />
+                  {balanceReview && fields.form !== "type" ? (
+                    <ScheduleBalanceImpact review={balanceReview} value={balanceDecision}
+                      onChange={(value) => {
+                        setFields({ ...fields, balanceImpact: value });
+                        setWorking(true);
+                      }} />
+                  ) : null}
                   <div className="hca-toolbar">
                     <ActionButton
-                      disabled={!canReview || draft.blocked || publishing}
+                      disabled={!canReview || !balanceReady || draft.blocked || publishing}
                       variant="primary"
                       type="submit"
                       ref={reviewTriggerRef}

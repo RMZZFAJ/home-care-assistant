@@ -5,7 +5,7 @@ import {
   scheduleTypeFields,
 } from "./creation";
 import { editedCivilInstant, localMinute } from "./time";
-import { scheduleBody } from "@/lib/validation/schedules";
+import { scheduleBalanceDecisionFields, scheduleBody } from "@/lib/validation/schedules";
 import type { ScheduleWorkspace } from "@/types/schedules";
 
 export const scheduleResourcePurposes = [
@@ -66,6 +66,7 @@ export const scheduleResourceFieldsSchema = z.discriminatedUnion("form", [
       operation: z.enum(["end_series", "approve", "reject"]),
       from: z.union([z.literal(""), z.iso.date()]),
       reason: text(1000),
+      balanceImpact: scheduleBalanceDecisionFields.optional(),
     })
     .strict(),
   z
@@ -81,6 +82,7 @@ export const scheduleResourceFieldsSchema = z.discriminatedUnion("form", [
       ),
       notes: text(2000),
       reason: text(1000),
+      balanceImpact: scheduleBalanceDecisionFields.optional(),
     })
     .strict(),
   z
@@ -88,9 +90,15 @@ export const scheduleResourceFieldsSchema = z.discriminatedUnion("form", [
       form: z.literal("decision"),
       operation: z.enum(["approve", "reject", "close"]),
       reason: text(1000),
+      balanceImpact: scheduleBalanceDecisionFields.optional(),
     })
     .strict(),
-]);
+]).refine((fields) => {
+  if (!("balanceImpact" in fields) || !fields.balanceImpact) return true;
+  return fields.form === "series" ? fields.operation === "end_series"
+    : fields.form === "shift" ? fields.operation !== "propose_change"
+    : fields.operation === "approve";
+});
 export type ScheduleResourceFields = z.infer<
   typeof scheduleResourceFieldsSchema
 >;
@@ -114,6 +122,33 @@ export function scheduleResourcePurpose(
 const id = z.uuid(),
   version = z.number().int().positive().max(2147483647),
   instant = z.iso.datetime({ offset: true });
+const balanceImpact = z.discriminatedUnion("restricted", [
+  z.object({ restricted: z.literal(true), shiftDate: z.iso.date() }),
+  z.object({
+    restricted: z.literal(false),
+    shiftDate: z.iso.date(),
+    assignmentId: id,
+    assignmentVersion: version,
+    sourceVersion: version,
+    shiftId: id,
+    professionalId: id,
+    professionalName: z.string(),
+    startsAt: instant,
+    endsAt: instant,
+    timezone: z.string(),
+    document: z.object({ id, protocol: z.string().nullable() }).nullable(),
+    inProgress: z.boolean(),
+    canDecide: z.boolean(),
+    canDefer: z.boolean(),
+    targets: z.array(z.object({
+      id, version, professionalName: z.string(), startsAt: instant, endsAt: instant,
+      timezone: z.string(), seriesId: id, localDate: z.iso.date(),
+    })),
+  }),
+]);
+export type ScheduleBalanceImpact = z.infer<typeof balanceImpact>;
+export type ScheduleBalanceDecision = z.infer<typeof scheduleBalanceDecisionFields>;
+
 const shift = z
   .object({
     id,
@@ -129,6 +164,7 @@ const shift = z
     version,
     notes: z.string(),
     is_exception: z.boolean(),
+    balanceImpact: balanceImpact.optional(),
   })
   .passthrough();
 const snapshot = z
@@ -181,6 +217,7 @@ export const scheduleResourceWorkspaceSchema = z.object({
         notes: z.string(),
         occurrences: z.array(shift),
         publication_blocked: z.boolean(),
+        balanceImpact: balanceImpact.optional(),
       })
       .passthrough(),
   ),
@@ -204,6 +241,7 @@ export const scheduleResourceWorkspaceSchema = z.object({
         is_stale: z.boolean(),
         current_professional_name: z.string(),
         current_proposed_professional_name: z.string(),
+        balanceImpact: balanceImpact.optional(),
         bal_impact: z.object({
           has_assignment: z.boolean(),
           changes_window: z.boolean(),
@@ -310,6 +348,9 @@ export function scheduleResourceCommand(
     if (c.action !== "type") throw Error("Confira o tipo de plantão.");
     return scheduleBody.parse({ ...c, body: { ...c.body, id: target } });
   }
+  const impact = fields.balanceImpact
+    ? { balanceImpact: { ...fields.balanceImpact, reason: fields.balanceImpact.reason.trim() } }
+    : {};
   if (fields.form === "series")
     return scheduleBody.parse({
       action: fields.operation,
@@ -317,6 +358,7 @@ export function scheduleResourceCommand(
         id: target,
         ...(fields.operation === "end_series" ? { fromDate: fields.from } : {}),
         ...(fields.reason ? { reason: fields.reason } : {}),
+        ...impact,
       },
     });
   if (fields.form === "decision")
@@ -328,12 +370,13 @@ export function scheduleResourceCommand(
           ? { approve: fields.operation === "approve" }
           : {}),
         ...(fields.reason ? { reason: fields.reason } : {}),
+        ...impact,
       },
     });
   if (fields.operation === "cancel")
     return scheduleBody.parse({
       action: "cancel",
-      body: { id: target, reason: fields.reason },
+      body: { id: target, reason: fields.reason, ...impact },
     });
   const source = reference?.workspace.shifts.find((s) => s.id === target);
   if (!source) throw Error("Atualize e compare a referência deste plantão.");
@@ -350,6 +393,7 @@ export function scheduleResourceCommand(
       endsAt: editedCivilInstant(fields.end, source.ends_at, source.timezone),
       notes: fields.notes,
       reason: fields.reason,
+      ...impact,
     },
   });
 }

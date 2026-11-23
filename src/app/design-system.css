@@ -47,6 +47,8 @@ fieldset input[type=checkbox] { width:20px; height:20px; flex-shrink:0; accent-c
 .hca-schedule-form select { min-width:0; width:100%; }
 .hca-schedule-hours { display:flex; align-items:flex-start; gap:12px; padding:14px; border:1px solid var(--hca-line); border-radius:12px; background:var(--hca-bg); }
 .hca-schedule-hours > svg { flex:none; }
+.hca-schedule-impact { min-width:0; margin-block:12px; padding:14px; border:1px solid #dec68e; border-radius:12px; background:#fff9eb; color:#503c16; }
+.hca-schedule-impact a { text-decoration:underline; }
 .hca-schedule-hours > div { display:grid; gap:3px; }
 .hca-schedule-hours span, .hca-schedule-hours small { color:var(--hca-muted); }
 

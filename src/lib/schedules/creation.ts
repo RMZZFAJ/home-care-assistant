@@ -2,6 +2,7 @@ import { z } from "zod";
 import { scheduleBody } from "@/lib/validation/schedules";
 import type { ScheduleWorkspace, ShiftType } from "@/types/schedules";
 import { residenceHours, shiftDayPeriod, shiftLocalTime, type ResidenceHours } from "./residence-hours";
+import { civilInstant } from "./time";
 
 const text = (max: number) =>
   z.string().refine((v) => v.length <= max, `Use até ${max} caracteres.`);
@@ -122,6 +123,8 @@ export function scheduleCreationCommand(fields: ScheduleCreationFields) {
   }
   if (fields.recurrence === "weekly" && !fields.weekdays.length)
     throw new Error("Selecione ao menos um dia da semana.");
+  const timingIssue = scheduleSpecialHoursIssue(fields);
+  if (timingIssue) throw new Error(timingIssue);
   const residence = fields.residence;
   return scheduleBody.parse({
     action: "series",
@@ -156,6 +159,26 @@ export function scheduleCreationCommand(fields: ScheduleCreationFields) {
       } : {}),
     },
   });
+}
+
+export function scheduleSpecialHoursIssue(fields: ScheduleCreationFields) {
+  if (fields.form !== "series" || !fields.residence?.special) return null;
+  const { specialStart, specialEnd } = fields.residence;
+  if (!specialStart || !specialEnd) return "Informe o início e o término do horário especial.";
+  if (!fields.from) return null;
+  const day = new Date(fields.from + "T12:00:00Z");
+  if (specialEnd <= specialStart) day.setUTCDate(day.getUTCDate() + 1);
+  try {
+    const start = civilInstant(`${fields.from}T${specialStart}`, fields.timezone);
+    const end = civilInstant(`${day.toISOString().slice(0, 10)}T${specialEnd}`, fields.timezone);
+    const minutes = (Date.parse(end) - Date.parse(start)) / 60000;
+    if (fields.recurrence === "cycle" && minutes !== Number(fields.cycle.split("x")[0]) * 60)
+      return "O horário especial precisa manter as horas de trabalho da escala escolhida.";
+    if (minutes < 15 || minutes > 1440) return "Use um intervalo entre 15 minutos e 24 horas.";
+  } catch {
+    return "Confira se o início e o término existem no fuso da residência nessa data.";
+  }
+  return null;
 }
 
 export function adoptResidenceHours(fields: Extract<ScheduleCreationFields, { form: "series" }>, hours: ResidenceHours) {

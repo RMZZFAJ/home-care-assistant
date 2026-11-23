@@ -78,15 +78,13 @@ export function ScheduleChangeFacts({ proposal }: { proposal: ShiftChange }) {
         <h3>Consequências para o BAL</h3>
         {impact.requires_family_decision ? (
           <Notice error>
-            Existe BAL designado com janela vigente. A alteração do período
-            exige decisão familiar no acompanhamento do balanço; esta aprovação
-            não pode adiar o prazo.
+            Este plantão tem um balanço designado. A família precisa encaminhar
+            a contagem antes de confirmar a alteração.
           </Notice>
         ) : impact.has_assignment ? (
           <p>
-            A janela e o prazo do BAL permanecem. A substituição transfere a
-            tarefa futura para a pessoa autorizada e preserva a autoria das
-            contagens anteriores.
+            Este plantão tem um balanço designado. Confira o responsável, o prazo
+            e o encaminhamento ao revisar a alteração.
           </p>
         ) : (
           <p>

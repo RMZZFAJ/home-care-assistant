@@ -6,6 +6,9 @@ import {
   ScheduleSummaryContext,
 } from "./schedule-preparation-summary";
 import type { ScheduleResourceContent } from "@/lib/schedules/resource-preparations";
+import { balanceScheduleLabels } from "./schedule-balance-impact";
+import { scheduleBalanceReview } from "@/lib/schedules/balance-impact";
+import { formatZonedDate } from "@/lib/schedules/time";
 
 export function ScheduleResourceSummary({
   content,
@@ -23,6 +26,10 @@ export function ScheduleResourceSummary({
       ? data?.professionals.find((p) => p.id === f.professionalId)
       : null;
   const missing = "Ainda não preenchido";
+  const balance = f.balanceImpact;
+  const destination = balance && balance.decision !== "keep"
+    ? scheduleBalanceReview(f, content.reference ?? null)?.[balance.decision].find((shift) => shift.id === balance.targetShiftId)
+    : undefined;
   const operations = {
     end_series: "Encerrar programação",
     approve: "Aprovar proposta",
@@ -82,6 +89,14 @@ export function ScheduleResourceSummary({
       ),
       wide: true,
     },
+    ...(f.balanceImpact ? [
+      { label: "Encaminhamento do balanço", value: balanceScheduleLabels[f.balanceImpact.decision] },
+      { label: "Motivo da decisão sobre o balanço", value: f.balanceImpact.reason || missing },
+    ] : []),
+    ...(destination ? [{
+      label: "Plantão de destino da contagem",
+      value: `${destination.professionalName} · ${formatZonedDate(destination.startsAt, destination.timezone)} até ${formatZonedDate(destination.endsAt, destination.timezone)}`,
+    }] : []),
     {
       label: content.reference
         ? "Versão da referência preservada"

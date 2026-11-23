@@ -122,3 +122,42 @@ test("open-ended cycles preserve cadence, stop on conflicts and extend after res
   sql(`select private.extend_residence_schedules(${q(dayOffset(advanced, 60) + "T12:00:00Z")})`);
   assert.deepEqual(queryOccurrences(rolling.id), after);
 });
+
+test("residence series reject empty weeks and special hours incompatible with a cycle", async () => {
+  const f = await residenceFixture();
+  const day = localDay(10);
+  const failing = body => f.admin.rpc("schedule_command", {
+    p_patient: f.patient, p_action: "series", p_key: randomUUID(), p_body: body,
+  });
+  const nextWeekday = new Date(`${dayOffset(day, 1)}T12:00Z`).getUTCDay();
+  const emptyWeek = await failing(series(f, day, { recurrence: "weekly", weekdays: [nextWeekday] }));
+  assert.equal(emptyWeek.error?.code, "22023");
+  assert.match(emptyWeek.error?.message, /no scheduled occurrence/);
+  const cycle = series(f, day, { recurrence: "cycle", workHours: 12, restHours: 36, validUntil: dayOffset(day, 2),
+    residenceHours: { version: f.hours.version, period: "day", startsLocal: "07:00", endsLocal: "15:00" },
+  });
+  assert.match((await failing(cycle)).error?.message, /match cycle work hours/);
+  assert.equal(sql(`select count(*) from public.shift_series where care_recipient_id=${q(f.patient)}`), "0");
+  cycle.residenceHours.endsLocal = "19:00";
+  const accepted = await shiftCommand(f.admin, f.patient, "series", cycle);
+  assert.deepEqual(queryOccurrences(accepted.id), [day, dayOffset(day, 2)].map(date => ({
+    start: date+"T11:00", end: date+"T23:00", status: "published",
+  })));
+});
+
+test("rolling a weekly horizon records a DST gap and preserves the neighboring valid shifts", async t => {
+  const f = await residenceFixture();
+  const zone = "America/New_York";
+  const changed = await saveHours(f.admin, f.patient, { ...defaultHours, timezone: zone, dayStart: "02:30" }, f.hours.version);
+  assert.ifError(changed.error);
+  const anchor = "2100-01-03";
+  const rolling = await shiftCommand(f.admin, f.patient, "series", series(f, anchor, {
+    timezone: zone, recurrence: "weekly", weekdays: [0], validUntil: null,
+    residenceHours: { version: changed.data.hours.version, period: "day", startsLocal: "02:30", endsLocal: null },
+  }));
+  t.after(() => sql(`update public.care_recipients set is_active=false where id=${q(f.patient)}`));
+  assert.equal(rolling.valid_until, "2100-02-28");
+  sql(`select private.materialize_residence_schedule(s, '2100-03-01', '2100-03-21') from public.shift_series s where id=${q(rolling.id)}`);
+  assert.deepEqual(queryOccurrences(rolling.id).slice(-2).map(row => row.start), ["2100-03-07T07:30", "2100-03-21T06:30"]);
+  assert.equal(sql(`select metadata->>'date' from public.audit_events where entity_id=${q(rolling.id)} and action='schedule.civil_time_skipped' and actor_id is null`), "2100-03-14");
+});

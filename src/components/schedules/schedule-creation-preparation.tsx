@@ -508,7 +508,10 @@ export function ScheduleCreationPreparation({
         else if (e instanceof ApiError && [401, 403, 404].includes(e.status)) {
           await draft.revalidateRead();
           if (mountedRef.current) await context.refresh();
-        } else source.refresh();
+        } else {
+          source.refresh();
+          if (purpose === "schedule_series_create" && e.status === 409) residenceRead.refresh();
+        }
       }
       setError(
         e instanceof Error

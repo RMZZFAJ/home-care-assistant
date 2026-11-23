@@ -41,6 +41,7 @@ const labels: Record<string, string> = {
   "bal.cycle.recount_recorded": "Nova contagem física do reconto registrada",
   "bal.cycle.counted": "Contagem atual registrada e pendências regularizadas",
   "bal.cycle.assignment_resolved": "Responsabilidade do balanço definida",
+  "bal.cycle.schedule_impact": "Encaminhamento do balanço após alteração de plantão",
   "schedule.type": "Tipo de plantão atualizado",
   "schedule.published": "Programação de plantões publicada",
   "schedule.proposed": "Programação proposta para aprovação",

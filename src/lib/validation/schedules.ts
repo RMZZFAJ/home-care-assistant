@@ -4,6 +4,22 @@ const id = z.uuid();
 const date = z.iso.date();
 const instant = z.iso.datetime({ offset: true });
 const reason = z.string().trim().min(3).max(1000);
+const version = z.number().int().positive().max(2147483647);
+export const scheduleBalanceDecisionFields = z.object({
+  decision: z.enum(["keep", "assign", "defer"]),
+  assignmentId: id,
+  assignmentVersion: version,
+  sourceVersion: version,
+  targetShiftId: id.optional(),
+  targetShiftVersion: version.optional(),
+  reason: z.string().max(1000),
+}).strict().refine(
+  (value) => (value.targetShiftId === undefined) === (value.targetShiftVersion === undefined),
+);
+const balanceImpact = scheduleBalanceDecisionFields.refine(
+  (value) => reason.safeParse(value.reason).success &&
+    (value.decision === "keep" ? !value.targetShiftId : Boolean(value.targetShiftId)),
+).optional();
 const person = {
   professionalId: id.optional(),
   startsAt: instant.optional(),
@@ -111,7 +127,7 @@ export const scheduleBody = z.discriminatedUnion("action", [
   z
     .object({
       action: z.literal("end_series"),
-      body: z.object({ id, fromDate: date, reason }).strict(),
+      body: z.object({ id, fromDate: date, reason, balanceImpact }).strict(),
     })
     .strict(),
   z
@@ -123,24 +139,26 @@ export const scheduleBody = z.discriminatedUnion("action", [
           ...person,
           reason,
           notes: z.string().max(2000).optional(),
+          balanceImpact,
         })
         .strict(),
     })
-    .strict(),
+    .strict()
+    .refine((value) => value.action === "change" || !value.body.balanceImpact),
   z
     .object({
       action: z.literal("cancel"),
-      body: z.object({ id, reason }).strict(),
+      body: z.object({ id, reason, balanceImpact }).strict(),
     })
     .strict(),
   z
     .object({
       action: z.literal("decide_change"),
       body: z
-        .object({ id, approve: z.boolean(), reason: reason.optional() })
+        .object({ id, approve: z.boolean(), reason: reason.optional(), balanceImpact })
         .strict()
         .refine(
-          (value) => value.approve || Boolean(value.reason),
+          (value) => value.approve || Boolean(value.reason) && !value.balanceImpact,
           "Informe o motivo da rejeição.",
         ),
     })

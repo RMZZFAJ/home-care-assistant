@@ -3,7 +3,7 @@
 import { useState, type FormEvent } from "react";
 import { RecordDrawer } from "@/components/forms/record-drawer";
 import { ActionButton, FormField, TextInput } from "@/components/ui/controls";
-import { Notice } from "@/components/workspace";
+import { ApiError, Notice } from "@/components/workspace";
 import { useResidenceHours } from "@/components/schedules/use-residence-hours";
 import { useCommandIntent } from "@/lib/client/use-command-intent";
 import { parseResidenceHours, residenceHoursChange, type ResidenceHours } from "@/lib/schedules/residence-hours";
@@ -11,6 +11,7 @@ import type { z } from "zod";
 
 type Packet = z.infer<typeof residenceHoursChange>;
 type Result = ReturnType<typeof parseResidenceHours>;
+const emptyHours: Packet["hours"] = { timezone: "", dayStart: "", nightStart: "" };
 
 function confirmed(value: unknown, packet: Packet) {
   try {
@@ -24,26 +25,30 @@ function confirmed(value: unknown, packet: Packet) {
 export function ScheduleResidenceSettings({ patientId }: { patientId: string }) {
   const read = useResidenceHours(patientId, true);
   const command = useCommandIntent<Packet, Result>(confirmed);
-  const [editor, setEditor] = useState<{ base: ResidenceHours | null; opener: HTMLButtonElement } | null>(null);
+  const [editor, setEditor] = useState<{ base: ResidenceHours | null; fields: Packet["hours"]; opener: HTMLButtonElement } | null>(null);
+  const [conflict, setConflict] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
   function finish() {
     setEditor(null);
+    setConflict(false);
     setMessage("Horários da residência atualizados.");
     read.refresh();
     window.dispatchEvent(new Event("hca:data-changed"));
   }
+  function change(field: keyof Packet["hours"], value: string) {
+    setEditor((open) => open && { ...open, fields: { ...open.fields, [field]: value } });
+  }
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!editor || command.busy || command.uncertain) return;
-    const values = new FormData(event.currentTarget);
+    if (!editor || conflict || command.busy || command.uncertain) return;
     const packet = residenceHoursChange.safeParse({
       careRecipientId: patientId,
       idempotencyKey: crypto.randomUUID(),
       expectedVersion: editor.base?.version ?? null,
-      hours: { timezone: values.get("timezone"), dayStart: values.get("dayStart"), nightStart: values.get("nightStart") },
+      hours: editor.fields,
     });
     if (!packet.success) {
       setError("Confira o fuso da residência e os horários de início.");
@@ -51,7 +56,13 @@ export function ScheduleResidenceSettings({ patientId }: { patientId: string }) 
     }
     setError("");
     try { await command.send(read.endpoint, packet.data); finish(); }
-    catch (reason) { setError(reason instanceof Error ? reason.message : "Não foi possível confirmar a alteração."); }
+    catch (reason) {
+      if (reason instanceof ApiError && reason.status === 409) {
+        setConflict(true);
+        read.refresh();
+      }
+      setError(reason instanceof Error ? reason.message : "Não foi possível confirmar a alteração.");
+    }
   }
 
   const hours = read.data?.hours;
@@ -61,7 +72,11 @@ export function ScheduleResidenceSettings({ patientId }: { patientId: string }) 
         : hours ? <p>Diurno {hours.dayStart} · Noturno {hours.nightStart} · {hours.timezone}</p>
           : read.data ? <p>Defina o fuso e o início dos plantões diurnos e noturnos.</p> : null}
     </div><ActionButton disabled={read.loading || Boolean(read.error) || !read.data}
-      onClick={event => { setMessage(""); setError(""); setEditor({ base: hours ?? null, opener: event.currentTarget }); }}>
+      onClick={event => {
+        setMessage(""); setError(""); setConflict(false);
+        const fields = hours ? { timezone: hours.timezone, dayStart: hours.dayStart, nightStart: hours.nightStart } : emptyHours;
+        setEditor({ base: hours ?? null, fields, opener: event.currentTarget });
+      }}>
       Editar horários
     </ActionButton></div>
     {read.error ? <Notice error>{read.error}<ActionButton onClick={read.refresh}>Consultar novamente</ActionButton></Notice> : null}
@@ -71,17 +86,27 @@ export function ScheduleResidenceSettings({ patientId }: { patientId: string }) 
       <form className="hca-form-stack" onSubmit={event => void submit(event)}>
         <fieldset className="hca-form-stack" disabled={command.uncertain}>
           <FormField label="Fuso da residência" required helpText="Exemplo: America/Manaus.">
-            <TextInput name="timezone" defaultValue={editor.base?.timezone} required maxLength={80} />
+            <TextInput name="timezone" value={editor.fields.timezone} onChange={event => change("timezone", event.currentTarget.value)} required maxLength={80} />
           </FormField>
           <div className="hca-compact-grid">
-            <FormField label="Início diurno" required><TextInput type="time" name="dayStart" defaultValue={editor.base?.dayStart} required /></FormField>
-            <FormField label="Início noturno" required><TextInput type="time" name="nightStart" defaultValue={editor.base?.nightStart} required /></FormField>
+            <FormField label="Início diurno" required><TextInput type="time" name="dayStart" value={editor.fields.dayStart} onChange={event => change("dayStart", event.currentTarget.value)} required /></FormField>
+            <FormField label="Início noturno" required><TextInput type="time" name="nightStart" value={editor.fields.nightStart} onChange={event => change("nightStart", event.currentTarget.value)} required /></FormField>
           </div>
           <p>Plantões já registrados conservam seus intervalos.</p>
-          <ActionButton type="submit" variant="primary">Registrar horários</ActionButton>
+          <ActionButton type="submit" variant="primary" disabled={conflict}>Registrar horários</ActionButton>
         </fieldset>
       </form>
       {error ? <Notice error>{error}</Notice> : null}
+      {conflict ? <Notice>
+        {read.loading ? <p role="status">Consultando horários atuais…</p> : hours && hours.version !== editor.base?.version ? <>
+          <p>Horários atuais, versão {hours.version}. Diurno {hours.dayStart} · Noturno {hours.nightStart} · {hours.timezone}</p>
+          <ActionButton onClick={() => {
+            setEditor({ ...editor, base: hours });
+            setConflict(false);
+            setError("");
+          }}>Adotar versão atual e manter meus horários</ActionButton>
+        </> : <ActionButton onClick={read.refresh}>Consultar horários novamente</ActionButton>}
+      </Notice> : null}
       {command.uncertain ? <ActionButton variant="primary" onClick={async () => {
         setError("");
         try { await command.recover(); finish(); }

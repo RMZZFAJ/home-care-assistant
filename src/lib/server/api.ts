@@ -148,6 +148,12 @@ export function databaseError(
       "O tipo de plantão mudou. Consulte e revise os horários atuais antes de confirmar.",
       409,
     );
+  if (error?.code === "PT409" && message === "stale residence hours")
+    throw new ApiError(
+      "VERSION_CONFLICT",
+      "Os horários da residência mudaram em outra sessão. Compare os horários atuais antes de confirmar.",
+      409,
+    );
   if (
     /stale document balance preparation reference|balance reference changed during private confirmation/i.test(
       message,
@@ -398,6 +404,20 @@ export function databaseError(
     throw new ApiError(
       "VERSION_CONFLICT",
       "A referência do conteúdo desta requisição não confere. Reabra a requisição antes de confirmar ciência.",
+      409,
+    );
+  if (
+    /balance schedule impact requires family deferral or reassignment|balance schedule target changed/i.test(message)
+  )
+    throw new ApiError(
+      "VERSION_CONFLICT",
+      "Confira novamente o balanço e o plantão de destino. A alteração exige uma decisão válida da família para a contagem.",
+      409,
+    );
+  if (error?.code === "PT409" && message === "stale schedule reference")
+    throw new ApiError(
+      "VERSION_CONFLICT",
+      "A referência da escala mudou. Confira a alteração e o balanço novamente antes de confirmar.",
       409,
     );
   if (

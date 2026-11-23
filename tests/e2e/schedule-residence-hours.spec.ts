@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
-import { setup } from "../integration/v4-fixtures.mjs";
-import { dayOffset, localToday, shiftCommand, shiftWorker } from "../integration/shift-fixtures.mjs";
+import { rpc, setup } from "../integration/v4-fixtures.mjs";
+import { balanceSetup, dayOffset, localToday, shiftCommand, shiftWorker } from "../integration/shift-fixtures.mjs";
 import { selectContext } from "./auth-context";
 import { audit } from "./accessibility-audit";
 
@@ -28,6 +28,15 @@ test("horários da residência governam plantão isolado, exceção noturna e re
   await editor.getByRole("textbox", { name: "Fuso da residência", exact: true }).fill("America/Manaus");
   await editor.getByLabel(/^Início diurno/).fill("06:25");
   await editor.getByLabel(/^Início noturno/).fill("20:40");
+  await rpc(admin.client, "set_schedule_residence", {
+    p_patient: fixture.patient, p_body: { timezone: "America/Manaus", dayStart: "07:10", nightStart: "19:15" },
+    p_version: null, p_key: crypto.randomUUID(),
+  });
+  await editor.getByRole("button", { name: "Registrar horários", exact: true }).click();
+  await expect(editor).toContainText("Diurno 07:10 · Noturno 19:15 · America/Manaus");
+  await editor.getByRole("button", { name: "Adotar versão atual e manter meus horários", exact: true }).click();
+  await expect(editor.getByLabel(/^Início diurno/)).toHaveValue("06:25");
+  await expect(editor.getByLabel(/^Início noturno/)).toHaveValue("20:40");
   const receipt = page.waitForResponse(response => new URL(response.url()).pathname === "/api/schedules/residence"
     && response.request().method() === "POST");
   await editor.getByRole("button", { name: "Registrar horários", exact: true }).click();
@@ -52,6 +61,7 @@ test("horários da residência governam plantão isolado, exceção noturna e re
   await expect(form).toContainText("20:40 às 08:40");
   await form.getByRole("switch", { name: "Horário especial", exact: true }).check();
   await form.getByLabel("Início", { exact: true }).fill("21:45");
+  await expect(form.getByRole("button", { name: "Revisar alteração", exact: true })).toBeDisabled();
   await form.getByLabel("Término", { exact: true }).fill("06:15");
   await expect(form).toContainText("Término no dia seguinte.");
   await page.setViewportSize({ width: 390, height: 844 });
@@ -92,5 +102,44 @@ test("horários da residência governam plantão isolado, exceção noturna e re
   const data = (await repeated.json()).data;
   expect(data.series.some((row: { open_ended: boolean; recurrence: string }) => row.open_ended && row.recurrence === "cycle")).toBe(true);
   expect(data.shifts).toHaveLength(2);
+  expect(Date.parse(data.shifts[0].starts_at)).toBe(Date.parse(`${recurringDay}T10:25:00Z`));
   expect(Date.parse(data.shifts[1].starts_at) - Date.parse(data.shifts[0].starts_at)).toBe(48 * 3_600_000);
+});
+
+test("cancelar plantão com BAL exige encaminhar a contagem e confirma os dois atos", async ({ page }) => {
+  test.setTimeout(120_000);
+  const fixture = await balanceSetup({ stableCurrentWindow: true });
+  const admin = await shiftWorker(fixture.patient, "admin");
+  const before = await rpc(admin.client, "balance_workspace", { p_patient: fixture.patient });
+  const assignment = before.eligibility.assignment;
+  const target = before.targets.find((shift: { starts_at: string }) => Date.parse(shift.starts_at) >= Date.parse(assignment.ends_at));
+
+  await page.goto("/login");
+  await page.getByLabel("E-mail", { exact: true }).fill(admin.email);
+  await page.getByLabel("Senha", { exact: true }).fill(fixturePassword);
+  await page.getByRole("button", { name: "Entrar", exact: true }).click();
+  await selectContext(page, fixture.patient);
+  await page.goto(`/escalas?day=${fixture.today}`);
+  await page.getByRole("button", { name: "Alterar plantão", exact: true }).first().click();
+  const editor = page.getByRole("dialog", { name: "Alteração pontual", exact: true });
+  await editor.getByRole("combobox", { name: "Operação", exact: true }).selectOption("cancel");
+  const review = editor.getByRole("button", { name: "Revisar alteração", exact: true });
+  await expect(review).toBeDisabled();
+  await editor.getByRole("textbox", { name: "Justificativa", exact: true }).fill("Ausência confirmada pela família");
+  const impact = editor.getByRole("region", { name: "Impacto em balanço", exact: true });
+  await expect(impact).toContainText("Ainda não contado");
+  await impact.getByRole("combobox", { name: "O que fazer com o balanço", exact: true }).selectOption("defer");
+  await impact.getByRole("combobox", { name: "Plantão de destino da contagem", exact: true }).selectOption(target.id);
+  const reason = "Cobertura confirmada para o plantão seguinte";
+  await impact.getByRole("textbox", { name: "Motivo da decisão sobre o balanço", exact: true }).fill(reason);
+  await review.click();
+  const confirmation = page.getByRole("dialog", { name: "Revisar escala", exact: true });
+  await expect(confirmation).toContainText(reason);
+  const response = page.waitForResponse(result => result.request().method() === "POST" &&
+    new URL(result.url()).pathname === "/api/schedules/resource-preparations/commit");
+  await confirmation.getByRole("button", { name: "Confirmar gravação", exact: true }).click();
+  expect((await response).ok()).toBe(true);
+  const final = await rpc(admin.client, "balance_workspace", { p_patient: fixture.patient });
+  expect(final.eligibility.assignment.shift_id).toBe(target.id);
+  expect(final.assignments.find((row: { id: string }) => row.id === assignment.id).status).toBe("deferred");
 });
