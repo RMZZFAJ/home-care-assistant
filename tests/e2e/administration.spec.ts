@@ -402,9 +402,8 @@ test.describe("administração integrada no ambiente local", () => {
     await page
       .getByRole("combobox", { name: "Item do catálogo", exact: true })
       .selectOption({ label: "Fralda" });
-    await page
-      .getByRole("group", { name: "Custódia", exact: true })
-      .getByRole("button", { name: "Equipe", exact: true }).click();
+    await page.getByRole("combobox", { name: "Custódia", exact: true })
+      .selectOption({ label: "Equipe de cuidado" });
     await page.getByLabel("Limite baixo", { exact: true }).fill("5");
     await page.getByLabel("Limite crítico", { exact: true }).fill("2");
     await page

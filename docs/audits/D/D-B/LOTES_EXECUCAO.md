@@ -3391,6 +3391,24 @@ WhatsApp ainda requer homologação do provedor.
 - **E09-08** — Login contextual, autorização para detalhes e revogação real.
   `public-verification.spec.ts`, `public-verification-contract.test.ts`.
 
+### Regressões de navegador em c5c409bc
+
+- Chromium e Android falharam nos mesmos 26 casos, inclusive na retentativa.
+  Os relatórios permitiram distinguir seletores anteriores ao L3 de
+  regressões da interface. A execução ficou registrada no
+  [GitHub Actions](https://github.com/RMZZFAJ/home-care-assistant/actions/runs/45176335374).
+- A retomada do BAL abre uma categoria que contém material e mantém a
+  conferência anterior exatamente como foi gravada. A revisão de uma
+  compensação familiar mostra o movimento original e posiciona o foco
+  para conferência por teclado. Os dois casos passaram em Android emulado.
+- Os casos dirigidos também confirmaram as capacidades dos cinco perfis,
+  a seleção de custódia na Administração, as abas e os atalhos das fichas,
+  a consulta em trânsito e a conferência pública do PDF por código e hash.
+  A chave interna do exemplar permanece restrita à consulta autorizada.
+- A lista remota de migrations coincide com o checkout. As duas novas
+  versões do conjunto, `20261123130151` e `20261123131427`, já constam
+  no Supabase vinculado. Os ajustes de navegador dispensam migração.
+
 ## L4
 
 Aguardando ordem e referência aprovadas.

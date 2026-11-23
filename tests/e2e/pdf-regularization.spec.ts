@@ -81,13 +81,16 @@ test("ENT regularizada gera PDF técnico pela interface, recupera a mesma reserv
   try{
     const endpoint=new URL(`/api/verification?code=${current.frozen.verificationCode}`,page.url()).href;
     const reference=await guest.request.get(endpoint);expect(reference.status()).toBe(200);
-    expect((await reference.json()).reference).toMatchObject({found:true,issuanceId:current.identity.id,bytesMatch:null});
+    const publicIdentity={found:true,verificationCode:current.frozen.verificationCode,sha256:digest(current.bytes)};
+    const publicReference=await reference.json();
+    expect(publicReference.reference).toMatchObject({...publicIdentity,bytesMatch:null});
+    expect(publicReference.reference).not.toHaveProperty("issuanceId");
     const upload=await guest.request.post(endpoint,{headers:{origin:new URL(page.url()).origin,"content-type":"application/pdf"},data:current.bytes});
     expect(upload.status(),upload.status()===200?"Current ENT public upload":await upload.text()).toBe(200);
     const result=await upload.json();
-    expect(result.reference).toMatchObject({found:true,issuanceId:current.identity.id,bytesMatch:true});
+    expect(result.reference).toMatchObject({...publicIdentity,bytesMatch:true});
     expect(result.analysis).toMatchObject({status:"verified",verification:{accepted:true,wholeFile:true,signerTrust:"internal",timestampTrust:"internal"}});
-    for(const privateFact of [f.patient,f.reason,f.item.proposed_by,fixtures.professional.id])expect(JSON.stringify(result)).not.toContain(privateFact);
+    for(const privateFact of [current.identity.id,"issuanceId",f.patient,f.reason,f.item.proposed_by,fixtures.professional.id])expect(JSON.stringify(result)).not.toContain(privateFact);
   }finally{await guest.close();}
 });
 

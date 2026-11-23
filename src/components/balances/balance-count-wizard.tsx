@@ -205,7 +205,7 @@ function ScheduledCount({
     [fieldErrors, setFieldErrors] = useState<Record<string, string>>({}),
     [reference, setReference] = useState<Record<string, string>>({});
   const [extras, setExtras] = useState<BalanceCountExtra[]>([]);
-  const [category, setCategory] = useState<WizardMaterialCategory>("medicamentos");
+  const [category, setCategory] = useState<WizardMaterialCategory>();
   const [cataloguePicker, setCataloguePicker] = useState(false);
   const cataloguePickerButtonRef = useRef<HTMLButtonElement>(null);
   const [editing, setEditing] = useState<SupplyDocument | null>(null),
@@ -279,10 +279,11 @@ function ScheduledCount({
   const prior = useMemo(() => priorBalanceMaterials(recount ? editing : null, products), [recount, editing, products]);
   const preservedExtraIds = new Set(prior.extras.map(extra => extra.id));
   const countedProducts = products.filter(product => !recount || prior.catalogued.has(product.id) || Object.hasOwn(counts, product.id));
-  const visibleProducts = countedProducts.filter(product => product.category === category);
+  const activeCategory = category ?? adjacentMaterialCategory(undefined, countedProducts, "next") ?? "medicamentos";
+  const visibleProducts = countedProducts.filter(product => product.category === activeCategory);
   const countedProductIds = new Set(countedProducts.map(product => product.id));
   const pickableProducts = cataloguePicker
-    ? products.filter(product => product.category === category && !countedProductIds.has(product.id)) : [];
+    ? products.filter(product => product.category === activeCategory && !countedProductIds.has(product.id)) : [];
   const materialReferences = useWizardMaterialReferences(
     context.patient!.id, "BAL", () => setDraftTouched(true), editing?.id ?? documentId,
   );
@@ -343,7 +344,7 @@ function ScheduledCount({
       setObservationTimes(content.observationTimes);
       setNotes(content.notes);
       setExtras(content.balanceExtras ?? []);
-      setCategory(content.materialCategory ?? "medicamentos");
+      setCategory(content.materialCategory);
       setDraftMaterials(content.materials);
       setStep(stepForNavigation("BAL", draft.navigation));
       setError("");
@@ -372,7 +373,7 @@ function ScheduledCount({
       setObservationTimes({});
       setNotes("");
       setExtras(prior.extras.map(extra => ({ ...extra, quantity: "" })));
-      setCategory("medicamentos");
+      setCategory(undefined);
       setDraftMaterials([]);
       setPreservedContext(null);
       setPreviousObservations(undefined);
@@ -443,8 +444,7 @@ function ScheduledCount({
       setAssignment(state.data.eligibility.assignment);
       setReferenceRevision(state.data.referenceRevision);
       const initialPrior = state.data.eligibility.assignment?.kind === "recount" ? priorBalanceMaterials(doc, catalog.data) : null;
-      const initialMaterials = initialPrior ? catalog.data.filter(product => initialPrior.catalogued.has(product.id)) : catalog.data;
-      setCategory(adjacentMaterialCategory(undefined, initialMaterials, "next") ?? "medicamentos");
+      setCategory(undefined);
       setReference(stock.data.revision === state.data.referenceRevision ? stock.data.quantities : {});
       const persistedExtras = initialPrior ? initialPrior.extras.map(extra => ({ ...extra, quantity: "" })) : doc?.payload.balanceExtras ?? [];
       setExtras(persistedExtras);
@@ -738,7 +738,7 @@ function ScheduledCount({
     setError("");
     if (step === 0) setStep(1);
     if (step === 1) {
-      const nextCategory = adjacentMaterialCategory(category, countedProducts, "next");
+      const nextCategory = adjacentMaterialCategory(activeCategory, countedProducts, "next");
       if (nextCategory) setCategory(nextCategory);
       else if (validate()) setStep(2);
     }
@@ -746,7 +746,7 @@ function ScheduledCount({
     if (step === 3) void review();
   }
   function previousStep() {
-    const previousCategory = step === 1 ? adjacentMaterialCategory(category, countedProducts, "previous") : undefined;
+    const previousCategory = step === 1 ? adjacentMaterialCategory(activeCategory, countedProducts, "previous") : undefined;
     if (previousCategory) setCategory(previousCategory);
     else setStep(step - 1);
   }
@@ -934,6 +934,12 @@ function ScheduledCount({
       });
       if (state.data.eligibility.assignment.kind === "recount")
         next.counts = Object.fromEntries(catalog.data.filter(product => carriedItems.has(product.id)).map(product => [product.id, ""]));
+      const currentProducts = state.data.eligibility.assignment.kind === "recount"
+        ? catalog.data.filter(product => carriedItems.has(product.id))
+        : catalog.data;
+      const nextCategory = currentProducts.some(product => product.category === category)
+        ? category : undefined;
+      next.materialCategory = nextCategory;
       preserveCountCache(
         sessionStorage,
         storageKey,
@@ -969,6 +975,7 @@ function ScheduledCount({
       setPreviousObservations(next.previousObservations);
       setNeedsRecount(false);
       setFieldErrors({});
+      setCategory(nextCategory);
       setDraftTouched(true);
       setStep(1);
       setMessage(
@@ -1199,7 +1206,7 @@ function ScheduledCount({
           <>
             <div><h2>{recount ? "Conte novamente os materiais" : "Conte os materiais"}</h2>
               <p className="hca-muted">Informe a quantidade física da equipe. Use zero quando o material estiver ausente.</p></div>
-            <WizardMaterialCategories category={category} onChange={setCategory}
+            <WizardMaterialCategories category={activeCategory} onChange={setCategory}
               selected={countedProducts.filter(product => validQuantity(counts[product.id] ?? "", product.quantity_decimals ?? 0, true))} />
             <div className="hca-toolbar">
               <strong>

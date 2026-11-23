@@ -129,8 +129,10 @@ test("documentos comuns, histórico com URL e estoque têm apresentação real e
   await noOverflow(page);
   await capture(page, "estoque-mobile", info.project.name);
   await page.getByRole("button", { name: "Consultar Fralda · Família", exact: true }).click();
-  await expect(page.getByRole("dialog")).toBeVisible();
-  await expect(page.getByText("Saldo confirmado · unidade", { exact: true })).toBeVisible();
+  const stock = page.getByRole("dialog", { name: "Fralda", exact: true })
+    .getByRole("region", { name: "Estoque atual", exact: true });
+  await expect(stock.locator('dl[aria-label="Família"]').getByRole("definition").first()).toHaveText("8 unidade");
+  await expect(stock.locator('dl[aria-label="Equipe"]').getByRole("definition").first()).toHaveText("2 unidade");
   await capture(page, "estoque-detalhe-mobile", info.project.name);
 });
 

@@ -216,6 +216,11 @@ test("Abas REQ COM ENT BAL preservam conteúdo, autorização, teclado e navega�
     });
     await overview.focus();
     await overview.press("ArrowRight");
+    if (type === "BAL") {
+      const progress = page.getByRole("tab", { name: "Andamentos", exact: true });
+      await expect(progress).toBeFocused();
+      await progress.press("ArrowRight");
+    }
     await expect(
       page.getByRole("tab", { name: "Materiais", exact: true }),
     ).toBeFocused();

@@ -66,7 +66,7 @@ test("stock rejects malformed balances and transit, preserves the last verified 
   const transit = page.getByRole("dialog", { name: "Materiais em trânsito", exact: true });
   const close = transit.getByRole("button", { name: "Fechar", exact: true });
   await opener.click();
-  await expect(transit.getByRole("link", { name: delivery.code, exact: true })).toBeVisible();
+  await expect(transit.getByRole("button", { name: delivery.code, exact: true })).toBeVisible();
   await expect(transit.getByText("4 unidade", { exact: true })).toHaveCount(2);
   mode = "emptyTransit";
   await close.click();
@@ -80,7 +80,7 @@ test("stock rejects malformed balances and transit, preserves the last verified 
   await expect(transit.getByText("Nenhuma entrega em trânsito", { exact: true })).toHaveCount(0);
   mode = "live";
   await transit.getByRole("button", { name: "Atualizar consulta", exact: true }).click();
-  await expect(transit.getByRole("link", { name: delivery.code, exact: true })).toBeVisible();
+  await expect(transit.getByRole("button", { name: delivery.code, exact: true })).toBeVisible();
   await close.click();
   await expect(opener).toBeFocused();
   await expect(row).toContainText("26");

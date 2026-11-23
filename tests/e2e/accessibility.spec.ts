@@ -12,7 +12,9 @@ import { fixtureFile, sql } from "../../scripts/test-environment.mjs";
 test.setTimeout(180_000);
 test("login, navegação, menus, filtros e quatro wizards são acessíveis e responsivos", async ({
   page,
-}) => {
+}, info) => {
+  // The retained local database takes longer to initialize each workspace.
+  if (!process.env.CI) info.setTimeout(300_000);
   const fixture = JSON.parse(readFileSync(fixtureFile, "utf8"));
   sql(
     `insert into public.care_recipient_memberships(care_recipient_id,user_id,role) values('${patientA}','${fixture.global.id}','admin'),('${patientB}','${fixture.global.id}','admin') on conflict do nothing;`,
@@ -51,7 +53,7 @@ test("login, navegação, menus, filtros e quatro wizards são acessíveis e res
     ["/configuracoes", "Permissões, comunicação e regras"],
     ["/perfil", "Meu perfil e segurança"],
     ["/notificacoes", "Central de notificações"],
-    ["/consumo", "Faltas e consumo extraordinário"],
+    ["/consumo", "Consumo e faltas"],
     ["/unidades", "Unidades e apresentações"],
   ]) {
     await page.goto(path + "?careRecipientId=" + patientA);
@@ -144,13 +146,23 @@ for (const role of [
       ["req.create", "/fichas/req"],
       ["com.create", "/fichas/com"],
       ["ent.create", "/fichas/ent"],
-      ["bal.read", "/balancos"],
     ])
       await expect(
         nav.locator(`a[href="${href}"]`),
       ).toHaveCount(patient.capabilities[cap] ? 1 : 0);
+    const shiftHub = nav.getByRole("link", { name: "Plantões e balanços", exact: true });
+    const canOpenShiftHub = ["schedule.read.own", "schedule.read.team", "bal.read"]
+      .some(capability => patient.capabilities[capability]);
+    await expect(shiftHub).toHaveCount(canOpenShiftHub ? 1 : 0);
     await audit(page, "menu " + role);
     await opened.close();
+    if (canOpenShiftHub) {
+      await page.goto("/escalas?careRecipientId=" + patientA);
+      const shiftNavigation = page.getByRole("navigation", { name: "Plantões e balanços", exact: true });
+      await expect(shiftNavigation).toBeVisible();
+      await expect(shiftNavigation.getByRole("link", { name: "Balanços", exact: true }))
+        .toHaveCount(patient.capabilities["bal.read"] ? 1 : 0);
+    }
     await page.goto("/estoque?careRecipientId=" + patientA);
     await expect(
       page.getByRole("heading", { name: "Saldos e previsões", exact: true }),

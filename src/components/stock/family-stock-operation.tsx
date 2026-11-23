@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useRef, useState, type RefObject } from "react";
+import { useEffect, useId, useRef, useState, type RefObject } from "react";
 import { DocumentOperationFailureDialog, operationRecoveryLimit } from "@/components/documents/document-operation-failure-dialog";
 import { RecordDrawer } from "@/components/forms/record-drawer";
 import { ActionButton, DefinitionGrid, FormField, SelectField, TextAreaField, TextInput } from "@/components/ui/controls";
@@ -62,6 +62,7 @@ export function FamilyStockOperation({
   const [error, setError] = useState("");
   const [dirty, setDirty] = useState(false);
   const inflightRef = useRef(false);
+  const reviewHeadingRef = useRef<HTMLHeadingElement>(null);
   const formId = useId();
   const correction = action.startsWith("correction_");
   const isInbound = action === "inbound" || action === "correction_in";
@@ -74,6 +75,9 @@ export function FamilyStockOperation({
   useOperationActivity(busy, {
     title: uncertain ? "Conferindo a movimentação" : review ? "Registrando movimentação" : "Consultando saldos",
   });
+  useEffect(() => {
+    if (!busy && review && !uncertain && !failure) reviewHeadingRef.current?.focus();
+  }, [busy, review, uncertain, failure]);
 
   function retain(packet: StockOperationInput | null) {
     setPending(packet);
@@ -188,12 +192,18 @@ export function FamilyStockOperation({
           ? "A consulta ainda não encontrou a confirmação. Você pode reenviar a mesma tentativa sem duplicar as movimentações."
           : "Confira o resultado da tentativa enviada antes de iniciar outra movimentação."}</p>
         <p>{labels[action]} · {lines.length} {lines.length === 1 ? "material" : "materiais"}</p>
-      </div> : reviewing && review ? <div className="hca-form-stack" aria-label="Revisão da movimentação familiar">
+      </div> : reviewing && review ? <section className="hca-form-stack" aria-label="Revisão da movimentação familiar">
+        <h3 ref={reviewHeadingRef} tabIndex={-1}>Confira o movimento e sua referência</h3>
         <p><strong>{labels[action]}</strong> · {reason}</p>
         {review.materials.map(material => {
           const line = lines.find(row => row.productId === material.productId)!;
           const delta = quantity(line.quantity).times(isInbound ? 1 : -1);
           const before = previous?.materials.find(row => row.productId === material.productId)?.quantity;
+          const original = correction ? movements.find(movement =>
+            movement.id === line.referenceId && movement.product_id === line.productId &&
+            movement.reference_type === "family_manual" &&
+            (isInbound ? movement.source_location === "FAMILY" : movement.destination_location === "FAMILY")
+          ) : undefined;
           return <article key={material.productId} className="ui-card">
             <h3>{material.name}</h3>
             <DefinitionGrid items={[
@@ -202,10 +212,18 @@ export function FamilyStockOperation({
               { label: isInbound ? "Entrada" : "Saída", value: formatQuantity(line.quantity, material.unit) },
               { label: "Saldo após a movimentação", value: material.quantity === null ? "Acesso restrito" : formatQuantity(quantity(material.quantity).plus(delta).toFixed(), material.unit) },
             ]} />
+            {correction && line.referenceId ? <details className="wrap-anywhere">
+              <summary>Movimento histórico compensado</summary>
+              <p>{line.referenceId}</p>
+              {original ? <>
+                <p>{formatBrazilDate(original.created_at)} · {formatQuantity(original.quantity, material.unit)}</p>
+                <p className="whitespace-pre-wrap">{original.justification}</p>
+              </> : null}
+            </details> : null}
           </article>;
         })}
         {!canConfirm ? <p role="status" className="ui-notice">Revise os materiais inativos e as quantidades acima do saldo disponível.</p> : null}
-      </div> : <form id={formId} className="hca-form-stack" onSubmit={event => { event.preventDefault(); void prepareReview(); }}>
+      </section> : <form id={formId} className="hca-form-stack" onSubmit={event => { event.preventDefault(); void prepareReview(); }}>
         <FormField label="Operação" required><SelectField value={action} onChange={event => {
           const next = stockOperationAction.parse(event.currentTarget.value);
           setAction(next); setDirty(true);

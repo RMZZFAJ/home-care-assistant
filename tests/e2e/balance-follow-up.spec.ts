@@ -33,14 +33,18 @@ for (const policy of ["required", "optional"] as const) {
     const initial = policy === "required" ? "Acompanhar as revisões do balanço" : "Consultar a contagem conciliada";
     await expect(page.getByRole("region", { name: "Próximo passo sugerido", exact: true }).getByText(initial, { exact: true })).toBeVisible();
     const before = balState(f.document.id);
-    const label = policy === "required" ? "Revisões" : "Contagens";
+    const label = "Revisões";
     const next = page.getByRole("region", { name: "Próximo passo sugerido", exact: true }).getByRole("button", { name: `Abrir ${label}`, exact: true });
     await next.focus();
     await next.press("Enter");
     await expect(page.getByRole("tab", { name: label, exact: true })).toBeFocused();
-    await expect(page.getByRole("heading", { name: policy === "required" ? /^Revisões da contagem/ : "Contagem física" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: /^Revisões da contagem/ })).toBeVisible();
     await page.reload();
     await expect(page.getByRole("tab", { name: label, exact: true })).toHaveAttribute("aria-selected", "true");
+    if (policy === "optional") {
+      await selectDocumentSection(page, "counts");
+      await expect(page.getByRole("heading", { name: "Contagem física", exact: true })).toBeVisible();
+    }
     expect(balState(f.document.id)).toBe(before);
 
     await receiveBalanceMaterials(f);
