@@ -112,6 +112,12 @@ test("COM aberta compara a quantidade corrigida de uma chegada antes de atualiza
   await expect(support.locator("pre")).toContainText("Tentativas nesta revisão: 0");
 
   blockReads = false;
+  const backgroundRead = page.waitForResponse(response => new URL(response.url()).pathname === `/api/documents/${awaiting.id}`
+    && response.request().method() === "GET" && response.ok());
+  await page.evaluate(() => window.dispatchEvent(new Event("hca:data-changed")));
+  expect(await (await backgroundRead).finished()).toBeNull();
+  await expect(page.locator(".hca-record-detail > span[role='status']")).toBeEmpty();
+  await expect(failure).toBeVisible();
   await failure.getByRole("button", { name: "Tentar novamente", exact: true }).click();
   const banner = page.locator(".hca-document-freshness");
   const opener = banner.getByRole("button", { name: "Ver o que mudou", exact: true });
@@ -159,6 +165,14 @@ test("COM aberta compara a quantidade corrigida de uma chegada antes de atualiza
   await refreshButton.click();
   await expect(failure).toBeVisible();
   await expect(retry).toHaveCount(0);
+
+  blockReads = false;
+  const recoveredAfterLimit = page.waitForResponse(response => new URL(response.url()).pathname === `/api/documents/${awaiting.id}`
+    && response.request().method() === "GET" && response.ok());
+  await page.evaluate(() => window.dispatchEvent(new Event("hca:data-changed")));
+  expect(await (await recoveredAfterLimit).finished()).toBeNull();
+  await expect(failure).toHaveCount(0);
+  await expect(refreshButton).toBeEnabled();
 
   expect(sql(`select count(*) from public.stock_movements where reference_type='purchase_receipt'
     and reference_id in (${sqlLiteral(receipt.id)}, ${sqlLiteral(other.receipt.id)});`)).toBe("0");

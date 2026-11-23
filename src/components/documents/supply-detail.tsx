@@ -352,6 +352,8 @@ export function SupplyDocumentContent({
     )
       .then(async (result) => {
         if (controller.signal.aborted) return;
+        // Keep an available explicit retry and its comparison baseline after a background refresh.
+        if (arrivalRead?.failed && arrivalRead.retries < arrivalRefreshRetryLimit) return;
         setReadDenied(false);
         setReadFailed(false);
         setArrivalReadFailure(null);
@@ -361,7 +363,7 @@ export function SupplyDocumentContent({
             setOpenRecoveredComparison(true);
           }
         }
-        const preserveCopy = editingRef.current || Boolean(arrivalRead && (arrivalRead.retries || arrivalRead.failed));
+        const preserveCopy = editingRef.current || Boolean(arrivalRead?.retries || arrivalRead?.failed);
         acceptRead(result.data, id + ":" + attempt, preserveCopy);
         setError("");
         if (result.data.type !== "COM" && result.data.care_recipient_id === patientId) {

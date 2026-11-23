@@ -3519,6 +3519,45 @@ WhatsApp ainda requer homologação do provedor.
   erro fechar durante o clique em **Tentar novamente**.
   [Execução e artefatos](https://github.com/RMZZFAJ/home-care-assistant/actions/runs/45219839814).
 
+### Preview publicado em 4fbdeb23
+
+- Os commits de histórico de balanços e acervo foram publicados no
+  [PR #8 em Draft](https://github.com/RMZZFAJ/home-care-assistant/pull/8).
+  O [Preview desse SHA](https://home-care-assistant-kpoczkoqx-rmzzfajs-projects.vercel.app)
+  ficou pronto. `/login`, `/verificar` e `/api/runtime` responderam HTTP 200.
+  O runtime confirmou protocolo 1 e esquema 2. Uma consulta por código
+  inexistente em `/api/verification` confirmou a resposta pública de ausência.
+- Supabase, assinatura PDF e Web Push têm variáveis no escopo Preview.
+  A política de confiança PDF tem uma configuração própria para a branch.
+  O verificador carregou essa política e classificou um PDF sintético como
+  não assinado. Emissão de PDF e entrega de notificações externas ficaram
+  fora da conferência do Preview.
+- A análise do SonarCloud aprovou esse SHA. O CodeRabbit pulou a revisão
+  automática por contar 239 arquivos para o limite de 100 da instalação.
+  [SonarCloud](https://github.com/RMZZFAJ/home-care-assistant/pull/8#issuecomment-7109843855)
+  e [CodeRabbit](https://github.com/RMZZFAJ/home-care-assistant/pull/8#issuecomment-7084927300).
+
+### Leitura privada de plantão e atualização da chegada de COM
+
+- A reprodução local da falha de plantões mostrou duas ou três cópias do
+  mesmo painel após recarregar com a escrita revogada. A agenda e a
+  programação do balanço eram irmãs com a mesma chave React. Cada seção
+  agora tem uma chave própria por usuário e paciente. O teste confere que
+  há um único painel antes e depois de retomar a revisão autenticada em
+  modo de consulta, com a escrita revogada no banco.
+- Uma leitura de COM disparada em segundo plano mantém o erro da atualização
+  solicitada e a versão anterior enquanto **Tentar novamente** está disponível.
+  O teste força uma resposta bem-sucedida antes do clique e confere os dois
+  valores, o retorno do foco e a ausência de baixas extras. Após esgotar as
+  tentativas, uma leitura bem-sucedida volta a liberar a consulta normal.
+- Os dois testes dirigidos passaram em Chromium, Android e iOS emulados.
+  A retomada da edição de um tipo de plantão por outra sessão também passou
+  nos três navegadores com o seletor compartilhado. O build de produção,
+  TypeScript e as verificações dos arquivos tocados passaram. O preparo da
+  COM sofreu timeout no banco local antes de abrir o navegador. A atualização
+  das estatísticas de planejamento das tabelas locais permitiu repetir o
+  teste com sucesso preservando os dados. Não há migration neste ajuste.
+
 ### Histórico de balanços
 
 - Na aba **Histórico**, os cartões de E08-01 mostram código, data de

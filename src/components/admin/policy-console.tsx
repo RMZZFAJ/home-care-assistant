@@ -87,9 +87,9 @@ export function PolicyConsole() {
               })}>Voltar à agenda</Link>
             {canConfigureResidenceHours(context)
               ? <ScheduleResidenceSettings key={context.patient.id} patientId={context.patient.id} /> : null}
-            <PatientSchedule key={context.userId + ":" + context.patient.id} context={context} settings />
+            <PatientSchedule key={`schedule:${context.userId}:${context.patient.id}`} context={context} settings />
             {canManageBalanceRegime(context) && can(context, "bal.read") ? (
-              <BalanceRegimeSettings key={context.userId + ":" + context.patient.id} context={context} patientId={context.patient.id} />
+              <BalanceRegimeSettings key={`balance-regime:${context.userId}:${context.patient.id}`} context={context} patientId={context.patient.id} />
             ) : null}
           </div>
         ) : context.patient &&

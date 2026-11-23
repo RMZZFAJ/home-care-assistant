@@ -13,9 +13,10 @@ export async function openScheduleTypeSettings(page: Page) {
 export async function openSchedulePrivateArea(page: Page) {
   await page.bringToFront();
   const settings = new URL(page.url()).searchParams.get("area") === "schedules";
-  const summary = page.getByText(settings ? "Meus preenchimentos de tipos de plantão" : "Meus preenchimentos privados da agenda", { exact: true });
+  const label = settings ? "Meus preenchimentos de tipos de plantão" : "Meus preenchimentos privados da agenda";
+  const summary = page.locator("summary").and(page.getByText(label, { exact: true })).filter({ visible: true });
   const details = summary.locator("..");
-  await expect(summary).toBeVisible();
+  await expect(summary).toHaveCount(1);
   if (!await details.evaluate(element => element.hasAttribute("open"))) {
     await summary.scrollIntoViewIfNeeded();
     await summary.focus(); await expect(summary).toBeFocused();

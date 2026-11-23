@@ -14,6 +14,7 @@ import { selectContext } from "./auth-context";
 import { audit } from "./accessibility-audit";
 import { openSchedulePrivateArea, openScheduleTypeSettings } from "./schedule-private-area";
 import { rpc } from "../integration/v4-fixtures.mjs";
+import { shiftWorker } from "../integration/shift-fixtures.mjs";
 test.setTimeout(150_000);
 async function peerContext(browser: Browser) {
   const use = test.info().project.use;
@@ -28,9 +29,9 @@ async function peerContext(browser: Browser) {
     serviceWorkers: "block",
   });
 }
-async function login(page: Page, patient: string) {
+async function login(page: Page, patient: string, email = fixtures.adminA.email) {
   await page.goto("/login");
-  await page.getByLabel("E-mail", { exact: true }).fill(fixtures.adminA.email);
+  await page.getByLabel("E-mail", { exact: true }).fill(email);
   await page.getByLabel("Senha", { exact: true }).fill(fixturePassword);
   await page.getByRole("button", { name: "Entrar", exact: true }).click();
   await expect(
@@ -103,16 +104,17 @@ test("tipo privado retoma entre sessões,compara CAS e continua consultável sem
   browser,
 }, info) => {
   const f = await configuredFixture(),
+    owner = await shiftWorker(f.patient, "admin"),
     before = scheduleNativeFacts(f),
     documents = scheduleDocumentFacts(f);
-  await login(page, f.patient);
+  await login(page, f.patient, owner.email);
   await open(page);
   await fillType(page, "Tipo inicial privado");
   await privateSaved(page, 1);
   const context = await peerContext(browser),
     peer = await context.newPage();
   try {
-    await login(peer, f.patient);
+    await login(peer, f.patient, owner.email);
     await open(peer);
     await expect(panel(peer)).toContainText("Tipo inicial privado");
     await expect(dialog(peer).locator("input,select,textarea")).toHaveCount(0);
@@ -153,12 +155,16 @@ test("tipo privado retoma entre sessões,compara CAS e continua consultável sem
     });
     expect(scheduleNativeFacts(f)).toBe(before);
     expect(scheduleDocumentFacts(f)).toBe(documents);
+    await peer.close();
+    await page.bringToFront();
     sql(
-      `insert into public.capability_overrides(care_recipient_id,subject_user,capability,enabled) values(${q(f.patient)},${q(fixtures.adminA.id)},'schedule.types.manage',false)`,
+      `insert into public.capability_overrides(care_recipient_id,subject_user,capability,enabled) values(${q(f.patient)},${q(owner.id)},'schedule.types.manage',false)`,
     );
     await page.reload();
     await openScheduleTypeSettings(page);
-    await expect(page.getByRole("region", { name: "Tipos de plantão", exact: true })).toHaveCount(1);
+    // The drawer makes its background inert. Count the underlying headings after opening it too.
+    const typesHeading = page.locator("h2[id='schedule-types-heading']");
+    await expect(typesHeading).toHaveCount(1);
     await expect(button(page, "Novo tipo de plantão")).toHaveCount(0);
     await openSchedulePrivateArea(page);
     const resume = button(page, "Retomar meu tipo de plantão");
@@ -174,6 +180,7 @@ test("tipo privado retoma entre sessões,compara CAS e continua consultável sem
     expect(response.status()).toBe(200);
     expect((await response.json()).data.revision).toBe(3);
     await expect(button(page, "Atualizar preenchimento privado")).toBeEnabled();
+    await expect(typesHeading).toHaveCount(1);
     await expect(panel(page)).toContainText("Minha edição antes do conflito");
     await expect(button(page, "Continuar rascunho")).toBeDisabled();
     await expect(dialog(page).locator("input,select,textarea")).toHaveCount(0);
