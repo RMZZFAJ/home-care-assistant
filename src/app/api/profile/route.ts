@@ -95,6 +95,48 @@ async function confirmSession(auth: AuthContext, password: string) {
   }
 }
 
+async function requireVerifiedSession(auth: AuthContext) {
+  const { data: session, error: sessionError } = await auth.client.auth.getSession();
+  if (sessionError || !session.session) throw new ApiError("SESSION_EXPIRED", "Sua sessão expirou. Entre novamente.");
+  const { data, error } = await auth.client.auth.mfa.getAuthenticatorAssuranceLevel(session.session.access_token);
+  if (error || !data) throw new ApiError("AUTH_UNAVAILABLE", "Não foi possível consultar a proteção da sessão.");
+  if (data.nextLevel === "aal2" && data.currentLevel !== "aal2")
+    throw new ApiError("MFA_REQUIRED", "Verifique esta sessão com o aplicativo autenticador.");
+}
+
+async function updatePassword(auth: AuthContext, current: string, password: string) {
+  const user = await currentUser(auth);
+  if (!user.email || !user.identities?.some(identity => identity.provider === "email"))
+    throw new ApiError("FORBIDDEN", "Use o método de acesso da sua conta para gerenciar a senha.");
+  await requireVerifiedSession(auth);
+  // Confirm knowledge of the password without installing the AAL1 session.
+  const verifier = temporaryAuthClient();
+  const { data, error } = await verifier.auth.signInWithPassword({ email: user.email, password: current });
+  if (error?.status === 429) throw new ApiError("RATE_LIMITED", "Aguarde antes de confirmar a senha novamente.");
+  if (error && (!error.status || error.status >= 500))
+    throw new ApiError("AUTH_UNAVAILABLE", "Não foi possível conferir a senha atual. A alteração ainda não foi solicitada.");
+  if (!data.session) throw new ApiError("FORBIDDEN", "Senha atual inválida.");
+  try {
+    if (data.user?.id !== auth.userId) throw new ApiError("FORBIDDEN", "Não foi possível confirmar esta conta.");
+    await requireVerifiedSession(auth);
+    if ((await rpc(auth.client, "my_session_valid")) !== true)
+      throw new ApiError("SESSION_EXPIRED", "Sua sessão foi encerrada. Entre novamente.");
+    const result = await auth.client.auth.updateUser({ password });
+    if (!result.error) return;
+    if (result.error.code === "insufficient_aal")
+      throw new ApiError("MFA_REQUIRED", "Verifique esta sessão com o aplicativo autenticador.");
+    if (result.error.code === "reauthentication_needed")
+      throw new ApiError("RECENT_SESSION_REQUIRED", "Entre novamente para atualizar sua senha.");
+    if (!result.error.status || result.error.status >= 500)
+      throw new ApiError("PERSISTENCE_UNCONFIRMED", "Não foi possível confirmar a alteração da senha.");
+    if (result.error.code === "same_password")
+      throw new ApiError("VALIDATION_ERROR", "Escolha uma senha diferente da atual.");
+    throw new ApiError("VALIDATION_ERROR", "Não foi possível alterar a senha. Confira os critérios da conta.");
+  } finally {
+    await verifier.auth.signOut({ scope: "local" });
+  }
+}
+
 export async function GET(request: Request) {
   return api("profile.read", async () => {
     const auth = await authenticate();
@@ -224,33 +266,7 @@ export async function POST(request: Request) {
         p_preferences: input.preferences ?? null,
       });
     else if (input.action === "password") {
-      const {
-        data: { user },
-      } = await auth.client.auth.getUser();
-      if (!user?.email)
-        throw new ApiError(
-          "FORBIDDEN",
-          "Confirme seu acesso antes de alterar a senha.",
-          403,
-        );
-      const { error: reauth } = await auth.client.auth.signInWithPassword({
-        email: user.email,
-        password: input.currentPassword,
-      });
-      if (reauth)
-        throw new ApiError(
-          "FORBIDDEN",
-          "Senha atual inválida. Entre novamente se necessário.",
-          403,
-        );
-      const { error } = await auth.client.auth.updateUser({
-        password: input.password,
-      });
-      if (error)
-        throw new ApiError(
-          "VALIDATION_ERROR",
-          "Não foi possível alterar a senha. Confira os critérios da conta.",
-        );
+      await updatePassword(auth, input.currentPassword, input.password);
     } else if (input.action === "confirmSession") {
       await confirmSession(auth, input.currentPassword);
     } else if (input.action === "email" || input.action === "phone" || input.action === "verifyPhone" ||
@@ -334,12 +350,12 @@ export async function POST(request: Request) {
         try { await rpc(auth.client, "register_verified_phone"); }
         catch { throw new ApiError("PERSISTENCE_UNCONFIRMED", "O número foi confirmado no Auth. Confira se o contato já consta na sua conta."); }
       }
-    } else {
+    } else if (input.action === "signoutOthers") {
+      await requireVerifiedSession(auth);
       if (!(await rpc(auth.client, "recent_session")))
         throw new ApiError(
-          "FORBIDDEN",
+          "RECENT_SESSION_REQUIRED",
           "Entre novamente para encerrar as outras sessões.",
-          403,
         );
       const { error } = await auth.client.auth.signOut({ scope: "others" });
       if (error)

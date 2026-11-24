@@ -22,6 +22,13 @@ export function profileIdentityEditor(page: Page) {
   return page.getByRole("dialog", { name: "Editar identificação", exact: true });
 }
 
+export async function openProfilePassword(page: Page) {
+  await page.getByRole("button", { name: /^Senha Atualize sua senha de acesso/ }).click();
+  const editor = page.getByRole("dialog", { name: "Alterar senha", exact: true });
+  await expect(editor.getByLabel("Nova senha", { exact: true })).toBeVisible();
+  return editor;
+}
+
 export async function openProfileIdentity(page: Page) {
   await page.getByRole("region", { name: "Identificação pessoal", exact: true }).getByRole("button", { name: "Editar", exact: true }).click();
   const editor = profileIdentityEditor(page);

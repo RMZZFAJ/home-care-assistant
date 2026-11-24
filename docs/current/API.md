@@ -464,6 +464,10 @@ documentais também exigem expectedVersion para detectar concorrência.
   conta elegível e revalida o vínculo da sessão com o banco. POST
   `confirmPhone` confere um número já confirmado pelo Auth e atualiza sua
   associação na conta sem solicitar SMS nem repetir o código.
+  POST `password` confere a senha atual e aplica a alteração na sessão
+  original. `signoutOthers` exige sessão recente e solicita ao Auth o
+  encerramento das demais sessões. Quando há MFA configurado, os dois
+  comandos exigem sessão verificada.
 
 - **Rota:** /api/profile/notices
 

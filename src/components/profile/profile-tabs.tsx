@@ -15,13 +15,17 @@ const sections: { id: string; label: string; icon: IconName }[] = [
   { id: "help", label: "Ajuda", icon: "help" },
 ];
 
-/** Keep every form and official recovery mounted while navigating the account. */
-export function ProfileTabs({ children }: { children: Record<string, ReactNode | ((active: boolean) => ReactNode)> }) {
+export function useProfileSection() {
   const params = useSearchParams();
   const requested = params.get("profileTab");
-  const value = requested && sections.some(section => section.id === requested)
+  return requested && sections.some(section => section.id === requested)
     ? requested
     : params.get("mfa") === "required" ? "security" : "identity";
+}
+
+/** Keep every form and official recovery mounted while navigating the account. */
+export function ProfileTabs({ children }: { children: Record<string, ReactNode | ((active: boolean) => ReactNode)> }) {
+  const value = useProfileSection();
   return (
     <SettingsSectionCards>
       <Tabs.Root value={value} onValueChange={next => {

@@ -1,0 +1,61 @@
+.hca-security { display: grid; gap: .85rem; }
+.hca-security-lead, .hca-security-hint, .hca-security-session, .hca-security-factor-step {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  gap: .7rem;
+}
+.hca-security-lead, .hca-security-hint {
+  border: 1px solid var(--hca-line);
+  border-radius: .95rem;
+  padding: .85rem;
+  background: #f7faf8;
+}
+.hca-security > .hca-security-lead {
+  border: 0;
+  background: transparent;
+  padding: 1rem 0 1.15rem;
+}
+.hca-security-glyph, .hca-security-factor-step > span {
+  display: grid;
+  flex: none;
+  width: 2rem;
+  height: 2rem;
+  place-items: center;
+  border-radius: .65rem;
+  background: var(--hca-tint);
+  color: var(--hca-teal);
+}
+.hca-security-lead h2, .hca-security-factor-step h3 { font-size: .94rem; font-weight: 700; }
+.hca-security-lead p, .hca-security-hint, .hca-security-caption, .hca-security-session small, .hca-security-factor-step p {
+  color: var(--hca-muted);
+  font-size: .78rem;
+  line-height: 1.55;
+}
+.hca-security-lead :is(p, .hca-status) { margin-top: .3rem; }
+.hca-security-hint svg { color: var(--hca-teal); }
+.hca-security .hca-account-section > .hca-account-links { padding-block: .35rem; }
+.hca-security .hca-control + .hca-control.hca-account-setting { border-top: 1px solid var(--hca-line); }
+.hca-security .hca-security-setting .hca-status { display: inline-flex; margin-top: .35rem; }
+.hca-security #contatos-de-acesso > .hca-account-setting:not(.hca-security-setting) > svg:first-child {
+  width: 2rem;
+  height: 2rem;
+  padding: .45rem;
+  border-radius: .65rem;
+  background: var(--hca-tint);
+  color: var(--hca-teal);
+}
+.hca-security-dialog > .hca-modal-content, .hca-security-sheet > .hca-modal-content, .hca-security-form {
+  display: grid;
+  align-content: start;
+  gap: .85rem;
+}
+.hca-security-sheet h3 { font-size: .86rem; font-weight: 700; }
+.hca-security-session { padding-block: .65rem; align-items: center; }
+.hca-security-session + .hca-security-session { border-top: 1px solid var(--hca-line); }
+.hca-security-session strong, .hca-security-session small { display: block; overflow-wrap: anywhere; }
+.hca-security-session details { margin-top: .3rem; }
+.hca-security-session summary { font-size: .73rem; color: var(--hca-muted); }
+.hca-security-session .hca-status { margin-top: .35rem; display: inline-flex; }
+.hca-security-qr { display: grid; justify-items: center; gap: .5rem; padding: .8rem; background: #f7faf8; border: 1px solid var(--hca-line); border-radius: .85rem; }
+.hca-security-qr img { width: min(10rem, 100%); height: auto; }

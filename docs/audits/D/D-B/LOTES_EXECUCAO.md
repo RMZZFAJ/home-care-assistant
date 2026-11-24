@@ -4041,6 +4041,34 @@ Cadastro, aceite e recuperação de senha também passaram nos dois projetos.
 SMS e OAuth habilitados precisam de teste com os provedores configurados.
 Esta etapa não tem migration.
 
+### E11-03 — Senha, autenticador e sessões da conta
+
+**Segurança** organiza Acesso, Proteção adicional e Sessões. A senha é
+editada em diálogo com a senha atual, o campo compartilhado de L1 e a
+repetição da nova senha. A confirmação da senha atual não troca a sessão
+da pessoa. Com MFA ativo, o servidor exige AAL2 e aplica a mudança na
+sessão original.
+
+O painel de autenticação diferencia cadastro preparado, código rejeitado,
+fator ativo e sessão que ainda precisa de confirmação. O QR pertence ao
+cadastro em curso. Um cadastro interrompido pode ser descartado. A remoção
+exige código atual e confirmação explícita do método selecionado.
+
+O painel de sessões identifica a sessão atual e separa as demais. A
+confirmação usa o encerramento real do Auth. Quando a resposta é perdida,
+até duas consultas conferem as sessões daquela solicitação. As credenciais
+já emitidas preservam o prazo do serviço. Esta etapa não tem migration.
+
+As capturas em 360 e 412 px foram comparadas com a v2. A interface conserva
+a identificação técnica do navegador em um detalhe expansível do painel.
+Oito casos em Android e iOS emulados passaram sem retentativas na rodada
+final, cobrindo também a navegação do Perfil e a recuperação de leitura.
+Com Auth real, a troca de senha manteve o ID da sessão, seu AAL2 e o vínculo.
+Uma sessão AAL1 teve a troca de senha e a revogação de outros acessos
+recusadas. Uma resposta perdida ao verificar o código deixou o fator
+intacto até nova confirmação. A recuperação de encerramento conferiu o
+resultado sem reenviar. O código inválido conservou o fator não verificado.
+
 ### E11-04 — Autorização dos avisos ao consultar e abrir
 
 A central, o sino e a visão geral consultam somente avisos do destinatário
@@ -4612,7 +4640,10 @@ e consumo. O aceite integrado continua sujeito à CI do candidato e à
 validação no Preview. As migrations locais aguardam a transição do banco
 compartilhado com a produção.
 Os cenários restantes de E10 ainda precisam de conferência de paridade
-com a v2. E11-03 ainda precisa alinhar senha, MFA e sessões ao laboratório.
+com a v2. O acesso a comprovantes de catálogo ainda aparece nas áreas
+comuns de Administração e Unidades. O fluxo também usa a preparação
+persistente em formulários do catálogo. A retirada dessas superfícies
+deve conservar a consulta dos registros oficiais e das tentativas.
 
 ### Pendências da CI publicada em `a08742dc`
 

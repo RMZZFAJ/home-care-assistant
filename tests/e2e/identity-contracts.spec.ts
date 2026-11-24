@@ -1,4 +1,4 @@
-import { selectProfileSection } from "./profile-sections";
+import { openProfilePassword, selectProfileSection } from "./profile-sections";
 import { expect, test, type Page } from "@playwright/test";
 import { createHash, randomBytes, randomUUID } from "node:crypto";
 import { mkdirSync, readFileSync } from "node:fs";
@@ -144,7 +144,8 @@ test("perfil recebe invalidação externa e senha nova conserva limites em carac
     await rpc(f.admin, "update_my_profile", { p_name: name, p_registration: "", p_state: null, p_category: "", p_preferences: {} });
     await expect(page.getByLabel("Menu do usuário", { exact: true })).toContainText(name);
     await selectProfileSection(page, "security");
-    const password = page.getByLabel("Nova senha", { exact: true });
+    const editor = await openProfilePassword(page);
+    const password = editor.getByLabel("Nova senha", { exact: true });
     await expect(password).toHaveAttribute("minlength", "6"); await expect(password).toHaveAttribute("maxlength", "72");
     await expect(password).toHaveAttribute("autocomplete", "new-password");
     await password.fill("Aa1!x"); expect(await password.evaluate((input: HTMLInputElement) => input.checkValidity())).toBe(false);

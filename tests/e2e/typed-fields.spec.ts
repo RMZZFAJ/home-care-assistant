@@ -1,6 +1,7 @@
-import { selectProfileSection } from "./profile-sections";
+import { openProfilePassword, selectProfileSection } from "./profile-sections";
 import { expect, test, type Page } from "@playwright/test";
-import { createHmac, randomUUID } from "node:crypto";
+import { randomUUID } from "node:crypto";
+import { totp } from "./auth-totp";
 import { setup, actor, fixtures } from "../integration/v4-fixtures.mjs";
 import { sql, sqlLiteral as q } from "../../scripts/test-environment.mjs";
 import { fixturePassword, patientA } from "../../scripts/test-constants.mjs";
@@ -87,14 +88,6 @@ test("CFinal019 catálogo e unidade preservam inteiros, código textual e escopo
   expect(sql(`select coalesce(jsonb_agg(to_jsonb(m) order by id),'[]') from public.stock_movements m where care_recipient_id=${q(f.patient)};`)).toBe(ledger);
 });
 
-function totp(secret: string) {
-  const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
-  const bits = [...secret.replaceAll("=", "")].map(character => alphabet.indexOf(character).toString(2).padStart(5, "0")).join("");
-  const key = Buffer.from((bits.match(/.{8}/g) ?? []).map(part => parseInt(part, 2))), counter = Buffer.alloc(8);
-  counter.writeBigUInt64BE(BigInt(Math.floor(Date.now() / 30_000)));
-  const mac = createHmac("sha1", key).update(counter).digest(), offset = mac[mac.length - 1] & 15;
-  return String((mac.readUInt32BE(offset) & 0x7fffffff) % 1_000_000).padStart(6, "0");
-}
 test("CFinal019 login, nova senha e OTP usam contratos distintos sem persistir desafio no navegador", async ({ page }) => {
   const client = await actor("family", patientA), enrolled = await client.auth.mfa.enroll({ factorType: "totp", friendlyName: "Campo fictício " + randomUUID().slice(0, 8) });
   expect(enrolled.error).toBeNull(); const factor = enrolled.data!.id;
@@ -102,11 +95,17 @@ test("CFinal019 login, nova senha e OTP usam contratos distintos sem persistir d
     expect((await client.auth.mfa.challengeAndVerify({ factorId: factor, code: totp(enrolled.data!.totp.secret) })).error).toBeNull();
     await login(page, "family", undefined, true); await page.goto("/perfil");
     await selectProfileSection(page, "security");
-    const current = page.getByLabel("Senha atual", { exact: true }), next = page.getByLabel("Nova senha", { exact: true });
+    const password = await openProfilePassword(page);
+    const current = password.getByLabel(/Senha atual/), next = password.getByLabel("Nova senha", { exact: true });
     await expect(current).toHaveAttribute("autocomplete", "current-password"); expect(await current.getAttribute("minlength")).toBeNull();
     await expect(next).toHaveAttribute("autocomplete", "new-password"); await expect(next).toHaveAttribute("minlength", "6");
-    await selectProfileSection(page, "security");
-    const code = page.getByLabel("Código do autenticador", { exact: true });
+    await password.getByRole("button", { name: "Cancelar", exact: true }).click();
+    async function openVerification() {
+      await page.getByRole("button", { name: /^Aplicativo autenticador/ }).click();
+      await page.getByRole("dialog", { name: "Aplicativo autenticador", exact: true }).getByRole("button", { name: "Verificar esta sessão", exact: true }).click();
+    }
+    await openVerification();
+    const code = page.getByRole("dialog", { name: "Verificação adicional", exact: true }).getByLabel(/Código de 6 dígitos/);
     await expect(code).toBeVisible(); await expect(code).toHaveAttribute("inputmode", "numeric"); await expect(code).toHaveAttribute("autocomplete", "one-time-code");
     await expect(page.getByAltText("QR privado para cadastrar seu autenticador", { exact: true })).toHaveCount(0);
     await code.fill("000012"); const valid = await code.evaluate((element: HTMLInputElement) => ({ length: element.value.length === 6, zeros: element.value.startsWith("0000"), valid: element.checkValidity() }));
@@ -116,6 +115,7 @@ test("CFinal019 login, nova senha e OTP usam contratos distintos sem persistir d
     expect(stored).toEqual([]);
     await code.fill("000012"); await page.reload();
     await selectProfileSection(page, "security");
-    await expect(page.getByLabel("Código do autenticador", { exact: true })).toHaveValue("");
+    await openVerification();
+    await expect(code).toHaveValue("");
   } finally { expect((await client.auth.mfa.unenroll({ factorId: factor })).error).toBeNull(); }
 });

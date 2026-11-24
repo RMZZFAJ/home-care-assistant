@@ -275,9 +275,9 @@ test("15 ID02 NOT02 NOT04 profile tabs follow the model and retain unsaved field
   await page.setViewportSize({ width: 360, height: 900 });
   await info.attach("perfil-edicao-360", { body: await page.screenshot(), contentType: "image/png" });
   await page.goBack();
-  await expect(page.getByRole("region", { name: "Sessões autenticadas", exact: true })).toBeVisible();
-  await expect(page.getByLabel("Senha atual", { exact: true })).toBeVisible();
-  await expect(page.getByRole("region", { name: "Contatos e métodos de login", exact: true })).toBeVisible();
+  await expect(page.getByRole("region", { name: "Sessões", exact: true })).toBeVisible();
+  await expect(page.getByRole("button", { name: /^Senha Atualize sua senha de acesso/ })).toBeVisible();
+  await expect(page.getByRole("region", { name: "Acesso", exact: true }).getByRole("button", { name: /^Contatos de acesso/ })).toBeVisible();
   await expect(name).not.toBeVisible();
   await page.goForward(); await expect(name).toHaveValue(marker); await expect(name).toBeVisible();
   await page.goBack(); await expect(page.getByRole("tab", { name: "Segurança", exact: true })).toHaveAttribute("aria-selected", "true");

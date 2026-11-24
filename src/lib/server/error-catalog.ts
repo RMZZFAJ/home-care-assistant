@@ -107,6 +107,12 @@ export const errorCatalog = {
     retryable: false,
     recommendedAction: "Confirme novamente que é você.",
   },
+  MFA_REQUIRED: {
+    category: "authentication",
+    status: 403,
+    retryable: false,
+    recommendedAction: "Verifique esta sessão com o aplicativo autenticador.",
+  },
   FORBIDDEN: {
     category: "authorization",
     status: 403,

@@ -174,15 +174,20 @@ habilitação do provedor.
 
 A política de novas senhas respeita o limite do bcrypt configurado no Auth,
 inclusive tamanho em bytes; o aplicativo não calcula hashes de credenciais.
+A confirmação da senha atual usa uma sessão provisória descartada no
+servidor. A alteração usa a sessão original e conserva o nível de
+autenticação já verificado. Quando existe fator confirmado, alterar senha
+e solicitar o encerramento das outras sessões exige AAL2.
 A referência é o
 [código oficial do Auth](https://github.com/supabase/auth/blob/master/internal/api/password.go).
 OAuth, confirmação de e-mail e SMS reais exigem configuração e teste próprios.
 
 TOTP usa exclusivamente os contratos oficiais Supabase Auth. Após cadastrar e
 confirmar um fator, operações administrativas exigem AAL2. Token AAL1, fator
-apenas iniciado ou sessão revogada não satisfazem a exigência. O QR privado
-não
-entra em logs, documentação ou artefatos versionados.
+apenas iniciado ou sessão revogada não satisfazem a exigência. A remoção do
+autenticador usa confirmação de código e confirmação explícita do método.
+O QR privado fica no cadastro em curso, fora de logs, documentação ou
+artefatos versionados.
 
 ## WhatsApp e Flows
 

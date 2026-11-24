@@ -45,9 +45,10 @@ test("D3 perfil termina carregamento em falha recupera a leitura e preserva edi�
     await expect(panel.getByRole("alert")).toContainText("Falha controlada na leitura do perfil");
     await expect(panel.getByText("Carregando perfil…", { exact: true })).toHaveCount(0);
     await expect(panel.getByText("Atualizando consulta do perfil…", { exact: true })).toHaveCount(0);
-    mode = "invalid"; await panel.getByRole("button", { name: "Consultar perfil novamente", exact: true }).click();
+    const security = panel.getByRole("region", { name: "Informações de segurança", exact: true });
+    mode = "invalid"; await security.getByRole("button", { name: "Consultar novamente", exact: true }).click();
     await expect(panel.getByRole("alert")).toContainText("A resposta da consulta do perfil não pôde ser lida");
-    mode = "emptyOptional"; await panel.getByRole("button", { name: "Consultar perfil novamente", exact: true }).click();
+    mode = "emptyOptional"; await security.getByRole("button", { name: "Consultar novamente", exact: true }).click();
     await expect(panel.getByRole("alert")).toHaveCount(0);
     await page.goForward();
     await expect(name).toHaveValue("Edição pessoal ainda não salva");
