@@ -55,7 +55,7 @@ export function useReviewedCatalogueOperation(userId: string, context: Pick<Cata
     } catch { /* Retain the reference in memory while this surface is open. */ }
   }
 
-  async function run(command: ReviewedCatalogueCommand, lookups: number) {
+  async function run(command: ReviewedCatalogueCommand, lookups: number, onRejected?: (error: ApiError) => void) {
     const signal = controllerRef.current?.signal;
     if (!signal || signal.aborted || !ready || runningRef.current || result) return;
     const { intent, ...pointer } = command;
@@ -72,7 +72,10 @@ export function useReviewedCatalogueOperation(userId: string, context: Pick<Cata
       if (signal.aborted) return;
       const rejected = intent !== null && cause instanceof ApiError && cause.status >= 400 && cause.status < 500
         && cause.status !== 408 && !["PERSISTENCE_UNCONFIRMED", "RECONCILIATION_REQUIRED", "IDEMPOTENCY_CONFLICT"].includes(cause.code ?? "");
-      if (rejected) keep(null);
+      if (rejected) {
+        keep(null);
+        onRejected?.(cause);
+      }
       setFailure({ key: pointer.key, cause, uncertain: !rejected });
     } finally {
       runningRef.current = false;
@@ -82,9 +85,9 @@ export function useReviewedCatalogueOperation(userId: string, context: Pick<Cata
 
   return {
     busy, pending, failure, result, blocked: !ready || busy || Boolean(pending || result),
-    submit: (scope: CatalogueScope, intent: NonNullable<ReviewedCatalogueCommand["intent"]>) => {
+    submit: (scope: CatalogueScope, intent: NonNullable<ReviewedCatalogueCommand["intent"]>, onRejected?: (error: ApiError) => void) => {
       if (pending || scope.patientId !== patientId || scope.mode !== mode || !purposes.includes(scope.purpose)) return;
-      return run({ ...scope, key: crypto.randomUUID(), intent }, 0);
+      return run({ ...scope, key: crypto.randomUUID(), intent }, 0, onRejected);
     },
     recover: () => {
       if (pending && pending.lookups < operationRecoveryLimit) return run({ ...pending.pointer, intent: null }, pending.lookups + 1);
@@ -94,31 +97,35 @@ export function useReviewedCatalogueOperation(userId: string, context: Pick<Cata
   };
 }
 
-export function ReviewedCatalogueFeedback({ operation, onFinish, onReview }: {
+export function ReviewedCatalogueFeedback({ operation, onFinish, onReview, identity = false, showPending = true }: {
   operation: ReturnType<typeof useReviewedCatalogueOperation>;
   onFinish: (receipt: ReviewedCatalogueReceipt) => void;
   onReview?: () => void;
+  identity?: boolean;
+  showPending?: boolean;
 }) {
   const { pending, failure, result, busy } = operation;
   const canCompare = failure?.cause instanceof ApiError && failure.cause.status === 409 && !failure.uncertain;
   const action = failure?.uncertain && pending && pending.lookups < operationRecoveryLimit
     ? { label: "Conferir resultado", onClick: () => void operation.recover() }
-    : canCompare && onReview ? { label: "Conferir cadastro atual", onClick: onReview } : undefined;
+    : canCompare && onReview ? { label: identity ? "Conferir atualização" : "Conferir cadastro atual", onClick: onReview } : undefined;
   const closed = result?.state === "closed";
   const proposed = result?.outcome && "proposalId" in result.outcome;
   const title = closed ? "Tentativa encerrada" : proposed ? "Proposta registrada"
-    : result?.purpose === "adopt" ? "Modelo adotado" : result?.purpose === "create" ? "Material adicionado" : "Cadastro atualizado";
+    : identity ? "Situação registrada"
+      : result?.purpose === "adopt" ? "Modelo adotado" : result?.purpose === "create" ? "Material adicionado" : "Cadastro atualizado";
   function finish() {
     if (!result) return;
     operation.closeResult();
     onFinish(result);
   }
   return <>
-    {pending && !busy && !failure
+    {showPending && pending && !busy && !failure
       ? <ActionButton onClick={operation.openRecovery}>Conferir resultado pendente</ActionButton> : null}
     {failure && !busy ? <DocumentOperationFailureDialog
       title={failure.uncertain ? "A resposta do catálogo não chegou" : "Não foi possível registrar no catálogo"}
-      description={failure.uncertain ? "Consulte a tentativa original para saber se o cadastro foi gravado."
+      description={failure.uncertain ? identity ? "Consulte a tentativa original para saber se a decisão foi registrada."
+        : "Consulte a tentativa original para saber se o cadastro foi gravado."
         : failure.cause instanceof Error ? failure.cause.message : "Confira os dados antes de confirmar."}
       outcome={failure.uncertain ? "uncertain" : "rejected"} cause={failure.cause}
       operation="Alterar catálogo" fallbackCode="CATALOGO_RESULTADO_NAO_CONFIRMADO" attemptReference={failure.key}
@@ -129,7 +136,8 @@ export function ReviewedCatalogueFeedback({ operation, onFinish, onReview }: {
     {result ? <Dialog open title={title} success={!closed} onClose={finish}
       subtitle={closed ? "A consulta confirmou que esta tentativa não alterou o catálogo."
         : proposed ? "Outro administrador da residência decide a proposta em Pessoas e propostas."
-          : "O material está identificado no catálogo. Os estoques mantêm seus registros."}
+          : identity ? "A decisão ficou no histórico. Os saldos e movimentos permanecem associados às identidades originais."
+            : "O material está identificado no catálogo. Os estoques mantêm seus registros."}
       footer={<ActionButton variant="primary" onClick={finish}>Concluir</ActionButton>}>{null}</Dialog> : null}
   </>;
 }

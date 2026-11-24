@@ -67,6 +67,14 @@
 .hca-catalogue-row .hca-guide-row-label { min-width: 0; overflow-wrap: anywhere; }
 .hca-catalogue-duplicate .hca-modal-footer { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); }
 .hca-catalogue-duplicate .hca-modal-footer > :last-child { grid-column: 1 / -1; }
+.hca-catalogue-balance-section h3 { font-size: 14px; font-weight: 700; }
+.hca-catalogue-balances { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 3px 0 14px; }
+.hca-catalogue-balances > div { display: flex; flex-direction: column; align-items: flex-start; min-width: 0; overflow-wrap: anywhere; padding: 12px 10px; border: 1px solid var(--hca-line); border-radius: 12px; background: #f6f9f7; }
+.hca-catalogue-balances svg { color: var(--hca-teal); margin-bottom: 7px; }
+.hca-catalogue-balances small, .hca-catalogue-balances span { color: var(--hca-muted); font-size: 10px; }
+.hca-catalogue-balances strong { color: var(--hca-teal); font-size: 24px; font-weight: 600; line-height: 1.25; margin-top: 4px; font-variant-numeric: tabular-nums; }
+.hca-catalogue-balance-hint { display: flex; align-items: flex-start; gap: 8px; }
+.hca-catalogue-balance-hint svg { flex-shrink: 0; margin-top: 2px; color: var(--hca-muted); }
 @media (max-width: 600px) { .hca-catalogue-add { width: 100%; } }
 .hca-notice-channel-disabled { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
 .hca-notice-channel-disabled small { display: block; color: var(--hca-muted); }

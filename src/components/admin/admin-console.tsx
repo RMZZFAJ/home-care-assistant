@@ -315,10 +315,6 @@ function PatientAdmin({ context, catalogueHeadingRef }: { context: WorkspaceCont
             writable={allowed}
             patientId={patientId}
             headingRef={catalogueHeadingRef}
-            onIdentitySaved={async (message) => {
-              setMessage(message);
-              if (allowed) await load();
-            }}
           /><div className="hca-form-stack">
             <Link className={buttonClass} href={"/comprovantes-catalogo?" + new URLSearchParams({
               [globalMode ? "paciente" : "careRecipientId"]: patientId,

@@ -2311,5 +2311,14 @@ confirma ausência e encerra a chave. A atuação global sobre material
 registra uma proposta sujeita a decisão local. Os campos ficam no formulário
 até a confirmação. A tentativa guarda o hash e a referência oficial.
 
+A finalidade `identity` usa `GET /api/catalog/identities` para consultar
+a situação, os saldos autorizados, o sucessor e os atos oficiais. O mesmo
+`POST /api/admin/catalogue-actions` confirma a decisão com o motivo e
+o hash retornado pela leitura. Uma mudança de referência exige nova
+conferência. O banco grava o ato e seu resultado de forma transacional e
+preserva a identidade, as custódias e o histórico. A consulta da tentativa
+própria continua autorizada enquanto houver leitura da residência. Novos
+atos exigem `catalog.manage`.
+
 Os endpoints históricos de preparação permanecem usados pelos editores de
-situação, unidades e apresentações durante a transição do L4.
+unidades e apresentações durante a transição do L4.

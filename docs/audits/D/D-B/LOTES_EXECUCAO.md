@@ -5156,6 +5156,11 @@ reemissão de convite e na saída da continuação de acesso. `ios-2` também
 registrou overflow de 3 px na preparação local a 320 px e falhas em dois
 destinos de aviso. A CI ainda estava em execução nessa leitura.
 Na leitura seguinte, `chromium-1` e `chromium-2` também já haviam falhado.
+O resultado final incluiu falha em `ios-3`, cancelamento em `mobile-2` e
+sucesso em `ios-1`. `chromium-1`, `chromium-2` e `ios-3` registraram um
+caso instável cada. A suíte repetiu falhas de navegação de avisos e
+arquivamento em mais de um navegador. A validação de tipos, o banco e o
+Preview desse SHA haviam passado.
 
 [preview-2b7f8ad7]: https://vercel.com/rmzzfajs-projects/home-care-assistant/GG35HJrDTyAEwQ5wWxsK2reXYoHD
 [ci-2b7f8ad7]: https://github.com/RMZZFAJ/home-care-assistant/actions/runs/45486440078
@@ -5198,6 +5203,54 @@ estoque e ausência de nova preparação. As capturas da lista e do modal de
 duplicata foram comparadas com o cenário de referência a 360 e 412 px.
 O campo de busca passou na verificação de espaçamento nessas larguras.
 
-Situação e sucessor, unidades e apresentações seguem nos fluxos existentes
-nesta etapa. A migração desses editores, o histórico do material e a
-retirada do acesso comum aos comprovantes seguem em E10-08 a E10-10.
+Os commits `e6a407ad` e `8bec6567` foram publicados na PR 8 em rascunho.
+O [Preview de 8bec6567][preview-8bec6567] ficou `READY`. O endereço de
+aplicação configurado corresponde ao alias da branch. Estão presentes as
+variáveis de Supabase, serviço, assinatura e confiança de PDF, Web Push e
+worker. Login, runtime, verificação pública, manifesto, service worker e
+página offline retornaram HTTP 200. O runtime retornou `ready`.
+
+Preview e produção continuam ligados ao mesmo Supabase. A simulação de
+aplicação listou 22 migrations pendentes, incluindo `20261124205347` e
+`20261124212833`. O teste público de runtime usa o contrato base e não
+valida as jornadas administrativas que dependem dessas migrations. A
+migration `20261124063932` exige `targetVersion` ao vincular uma
+contingência a um registro existente. A API de produção em `fab595c7`
+envia o motivo e o ID do registro, sem essa versão. Aplicar a fila no
+banco compartilhado faria o banco recusar essa ação em produção.
+A verificação preservou a configuração e o esquema publicados.
+
+O SonarCloud aprovou o Quality Gate do SHA. A revisão automática do
+[CodeRabbit][coderabbit-8bec6567] foi pulada porque o serviço não conseguiu
+retomar o ponto incremental. A [CI do SHA][ci-8bec6567] estava em execução.
+
+[preview-8bec6567]: https://vercel.com/rmzzfajs-projects/home-care-assistant/8VJEV1yXGr9KtEiNDnXQyGHgTh
+[coderabbit-8bec6567]: https://github.com/RMZZFAJ/home-care-assistant/pull/8#issuecomment-7084927300
+[ci-8bec6567]: https://github.com/RMZZFAJ/home-care-assistant/actions/runs/45500124941
+
+### E10-08 — Situação e sucessor
+
+O painel aberto a partir do cadastro reúne a situação, os saldos por
+custódia, o sucessor e o histórico autorizado. Segue a composição do
+cenário E10-08 em um painel contextual, com retorno ao material. As telas
+de sucessor e de histórico mostram a identidade e os atos reais, incluindo
+autor, motivo e instante. A indicação informa as próximas escolhas e a
+transferência física continua no fluxo de estoque.
+
+A decisão exige motivo, consulta da referência e confirmação separada.
+Saldos, unidades, custódias e fichas conservam suas identidades. Se a
+referência mudar, a comparação mostra os saldos usados na decisão e os
+atuais, preserva o motivo e exige nova revisão. A retomada de uma
+resposta perdida usa somente a chave da operação. A consulta da própria
+tentativa exige que a pessoa ainda possa ler a residência e continua
+disponível quando perde a permissão de alterar o catálogo.
+
+Passaram 17 integrações dirigidas de identidade e catálogo com Auth local
+e quatro cenários em Chromium no build de produção. A verificação
+preservou o PDF byte a byte, comparou a referência concorrente, recuperou
+a decisão após resposta perdida e confirmou a recusa de nova ação depois
+da revogação. O painel foi comparado com o laboratório a 360 e 412 px.
+
+Esta etapa usa a rota e a migration `20261124212833` de E10-07. Unidades,
+apresentações, o histórico de alterações gerais do material e a retirada
+do acesso comum aos comprovantes seguem em E10-09 e E10-10.

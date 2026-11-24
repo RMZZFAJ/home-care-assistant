@@ -17,22 +17,23 @@ import type { CatalogueScope, ReviewedCatalogueReceipt } from "@/lib/validation/
 import { catalogueCategories, CatalogueProductEditor } from "./catalogue-product-editor";
 
 const purposes = ["create", "edit", "adopt"] as const;
+const identityPurposes = ["identity"] as const;
 type ProductPurpose = typeof purposes[number];
 type OpenProduct = { id: string; opener: HTMLElement };
 const categoryIcon: Record<string, IconName> = { medicamentos: "pill", higiene: "heart", dieta: "box" };
 const categoryLabel = (category: string) => catalogueCategories[category as keyof typeof catalogueCategories] ?? category;
 const pageSize = 15;
 
-export function CatalogueManagement({ writable, userId, globalMode, patientId, headingRef, onIdentitySaved }: {
+export function CatalogueManagement({ writable, userId, globalMode, patientId, headingRef }: {
   writable: boolean; userId: string; globalMode: boolean; patientId: string;
   headingRef: RefObject<HTMLHeadingElement | null>;
-  onIdentitySaved: (message: string) => Promise<void>;
 }) {
   const mode = globalMode ? "global" : "patient";
   const revision = useLiveRevision();
   const decode = useCallback((value: unknown) => parseCatalogueCollectionRead(value, patientId), [patientId]);
   const read = useScopedRead("/api/admin?" + new URLSearchParams({ section: "catalog", careRecipientId: patientId }), String(revision), decode);
   const operation = useReviewedCatalogueOperation(userId, { patientId, mode }, purposes);
+  const identityOperation = useReviewedCatalogueOperation(userId, { patientId, mode }, identityPurposes);
   const rows = read.data?.data ?? [];
   const unavailable = read.loading || !read.data || Boolean(read.error);
   const locked = unavailable || operation.blocked;
@@ -45,6 +46,7 @@ export function CatalogueManagement({ writable, userId, globalMode, patientId, h
   const [identity, setIdentity] = useState<OpenProduct | null>(null);
   const [editor, setEditor] = useState<{ purpose: ProductPurpose; id: string | null; opener: HTMLElement } | null>(null);
   const [referenceRevision, setReferenceRevision] = useState(0);
+  const [identityRevision, setIdentityRevision] = useState(0);
   const addRef = useRef<HTMLButtonElement>(null);
   const term = normalizeCatalogText(search);
   const filtered = rows.filter(row =>
@@ -133,12 +135,13 @@ export function CatalogueManagement({ writable, userId, globalMode, patientId, h
     </> : null}
     {writable && detail && product ? <ProductDetails item={detail} opener={product.opener} fallback={headingRef}
       globalMode={globalMode} locked={locked} onClose={() => setProduct(null)} openEdit={opener => openEditor("edit", detail.id, opener)}
-      openIdentity={opener => setIdentity({ id: detail.id, opener })} /> : null}
-    {identity ? <CatalogueIdentityManagement
-      userId={userId} writable={writable} patientId={patientId} productId={identity.id}
-      products={rows.map(({ id, name, unit }) => ({ id, name, unit }))}
+      openIdentity={opener => { setIdentityRevision(0); setIdentity({ id: detail.id, opener }); }} /> : null}
+    {writable && identity ? <CatalogueIdentityManagement
+      key={identity.id} operation={identityOperation} referenceRevision={identityRevision}
+      patientId={patientId} productId={identity.id} products={rows}
       opener={identity.opener} onClose={() => setIdentity(null)} restoreFocusFallbackRef={headingRef}
-      onSaved={async message => { read.refresh(); await onIdentitySaved(message); }} /> : null}
+      onRefreshReference={() => setIdentityRevision(value => value + 1)}
+      /> : null}
     {writable && editor ? <CatalogueProductEditor key={JSON.stringify([editor.purpose, editor.id])}
       scope={{ patientId, mode, purpose: editor.purpose, targetId: editor.id } satisfies CatalogueScope}
       readRevision={referenceRevision} operation={operation} rows={rows} opener={editor.opener} fallback={headingRef}
@@ -149,6 +152,12 @@ export function CatalogueManagement({ writable, userId, globalMode, patientId, h
       }} /> : null}
     <ReviewedCatalogueFeedback operation={operation} onFinish={finish}
       onReview={editor ? () => { operation.closeFailure(); setReferenceRevision(value => value + 1); read.refresh(); } : undefined} />
+    {!globalMode ? <ReviewedCatalogueFeedback identity operation={identityOperation} showPending={!writable || !identity}
+      onFinish={result => { if (result.state === "recorded") { setIdentity(null); read.refresh(); } }}
+      onReview={identity && writable ? () => {
+        identityOperation.closeFailure();
+        setIdentityRevision(value => value + 1);
+      } : undefined} /> : null}
   </section>;
 }
 

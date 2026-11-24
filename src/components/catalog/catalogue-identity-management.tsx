@@ -1,463 +1,295 @@
 "use client";
-import { ActionButton, DefinitionGrid, FormField, LoadingIndicator, SelectField, TextAreaField } from "@/components/ui/controls";
-import Link from "next/link";
-import { useEffect, useId, useRef, useState, type RefObject } from "react";
 
-import { api, Notice } from "@/components/workspace";
+import Link from "next/link";
+import { useId, useRef, useState, type FormEvent, type RefObject } from "react";
 import { RecordDrawer } from "@/components/forms/record-drawer";
-import { useScopedRead } from "@/lib/use-scoped-read";
+import { ActionButton, DefinitionGrid, FormField, LoadingIndicator, Pill, SelectField, TextAreaField } from "@/components/ui/controls";
+import { FeedbackBanner } from "@/components/ui/feedback";
+import { Icon, type IconName } from "@/components/ui/icon";
+import { Dialog } from "@/components/ui/overlays";
 import { formatQuantity } from "@/lib/quantity";
 import { formatBrazilDate } from "@/lib/receipt";
-import { catalogueIdentityCommandSchema } from "@/lib/validation/catalogue";
-import type {
-  CatalogueIdentity,
-  CatalogueIdentityContext,
-} from "@/types/catalogue";
+import { useScopedRead } from "@/lib/use-scoped-read";
+import type { CatalogueCollectionItem } from "@/lib/validation/catalogue-list";
+import type { IdentityFields } from "@/lib/validation/catalogue-preparation";
+import type { CatalogueIdentity, CatalogueIdentityContext, CatalogueIdentityEvent } from "@/types/catalogue";
+import type { useReviewedCatalogueOperation } from "./reviewed-catalogue-operation";
 
-import type { CatalogueOutcome, IdentityFields } from "@/lib/validation/catalogue-preparation";
-import { CatalogueDraftButtons, CataloguePreparationFeedback } from "./catalogue-preparation-controls";
-import { sendPreparedCatalogueCommit, useCataloguePreparation } from "./use-catalogue-preparation";
+type Act = CatalogueIdentityEvent["action"];
+type Decision = IdentityFields & { identityAction: Act };
 
-function identityOutcome(outcome: CatalogueOutcome) {
-  return "eventId" in outcome ? `${labels[outcome.identityAction]} registrado por ${outcome.actorName}. Saldos, documentos e identidades anteriores preservados.` : "Alteração confirmada.";
+const actLabels = {
+  retire: "Inativar material",
+  reactivate: "Reativar material",
+  clear_successor: "Remover indicação",
+} satisfies Record<Act, string>;
+const recordedLabels = {
+  retire: "Inativação registrada",
+  reactivate: "Reativação registrada",
+  clear_successor: "Indicação removida",
+} satisfies Record<Act, string>;
+const custodies = [
+  ["FAMILY", "Família", "home"],
+  ["CARE_TEAM", "Equipe", "users"],
+  ["TRANSIT", "Em trânsito", "truck"],
+] as const;
+
+function balances(product: CatalogueIdentity) {
+  return custodies.map(([key, label]) => ({
+    label, value: product.stock[key] == null ? "Consulta restrita" : formatQuantity(product.stock[key], product.unit),
+  }));
 }
 
-const labels = {
-  retire: "Inativar",
-  reactivate: "Reativar",
-  clear_successor: "Remover indicação de sucessor",
-};
-const locations = {
-  FAMILY: "Família",
-  CARE_TEAM: "Equipe",
-  TRANSIT: "Em trânsito",
-};
-type Packet = ReturnType<typeof catalogueIdentityCommandSchema.parse>;
-function IdentityCard({
-  product,
-  label,
-}: {
-  product: CatalogueIdentity;
-  label: string;
-}) {
-  return (
-    <section
-      className="ui-card min-w-0 space-y-3 wrap-break-word"
-      aria-label={label}
-    >
-      <h3>{label}</h3>
-      <p>
-        <strong>{product.name}</strong> · {product.unit}
-      </p>
-      <p>
-        {product.is_active ? "Ativo" : "Inativo"} · {product.category} ·
-        precisão {product.quantity_decimals}
-      </p>
-      <p>
-        Nomes alternativos: {product.aliases.join(", ") || "Nenhum cadastrado"}.
-      </p>
-      <DefinitionGrid items={Object.entries(locations).map(([key,name]) => ({ label: name, value: product.stock[key as keyof typeof locations] == null ? "Consulta restrita ao seu acesso" : formatQuantity(product.stock[key as keyof typeof locations]!,product.unit) }))} />
-      <details>
-        <summary>Identidade preservada</summary>
-        <p className="break-all">{product.product_id}</p>
-      </details>
-    </section>
-  );
+function MaterialStatus({ product }: { product: CatalogueIdentity }) {
+  return <div className="hca-residence-admin-hero">
+    <span className="hca-guide-row-icon"><Icon name="box" /></span>
+    <div className="hca-guide-row-label"><strong>{product.name}</strong><small>{product.product_id} · {product.unit}</small></div>
+    <Pill tone={product.is_active ? "success" : "neutral"}>{product.is_active ? "Ativo" : "Inativo"}</Pill>
+  </div>;
 }
-export function CatalogueIdentityManagement({
-  userId,
-  writable,
-  patientId,
-  productId,
-  products,
-  opener,
-  onClose,
-  onSaved,
-  restoreFocusFallbackRef,
-}: {
-  userId: string;
-  writable: boolean;
+
+function IdentityRow({ icon, title, detail, onClick }: { icon: IconName; title: string; detail: string; onClick: () => void }) {
+  return <button type="button" className="hca-guide-row" onClick={onClick}>
+    <span className="hca-guide-row-icon"><Icon name={icon} /></span>
+    <span className="hca-guide-row-label"><strong>{title}</strong><small>{detail}</small></span>
+    <Icon name="chevron" width={15} height={15} />
+  </button>;
+}
+
+export function CatalogueIdentityManagement({ patientId, productId, products, opener, onClose, restoreFocusFallbackRef,
+  operation, referenceRevision, onRefreshReference }: {
   patientId: string;
   productId: string;
-  products: { id: string; name: string; unit: string }[];
+  products: CatalogueCollectionItem[];
   opener: HTMLElement;
   onClose: () => void;
-  onSaved: (message: string) => Promise<void>;
   restoreFocusFallbackRef: RefObject<HTMLElement | null>;
+  operation: ReturnType<typeof useReviewedCatalogueOperation>;
+  referenceRevision: number;
+  onRefreshReference: () => void;
 }) {
-  const [adopted, setAdopted] = useState<CatalogueIdentityContext | null>(null);
-  const [comparison, setComparison] = useState<CatalogueIdentityContext | null>(
-    null,
-  );
-  const [conflict, setConflict] = useState(false);
-  const [prepared, setPrepared] = useState<{
-    packet: Packet;
-    context: CatalogueIdentityContext;
-  } | null>(null);
+  const [decision, setDecision] = useState<Decision | null>(null);
+  const [prepared, setPrepared] = useState<CatalogueIdentityContext | null>(null);
+  const [reviewOpen, setReviewOpen] = useState(false);
+  const [obsoleted, setObsoleted] = useState(false);
+  const [dismissedComparisonRevision, setDismissedComparisonRevision] = useState(0);
+  const [secondary, setSecondary] = useState<"successor" | "history" | null>(null);
   const [page, setPage] = useState(1);
+  const [reasonError, setReasonError] = useState("");
+  const actionRef = useRef<HTMLButtonElement>(null);
+  const reasonRef = useRef<HTMLTextAreaElement>(null);
+  const editorId = useId();
   const reasonId = useId();
-  const reasonRef = useRef<HTMLTextAreaElement>(null),
-    reviewRef = useRef<HTMLHeadingElement>(null),
-    focusAfterRefusalRef = useRef(false);
-  const editor = useCataloguePreparation<IdentityFields, { hash: string | null }>({
-    scope: { patientId, mode: "patient", purpose: "identity", targetId: productId }, userId,
-    separateReference: true,
-    defaultFields: () => ({ identityAction: "", successorId: "", reason: "" }),
-    hashFor: reference => reference.hash,
-    sendCommit: attempt => sendPreparedCatalogueCommit("/api/catalog/identities", attempt),
-    onCommit: (outcome, recovered) => {
-      onClose();
-      void onSaved(identityOutcome(outcome) + (recovered ? " A mesma intenção foi recuperada." : "")).catch(() => undefined);
-    },
-    onRejected: reason => {
-      setPrepared(null);
-      focusAfterRefusalRef.current = true;
-      if (reason.code === "VERSION_CONFLICT") {
-        setConflict(true);
-        void consultConflict();
-      }
-    },
-  });
-  const fields = editor.fields;
-  const { identityAction: action, successorId, reason } = fields ?? { identityAction: "", successorId: "", reason: "" };
-  const { busy } = editor;
-  const uncertain = !!editor.pending;
-  const url =
-    "/api/catalog/identities?" +
-    new URLSearchParams({
-      careRecipientId: patientId,
-      productId,
-      ...(action === "retire" && successorId ? { successorId } : {}),
-    });
-  const source = useScopedRead<{ data: CatalogueIdentityContext }>(writable && fields ? url : null);
+  const url = "/api/catalog/identities?" + new URLSearchParams({ careRecipientId: patientId, productId });
+  const selectedId = decision?.successorId;
+  const source = useScopedRead<{ data: CatalogueIdentityContext }>(url, String(referenceRevision));
+  const successor = useScopedRead<{ data: CatalogueIdentityContext }>(
+    selectedId ? url + "&successorId=" + encodeURIComponent(selectedId) : null, String(referenceRevision),
+  );
   const older = useScopedRead<{ data: CatalogueIdentityContext }>(
-    writable && page > 1 ? url + "&page=" + page : null,
+    secondary === "history" && page > 1 ? url + "&page=" + page : null, String(referenceRevision),
   );
-  const reference = adopted ?? source.data?.data;
-  const hash = editor.reviewedHash ?? reference?.referenceHash ?? editor.snapshot?.reference.hash ?? null;
-  const referenceChanged = !!(reference && hash && reference.referenceHash !== hash);
-  const history = page > 1 ? older.data?.data : reference;
-  useEffect(() => {
-    if (prepared) reviewRef.current?.focus();
-  }, [prepared]);
-  useEffect(() => {
-    if (!prepared && !busy && focusAfterRefusalRef.current) {
-      focusAfterRefusalRef.current = false;
-      reasonRef.current?.focus();
-    }
-  }, [prepared, busy]);
-  function changed() {
-    setAdopted(null);
-    setComparison(null);
-    setConflict(false);
-    editor.setError("");
-    setPage(1);
-    editor.setReviewedHash(null);
+  const snapshot = source.data?.data;
+  const referenceRead = selectedId ? successor : source;
+  const reference = referenceRead.data?.data;
+  const linkedId = snapshot?.guidance?.successor_product_id;
+  const linked = products.find(item => item.id === linkedId);
+  const linkedLabel = linked ? `${linked.name} · ${linked.unit}` : linkedId ?? "Nenhum sucessor indicado";
+  const eligible = products.filter(item => item.id !== productId && item.is_active);
+  const history = (page > 1 ? older.data?.data : snapshot)?.events ?? [];
+  const canEdit = Boolean(snapshot) && !source.loading && !source.error && !operation.blocked;
+  const unsuitableSuccessor = Boolean(selectedId && reference?.successor?.is_active === false);
+  const canReview = canEdit && Boolean(reference) && !referenceRead.loading && !referenceRead.error && !obsoleted && !unsuitableSuccessor;
+  const comparing = Boolean(decision && obsoleted && referenceRevision > dismissedComparisonRevision);
+
+  function start(action: Act) {
+    if (!canEdit) return;
+    setDecision({ identityAction: action, successorId: action === "retire" && linked?.is_active ? linked.id : "", reason: "" });
+    setReasonError("");
+    setPrepared(null);
+    setObsoleted(false);
+    setDismissedComparisonRevision(referenceRevision);
+    setSecondary(null);
   }
-  function prepare() {
-    if (!writable || !fields || !reference || !hash || source.loading || source.error || conflict || referenceChanged || editor.locked)
-      return;
-    const result = catalogueIdentityCommandSchema.safeParse({
-      careRecipientId: patientId,
-      productId,
-      successorId: action === "retire" && successorId ? successorId : null,
-      referenceHash: hash,
-      action,
-      reason,
-      idempotencyKey: crypto.randomUUID(),
-    });
-    if (!result.success) {
-      editor.setError(result.error.issues[0]?.message ?? "Confira o ato e o motivo.");
+
+  function edit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!decision || !canReview || !reference) return;
+    const reason = decision.reason.trim();
+    if (Array.from(reason).length < 3 || reason.length > 1000) {
+      setReasonError("Informe um motivo próprio de 3 a 1.000 caracteres.");
       reasonRef.current?.focus();
       return;
     }
-    editor.setError("");
-    setPrepared({ packet: result.data, context: reference });
+    setDecision({ ...decision, reason });
+    setPrepared(reference);
+    setReviewOpen(true);
   }
-  async function consultConflict() {
-    try {
-      const current = await api<{ data: CatalogueIdentityContext }>(url);
-      setComparison(current.data);
-    } catch {
-      editor.setError(
-        "A referência atual está indisponível. Seu motivo e sua escolha foram preservados; consulte novamente.",
-      );
-    }
+
+  function confirm() {
+    if (!decision || !prepared || !canReview) return;
+    setReviewOpen(false);
+    void operation.submit({ patientId, mode: "patient", purpose: "identity", targetId: productId },
+      { fields: decision, referenceHash: prepared.referenceHash }, error => {
+        if (error.code === "VERSION_CONFLICT") setObsoleted(true);
+      });
   }
-  return (
-    <RecordDrawer
-      title="Situação e sucessor do material"
-      onClose={onClose}
-      busy={busy}
-      preventClose={uncertain}
-      hasUnsavedChanges={editor.dirty}
-      restoreFocusTo={opener}
-      restoreFocusFallbackRef={restoreFocusFallbackRef}
-    >
-      <div className="space-y-4">
-        <CataloguePreparationFeedback editor={editor} onClose={onClose} outcomeText={identityOutcome}
-          retryLabel="Recuperar mesma intenção" writable={writable}
-          uncertaintyText="O resultado ainda não foi confirmado. A escolha, o motivo e a chave estão congelados. Consulte o comprovante ou recupere a mesma intenção."
-          compareFields={value => <DefinitionGrid items={[
-            { label: "Ato", value: value.identityAction ? labels[value.identityAction] : "Em branco" },
-            { label: "Sucessor", value: products.find(row => row.id === value.successorId)?.name ?? (value.successorId || "Sem sucessor") },
-            { label: "Motivo", value: value.reason || "Em branco", wide: true },
-          ]} />} />
-        {prepared ? (
-          <section
-            className="space-y-4"
-            aria-label="Revisão da situação do material"
-          >
-            <h3 tabIndex={-1} ref={reviewRef}>
-              Confira o efeito no catálogo
-            </h3>
-            <IdentityCard
-              product={prepared.context.source}
-              label="Material de origem"
-            />
-            {prepared.context.successor ? (
-              <IdentityCard
-                product={prepared.context.successor}
-                label="Sucessor para novas escolhas"
-              />
-            ) : null}
-            <p>
-              Ato: <strong>{labels[prepared.packet.action]}</strong>.
-            </p>
-            <p>
-              {prepared.packet.action === "retire"
-                ? prepared.context.successor
-                  ? `A origem ficará inativa; ${prepared.context.successor.name} será uma orientação para novas seleções, com sua própria unidade ${prepared.context.successor.unit}.`
-                  : "O material ficará inativo e seus saldos permanecerão na mesma custódia, sem indicação de sucessor."
-                : prepared.packet.action === "reactivate"
-                  ? "O mesmo material ficará ativo novamente; a indicação de sucessor será removida."
-                  : "A indicação será removida, mantendo a situação atual do material."}
-            </p>
-            <p>
-              Não haverá transferência, conversão de unidades ou alteração de
-              fatos anteriores. Para destinação física, use o processo próprio
-              de estoque/ENT.
-            </p>
-            <p className="whitespace-pre-wrap">
-              Motivo próprio: {prepared.packet.reason}
-            </p>
-            <div className="hca-toolbar">
-              <ActionButton
-                disabled={busy || uncertain || !writable}
-                onClick={() => setPrepared(null)}
-              >
-                Voltar à escolha
-              </ActionButton>
-              {!uncertain ? <ActionButton
-                variant="primary" disabled={busy || !writable}
-                onClick={() => editor.start("commit", prepared.packet.referenceHash, {
-                  identityAction: prepared.packet.action, successorId: prepared.packet.successorId ?? "", reason: prepared.packet.reason,
-                })}
-              >
-                Confirmar mudança no catálogo
-              </ActionButton> : null}
-            </div>
-          </section>
-        ) : !writable ? (
-          <Notice error>
-            A permissão de alterar o catálogo não está mais disponível. Feche
-            esta consulta para continuar.
-          </Notice>
-        ) : fields && !uncertain ? (
-          <>
-            {source.loading ? (
-              <LoadingIndicator label="Consultando material, situação e saldos autorizados" />
-            ) : null}
-            {source.error ? (
-              <Notice error>
-                {source.error}{" "}
-                {source.data
-                  ? "Última consulta preservada; confirme a referência vigente antes de agir."
-                  : "A consulta não foi concluída."}
-                <ActionButton onClick={() => source.refresh()}>
-                  Tentar consulta do material novamente
-                </ActionButton>
-              </Notice>
-            ) : null}
-            {reference ? (
-              <>
-                <IdentityCard
-                  product={reference.source}
-                  label="Material de origem"
-                />
-                {reference.successor ? (
-                  <IdentityCard
-                    product={reference.successor}
-                    label="Material comparado"
-                  />
-                ) : null}
-                {reference.guidance ? (
-                  <p>
-                    Sucessor atualmente indicado:{" "}
-                    {products.find(
-                      (row) =>
-                        row.id === reference.guidance?.successor_product_id,
-                    )?.name ?? "Identificação indisponível"}
-                    .
-                  </p>
-                ) : null}
-                <Notice>
-                  Inativar conserva saldo na família, na equipe e em trânsito.
-                  Reativar conserva a mesma identidade. Um sucessor orienta
-                  novas escolhas; unidades e saldos não são somados ou
-                  convertidos.
-                </Notice>
-                {(conflict || referenceChanged) ? (
-                  <section
-                    aria-label="Comparação da referência atual"
-                    className="ui-card space-y-3"
-                  >
-                    <h3>O cadastro ou o saldo consultado mudou</h3>
-                    {comparison ? (
-                      <>
-                        <IdentityCard
-                          product={comparison.source}
-                          label="Referência atual de origem"
-                        />
-                        {comparison.successor ? (
-                          <IdentityCard
-                            product={comparison.successor}
-                            label="Referência atual do sucessor"
-                          />
-                        ) : null}
-                        <ActionButton
-                          onClick={() => {
-                            setAdopted(comparison);
-                            setComparison(null);
-                            setConflict(false);
-                            editor.setReviewedHash(comparison.referenceHash);
-                            editor.setError("");
-                            reasonRef.current?.focus();
-                          }}
-                        >
-                          Adotar referência consultada e manter meu motivo
-                        </ActionButton>
-                      </>
-                    ) : null}
-                    <ActionButton onClick={() => void consultConflict()}>
-                      Consultar referência para comparação
-                    </ActionButton>
-                  </section>
-                ) : null}
-                {editor.draft?.state !== "consumed" ? <>
-                  <fieldset className="hca-form" disabled={editor.locked}>
-                    <FormField label="Ato no catálogo">
-                      <SelectField value={action} onChange={event => {
-                        editor.setFields({ ...fields, identityAction: event.target.value as IdentityFields["identityAction"], successorId: "" });
-                        changed();
-                      }}>
-                        <option value="">Escolha o ato</option>
-                        <option value="retire">Inativar, mantendo os saldos</option>
-                        <option value="reactivate">Reativar a mesma identidade</option>
-                        <option value="clear_successor">Remover indicação de sucessor</option>
-                      </SelectField>
-                    </FormField>
-                    {action === "retire" ? <FormField label="Sucessor para novas escolhas, opcional">
-                      <SelectField value={successorId} onChange={event => {
-                        editor.setFields({ ...fields, successorId: event.target.value });
-                        changed();
-                      }}>
-                        <option value="">Sem indicar sucessor</option>
-                        {successorId && !products.some(row => row.id === successorId) ? <option disabled value={successorId}>Sucessor indisponível</option> : null}
-                        {products.filter(row => row.id !== productId).map(row =>
-                          <option key={row.id} value={row.id}>{row.name} · {row.unit}</option>)}
-                      </SelectField>
-                    </FormField> : null}
-                    <FormField label="Motivo próprio da escolha" htmlFor={reasonId}>
-                      <TextAreaField id={reasonId} ref={reasonRef} value={reason} minLength={3} maxLength={1000}
-                        onChange={event => editor.setFields({ ...fields, reason: event.target.value })} />
-                    </FormField>
-                  </fieldset>
-                  <div className="hca-toolbar">
-                    <ActionButton type="button" variant="primary" disabled={editor.locked || !action || source.loading || !!source.error || conflict || referenceChanged}
-                      onClick={prepare}>Revisar mudança no catálogo</ActionButton>
-                    <CatalogueDraftButtons editor={editor} hash={hash} />
-                  </div>
-                </> : null}
-                <Link
-                  className="ui-button ui-button-secondary"
-                  href={
-                    "/transferencias?" +
-                    new URLSearchParams({ careRecipientId: patientId })
-                  }
-                >
-                  Planejar transferência física separadamente
-                </Link>
-                <section
-                  className="space-y-3"
-                  aria-label="Histórico da situação e sucessor"
-                >
-                  <h3>Escolhas registradas</h3>
-                  {older.loading ? (
-                    <LoadingIndicator label="Consultando escolhas anteriores" />
-                  ) : null}
-                  {older.error ? (
-                    <Notice error>
-                      {older.error}
-                      <ActionButton onClick={() => older.refresh()}>
-                        Tentar histórico novamente
-                      </ActionButton>
-                    </Notice>
-                  ) : null}
-                  {history?.events.length === 0 ? (
-                    <p>
-                      Nenhuma escolha registrada neste fluxo. Alterações
-                      anteriores não foram reconstruídas.
-                    </p>
-                  ) : null}
-                  {history?.events.map((event) => (
-                    <article key={event.id} className="ui-card space-y-2">
-                      <p>
-                        {labels[event.action]} · {event.actor_name} ·{" "}
-                        {formatBrazilDate(event.recorded_at)}
-                      </p>
-                      <p className="whitespace-pre-wrap">{event.reason}</p>
-                      <p>
-                        Origem preservada: {event.before_state.source.name} ·{" "}
-                        {event.before_state.source.unit}.
-                      </p>
-                      {event.after_state.successor ? (
-                        <p>
-                          Sucessor indicado no ato:{" "}
-                          {event.after_state.successor.name} ·{" "}
-                          {event.after_state.successor.unit}.
-                        </p>
-                      ) : null}
-                    </article>
-                  ))}
-                  {reference.eventTotal > 20 ? (
-                    <nav
-                      aria-label="Páginas das escolhas de catálogo"
-                      className="hca-toolbar"
-                    >
-                      <ActionButton
-                        disabled={page <= 1}
-                        onClick={() => setPage((value) => value - 1)}
-                      >
-                        Escolhas anteriores
-                      </ActionButton>
-                      <span>
-                        Página {page} de {Math.ceil(reference.eventTotal / 20)}
-                      </span>
-                      <ActionButton
-                        disabled={page * 20 >= reference.eventTotal}
-                        onClick={() => setPage((value) => value + 1)}
-                      >
-                        Mais escolhas
-                      </ActionButton>
-                    </nav>
-                  ) : null}
-                </section>
-              </>
-            ) : null}
-          </>
-        ) : null}
-      </div>
+
+  function dismissDecision() {
+    setDecision(null);
+    setReviewOpen(false);
+    setPrepared(null);
+    setObsoleted(false);
+  }
+
+  const mainAction = snapshot?.source.is_active ? "retire" : "reactivate";
+  return <>
+    <RecordDrawer title="Situação do material" subtitle="Preserve a identidade e oriente as próximas escolhas."
+      kicker="Organização da residência" headingIcon="box" popupClassName="hca-preference-sheet hca-residence-settings-sheet"
+      onClose={onClose} busy={operation.busy} trackChanges={false} restoreFocusTo={opener}
+      restoreFocusFallbackRef={restoreFocusFallbackRef} keyboardScrollable
+      footer={close => <><ActionButton onClick={close}>Voltar ao material</ActionButton>
+        {operation.pending && !operation.busy && !operation.failure ? <ActionButton variant="primary" onClick={operation.openRecovery}>Conferir resultado pendente</ActionButton>
+          : snapshot ? <ActionButton ref={actionRef} variant="primary" disabled={!canEdit} onClick={() => start(mainAction)}>
+          <Icon name={mainAction === "retire" ? "archive" : "refresh"} />{actLabels[mainAction]}
+        </ActionButton> : null}</>}>
+      {source.loading ? <LoadingIndicator label="Consultando material e saldos autorizados" /> : null}
+      {source.error ? <FeedbackBanner tone="error">{source.error} <ActionButton onClick={source.refresh}>Consultar material novamente</ActionButton></FeedbackBanner> : null}
+      {snapshot ? <div className="hca-form-stack">
+        <MaterialStatus product={snapshot.source} />
+        {!snapshot.source.is_active ? <p className="hca-residence-admin-subtitle">Fora de novas escolhas. Cadastro, saldos e histórico preservados.</p> : null}
+        <section className="hca-residence-admin-section hca-catalogue-balance-section" aria-label="Saldos preservados">
+          <header><h3>Saldos preservados</h3></header>
+          <div>
+            <div className="hca-catalogue-balances">{custodies.map(([key, title, icon]) => {
+              const value = snapshot.source.stock[key];
+              return <div key={key}><Icon name={icon} width={17} height={17} /><small>{title}</small>
+                {value === null ? <span>Consulta restrita</span> : <><strong>{formatQuantity(value)}</strong><span>{snapshot.source.unit}</span></>}
+              </div>;
+            })}</div>
+            <p className="hca-field-hint hca-catalogue-balance-hint"><Icon name="box" width={16} height={16} />Inativar ou indicar um sucessor preserva os saldos.</p>
+          </div>
+        </section>
+        <section className="hca-residence-admin-section hca-residence-rules">
+          <header><h3>Próximas escolhas</h3></header>
+          <div>
+            <IdentityRow icon="arrow" title="Sucessor" detail={linkedLabel} onClick={() => setSecondary("successor")} />
+            <IdentityRow icon="history" title="Histórico da situação" detail="Autor, motivo e efeito de cada decisão" onClick={() => { setPage(1); setSecondary("history"); }} />
+          </div>
+        </section>
+      </div> : null}
     </RecordDrawer>
-  );
+    {secondary && snapshot ? <RecordDrawer title={secondary === "successor" ? "Sucessor do material" : "Histórico da situação"}
+      subtitle={secondary === "successor" ? "Orientação para novas escolhas" : snapshot.source.name} headingIcon={secondary === "successor" ? "box" : "history"}
+      kicker="Organização da residência" popupClassName="hca-preference-sheet hca-residence-settings-sheet"
+      trackChanges={false} keyboardScrollable onClose={() => setSecondary(null)}
+      footer={close => <><ActionButton onClick={close}>Voltar</ActionButton>
+        {secondary === "successor" && !snapshot.source.is_active ? <ActionButton disabled={!canEdit} onClick={() => start("retire")}>
+          {linkedId ? "Alterar indicação" : "Indicar sucessor"}
+        </ActionButton> : null}
+        {secondary === "successor" && linkedId ? <ActionButton disabled={!canEdit} onClick={() => start("clear_successor")}>Remover indicação</ActionButton> : null}</>}>
+      {secondary === "successor" ? <div className="hca-form-stack">
+        <DefinitionGrid items={[
+          { label: "Material de origem", value: `${snapshot.source.name} · ${snapshot.source.unit}` },
+          { label: "Sucessor indicado", value: linkedLabel },
+        ]} />
+        <FeedbackBanner>A indicação orienta novas escolhas. Cada identidade conserva sua unidade, custódia e saldo.</FeedbackBanner>
+        <Link className="hca-control" href={"/transferencias?" + new URLSearchParams({ careRecipientId: patientId })}>Planejar transferência física separadamente</Link>
+      </div> : <div className="hca-form-stack">
+        {older.loading ? <LoadingIndicator label="Consultando decisões anteriores" /> : null}
+        {older.error ? <FeedbackBanner tone="error">{older.error} <ActionButton onClick={older.refresh}>Consultar histórico novamente</ActionButton></FeedbackBanner> : null}
+        {history.length ? history.map(event => <section key={event.id} className="hca-residence-admin-section">
+          <header><h3>{recordedLabels[event.action]}</h3><p>{event.actor_name} · {formatBrazilDate(event.recorded_at)}</p></header>
+          <div><DefinitionGrid items={[
+            { label: "Motivo", value: <span className="whitespace-pre-wrap">{event.reason}</span>, wide: true },
+            { label: "Identidade anterior", value: `${event.before_state.source.name} · ${event.before_state.source.unit}` },
+            { label: "Situação após a decisão", value: event.after_state.source.is_active ? "Ativo" : "Inativo" },
+            ...(event.action === "retire" && event.after_state.successor ? [{ label: "Sucessor indicado", value: `${event.after_state.successor.name} · ${event.after_state.successor.unit}` }] : []),
+          ]} /></div>
+        </section>) : !older.loading && !older.error ? <p>Nenhuma decisão registrada para este material.</p> : null}
+        {snapshot.eventTotal > 20 ? <nav aria-label="Páginas das decisões de catálogo" className="hca-pagination">
+          <ActionButton disabled={page <= 1} onClick={() => setPage(value => value - 1)}>Anterior</ActionButton>
+          <span>Página {page} de {Math.ceil(snapshot.eventTotal / 20)}</span>
+          <ActionButton disabled={page * 20 >= snapshot.eventTotal} onClick={() => setPage(value => value + 1)}>Próxima</ActionButton>
+        </nav> : null}
+      </div>}
+    </RecordDrawer> : null}
+    {decision && snapshot && !operation.blocked && !operation.failure && !comparing && !reviewOpen ? <Dialog
+      open title={actLabels[decision.identityAction]} kicker="Organização da residência" headingIcon="box"
+      keyboardScrollable onClose={dismissDecision} finalFocus={actionRef}
+      footer={<><ActionButton onClick={dismissDecision}>Voltar</ActionButton>
+        <ActionButton variant="primary" type="submit" form={editorId} disabled={!canReview}><Icon name="check" />Revisar efeito</ActionButton></>}>
+      <form id={editorId} className="hca-form" onSubmit={edit}>
+        {obsoleted ? <FeedbackBanner tone="warning"><strong>A referência mudou.</strong> Confira os dados atuais. Seu motivo permanece nesta edição.
+          <ActionButton onClick={onRefreshReference}>Conferir atualização</ActionButton>
+        </FeedbackBanner> : null}
+        <DefinitionGrid items={[{ label: "Material", value: snapshot.source.name }, { label: "Unidade de origem", value: snapshot.source.unit }]} />
+        {decision.identityAction === "retire" ? <FormField label="Sucessor para novas escolhas">
+          <SelectField value={decision.successorId} disabled={obsoleted} onChange={event => setDecision({ ...decision, successorId: event.currentTarget.value })}>
+            <option value="">Sem indicar sucessor</option>
+            {decision.successorId && !eligible.some(item => item.id === decision.successorId)
+              ? <option value={decision.successorId} disabled>Sucessor indisponível</option> : null}
+            {eligible.map(item => <option key={item.id} value={item.id}>{item.name} · {item.unit}</option>)}
+          </SelectField>
+        </FormField> : null}
+        {referenceRead.loading ? <LoadingIndicator label="Consultando a referência para a decisão" /> : null}
+        {referenceRead.error ? <FeedbackBanner tone="error">{referenceRead.error} <ActionButton onClick={referenceRead.refresh}>Consultar referência novamente</ActionButton></FeedbackBanner> : null}
+        {unsuitableSuccessor ? <FeedbackBanner tone="warning">O sucessor está inativo. Selecione um material ativo ou prossiga sem indicação.</FeedbackBanner>
+          : reference?.successor && reference.successor.unit !== snapshot.source.unit ? <FeedbackBanner>
+          O sucessor usa {reference.successor.unit} e a origem usa {snapshot.source.unit}. Ambas as unidades e seus saldos permanecem separados.
+        </FeedbackBanner> : <FeedbackBanner>{decision.identityAction === "reactivate"
+          ? "A mesma identidade voltará a ficar ativa. A indicação de sucessor será removida."
+          : decision.identityAction === "clear_successor" ? "A situação do material será preservada ao remover a indicação."
+            : "O sucessor orienta novas seleções. Os saldos permanecem no material de origem."}</FeedbackBanner>}
+        <FormField label="Motivo da decisão" htmlFor={reasonId} helpText="Explique brevemente por que a situação deve mudar." error={reasonError || undefined}>
+          <TextAreaField id={reasonId} ref={reasonRef} value={decision.reason} minLength={3} maxLength={1000} required
+            onChange={event => { setDecision({ ...decision, reason: event.currentTarget.value }); setReasonError(""); }} />
+        </FormField>
+      </form>
+    </Dialog> : null}
+    {decision && prepared && reviewOpen ? <Dialog open title="Confirmar efeito no catálogo?" kicker="Organização da residência" headingIcon="check"
+      keyboardScrollable onClose={() => setReviewOpen(false)}
+      footer={<><ActionButton onClick={() => setReviewOpen(false)}>Voltar à edição</ActionButton>
+        <ActionButton variant="primary" disabled={!canReview} onClick={confirm}>Confirmar decisão</ActionButton></>}>
+      <div className="hca-form-stack">
+        <DefinitionGrid items={[
+          { label: "Ato", value: actLabels[decision.identityAction] },
+          { label: "Sucessor", value: prepared.successor ? `${prepared.successor.name} · ${prepared.successor.unit}`
+            : decision.identityAction === "retire" ? "Sem indicar sucessor" : "Indicação removida" },
+          { label: "Motivo", value: <span className="whitespace-pre-wrap">{decision.reason}</span>, wide: true },
+        ]} />
+        <section className="hca-form" aria-label="Material de origem">
+          <h3>{prepared.source.name} · {prepared.source.unit}</h3><DefinitionGrid items={balances(prepared.source)} />
+        </section>
+        {prepared.successor ? <section className="hca-form" aria-label="Sucessor para novas escolhas">
+          <h3>{prepared.successor.name} · {prepared.successor.unit}</h3><DefinitionGrid items={balances(prepared.successor)} />
+        </section> : null}
+        <FeedbackBanner>Saldos, custódias e fatos anteriores permanecem associados às identidades originais.</FeedbackBanner>
+      </div>
+    </Dialog> : null}
+    {comparing && snapshot && prepared ? <Dialog open title="Referência atual do material" kicker="Organização da residência" headingIcon="history"
+      keyboardScrollable onClose={() => setDismissedComparisonRevision(referenceRevision)}
+      footer={<><ActionButton onClick={() => setDismissedComparisonRevision(referenceRevision)}>Voltar</ActionButton>
+        <ActionButton variant="primary" disabled={!reference || referenceRead.loading || Boolean(referenceRead.error)}
+          onClick={() => { setDismissedComparisonRevision(referenceRevision); setObsoleted(false); }}>Usar referência atual</ActionButton></>}>
+      <div className="hca-form-stack">
+        {referenceRead.loading ? <LoadingIndicator label="Conferindo a referência do material" /> : null}
+        {referenceRead.error ? <FeedbackBanner tone="error">A referência atual está indisponível. Seu motivo permanece na edição.
+          <ActionButton onClick={referenceRead.refresh}>Consultar novamente</ActionButton>
+        </FeedbackBanner> : null}
+        {reference && !referenceRead.error && !referenceRead.loading ? <>
+          <section className="hca-form" aria-label="Referência da decisão">
+            <h3>{prepared.source.name} · {prepared.source.unit}</h3><DefinitionGrid items={balances(prepared.source)} />
+          </section>
+          <section className="hca-form" aria-label="Referência atual de origem">
+            <h3>{reference.source.name} · {reference.source.unit}</h3><DefinitionGrid items={balances(reference.source)} />
+          </section>
+          {reference.successor ? <section className="hca-form" aria-label="Referência atual do sucessor">
+            <h3>{reference.successor.name} · {reference.successor.unit}</h3><DefinitionGrid items={balances(reference.successor)} />
+          </section> : null}
+          <FeedbackBanner>Uma nova revisão usará a referência atual. Os dados da sua edição continuam disponíveis.</FeedbackBanner>
+        </> : null}
+      </div>
+    </Dialog> : null}
+  </>;
 }

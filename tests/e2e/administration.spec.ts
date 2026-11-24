@@ -152,11 +152,15 @@ test.describe("administração integrada no ambiente local", () => {
     await record("Salvar cadastro", "Cadastro atualizado");
     const material = page.getByRole("dialog", { name: finalName, exact: true });
     await material.getByRole("button", { name: /^Situação e sucessor/ }).click();
-    const identity = page.getByRole("dialog", { name: "Situação e sucessor do material", exact: true });
-    await identity.getByLabel("Ato no catálogo", { exact: true }).selectOption("retire");
-    await identity.getByLabel("Motivo próprio da escolha", { exact: true }).fill("Identidade preservada durante a revisão do cadastro.");
-    await identity.getByRole("button", { name: "Revisar mudança no catálogo", exact: true }).click();
-    await identity.getByRole("button", { name: "Confirmar mudança no catálogo", exact: true }).click();
+    const identity = page.getByRole("dialog", { name: "Situação do material", exact: true });
+    await identity.getByRole("button", { name: "Inativar material", exact: true }).click();
+    const identityEditor = page.getByRole("dialog", { name: "Inativar material", exact: true });
+    await identityEditor.getByLabel("Motivo da decisão", { exact: true }).fill("Identidade preservada durante a revisão do cadastro.");
+    await identityEditor.getByRole("button", { name: "Revisar efeito", exact: true }).click();
+    await page.getByRole("dialog", { name: "Confirmar efeito no catálogo?", exact: true })
+      .getByRole("button", { name: "Confirmar decisão", exact: true }).click();
+    await page.getByRole("dialog", { name: "Situação registrada", exact: true })
+      .getByRole("button", { name: "Concluir", exact: true }).click();
     await expect(identity).toHaveCount(0);
     await material.getByRole("button", { name: "Voltar", exact: true }).click();
     await page.getByRole("combobox", { name: "Situação dos produtos", exact: true }).selectOption("inactive");
