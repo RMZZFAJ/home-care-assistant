@@ -1,0 +1,123 @@
+.hca-pwa-entries {
+  display: grid;
+  gap: .65rem;
+}
+
+.hca-overlay:has(.hca-pwa-sheet) > .hca-modal-backdrop {
+  inset: var(--app-header-height) 0 0;
+}
+
+.hca-pwa-sheet > .hca-modal-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.hca-pwa-sheet > .hca-modal-content > * {
+  flex-shrink: 0;
+}
+
+.hca-pwa-brand {
+  display: flex;
+  align-items: center;
+  gap: .9rem;
+  padding-block: 1.25rem 1.6rem;
+}
+
+.hca-pwa-brand > span {
+  display: grid;
+  flex: 0 0 3.5rem;
+  height: 3.5rem;
+  place-items: center;
+  border-radius: 1rem;
+  color: white;
+  background: var(--hca-teal);
+}
+
+.hca-pwa-brand > div,
+.hca-pwa-section,
+.hca-pwa-instructions {
+  display: grid;
+  gap: .45rem;
+}
+
+.hca-pwa-brand small {
+  color: var(--hca-muted);
+}
+
+.hca-pwa-section {
+  justify-items: start;
+  grid-template-columns: minmax(0, 1fr);
+  padding-block-end: .85rem;
+  border: 1px solid var(--hca-line);
+  border-radius: 1rem;
+  overflow: hidden;
+}
+
+.hca-pwa-section > :not(h3) {
+  margin-inline: 1rem;
+}
+
+.hca-pwa-section > :is(.hca-push-detail, [role="status"]) {
+  justify-self: stretch;
+}
+
+.hca-pwa-section h3 {
+  width: 100%;
+  padding: .85rem 1rem;
+  background: var(--hca-bg);
+  border-block-end: 1px solid var(--hca-line);
+  font-size: .875rem;
+  font-weight: 700;
+}
+
+.hca-pwa-section .hca-push-detail p,
+.hca-pwa-details p {
+  font-size: .78rem;
+  line-height: 1.6;
+}
+
+.hca-pwa-details {
+  border-block-start: 1px solid var(--hca-line);
+  padding-block: .7rem;
+}
+
+.hca-pwa-details summary {
+  display: flex;
+  min-height: 2.5rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: .6rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.hca-pwa-details summary::-webkit-details-marker {
+  display: none;
+}
+
+.hca-l1 .hca-pwa-sheet details.hca-pwa-details > summary::after {
+  content: none;
+  display: none;
+}
+
+.hca-pwa-details[open] summary svg {
+  transform: rotate(180deg);
+}
+
+.hca-pwa-details p {
+  margin-block-start: .5rem;
+}
+
+.hca-pwa-instructions {
+  list-style: decimal;
+  padding-inline-start: 1.5rem;
+}
+
+.hca-pwa-copy {
+  margin-block-start: .75rem;
+}
+
+.hca-pwa-copy svg {
+  display: inline-block;
+  vertical-align: middle;
+}

@@ -179,9 +179,22 @@ test("Preview estável atualiza por confirmação explícita e conserva a outra 
   await selectContext(page, f.patient);
   application = true; legacyWorker = true; await authorize(context);
   await page.goto(origin + "/perfil?careRecipientId=" + f.patient);
-  await selectProfileSection(page, "notices");
-  await expect(page.getByText("Orientação pública disponível para falta de conexão.", { exact: true })).toBeVisible();
-  await expect(page.getByText("A orientação offline deste aparelho é anterior ao teste de avisos. Consulte as atualizações antes de testar.", { exact: true })).toBeVisible();
+  async function inspectApp(tab: Page) {
+    await selectProfileSection(tab, "notices");
+    await tab.getByRole("button", { name: /^Aplicativo Instalação e preparação/ }).click();
+    const app = tab.getByRole("dialog", { name: "Aplicativo neste aparelho", exact: true });
+    await expect(app.getByText("Orientação pública disponível para falta de conexão.", { exact: true })).toBeVisible();
+    await expect(app.getByText("Atualize a orientação offline antes de testar os avisos neste aparelho.", { exact: true })).toBeVisible();
+    await app.getByRole("button", { name: "Voltar", exact: true }).click();
+  }
+  async function openConnection(tab: Page) {
+    await selectProfileSection(tab, "notices");
+    await tab.getByRole("button", { name: /^Conexão e atualização/ }).click();
+    const panel = tab.getByRole("dialog", { name: "Conexão e atualização", exact: true });
+    await expect(panel.getByRole("heading", { name: "Uma nova versão está pronta", exact: true })).toBeVisible();
+    return panel;
+  }
+  await inspectApp(page);
   await selectProfileSection(page, "identity");
   const first = page.getByRole("textbox", { name: "Nome", exact: true });
   const originalName = await first.inputValue();
@@ -189,8 +202,7 @@ test("Preview estável atualiza por confirmação explícita e conserva a outra 
   const peer = await context.newPage();
   try {
     await peer.goto(origin + "/perfil?careRecipientId=" + f.patient);
-    await selectProfileSection(peer, "notices");
-    await expect(peer.getByText("Orientação pública disponível para falta de conexão.", { exact: true })).toBeVisible();
+    await inspectApp(peer);
     await selectProfileSection(peer, "identity");
     const other = peer.getByRole("textbox", { name: "Nome", exact: true });
     await other.fill("Edição intacta na outra aba");
@@ -198,33 +210,74 @@ test("Preview estável atualiza por confirmação explícita e conserva a outra 
     await expect.poll(() => page.evaluate(async () => (await navigator.serviceWorker.getRegistration("/"))?.active?.state)).toBe("activated");
     legacyWorker = false; revision = randomUUID().replaceAll("-", "").slice(0, 24);
     await page.evaluate(async () => (await navigator.serviceWorker.getRegistration("/"))!.update());
-    const banner = page.getByRole("status", { name: "Atualização do aplicativo", exact: true });
-    await expect(banner).toBeVisible();
-    if (info.project.name === "chromium") {
-      const noticeBox = (await banner.boundingBox())!, headerBox = (await page.locator(".app-header").boundingBox())!, navigationBox = (await page.locator(".hca-desktop-navigation").boundingBox())!;
-      expect(noticeBox.y).toBeGreaterThanOrEqual(headerBox.y + headerBox.height);
-      expect(noticeBox.x).toBeGreaterThanOrEqual(navigationBox.x + navigationBox.width);
-    }
+    await expect.poll(() => page.evaluate(async () => Boolean((await navigator.serviceWorker.getRegistration("/"))?.waiting))).toBe(true);
+    await expect(page.getByRole("status", { name: "Atualização do aplicativo", exact: true })).toHaveCount(0);
+    const connection = await openConnection(page);
+    const disclosure = connection.locator("details > summary");
+    await expect(disclosure).toHaveText("Ao retomar a conexão");
+    expect(await disclosure.evaluate(element => getComputedStyle(element, "::after").content)).toBe("none");
     await info.attach("pwa-update-placement", { body: await page.screenshot(), contentType: "image/png" });
-    await banner.getByRole("button", { name: "Atualizar aplicativo", exact: true }).click();
-    const confirmation = page.getByRole("dialog", { name: "Atualizar aplicativo neste aparelho", exact: true });
-    await confirmation.getByRole("button", { name: "Voltar para salvar", exact: true }).click();
+    await connection.getByRole("button", { name: "Atualizar esta aba", exact: true }).click();
+    const confirmation = page.getByRole("dialog", { name: "Atualizar esta aba?", exact: true });
+    await confirmation.getByRole("button", { name: "Agora não", exact: true }).click();
+    await connection.getByRole("button", { name: "Voltar", exact: true }).click();
+    await selectProfileSection(page, "identity");
     await expect(first).toHaveValue("Edição que será preservada ao cancelar");
     expect(await page.evaluate(() => performance.timeOrigin)).toBe(firstClock);
     await first.fill(originalName);
-    await banner.getByRole("button", { name: "Atualizar aplicativo", exact: true }).click();
+    // Hold the application's actual dispatched profile command in this tab.
+    // The protected fixture never forwards private writes to an upstream.
+    type SendGate = { attempts: number; failUpdate: boolean; release?: () => void };
+    await page.evaluate(() => {
+      const gate: SendGate = { attempts: 0, failUpdate: false };
+      (window as typeof window & { hcaSendGate: SendGate }).hcaSendGate = gate;
+      const original = window.fetch.bind(window);
+      window.fetch = (input, init) => {
+        if (input === "/api/runtime" && gate.failUpdate) {
+          gate.failUpdate = false;
+          return Promise.resolve(Response.json({ state: "unavailable" }, { status: 503 }));
+        }
+        if (input !== "/api/profile" || init?.method !== "POST") return original(input, init);
+        gate.attempts++;
+        return new Promise(resolve => {
+          gate.release = () => resolve(Response.json({ ok: true }));
+        });
+      };
+    });
+    await page.getByRole("button", { name: "Salvar perfil", exact: true }).click();
+    const attempts = () => page.evaluate(() => (window as typeof window & { hcaSendGate: SendGate }).hcaSendGate.attempts);
+    await expect.poll(attempts).toBe(1);
+    const duringSend = await openConnection(page);
+    const update = duringSend.getByRole("button", { name: "Atualizar esta aba", exact: true });
+    try {
+      await expect(update).toBeDisabled();
+      await duringSend.getByRole("button", { name: "Conferir o envio", exact: true }).click();
+      await expect(duringSend.getByRole("button", { name: "Conferindo o envio…", exact: true })).toBeDisabled();
+      expect(await page.evaluate(() => performance.timeOrigin)).toBe(firstClock);
+    } finally {
+      await page.evaluate(() => (window as typeof window & { hcaSendGate: SendGate }).hcaSendGate.release?.());
+    }
+    await expect(update).toBeEnabled();
+    expect(await attempts()).toBe(1);
+    await page.evaluate(() => { (window as typeof window & { hcaSendGate: SendGate }).hcaSendGate.failUpdate = true; });
+    await update.click();
+    await confirmation.getByRole("button", { name: "Atualizar agora", exact: true }).click();
+    const failure = page.getByRole("dialog", { name: "Atualização não concluída", exact: true });
+    await expect(failure).toBeVisible();
+    await failure.getByRole("button", { name: "Entendi", exact: true }).click();
+    expect(await page.evaluate(() => performance.timeOrigin)).toBe(firstClock);
+    expect(await attempts()).toBe(1);
+    await update.click();
     await Promise.all([page.waitForEvent("domcontentloaded"), confirmation.getByRole("button", { name: "Atualizar agora", exact: true }).click()]);
-    await expect(page.getByRole("status", { name: "Resultado da atualização", exact: true })).toContainText("Aplicativo atualizado com sucesso");
+    await expect(page.getByRole("dialog", { name: "Esta aba foi atualizada", exact: true })).toBeVisible();
     expect(await page.evaluate(() => performance.timeOrigin)).toBeGreaterThan(firstClock);
     await expect.poll(() => page.evaluate(async () => Boolean((await navigator.serviceWorker.getRegistration("/"))?.waiting))).toBe(false);
     await expect(other).toHaveValue("Edição intacta na outra aba");
     expect(await peer.evaluate(() => performance.timeOrigin)).toBe(peerClock);
-    const peerBanner = peer.getByRole("status", { name: "Atualização do aplicativo", exact: true });
-    await expect(peerBanner).toBeVisible();
     await other.fill(originalName);
-    await peerBanner.getByRole("button", { name: "Atualizar aplicativo", exact: true }).click();
-    await Promise.all([peer.waitForEvent("domcontentloaded"), peer.getByRole("dialog", { name: "Atualizar aplicativo neste aparelho", exact: true }).getByRole("button", { name: "Atualizar agora", exact: true }).click()]);
-    await expect(peer.getByRole("status", { name: "Resultado da atualização", exact: true })).toContainText("Aplicativo atualizado com sucesso");
+    await (await openConnection(peer)).getByRole("button", { name: "Atualizar esta aba", exact: true }).click();
+    await Promise.all([peer.waitForEvent("domcontentloaded"), peer.getByRole("dialog", { name: "Atualizar esta aba?", exact: true }).getByRole("button", { name: "Atualizar agora", exact: true }).click()]);
+    await expect(peer.getByRole("dialog", { name: "Esta aba foi atualizada", exact: true })).toBeVisible();
     expect(await page.evaluate(() => performance.timeOrigin)).toBeGreaterThan(firstClock);
     expect(await cachePaths(peer)).toEqual(publicPaths);
   } finally { await peer.close(); }

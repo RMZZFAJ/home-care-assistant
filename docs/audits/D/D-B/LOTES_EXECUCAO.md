@@ -4159,6 +4159,42 @@ do botão de atualização na própria região. Os testes foram feitos com
 transporte controlado. As capturas de bloqueio, pausa e teste em 360 e
 412 px ficam em `output/playwright/l4-device-panels/`.
 
+### E11-08 e E11-09 — Instalação, conexão e atualização da aba
+
+- **Aplicativo** abre o painel com instalação opcional, preparação pública e
+  verificação de versão. O aviso nativo do navegador depende de confirmação.
+  Quando o navegador não oferece a instalação, o painel orienta pelo menu e
+  mantém o acesso pela web. Aceitar um pedido não atesta que a instalação
+  terminou. Preparação, instalação e inscrição de Push têm resultados próprios.
+  O painel também reúne o endereço estável do Preview e a revisão para suporte.
+- **Conexão e atualização** mostra conexão, versão e estado do envio em curso.
+  A atualização pronta aparece nessa área. A confirmação ativa a versão
+  compatível e recarrega somente a aba que pediu a atualização. Uma falha mantém
+  a aba aberta e apresenta o resultado no diálogo compartilhado.
+- A conferência de envio aguarda até 30 segundos pelas requisições já iniciadas
+  na aba. Se o resultado não for confirmado, o fluxo volta à operação original
+  para consulta. O acompanhamento não grava formulários ou chaves de tentativas.
+  A recarga continua bloqueada enquanto houver envio ativo. Os rascunhos já
+  aprovados mantêm seus contratos próprios.
+- Ao reconectar, a aba confere a versão e aguarda a leitura atual de sessão e
+  acessos. Uma tentativa de registrar acesso à ficha com resposta incerta só é
+  repetida por solicitação explícita. Sem conexão, a orientação pública pode
+  continuar disponível e ações privadas não entram em fila.
+
+A comparação usou o laboratório v2 em 360 e 412 px e as capturas do painel
+de instalação e conexão no Android e no iOS emulados. A rodada passou em 15 casos
+sem retentativas em Chromium, Android e iOS emulados. Ela confirmou instalação
+manual, tentativa nativa por gesto, recuperação da preparação, retorno da rede,
+falha de atualização, proteção do envio e isolamento entre abas. Oito casos
+complementares passaram em Android e iOS, incluindo revogação da sessão e
+ausência de cache privado. As capturas mostraram cartões cortados em telas
+baixas. O conteúdo passou a rolar preservando a altura dos cartões e o rodapé.
+Os quatro testes de instalação e recuperação passaram após esse ajuste em
+Android e iOS, com checagem do alvo de toque. Os 22 testes unitários de
+transporte e bloqueio passaram. A etapa usa o esquema existente. A instalação
+em aparelho físico e a validação no Preview com as migrations de L4 permanecem
+pendentes.
+
 ### E12-01 — Guias e ajuda na tarefa
 
 - Os assuntos são apresentados por função e abrem o painel de orientação
@@ -4520,8 +4556,12 @@ COM, regularização ENT, estoque familiar, administração de acesso, balanço
 e consumo. O aceite integrado continua sujeito à CI do candidato e à
 validação no Preview. As migrations locais aguardam a transição do banco
 compartilhado com a produção.
-Os demais cenários de E10 e E11 ainda precisam de conferência de paridade
-com a v2. Os testes de E12 não comprovam esse aceite.
+Os cenários restantes de E10 ainda precisam de conferência de paridade
+com a v2. Em E11-01, a identidade e a foto ainda usam a edição na própria
+página do perfil. Falta aplicar os painéis e os resultados previstos na v2,
+preservando a confirmação do envio de foto e a troca concorrente. A revisão
+de E11-02 e E11-03 ainda deve comparar os contatos, a disponibilidade do
+Google, a apresentação do MFA e as sessões com o laboratório.
 
 ### Pendências da CI publicada em `a08742dc`
 
@@ -4543,3 +4583,40 @@ com a v2. Os testes de E12 não comprovam esse aceite.
 - Também no `mobile-2`, o teste de chegada da COM passou na repetição.
   A primeira tentativa perdeu a aba **Materiais** durante a seleção.
   [Job Mobile 2](https://github.com/RMZZFAJ/home-care-assistant/actions/runs/45330314424/job/138238031133)
+
+### Publicação em draft de `e7be6b72`
+
+A PR 8 permaneceu em draft em `feat/phase-d-continuation`. O push reuniu 16
+commits, com 13 migrations de L4 que ainda constam apenas no banco local. O
+SonarCloud aprovou o SHA e o CodeRabbit pulou a revisão
+incremental por não conseguir retomar o último ponto revisado. Na rodada
+anterior, o CodeRabbit havia informado um limite de 100 arquivos para os
+274 que entraram no escopo da revisão.
+
+A CI desse SHA falhou no job de banco e não iniciou os navegadores. Dois
+testes de diretório comparavam a projeção antiga, anterior à autorização
+de consumo familiar por vínculo. O teste de arquivamento tentava retirar a
+própria restrição. Os testes locais passaram a conferir a ausência da
+autorização de consumo fora do contexto ativo e a recusa de autoelevação.
+Outra pessoa autorizada restaura a permissão no caso de arquivamento. Os
+três testes passaram localmente com Auth real.
+
+O Preview ficou `READY` no SHA publicado. A Vercel confirmou o domínio da
+branch e as variáveis de Supabase, assinatura de PDF, Web Push e notificações
+no escopo correto. `/login`, `/api/runtime`, o manifesto, o service worker e
+a página offline responderam HTTP 200. A consulta de notificações sem sessão
+retornou HTTP 401. A checagem não emitiu PDFs nem disparou avisos.
+
+O Preview e a produção em `fab595c7` ainda consultam o mesmo Supabase, com
+362 migrations. A consulta ao banco confirmou a ausência da função da nova
+caixa de avisos. A checagem básica do runtime confere apenas o protocolo e a
+versão do esquema, por isso ainda retorna `ready`. Para validar os fluxos
+novos de ponta a ponta no Preview, ele precisa de um banco com as migrations
+do candidato. Aplicar a migration de contingência no banco compartilhado
+impediria o vínculo de referências pela versão atual de produção.
+
+[PR 8](https://github.com/RMZZFAJ/home-care-assistant/pull/8) ·
+[Preview de e7be6b72][preview-e7be6b72] · [CI de e7be6b72][ci-e7be6b72]
+
+[preview-e7be6b72]: https://home-care-assistant-gxfff9eet-rmzzfajs-projects.vercel.app
+[ci-e7be6b72]: https://github.com/RMZZFAJ/home-care-assistant/actions/runs/45396260206

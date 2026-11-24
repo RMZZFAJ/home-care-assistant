@@ -22,7 +22,11 @@ test.afterEach(async ({ page }) => {
   if (!page.isClosed()) await page.unrouteAll({ behavior: "wait" });
 });
 const pwa = (page: Page) =>
-  page.getByRole("region", { name: "Aplicativo neste aparelho", exact: true });
+  page.getByRole("dialog", { name: "Aplicativo neste aparelho", exact: true });
+async function openApp(page: Page) {
+  await page.getByRole("button", { name: /^Aplicativo Instalação e preparação/ }).click();
+  await expect(pwa(page)).toBeVisible();
+}
 async function login(page: Page, patient: string, email = fixtures.family.email) {
   await page.goto("/login");
   await page.getByLabel("E-mail", { exact: true }).fill(email);
@@ -36,12 +40,14 @@ async function login(page: Page, patient: string, email = fixtures.family.email)
 async function profile(page: Page, patient: string) {
   await page.goto("/perfil?careRecipientId=" + patient);
   await selectProfileSection(page, "notices");
+  await openApp(page);
   await expect(
     pwa(page).getByText(
       "Orientação pública disponível para falta de conexão.",
       { exact: true },
     ),
   ).toBeVisible();
+  await pwa(page).getByRole("button", { name: "Voltar", exact: true }).click();
 }
 const cachePaths = (page: Page) =>
   page.evaluate(async () => {
@@ -301,6 +307,11 @@ test("PWA conserva edição em offline, falha e incompatibilidade e só libera a
             .hcaRuntimeFaultCount ?? 0,
       ),
     ).toBeGreaterThan(previousInjections);
+    if (failure === "incompatible" || failure === "protocol") {
+      const result = page.getByRole("dialog", { name: "Versão incompatível", exact: true });
+      await expect(result).toBeVisible();
+      await result.getByRole("button", { name: "Fechar diálogo", exact: true }).click();
+    }
     if (failure === "unavailable") {
       const menu = page.getByRole("menu", {
         name: "Contextos autorizados",
@@ -427,11 +438,7 @@ test("PWA sem confirmação de atualização aguarda abas, preserva edição e r
         ),
       )
       .toBe(true);
-    await expect(
-      peer.getByText(
-        /^Atualização pronta neste aparelho\./,
-      ),
-    ).toBeVisible();
+    await expect(peer.getByRole("status", { name: "Atualização do aplicativo", exact: true })).toHaveCount(0);
     await expect(other).toHaveValue("2,");
     await expect(first).toHaveValue("1,");
     expect(await peer.evaluate(() => performance.timeOrigin)).toBe(clock);
@@ -474,10 +481,19 @@ test("PWA sem confirmação de atualização aguarda abas, preserva edição e r
 
 test("PWA oferece instalação somente por gesto e mantém web quando o worker não está disponível", async ({
   page,
-}) => {
+}, info) => {
   const f = await setup();
   await login(page, f.patient);
   await profile(page, f.patient);
+  await openApp(page);
+  const installEntry = pwa(page).getByRole("button", { name: /^(Instalar aplicativo|Ver como instalar)$/ });
+  await expect(installEntry).toBeVisible();
+  await installEntry.scrollIntoViewIfNeeded();
+  await expect.poll(() => installEntry.evaluate(element => {
+    const bounds = element.getBoundingClientRect();
+    return element.contains(document.elementFromPoint(bounds.left + bounds.width / 2, bounds.top + bounds.height / 2));
+  })).toBe(true);
+  await info.attach("pwa-installation-panel", { body: await pwa(page).screenshot(), contentType: "image/png" });
   for (const outcome of ["dismissed", "accepted"] as const) {
     await page.evaluate((outcome) => {
       const state = window as typeof window & { hcaInstallCalls?: number };
@@ -500,17 +516,17 @@ test("PWA oferece instalação somente por gesto e mantém web quando o worker n
             .hcaInstallCalls,
       ),
     ).toBe(0);
-    await pwa(page)
-      .getByRole("button", { name: "Instalar aplicativo", exact: true })
-      .click();
-    await expect(
-      pwa(page).getByText(
-        outcome === "dismissed"
-          ? "Instalação adiada. O aplicativo web continua disponível."
-          : "Pedido aceito. Confira a instalação no navegador.",
-        { exact: true },
-      ),
-    ).toBeVisible();
+    await pwa(page).getByRole("button", { name: "Instalar aplicativo", exact: true }).click();
+    const consent = page.getByRole("dialog", { name: "Instalar neste aparelho", exact: true });
+    await expect(consent).toBeVisible();
+    expect(await page.evaluate(() => (window as typeof window & { hcaInstallCalls?: number }).hcaInstallCalls)).toBe(0);
+    await consent.getByRole("button", { name: "Instalar aplicativo", exact: true }).click();
+    if (outcome === "accepted") {
+      const result = page.getByRole("dialog", { name: "Instalação solicitada", exact: true });
+      await expect(result).toBeVisible();
+      await result.getByRole("button", { name: "Entendi", exact: true }).click();
+    }
+    await expect(pwa(page).getByRole("button", { name: "Ver como instalar", exact: true })).toBeEnabled();
     expect(
       await page.evaluate(
         () =>
@@ -519,7 +535,7 @@ test("PWA oferece instalação somente por gesto e mantém web quando o worker n
       ),
     ).toBe(1);
     await expect(
-      pwa(page).getByText("Aplicativo instalado neste aparelho.", {
+      pwa(page).getByText("Aplicativo instalado", {
         exact: true,
       }),
     ).toHaveCount(0);
@@ -529,12 +545,18 @@ test("PWA oferece instalação somente por gesto e mantém web quando o worker n
   });
   await page.reload();
   await selectProfileSection(page, "notices");
+  await openApp(page);
   await expect(
     pwa(page).getByText(
-      "A instalação e a orientação offline não estão disponíveis neste navegador. As funções web continuam disponíveis.",
+      "A orientação offline não está disponível neste navegador.",
       { exact: true },
     ),
   ).toBeVisible();
+  const guide = page.getByRole("dialog", { name: "Instalação pelo navegador", exact: true });
+  await pwa(page).getByRole("button", { name: "Ver como instalar", exact: true }).click();
+  await expect(guide.getByText("Abra o menu do navegador", { exact: true })).toBeVisible();
+  await guide.getByRole("button", { name: "Entendi", exact: true }).click();
+  await pwa(page).getByRole("button", { name: "Voltar", exact: true }).click();
   await selectProfileSection(page, "identity");
   await expect(
     page.getByRole("textbox", { name: "Nome", exact: true }),

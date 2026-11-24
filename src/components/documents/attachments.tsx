@@ -1,6 +1,6 @@
 "use client";
 import { useOperationActivity } from "@/components/ui/operation-activity";
-import { ApiError, requireRuntimeCommandsAvailable } from "@/lib/client/api";
+import { ApiError, observeCommand, requireRuntimeCommandsAvailable } from "@/lib/client/api";
 import { useCallback, useEffect, useId, useRef, useState, type FormEvent } from "react";
 import { z } from "zod";
 import { api, buttonClass, errorMessage, inputClass, Notice, primaryClass } from "@/components/workspace";
@@ -198,27 +198,36 @@ function ScopedAttachments({ patientId, documentId, documentCode, movementId, co
         }
       }
       async function send(prepare: boolean) {
-        const response = await fetch(`/api/attachments${prepare ? "?prepare=1" : ""}`, { method: "POST", body: attachmentForm(pending!, patientId, documentId, movementId, contingencyId), signal: AbortSignal.timeout(30_000) });
-        const body: unknown = await response.json().catch(() => { throw new Error("A resposta do envio não pôde ser confirmada. Consulte a mesma tentativa."); });
-        if (!response.ok) {
-          // A complete validation refusal before any reservation is distinct
-          // from a lost/malformed response or a previously unknown command.
-          const refusal = z.object({ code: z.enum(["VALIDATION_ERROR", "PAYLOAD_TOO_LARGE", "PDF_ANNOTATIONS_UNSUPPORTED"]) }).safeParse(body);
-          if (prepare && !wasUncertain && !resumeTarget && !preparedIdRef.current && [400, 413, 422].includes(response.status) && refusal.success) clearPending(true);
-          throw new Error(errorMessage(body, "Não foi possível confirmar o anexo."));
-        }
-        return body;
+        const upload = pending!;
+        const form = attachmentForm(upload, patientId, documentId, movementId, contingencyId);
+        return observeCommand(async () => {
+          const response = await fetch(`/api/attachments${prepare ? "?prepare=1" : ""}`, { method: "POST", body: form, signal: AbortSignal.timeout(30_000) });
+          const body: unknown = await response.json().catch(() => { throw new Error("A resposta do envio não pôde ser confirmada. Consulte a mesma tentativa."); });
+          if (!response.ok) {
+            // Only a complete pre-reservation refusal settles this send.
+            const refusal = z.object({ code: z.enum(["VALIDATION_ERROR", "PAYLOAD_TOO_LARGE", "PDF_ANNOTATIONS_UNSUPPORTED"]) }).safeParse(body);
+            const message = errorMessage(body, "Não foi possível confirmar o anexo.");
+            if (prepare && !wasUncertain && !resumeTarget && !preparedIdRef.current && [400, 413, 422].includes(response.status) && refusal.success) {
+              clearPending(true);
+              throw new ApiError(message, response.status);
+            }
+            throw new Error(message);
+          }
+          if (confirmedAttachment(body, upload.sourceSha256, preparedIdRef.current)) return { kind: "confirmed" as const, body };
+          if (!prepare) throw new Error("A resposta do envio não pôde ser confirmada. Consulte a mesma tentativa.");
+          const result = attachmentPrepared.safeParse(body);
+          if (!result.success) throw new Error("A preparação não pôde ser confirmada. Consulte a mesma tentativa.");
+          if (result.data.sourceSha256 !== upload.sourceSha256 || preparedIdRef.current && result.data.id !== preparedIdRef.current)
+            throw new Error("A preparação não corresponde ao arquivo desta tentativa.");
+          return { kind: "prepared" as const, body: result.data };
+        });
       }
       phase = "prepare";
       const prepared = await send(true);
-      if (confirmedAttachment(prepared, pending.sourceSha256, preparedIdRef.current)) { acceptConfirmed(prepared, pending, true); return; }
-      const parsed = attachmentPrepared.safeParse(prepared);
-      if (!parsed.success) throw new Error("A preparação não pôde ser confirmada. Consulte a mesma tentativa.");
-      const receipt = parsed.data;
-      if (receipt.sourceSha256 !== pending.sourceSha256 || preparedIdRef.current && receipt.id !== preparedIdRef.current) throw new Error("A preparação não corresponde ao arquivo desta tentativa.");
-      preparedIdRef.current = receipt.id;
+      if (prepared.kind === "confirmed") { acceptConfirmed(prepared.body, pending, true); return; }
+      preparedIdRef.current = prepared.body.id;
       phase = "upload";
-      acceptConfirmed(await send(false), pending);
+      acceptConfirmed((await send(false)).body, pending);
     } catch (reason) {
       if (pendingRef.current && phase !== "local") setUncertain(true);
       const interrupted = reason instanceof TypeError || reason && typeof reason === "object" && "name" in reason && ["AbortError", "TimeoutError"].includes(String(reason.name));

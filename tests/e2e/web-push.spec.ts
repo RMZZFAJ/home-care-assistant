@@ -590,19 +590,26 @@ test("preparação recusada explica a falha, bloqueia permissão Push e recupera
   await expect(activate(page)).toBeDisabled();
   expect(await page.evaluate(() => (window as unknown as { hcaPushCapability: { requests: number; subscriptions: number } }).hcaPushCapability)).toMatchObject({ requests: 0, subscriptions: 0 });
   await panel(page).getByRole("button", { name: "Voltar", exact: true }).press("Enter");
-  const app = page.getByRole("region", { name: "Aplicativo neste aparelho", exact: true });
-  await expect(app.getByRole("alert").filter({ hasText: "Não foi possível iniciar a preparação" })).toBeVisible();
+  await page.getByRole("button", { name: /^Aplicativo Instalação e preparação/ }).click();
+  const app = page.getByRole("dialog", { name: "Aplicativo neste aparelho", exact: true });
+  const failure = page.getByRole("dialog", { name: "Falha na preparação", exact: true });
+  await expect(failure).toContainText("Confira a conexão e o acesso a este endereço");
+  await failure.getByRole("button", { name: "Entendi", exact: true }).click();
   const attempts = await page.evaluate(() => (window as unknown as { hcaRegistrationGate: { calls: number } }).hcaRegistrationGate.calls);
-  await app.getByRole("button", { name: "Consultar atualizações", exact: true }).click();
+  await app.getByRole("button", { name: "Verificar atualizações", exact: true }).click();
   await expect.poll(() => page.evaluate(() => (window as unknown as { hcaRegistrationGate: { calls: number } }).hcaRegistrationGate.calls)).toBeGreaterThan(attempts);
-  await expect(app.getByRole("alert").filter({ hasText: "Não foi possível iniciar a preparação" })).toBeVisible();
+  await expect(failure).toBeVisible();
+  await failure.getByRole("button", { name: "Entendi", exact: true }).click();
   const clock = await page.evaluate(() => performance.timeOrigin);
   await page.evaluate(() => { (window as unknown as { hcaRegistrationGate: { blocked: boolean } }).hcaRegistrationGate.blocked = false; });
-  await app.getByRole("button", { name: "Tentar preparar orientação offline novamente", exact: true }).click();
+  await app.getByRole("button", { name: "Conferir preparação", exact: true }).click();
+  const prepared = page.getByRole("dialog", { name: "Aplicativo preparado", exact: true });
+  await expect(prepared).toBeVisible();
+  await prepared.getByRole("button", { name: "Entendi", exact: true }).click();
   await expect(app.getByText("Orientação pública disponível para falta de conexão.", { exact: true })).toBeVisible();
   expect(await page.evaluate(() => performance.timeOrigin)).toBe(clock);
   expect(await page.evaluate(() => matchMedia("(display-mode: standalone)").matches)).toBe(false);
-  const checkUpdates = app.getByRole("button", { name: "Consultar atualizações", exact: true });
+  const checkUpdates = app.getByRole("button", { name: "Verificar atualizações", exact: true });
   for (const width of [1440, 768, 390, 320]) {
     await page.setViewportSize({ width, height: 950 });
     // Audit the page at its known origin, then check the actual update target
@@ -618,6 +625,7 @@ test("preparação recusada explica a falha, bloqueia permissão Push e recupera
       )));
     })).toBe(true);
   }
+  await app.getByRole("button", { name: "Voltar", exact: true }).click();
   await openPushPanel(page);
   await expect(activate(page)).toBeEnabled();
   expect(await page.evaluate(() => (window as unknown as { hcaPushCapability: { requests: number } }).hcaPushCapability.requests)).toBe(0);

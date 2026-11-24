@@ -147,11 +147,17 @@ export function WorkspaceProvider({ children }: { children: ReactNode; }) {
   useEffect(() => {
     if (publicPage) return;
     const refresh = () => { void load(); };
+    const revalidateAccess = (event: Event) => {
+      const { signal, waitFor } = (event as CustomEvent<{ signal: AbortSignal; waitFor: (read: Promise<void>) => void }>).detail;
+      waitFor(load(signal));
+    };
     window.addEventListener("hca:profile-updated", refresh);
     window.addEventListener("hca:data-changed", refresh);
+    window.addEventListener("hca:revalidate-access", revalidateAccess);
     return () => {
       window.removeEventListener("hca:profile-updated", refresh);
       window.removeEventListener("hca:data-changed", refresh);
+      window.removeEventListener("hca:revalidate-access", revalidateAccess);
     };
   }, [load, publicPage]);
   const selectProfile = async (id: string | null) => {

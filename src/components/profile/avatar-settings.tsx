@@ -2,7 +2,7 @@
 import { useRef, useState, type FormEvent } from "react";
 import Image from "next/image";
 import { z } from "zod";
-import { api, ApiError, errorMessage, requireRuntimeCommandsAvailable } from "@/lib/client/api";
+import { api, ApiError, errorMessage, observeCommand } from "@/lib/client/api";
 import { useScopedRead } from "@/lib/use-scoped-read";
 import { useLiveRevision } from "@/lib/use-live-revision";
 import { avatarAttemptSchema, parseAvatarRead } from "@/lib/validation/avatar";
@@ -54,12 +54,17 @@ function AvatarContent() {
       }
       selected ??= { key: pending?.key ?? crypto.randomUUID(), reference: pending?.referenceRevision ?? data.referenceRevision, hash, file };
       setPacket(selected); setLookup(selected.key);
-      requireRuntimeCommandsAvailable();
-      const form = new FormData(); form.set("file", selected.file);
-      const response = await fetch("/api/profile/avatar", { method: "POST", headers: { "idempotency-key": selected.key, "x-avatar-reference": String(selected.reference) }, body: form });
-      const body: unknown = await response.json();
-      if (!response.ok) throw new ApiError(errorMessage(body, "Não foi possível concluir a troca da foto."), response.status);
-      resultSchema.parse(body);
+      const { file: avatar, key, reference } = selected;
+      const form = new FormData(); form.set("file", avatar);
+      await observeCommand(async () => {
+        const response = await fetch("/api/profile/avatar", {
+          method: "POST", headers: { "idempotency-key": key, "x-avatar-reference": String(reference) },
+          body: form, signal: AbortSignal.timeout(30_000),
+        });
+        const body: unknown = await response.json();
+        if (!response.ok) throw new ApiError(errorMessage(body, "Não foi possível concluir a troca da foto."), response.status);
+        resultSchema.parse(body);
+      });
       await reconcile(selected.key);
       requestAnimationFrame(() => resultRef.current?.focus());
     } catch (reason) {

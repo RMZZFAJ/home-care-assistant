@@ -8,13 +8,18 @@ import {
   useLayoutEffect,
   useRef,
   useState,
+  useSyncExternalStore,
   type ReactNode,
 } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import contract from "@/lib/pwa/contract.json";
 import { setRuntimeCommandsAvailable } from "@/lib/client/api";
+import { claimTabUpdate, observeTabCommands, subscribeTabCommands, tabCommandCount } from "@/lib/client/tab-commands";
 import { activeWorker, activateWorkerUpdate, workerContract, workerFailure, workerSupports, type WorkerPhase } from "@/lib/pwa/worker";
+import { ActionButton } from "@/components/ui/controls";
+import { Icon } from "@/components/ui/icon";
 import { Dialog } from "@/components/ui/overlays";
+import { PwaPanels, preparationDetail, type PwaPanel } from "./pwa-panels";
 
 type Runtime = "checking" | "ready" | "unavailable" | "incompatible";
 type WorkerState = "checking" | "ready" | "unavailable" | "error";
@@ -22,7 +27,7 @@ type InstallPrompt = Event & {
   prompt: () => Promise<void>;
   userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
 };
-type State = {
+export type PwaState = {
   blocked: boolean;
   notices: ReactNode;
   runtime: Runtime;
@@ -36,9 +41,11 @@ type State = {
   installing: boolean;
   updating: boolean;
   pushTestReady: boolean;
-  message: string;
-  error: string;
+  checkedAt: number | null;
+  checkingUpdates: boolean;
+  updated: boolean;
   revision: string;
+  openPanel: (panel: PwaPanel, trigger?: HTMLButtonElement) => void;
   install: () => Promise<void>;
   checkUpdates: () => Promise<void>;
   requestUpdate: () => void;
@@ -47,7 +54,9 @@ type State = {
   readyRegistration: () => ServiceWorkerRegistration | null;
   previewInstallUrl: string | null;
 };
-const Context = createContext<State | null>(null);
+type Feedback = { title: string; text: string; outcome?: "success" | "rejected" | "uncertain" };
+const Context = createContext<PwaState | null>(null);
+const noServerCommands = () => 0;
 export function usePwa() {
   const value = use(Context);
   if (!value) throw new Error("PWA settings require their provider");
@@ -55,6 +64,7 @@ export function usePwa() {
 }
 export function PwaProvider({ children, previewOrigin = null }: { children: ReactNode; previewOrigin?: string | null }) {
   const pathname = usePathname();
+  const router = useRouter();
   const publicPage =
     ["/login", "/recuperar-senha", "/convites/aceitar"].includes(pathname) ||
     pathname === "/verificar" ||
@@ -76,15 +86,26 @@ export function PwaProvider({ children, previewOrigin = null }: { children: Reac
   const [installed, setInstalled] = useState(false),
     [canInstall, setCanInstall] = useState(false),
     [installing, setInstalling] = useState(false);
-  const [message, setMessage] = useState(""),
-    [error, setError] = useState(""),
-    [revision, setRevision] = useState("");
+  const [revision, setRevision] = useState(""),
+    [checkingUpdates, setCheckingUpdates] = useState(false),
+    [checkedAt, setCheckedAt] = useState<number | null>(null),
+    [updated, setUpdated] = useState(false);
+  const [panel, setPanel] = useState<PwaPanel | null>(null);
+  const panelTriggerRef = useRef<HTMLButtonElement | null>(null);
+  const [feedback, setFeedback] = useState<Feedback | null>(null);
+  const [incompatibilityDismissed, setIncompatibilityDismissed] = useState(false);
+  const [sendCheck, setSendCheck] = useState<Awaited<ReturnType<typeof observeTabCommands>> | null>(null);
+  const [checkingSend, setCheckingSend] = useState(false);
+  const sendCount = useSyncExternalStore(subscribeTabCommands, tabCommandCount, noServerCommands);
+  const checkingSendRef = useRef(false);
+  const preparationRequestedRef = useRef(false);
+  const sendReviewRef = useRef(0);
+  const installationConfirmedRef = useRef(false);
   const [confirmUpdate, setConfirmUpdate] = useState(false),
     [updating, setUpdating] = useState(false);
   const [tabNeedsReload, setTabNeedsReload] = useState(false);
   const [pushTestReady, setPushTestReady] = useState(false);
   const tabRevisionRef = useRef<string | null>(null);
-  const [updateFeedback, setUpdateFeedback] = useState<{ text: string; failed: boolean } | null>(null);
   const updateReceiptRef = useRef<{ revision: string; at: number } | null>(null);
   const updateBusyRef = useRef(false);
   const registrationRef = useRef<ServiceWorkerRegistration | null>(null),
@@ -97,12 +118,14 @@ export function PwaProvider({ children, previewOrigin = null }: { children: Reac
     sequenceRef.current++;
     requestRef.current?.abort();
   }, []);
-  const refresh = useCallback(async () => {
+  const refresh = useCallback(async (revalidateAccess = true) => {
+    if (!navigator.onLine) return;
     requestRef.current?.abort();
     const controller = new AbortController(),
       own = ++sequenceRef.current;
     requestRef.current = controller;
     const timeout = setTimeout(() => controller.abort(), 8000);
+    setIncompatibilityDismissed(false);
     setRuntime("checking");
     try {
       const response = await fetch("/api/runtime", {
@@ -111,20 +134,26 @@ export function PwaProvider({ children, previewOrigin = null }: { children: Reac
       });
       const body = await response.json();
       if (own !== sequenceRef.current) return;
-      setRuntime(
-        body.state === "incompatible" ||
-          (response.ok &&
-            body.state === "ready" &&
-            (body.protocol !== contract.protocol ||
-              body.schema !== contract.schema))
-          ? "incompatible"
-          : response.ok &&
-              body.state === "ready" &&
-              body.protocol === contract.protocol &&
-              body.schema === contract.schema
-            ? "ready"
-            : "unavailable",
-      );
+      if (body.state === "incompatible" || response.ok && body.state === "ready" &&
+        (body.protocol !== contract.protocol || body.schema !== contract.schema)) {
+        setRuntime("incompatible");
+      } else if (response.ok && body.state === "ready") {
+        if (revalidateAccess) {
+          const reads: Promise<void>[] = [];
+          window.dispatchEvent(new CustomEvent("hca:revalidate-access", {
+            detail: { signal: controller.signal, waitFor: (read: Promise<void>) => reads.push(read) },
+          }));
+          await Promise.all(reads);
+          if (own !== sequenceRef.current) return;
+          if (controller.signal.aborted) {
+            setRuntime("unavailable");
+            return;
+          }
+        }
+        setRuntime("ready");
+      } else {
+        setRuntime("unavailable");
+      }
     } catch {
       if (own === sequenceRef.current) setRuntime("unavailable");
     } finally {
@@ -138,7 +167,10 @@ export function PwaProvider({ children, previewOrigin = null }: { children: Reac
       setPreparationAttempt(value => value + 1);
       void refresh();
     };
-    const disconnected = () => setOffline(true);
+    const disconnected = () => {
+      invalidate();
+      setOffline(true);
+    };
     const controllerChanged = () => {
       readyRegistrationRef.current = null; readyWorkerRef.current = null;
       setPushTestReady(false);
@@ -150,10 +182,11 @@ export function PwaProvider({ children, previewOrigin = null }: { children: Reac
       setCanInstall(true);
     };
     const appInstalled = () => {
+      installationConfirmedRef.current = true;
       setInstalled(true);
       setCanInstall(false);
       promptRef.current = null;
-      setMessage("Aplicativo instalado neste aparelho.");
+      setFeedback({ title: "Aplicativo instalado", text: "Abra o Home Care Assistant pela tela inicial deste aparelho.", outcome: "success" });
     };
     void Promise.resolve().then(() => {
       if (!live) return;
@@ -176,7 +209,7 @@ export function PwaProvider({ children, previewOrigin = null }: { children: Reac
       );
       if (!("serviceWorker" in navigator) || !window.isSecureContext)
         setWorker("unavailable");
-      void refresh();
+      void refresh(false);
     });
     window.addEventListener("online", online);
     window.addEventListener("offline", disconnected);
@@ -266,11 +299,10 @@ export function PwaProvider({ children, previewOrigin = null }: { children: Reac
         if (!updateBusyRef.current) setTabNeedsReload(version.revision !== tabRevisionRef.current);
         if (updateReceiptRef.current) {
           if (updateReceiptRef.current.revision === version.revision) {
-            setMessage("Aplicativo atualizado com sucesso neste aparelho.");
-            setUpdateFeedback({ text: "Aplicativo atualizado com sucesso neste aparelho.", failed: false });
+            setUpdated(true);
+            setFeedback({ title: "Esta aba foi atualizada", text: "Você está usando a versão atual neste acesso.", outcome: "success" });
           } else {
-            setError("A nova versão ainda não foi confirmada. Consulte as atualizações novamente.");
-            setUpdateFeedback({ text: "A nova versão ainda não foi confirmada. Consulte as atualizações novamente.", failed: true });
+            setFeedback({ title: "Atualização não confirmada", text: "Confira as atualizações para consultar a versão disponível.", outcome: "uncertain" });
           }
           updateReceiptRef.current = null;
         }
@@ -278,11 +310,23 @@ export function PwaProvider({ children, previewOrigin = null }: { children: Reac
         readyWorkerRef.current = active;
         setWorkerPhase("ready");
         setWorker("ready");
+        if (preparationRequestedRef.current) {
+          preparationRequestedRef.current = false;
+          setCheckedAt(Date.now());
+          setFeedback({ title: "Aplicativo preparado", text: "A orientação pública está disponível neste navegador.", outcome: "success" });
+        }
         failure = "update_failed";
       })
       .catch((reason) => {
         clearTimeout(registrationDeadline);
-        if (live) { readyRegistrationRef.current = null; setWorker("error"); setWorkerPhase("failed"); setWorkerIssue(workerFailure(reason, failure)); }
+        if (!live) return;
+        const issue = workerFailure(reason, failure);
+        readyRegistrationRef.current = null;
+        setWorker("error"); setWorkerPhase("failed"); setWorkerIssue(issue);
+        if (preparationRequestedRef.current) {
+          preparationRequestedRef.current = false;
+          setFeedback({ title: "Falha na preparação", text: preparationDetail(issue), outcome: "rejected" });
+        }
       });
     });
     return () => {
@@ -294,8 +338,12 @@ export function PwaProvider({ children, previewOrigin = null }: { children: Reac
     };
   }, [runtime, preparationAttempt]);
   async function retryWorker() {
-    setError(""); setMessage("");
-    if (runtime !== "ready") await refresh();
+    if (offline || !navigator.onLine || worker === "unavailable") return;
+    if (runtime !== "ready") {
+      await refresh();
+      return;
+    }
+    preparationRequestedRef.current = true;
     setPreparationAttempt(value => value + 1);
   }
   function readyRegistration() {
@@ -308,64 +356,99 @@ export function PwaProvider({ children, previewOrigin = null }: { children: Reac
     promptRef.current = null;
     setCanInstall(false);
     setInstalling(true);
-    setError("");
     try {
       await invitation.prompt();
       const choice = await invitation.userChoice;
-      setMessage(
-        choice.outcome === "accepted"
-          ? "Pedido aceito. Confira a instalação no navegador."
-          : "Instalação adiada. O aplicativo web continua disponível.",
-      );
+      if (choice.outcome === "accepted" && !installationConfirmedRef.current) {
+        setFeedback({ title: "Instalação solicitada", text: "Confira a instalação na tela inicial deste aparelho." });
+      }
     } catch {
-      setError("Não foi possível abrir a instalação. Use o menu do navegador.");
+      setFeedback({ title: "Instalação indisponível", text: "Confira a opção de instalação no menu do navegador.", outcome: "rejected" });
     } finally {
       setInstalling(false);
     }
   }
   async function checkUpdates() {
-    setError("");
-    setWorkerIssue("");
+    if (checkingUpdates || offline || !navigator.onLine) return;
+    const registration = registrationRef.current;
+    if (!registration || worker === "error") {
+      await retryWorker();
+      return;
+    }
+    setCheckingUpdates(true);
     try {
-      if (!registrationRef.current || worker === "error") {
-        await retryWorker();
-        return;
+      const problem = workerIssue;
+      setWorkerIssue("");
+      await registration.update();
+      const candidate = registration.waiting;
+      setWaiting(Boolean(candidate));
+      if (candidate || tabNeedsReload) {
+        setFeedback({ title: "Atualização disponível", text: "Em Conexão e atualização, escolha quando recarregar esta aba." });
+      } else if (registration.installing) {
+        setFeedback({ title: "Verificação em andamento", text: "O navegador está preparando arquivos da nova versão. Consulte novamente quando a preparação terminar." });
+      } else if (problem) {
+        setFeedback({ title: "Verificação não concluída", text: preparationDetail(problem), outcome: "rejected" });
+      } else if (worker === "ready" && registration.active === readyWorkerRef.current) {
+        setCheckedAt(Date.now());
+        setFeedback({ title: "Você está na versão atual", text: "A verificação foi concluída neste navegador.", outcome: "success" });
       }
-      await registrationRef.current.update();
-      setWaiting(Boolean(registrationRef.current.waiting));
-      setMessage(
-        registrationRef.current.installing ? "Preparando uma atualização. A versão atual continua disponível enquanto o navegador verifica os arquivos públicos." : registrationRef.current.waiting || tabNeedsReload ? "Atualização pronta. Você pode atualizar este aparelho após salvar seus preenchimentos." : "Verificação concluída. O aplicativo está atualizado neste aparelho.",
-      );
     } catch {
-      setError(
-        "Não foi possível consultar atualizações. Verifique a conexão e tente novamente.",
-      );
+      setFeedback({ title: "Não foi possível verificar atualizações", text: "Confira sua conexão e tente novamente.", outcome: "rejected" });
+    } finally {
+      setCheckingUpdates(false);
+    }
+  }
+  async function checkSend() {
+    if (checkingSendRef.current || !tabCommandCount()) return;
+    checkingSendRef.current = true;
+    setCheckingSend(true);
+    const review = ++sendReviewRef.current;
+    const receive = (result: Awaited<ReturnType<typeof observeTabCommands>>) => {
+      if (review === sendReviewRef.current) setSendCheck(result);
+    };
+    try {
+      receive(await observeTabCommands(30_000, receive));
+    } finally {
+      checkingSendRef.current = false;
+      setCheckingSend(false);
+    }
+  }
+  function openPanel(next: PwaPanel, trigger?: HTMLButtonElement) {
+    panelTriggerRef.current = trigger ?? null;
+    setPanel(next);
+    if (next === "app" && worker === "error") {
+      setFeedback({ title: "Falha na preparação", text: preparationDetail(workerIssue), outcome: "rejected" });
     }
   }
   async function applyUpdate() {
     const registration = registrationRef.current;
     const needsActivation = Boolean(registration?.waiting);
     const candidate = registration?.waiting ?? (tabNeedsReload ? registration?.active : null);
-    if (updateBusyRef.current || offline || !registration || !candidate) return;
+    if (updateBusyRef.current || offline || runtime !== "ready" || sendCheck?.state === "uncertain" || !navigator.onLine || !registration || !candidate) return;
+    const release = claimTabUpdate();
+    if (!release) {
+      setConfirmUpdate(false);
+      return;
+    }
     updateBusyRef.current = true;
-    setUpdating(true); setError(""); setMessage("");
+    setUpdating(true);
     try {
       const target = await workerContract(candidate);
       const response = await fetch("/api/runtime", { cache: "no-store", signal: AbortSignal.timeout(8000) });
       const available = await response.json();
-      if (!response.ok || available.state !== "ready" || target.protocol !== available.protocol || target.schema !== available.schema || !workerSupports(target, "explicit-update") || !/^[a-f0-9]{24}$/.test(target.revision) || (needsActivation ? registration.waiting : registration.active) !== candidate)
+      if (!navigator.onLine || !response.ok || available.state !== "ready" || target.protocol !== available.protocol || target.schema !== available.schema || !workerSupports(target, "explicit-update") || !/^[a-f0-9]{24}$/.test(target.revision) || (needsActivation ? registration.waiting : registration.active) !== candidate)
         throw new Error("update_not_compatible");
       sessionStorage.setItem("hca:pwa-update", JSON.stringify({ revision: target.revision, at: Date.now() }));
       const activated = needsActivation ? await activateWorkerUpdate(registration, target.revision, new AbortController().signal) : candidate;
       const actual = await workerContract(activated);
-      if (actual.revision !== target.revision || actual.protocol !== target.protocol || actual.schema !== target.schema)
+      if (!navigator.onLine || actual.revision !== target.revision || actual.protocol !== target.protocol || actual.schema !== target.schema)
         throw new Error("update_not_confirmed");
       // Only this confirming tab reloads. Other tabs retain their fields and pending intentions.
       window.location.reload();
     } catch {
       try { sessionStorage.removeItem("hca:pwa-update"); } catch { /* No retry or reload loop. */ }
-      setError("Não foi possível confirmar a atualização. Esta aba não foi recarregada; seus preenchimentos foram preservados. Consulte as atualizações e tente novamente.");
-      setUpdateFeedback({ text: "Não foi possível confirmar a atualização. Esta aba não foi recarregada. Consulte as atualizações e tente novamente.", failed: true });
+      release();
+      setFeedback({ title: "Atualização não concluída", text: "Esta aba continua aberta. Confira as atualizações e tente novamente.", outcome: "uncertain" });
       setConfirmUpdate(false); setUpdating(false); updateBusyRef.current = false;
     }
   }
@@ -379,57 +462,60 @@ export function PwaProvider({ children, previewOrigin = null }: { children: Reac
         : "Conferindo conexão e versão do aplicativo…";
   // The shell places notices in its content column, outside the inert command
   // regions. A notice before the shell is covered by its fixed desktop sidebar.
-  const notices = <>
-    {offline || runtime !== "ready" ? (
+  const notices = offline || runtime !== "ready" ? (
       <section className="ui-notice m-3" aria-label="Conexão e versão do aplicativo" role={runtime === "checking" && !offline ? "status" : "alert"}>
         <p>{status}</p>
-        {runtime !== "checking" ? <button className="ui-button ui-button-secondary" type="button" onClick={() => void refresh()}>Consultar conexão e versão novamente</button> : null}
+        {runtime !== "checking" ? <ActionButton disabled={offline} onClick={() => void refresh()}>Consultar conexão e versão novamente</ActionButton> : null}
+        {offline || runtime !== "checking" ? <ActionButton onClick={event => openPanel("connection", event.currentTarget)}>Abrir conexão e atualização</ActionButton> : null}
       </section>
-    ) : null}
-    {(waiting || tabNeedsReload) && !offline ? (
-      <aside className="ui-notice m-3" role="status" aria-label="Atualização do aplicativo">
-        <p>Atualização pronta neste aparelho. Salve seus preenchimentos antes de atualizar. As outras abas não serão recarregadas.</p>
-        <button type="button" className="ui-button ui-button-primary" disabled={updating} onClick={() => setConfirmUpdate(true)}>Atualizar aplicativo</button>
-      </aside>
-    ) : null}
-    {updateFeedback ? <aside className="ui-notice m-3" role={updateFeedback.failed ? "alert" : "status"} aria-label="Resultado da atualização"><p>{updateFeedback.text}</p><button type="button" className="ui-button ui-button-secondary" onClick={() => setUpdateFeedback(null)}>Fechar aviso de atualização</button></aside> : null}
-  </>;
+  ) : null;
+  const blockedBySend = Boolean(sendCount || checkingSend || sendCheck?.state === "pending" || sendCheck?.state === "uncertain");
+  const updateAvailable = waiting || tabNeedsReload;
+  const pwa: PwaState = {
+    blocked, notices, runtime, offline, worker, workerPhase, workerIssue,
+    waiting: updateAvailable, installed, canInstall, installing, updating,
+    pushTestReady, checkedAt, checkingUpdates, updated, revision, openPanel, install,
+    checkUpdates, requestUpdate: () => { if (!blockedBySend && !offline && runtime === "ready") setConfirmUpdate(true); },
+    refresh, retryWorker, readyRegistration,
+    previewInstallUrl: previewOrigin && origin && origin !== previewOrigin ? previewOrigin : null,
+  };
+  const openIncompatibility = !publicPage && !offline && runtime === "incompatible" && !incompatibilityDismissed;
+  const dismissIncompatibility = () => setIncompatibilityDismissed(true);
+  const overlay = confirmUpdate ? <Dialog open title="Atualizar esta aba?" kicker="Aplicativo" headingIcon="refresh"
+    closeDisabled={updating} onClose={() => { if (!updateBusyRef.current) setConfirmUpdate(false); }}
+    footer={<>
+      <ActionButton disabled={updating} onClick={() => setConfirmUpdate(false)}>Agora não</ActionButton>
+      <ActionButton variant="primary" disabled={updating || offline || runtime !== "ready" || blockedBySend || !updateAvailable} onClick={() => void applyUpdate()}>
+        <Icon name="refresh" />{updating ? "Atualizando…" : "Atualizar agora"}
+      </ActionButton>
+    </>}>
+    <p>Vamos recarregar esta aba com a versão mais recente. As outras abas permanecem abertas.</p>
+    <p className="hca-pwa-copy"><Icon name="shield" /> A atualização não reenvia registros. Termine o preenchimento desta aba antes de continuar.</p>
+    {blockedBySend ? <p role="status">Aguarde a confirmação do envio antes de atualizar.</p> : null}
+  </Dialog> : openIncompatibility ? <Dialog open title="Versão incompatível" failure="rejected" dismissOnOutsideClick={false}
+    popupClassName="hca-operation-result-dialog" onClose={dismissIncompatibility}
+    footer={<ActionButton variant="primary" onClick={() => {
+      dismissIncompatibility();
+      openPanel("connection");
+    }}>Abrir conexão e atualização</ActionButton>}>
+    <p>Aguarde uma versão compatível e confira a conexão para continuar.</p>
+  </Dialog> : feedback && !publicPage ? <Dialog open title={feedback.title} success={feedback.outcome === "success"}
+    failure={feedback.outcome === "uncertain" || feedback.outcome === "rejected" ? feedback.outcome : undefined}
+    popupClassName={feedback.outcome ? "hca-operation-result-dialog" : undefined} dismissOnOutsideClick={false}
+    onClose={() => setFeedback(null)} footer={<ActionButton variant="primary" onClick={() => setFeedback(null)}>Entendi</ActionButton>}>
+    <p>{feedback.text}</p>
+  </Dialog> : null;
   return (
-    <Context
-      value={{
-        blocked,
-        notices,
-        runtime,
-        offline,
-        worker,
-        workerPhase,
-        workerIssue,
-        waiting: waiting || tabNeedsReload,
-        installed,
-        canInstall,
-        installing,
-        updating,
-        pushTestReady,
-        message,
-        error,
-        revision,
-        install,
-        checkUpdates,
-        requestUpdate: () => setConfirmUpdate(true),
-        refresh,
-        retryWorker,
-        readyRegistration,
-        previewInstallUrl: previewOrigin && origin && origin !== previewOrigin ? previewOrigin : null,
-      }}
-    >
-      {confirmUpdate ? <Dialog open title="Atualizar aplicativo neste aparelho" closeDisabled={updating} onClose={() => { if (!updateBusyRef.current) setConfirmUpdate(false); }}>
-        <p>Esta aba será recarregada. Salve seus preenchimentos e aguarde a conclusão de qualquer envio antes de continuar. As outras abas permanecem abertas com seus campos; nenhuma operação será reenviada automaticamente.</p>
-        <div className="hca-toolbar">
-          <button type="button" className="ui-button ui-button-secondary" disabled={updating} onClick={() => setConfirmUpdate(false)}>Voltar para salvar</button>
-          <button type="button" className="ui-button ui-button-primary" disabled={updating || offline || !(waiting || tabNeedsReload)} onClick={() => void applyUpdate()}>{updating ? "Atualizando…" : "Atualizar agora"}</button>
-        </div>
-      </Dialog> : null}
+    <Context value={pwa}>
       {children}
+      {panel ? <PwaPanels key={panel} panel={panel} pwa={pwa} finalFocus={panelTriggerRef} overlay={overlay}
+        blockedBySend={blockedBySend} sendCount={sendCount} sendCheck={sendCheck} checkingSend={checkingSend}
+        onCheckSend={() => void checkSend()} onClose={() => setPanel(null)} onReturnToSend={destination => {
+          sendReviewRef.current++;
+          setPanel(null);
+          setSendCheck(null);
+          if (destination !== location.pathname + location.search) router.push(destination);
+        }} /> : overlay}
     </Context>
   );
 }

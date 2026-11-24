@@ -56,8 +56,11 @@ test("access-report failure stays in history without moving the ficha controls a
   let release!: () => void;
   const held = new Promise<void>(resolve => { release = resolve; });
   let intercepted = false;
+  let accessWrites = 0;
   await page.route("**" + endpoint, async route => {
-    if (route.request().method() !== "POST" || intercepted) return route.continue();
+    if (route.request().method() !== "POST") return route.continue();
+    accessWrites++;
+    if (intercepted) return route.continue();
     intercepted = true;
     await held;
     await route.fulfill({ status: 503, contentType: "application/json", body: JSON.stringify({ error: "Registro temporariamente indisponível." }) });
@@ -76,9 +79,16 @@ test("access-report failure stays in history without moving the ficha controls a
     await selectDocumentSection(page, "workflow");
     await selectDocumentSection(page, "history");
     await expect(retry).toBeVisible();
+    await page.evaluate(() => window.dispatchEvent(new Event("offline")));
+    await expect(page.getByText(/^Sem conexão\./)).toBeVisible();
+    await page.evaluate(() => window.dispatchEvent(new Event("online")));
+    await expect(retry).toBeEnabled();
+    await page.evaluate(() => new Promise<void>(resolve => requestAnimationFrame(() => requestAnimationFrame(() => requestAnimationFrame(() => resolve())))));
+    expect(accessWrites).toBe(1);
     const recovered = page.waitForResponse(response => new URL(response.url()).pathname === endpoint && response.request().method() === "POST");
     await retry.click();
     expect((await recovered).status()).toBe(200);
+    expect(accessWrites).toBe(2);
     await expect(retry).toHaveCount(0);
     await expect(page.getByRole("region", { name: "Histórico de acesso à ficha", exact: true }).getByRole("listitem")).toHaveCount(1);
     expect(physical(f.patient)).toBe(before);
