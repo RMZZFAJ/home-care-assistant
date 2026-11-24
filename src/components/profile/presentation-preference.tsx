@@ -1,7 +1,6 @@
 "use client";
 
 import { useId, useState } from "react";
-import { SettingsSection } from "@/components/forms/settings-section";
 import { useWorkspaceState } from "@/components/layout/workspace-context";
 import { ActionButton } from "@/components/ui/controls";
 import { Icon } from "@/components/ui/icon";
@@ -35,9 +34,9 @@ function Preference({ userId, active }: { userId: string; active: boolean }) {
     setDraft(null);
     setOutcome(setMode(draft.selected) ? "saved" : "failed");
   }
-  return <SettingsSection title="Apresentação do início" summary={(mode === "simple" ? "Simples" : "Completa") + " neste aparelho"}>
-    <ActionButton onClick={() => { setOutcome(null); setDraft({ baseline: mode, selected: mode }); }}>
-      Editar apresentação<Icon name="chevron" width={16} height={16} />
+  return <section aria-label="Apresentação do início">
+    <ActionButton className="hca-account-setting" onClick={() => { setOutcome(null); setDraft({ baseline: mode, selected: mode }); }}>
+      <Icon name="home" /><span><strong>Apresentação do início</strong><small>{mode === "simple" ? "Simples" : "Completa"} neste aparelho</small></span><Icon name="chevron" width={16} height={16} />
     </ActionButton>
     {active && draft ? <Dialog open title="Apresentação do início" kicker="Minha conta" headingIcon="home" onClose={() => setDraft(null)}
       footer={<><ActionButton onClick={() => setDraft(null)}>Voltar</ActionButton><ActionButton variant="primary" onClick={apply}>
@@ -57,5 +56,5 @@ function Preference({ userId, active }: { userId: string; active: boolean }) {
         ? "A edição foi descartada. Confira a preferência atual antes de escolher novamente."
         : "O navegador não aceitou o salvamento da preferência."}
       onClose={() => setOutcome(null)} footer={<ActionButton variant="primary" onClick={() => setOutcome(null)}>Concluir</ActionButton>}>{null}</Dialog> : null}
-  </SettingsSection>;
+  </section>;
 }

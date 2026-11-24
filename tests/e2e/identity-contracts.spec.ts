@@ -21,7 +21,7 @@ test("CFinal021 conta alheia tem revisão global própria e não atravessa Meu p
     await page.getByRole("button", { name: "Buscar contas", exact: true }).click();
     await page.getByRole("button", { name: "Editar conta " + before.fullName, exact: true }).click();
     const editor = page.getByRole("dialog", { name: "Editar conta global", exact: true });
-    await expect(editor.getByRole("heading", { name: "Meu perfil e segurança", exact: true })).toHaveCount(0);
+    await expect(editor.getByRole("heading", { name: "Minha conta", exact: true })).toHaveCount(0);
     const classification = editor.getByRole("combobox", { name: "Papel global", exact: true });
     await expect(classification.locator("option")).toHaveText(["Administração", "Supervisão", "Profissional", "Leitura"]);
     await expect(classification).toHaveValue(before.role);
@@ -46,7 +46,8 @@ test("CFinal021 conta alheia tem revisão global própria e não atravessa Meu p
     await review.getByRole("button", { name: "Confirmar conta global", exact: true }).click(); expect((await restored).ok()).toBe(true);
     await expect.poll(() => profile(target)).toEqual(before);
     await page.goto("/perfil"); await selectProfileSection(page, "identity");
-    await expect(page.getByLabel("Nome", { exact: true })).toHaveValue(ownBefore.fullName);
+    const identity = page.getByRole("region", { name: "Identificação pessoal", exact: true });
+    await expect(identity.getByText(ownBefore.fullName, { exact: true })).toBeVisible();
     await login(page, "adminA", f.patient);
     expect((await page.request.get("/api/admin?section=profiles")).status()).toBe(403);
     expect((await page.request.post("/api/admin", { data: { action: "profile", userId: target, ...before, fullName: changedName } })).status()).toBe(403);

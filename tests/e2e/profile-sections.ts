@@ -13,6 +13,26 @@ export async function selectProfileSection(page: Page, section: ProfileSection) 
   await page.evaluate(() => new Promise<void>(ready => requestAnimationFrame(() => requestAnimationFrame(() => ready()))));
   if (test.info().project.use.hasTouch) await tab.tap();
   else await tab.click();
-  await expect(tab).toHaveAttribute("aria-selected", "true");
-  await expect(page.getByRole("tabpanel")).toHaveCount(1);
+  const selected = page.locator('[role="tab"][aria-selected="true"]');
+  await expect(selected).toHaveText(labels[section]);
+  await expect(page.locator('[role="tabpanel"]:not([hidden])')).toHaveCount(1);
+}
+
+export function profileIdentityEditor(page: Page) {
+  return page.getByRole("dialog", { name: "Editar identificação", exact: true });
+}
+
+export async function openProfileIdentity(page: Page) {
+  await page.getByRole("region", { name: "Identificação pessoal", exact: true }).getByRole("button", { name: "Editar", exact: true }).click();
+  const editor = profileIdentityEditor(page);
+  await expect(editor.getByRole("textbox", { name: "Nome completo", exact: true })).toBeEditable();
+  return editor;
+}
+
+export async function openProfilePhoto(page: Page) {
+  await page.getByRole("button", { name: "Alterar minha foto", exact: true }).click();
+  const photo = page.getByRole("dialog", { name: "Minha foto", exact: true });
+  await expect(photo.getByRole("status")).toHaveCount(0);
+  await expect(photo).toBeVisible();
+  return photo;
 }

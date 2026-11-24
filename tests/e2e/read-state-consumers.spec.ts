@@ -1,4 +1,4 @@
-import { selectProfileSection } from "./profile-sections";
+import { openProfileIdentity, selectProfileSection } from "./profile-sections";
 import { expect, test, type Page } from "@playwright/test";
 import { randomUUID } from "node:crypto";
 import { rpc, fixtures, setup } from "../integration/v4-fixtures.mjs";
@@ -32,17 +32,26 @@ test("D3 perfil termina carregamento em falha recupera a leitura e preserva edi�
     await page.goto("/perfil?careRecipientId=" + f.patient); await first;
     const panel = page.getByRole("region", { name: "Perfil pessoal", exact: true });
     await expect(panel.getByText("Carregando perfil…", { exact: true })).toBeVisible();
-    release(); await expect(panel.getByRole("heading", { name: "Identidade pessoal", exact: true })).toBeVisible();
+    const identification = panel.getByRole("heading", { name: "Identificação", exact: true });
+    release(); await expect(identification).toBeVisible();
+    await selectProfileSection(page, "security");
     await selectProfileSection(page, "identity");
-    const name = panel.getByLabel("Nome", { exact: true }); await name.fill("Edição pessoal ainda não salva");
+    const editor = await openProfileIdentity(page);
+    const name = editor.getByRole("textbox", { name: "Nome completo", exact: true });
+    await name.fill("Edição pessoal ainda não salva");
     mode = "error"; await page.evaluate(() => window.dispatchEvent(new Event("hca:data-changed")));
+    await page.goBack();
+    await expect(editor).not.toBeVisible();
     await expect(panel.getByRole("alert")).toContainText("Falha controlada na leitura do perfil");
     await expect(panel.getByText("Carregando perfil…", { exact: true })).toHaveCount(0);
     await expect(panel.getByText("Atualizando consulta do perfil…", { exact: true })).toHaveCount(0);
     mode = "invalid"; await panel.getByRole("button", { name: "Consultar perfil novamente", exact: true }).click();
     await expect(panel.getByRole("alert")).toContainText("A resposta da consulta do perfil não pôde ser lida");
     mode = "emptyOptional"; await panel.getByRole("button", { name: "Consultar perfil novamente", exact: true }).click();
-    await expect(panel.getByRole("alert")).toHaveCount(0); await expect(name).toHaveValue("Edição pessoal ainda não salva");
+    await expect(panel.getByRole("alert")).toHaveCount(0);
+    await page.goForward();
+    await expect(name).toHaveValue("Edição pessoal ainda não salva");
+    await page.getByRole("dialog", { name: "Editar identificação", exact: true }).getByRole("button", { name: "Cancelar", exact: true }).click();
     await expect(panel.getByRole("heading", { name: "Seus vínculos com pacientes", exact: true })).toBeVisible();
     await expect(panel.getByText("Nenhum vínculo local disponível para consulta.", { exact: false })).toBeVisible();
     mode = "restrictedMembership"; await page.evaluate(() => window.dispatchEvent(new Event("hca:data-changed")));
@@ -53,14 +62,13 @@ test("D3 perfil termina carregamento em falha recupera a leitura e preserva edi�
     // profile itself remains the real authorized record and is never mutated.
     mode = "live"; await page.evaluate(() => window.dispatchEvent(new Event("hca:data-changed")));
     await expect(panel.getByText("Nenhum vínculo local disponível para consulta.", { exact: false })).toHaveCount(0);
-    await expect(name).toHaveValue("Edição pessoal ainda não salva");
     const current = await (await page.request.get("/api/profile")).json(); expect(current.data.full_name).not.toBe("Edição pessoal ainda não salva");
     mode = "error"; await page.reload();
     await expect(panel.getByRole("alert")).toContainText("Falha controlada na leitura do perfil");
     await expect(panel.getByText("Carregando perfil…", { exact: true })).toHaveCount(0);
-    await expect(panel.getByRole("heading", { name: "Identidade pessoal", exact: true })).toHaveCount(0);
+    await expect(identification).toHaveCount(0);
     mode = "live"; await panel.getByRole("button", { name: "Consultar perfil novamente", exact: true }).click();
-    await expect(panel.getByRole("heading", { name: "Identidade pessoal", exact: true })).toBeVisible();
+    await expect(identification).toBeVisible();
     for (const width of [320, 390, 768, 1440]) { await page.setViewportSize({ width, height: 900 }); await audit(page, "D3 profile read " + width); }
   } finally { release(); }
 });

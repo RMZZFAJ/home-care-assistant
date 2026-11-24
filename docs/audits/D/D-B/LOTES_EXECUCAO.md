@@ -3986,7 +3986,36 @@ Android emulado passaram sem retentativa. Eles conferiram a entrada da
 contagem facultativa, a opção de custódia na criação de um relato e a
 confirmação de uma concessão antiga com o efeito exibido no histórico.
 
-### E11-01 — Autorização dos avisos ao consultar e abrir
+### E11-01 — Identificação e foto da conta
+
+- **Minha conta** mostra a identificação profissional declarada, os vínculos e
+  as ações de foto e apresentação. A consulta depende da identidade autenticada
+  e funciona sem selecionar um paciente. Os dados profissionais continuam
+  disponíveis à conferência familiar versionada.
+- **Editar identificação** usa um diálogo de preenchimento com validação no
+  campo e resultado compartilhado. Se a resposta chegar incompleta, a consulta
+  compara os valores atuais da conta com o envio. O preenchimento fica nesta
+  aba até a pessoa cancelar. A confirmação e o retorno de rede preservam o
+  bloqueio de acesso quando a sessão é revogada.
+- **Minha foto** valida a imagem, oferece a prévia local e exige confirmação
+  para enviar. A mesma tentativa pode ser consultada até duas vezes e tem
+  detalhes copiáveis se a falha persistir. Uma seleção antiga encontra a foto
+  vigente e mostra o conflito. A associação confirmada continua sendo sucesso
+  quando a limpeza de arquivos anteriores fica pendente.
+- A apresentação do início abre pela seção **Acesso e apresentação**. O atalho
+  de contatos leva aos controles existentes em Segurança enquanto o painel
+  próprio de E11-02 está pendente.
+
+O laboratório v2 foi conferido em 360 e 412 px. As capturas do produto e a
+auditoria em 320 px identificaram um e-mail longo que ultrapassava o cartão.
+O texto passou a quebrar dentro da largura do cartão. Os cinco testes unitários
+do contrato de foto passaram. As verificações dirigidas em Android e iOS
+cobriram a confirmação de um salvamento cuja resposta foi perdida, o conflito
+por edição concorrente, o bloqueio após revogação real e a preservação da
+edição durante a recuperação de uma falha de leitura. Esta etapa usa as APIs
+e o esquema existentes.
+
+### E11-04 — Autorização dos avisos ao consultar e abrir
 
 A central, o sino e a visão geral consultam somente avisos do destinatário
 no vínculo selecionado. A política do Supabase confere a leitura da ficha,
@@ -4016,7 +4045,7 @@ após o ajuste que limpa a contagem antiga do sino. As execuções dirigidas
 usaram zero retentativas. O Advisor local retornou o aviso já registrado
 sobre a extensão `unaccent` no esquema público.
 
-### E11-02 — Central com busca, filtros e ações da ficha
+### E11-04 — Central com busca, filtros e ações da ficha
 
 A central segue a ordem do laboratório v2 com resumo, busca, filtros de
 estado, tipo de ficha em diálogo, hora da consulta e lista de avisos. A busca
@@ -4045,7 +4074,7 @@ Chromium móvel e WebKit no perfil iPhone. Um timeout de login apareceu em
 rodada anterior e o cenário passou nas reexecuções dirigidas sem retry.
 As capturas de 360 e 412 px estão em `output/playwright/l4-inbox/`.
 
-### E11-03 — Preferências pessoais, consentimento e resultado
+### E11-05 — Preferências pessoais, consentimento e resultado
 
 Os canais ficam em Avisos e aplicativo, em painel próprio, e usam a versão
 atual da conta. Salvar a identidade pessoal preserva os canais. Preferências
@@ -4557,11 +4586,8 @@ e consumo. O aceite integrado continua sujeito à CI do candidato e à
 validação no Preview. As migrations locais aguardam a transição do banco
 compartilhado com a produção.
 Os cenários restantes de E10 ainda precisam de conferência de paridade
-com a v2. Em E11-01, a identidade e a foto ainda usam a edição na própria
-página do perfil. Falta aplicar os painéis e os resultados previstos na v2,
-preservando a confirmação do envio de foto e a troca concorrente. A revisão
-de E11-02 e E11-03 ainda deve comparar os contatos, a disponibilidade do
-Google, a apresentação do MFA e as sessões com o laboratório.
+com a v2. A revisão de E11-02 e E11-03 ainda deve comparar os contatos, a
+disponibilidade do Google, a apresentação do MFA e as sessões com o laboratório.
 
 ### Pendências da CI publicada em `a08742dc`
 

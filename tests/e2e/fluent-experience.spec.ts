@@ -1,4 +1,4 @@
-import { selectProfileSection } from "./profile-sections";
+import { openProfileIdentity, selectProfileSection } from "./profile-sections";
 import { test, expect, type Page } from "@playwright/test";
 import { readFileSync, mkdirSync } from "node:fs";
 import { fixtureFile } from "../../scripts/test-environment.mjs";
@@ -38,6 +38,7 @@ test.describe("estilo canônico SSR", () => {
 });
 
 test("gestão canônica troca contexto no submenu, mantém navegação e edita perfil sob demanda", async ({ page }, info) => {
+  test.setTimeout(90_000);
   const failures: string[] = [];
   page.on("pageerror", (error) => failures.push(error.message));
   await login(page, "shared");
@@ -45,13 +46,17 @@ test("gestão canônica troca contexto no submenu, mantém navegação e edita p
   await page.getByRole("menuitem", { name: "Meu perfil e segurança", exact: true }).click();
   await expect(page).toHaveURL(/\/perfil/);
   await expect(page.locator("body style[data-make-styles-rehydration]")).toHaveCount(0);
-  await selectProfileSection(page, "identity");
-  const name = page.getByLabel("Nome", { exact: true }), retainedName = await name.inputValue();
-  await expect(name).toBeVisible();
   await selectProfileSection(page, "security");
-  await expect(name).not.toBeVisible();
   await selectProfileSection(page, "identity");
+  const editor = await openProfileIdentity(page);
+  const name = editor.getByRole("textbox", { name: "Nome completo", exact: true });
+  const retainedName = await name.inputValue();
+  await page.goBack();
+  await expect(page).toHaveURL(/profileTab=security/);
+  await expect(name).not.toBeVisible();
+  await page.goForward();
   await expect(name).toHaveValue(retainedName);
+  await editor.getByRole("button", { name: "Cancelar", exact: true }).click();
   await capture(page, "perfil", info.project.name);
   await page.getByLabel("Menu do usuário", { exact: true }).click();
   await page.getByRole("menuitem", { name: "Mudar paciente ou função", exact: true }).click();

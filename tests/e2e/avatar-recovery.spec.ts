@@ -1,4 +1,4 @@
-import { selectProfileSection } from "./profile-sections";
+import { openProfilePhoto, selectProfileSection } from "./profile-sections";
 import { expect, test, type Page } from "@playwright/test";
 import sharp from "sharp";
 import { randomUUID, createHash } from "node:crypto";
@@ -24,10 +24,7 @@ async function login(page: Page) {
 async function openPhoto(page: Page) {
   await page.goto("/perfil");
   await selectProfileSection(page, "identity");
-  const panel = page.getByRole("region", { name: "Troca da foto de perfil", exact: true });
-  await expect(panel.getByLabel("Nova foto", { exact: true })).toBeVisible();
-  await expect(panel.getByRole("button", { name: "Atualizar consulta da foto", exact: true })).toHaveAttribute("aria-disabled", "false");
-  return panel;
+  return openProfilePhoto(page);
 }
 async function fixture(run: (f: Awaited<ReturnType<typeof createFixture>>) => Promise<void>) {
   const f = await createFixture();
@@ -51,12 +48,10 @@ async function createFixture() {
   return { client, service, old, before, ids, valid, jpeg, chosen };
 }
 
-test("foto recupera commit com resposta perdida pela chave original, sem duplicar objeto ou reaplicar arquivo diferente", async ({ page }) => fixture(async f => {
+test("foto recupera commit com resposta perdida pela chave original, sem duplicar objeto ou reaplicar arquivo diferente", async ({ page }, info) => fixture(async f => {
   await login(page); const panel = await openPhoto(page), count = objects().length;
   expect((await (await page.request.get("/api/context")).json()).data.activeContext).toBeNull();
-  const name = page.locator('input[name="name"]');
-  if (!(await name.isVisible())) await selectProfileSection(page, "identity");
-  await name.fill("Nome em edição durante a troca de foto");
+  const savedName = (await (await page.request.get("/api/profile")).json()).data.full_name;
   let holdReads = true;
   let key = "", reference = "";
   await page.route("**/api/profile/avatar?key=*", route => holdReads ? route.fulfill({ status: 503, contentType: "application/json", body: JSON.stringify({ error: "Consulta fictícia da foto indisponível" }) }) : route.continue());
@@ -80,16 +75,18 @@ test("foto recupera commit com resposta perdida pela chave original, sem duplica
     };
   });
   await panel.getByLabel("Nova foto", { exact: true }).setInputFiles({ name: "foto-ficticia.png", mimeType: "image/png", buffer: f.chosen });
-  await panel.getByRole("button", { name: "Salvar foto", exact: true }).click();
-  await expect(panel.getByText("O resultado desta troca ainda é desconhecido.", { exact: false })).toBeVisible();
+  await expect(panel.getByRole("img", { name: "Prévia da nova foto", exact: true })).toBeVisible();
+  await info.attach("perfil-previa-da-foto", { body: await page.screenshot(), contentType: "image/png" });
+  await panel.getByRole("button", { name: "Usar esta foto", exact: true }).click();
+  const uncertain = page.getByRole("dialog", { name: "Não foi possível confirmar a foto", exact: true });
+  await expect(uncertain).toBeVisible();
   await expect.poll(() => page.evaluate(() => document.documentElement.dataset.avatarUpstream)).toBe("200");
-  await expect(panel.getByLabel("Nova foto", { exact: true })).toBeDisabled();
-  await expect(panel.getByLabel("Nova foto", { exact: true })).toHaveAttribute("aria-invalid", "false");
+  await expect(page.locator('input[type="file"][aria-label="Nova foto"]')).toBeDisabled();
   expect(objects().length).toBe(count + 1); const appliedPath = pointer(); expect(appliedPath).toContain("/managed/");
   holdReads = false;
-  await panel.getByRole("button", { name: "Recuperar troca de foto", exact: true }).click();
-  await expect(panel.getByText("Foto atualizada e associação confirmada.", { exact: true })).toBeVisible();
-  await expect(name).toHaveValue("Nome em edição durante a troca de foto");
+  await uncertain.getByRole("button", { name: "Conferir resultado", exact: true }).click();
+  await page.getByRole("dialog", { name: "Foto confirmada", exact: true }).getByRole("button", { name: "Concluir", exact: true }).click();
+  expect((await (await page.request.get("/api/profile")).json()).data.full_name).toBe(savedName);
   const replay = await page.request.post("/api/profile/avatar", { headers: { "idempotency-key": key, "x-avatar-reference": reference }, multipart: { file: { name: "foto-ficticia.png", mimeType: "image/png", buffer: f.chosen } } });
   expect(replay.status()).toBe(200); expect((await replay.json()).attempt.state).toBe("applied");
   const changed = await page.request.post("/api/profile/avatar", { headers: { "idempotency-key": key, "x-avatar-reference": reference }, multipart: { file: { name: "outro.jpg", mimeType: "image/jpeg", buffer: f.jpeg } } });
@@ -108,11 +105,11 @@ test("foto preserva avatar válido após revogação no commit e retoma o upload
   expect((await f.service.storage.from("profile-avatars").upload(a.objectPath, f.jpeg, { contentType: "image/jpeg", upsert: false })).error).toBeNull();
   const count = objects().length;
   await login(page); let panel = await openPhoto(page);
-  await expect(panel.getByText("Troca de foto em andamento", { exact: true })).toBeVisible();
+  await expect(panel.getByText("Confirmação em consulta", { exact: true })).toBeVisible();
   const profile = await (await page.request.get("/api/profile")).json(); const current = profile.sessions.find((session: { current: boolean }) => session.current);
   const response = await whileRowWaits("profiles", owner, "finish_my_avatar_change", async () => {
     const response = page.waitForResponse(r => new URL(r.url()).pathname === "/api/profile/avatar" && r.request().method() === "POST");
-    await panel.getByRole("button", { name: "Recuperar troca de foto", exact: true }).click(); return response;
+    await panel.getByRole("button", { name: "Conferir resultado", exact: true }).click(); return response;
   }, async () => {
     expect(pointer()).toBe(f.valid); expect(objects().length).toBe(count);
     sql(`delete from auth.sessions where id=${sqlLiteral(current.id)} and user_id=${sqlLiteral(owner)};`);
@@ -120,9 +117,29 @@ test("foto preserva avatar válido após revogação no commit e retoma o upload
   expect(response.status()).toBe(403); expect(pointer()).toBe(f.valid); expect(objects().length).toBe(count);
   await login(page); panel = await openPhoto(page);
   const resumed = await (await page.request.get("/api/profile/avatar?key=" + key)).json(); expect(resumed.attempt.key).toBe(key); expect(resumed.attempt.verified).toBe(true);
-  await panel.getByRole("button", { name: "Recuperar troca de foto", exact: true }).click();
-  await expect(panel.getByText("Foto atualizada e associação confirmada.", { exact: true })).toBeVisible();
+  await panel.getByRole("button", { name: "Conferir resultado", exact: true }).click();
+  await page.getByRole("dialog", { name: "Foto confirmada", exact: true }).getByRole("button", { name: "Concluir", exact: true }).click();
   expect(pointer()).toBe(a.objectPath); expect(objects().length).toBe(count);
   expect((await f.service.storage.from("profile-avatars").download(f.valid)).error).toBeNull();
   for (const width of [320, 390, 768, 1440]) { await page.setViewportSize({ width, height: 900 }); await auditFromTop(page, "avatar new session " + width); }
+}));
+
+test("foto escolhida sobre referência antiga exibe o conflito e carrega a foto vigente", async ({ page }) => fixture(async f => {
+  await login(page);
+  const panel = await openPhoto(page);
+  await panel.getByLabel("Nova foto", { exact: true }).setInputFiles({ name: "selecao-antiga.png", mimeType: "image/png", buffer: f.chosen });
+  await expect(panel.getByRole("img", { name: "Prévia da nova foto", exact: true })).toBeVisible();
+  const newer = `${owner}/${randomUUID()}.jpg`;
+  expect((await f.client.storage.from("profile-avatars").upload(newer, f.jpeg, { contentType: "image/jpeg" })).error).toBeNull();
+  await rpc(f.client, "set_my_avatar", { p_path: newer });
+  const before = objects();
+  const rejected = page.waitForResponse(response => new URL(response.url()).pathname === "/api/profile/avatar" && response.request().method() === "POST");
+  await panel.getByRole("button", { name: "Usar esta foto", exact: true }).click();
+  expect((await rejected).status()).toBe(409);
+  const conflict = page.getByRole("dialog", { name: "A foto da conta mudou", exact: true });
+  await conflict.getByRole("button", { name: "Voltar à foto", exact: true }).click();
+  await expect(panel.getByRole("img", { name: "Sua foto de perfil", exact: true })).toHaveAttribute("src", new RegExp(newer));
+  expect(pointer()).toBe(newer);
+  expect(objects()).toEqual(before);
+  await expect(panel.getByRole("button", { name: "Usar esta foto", exact: true })).toHaveCount(0);
 }));

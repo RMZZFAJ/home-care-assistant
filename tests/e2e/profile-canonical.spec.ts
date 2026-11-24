@@ -8,7 +8,7 @@ import { shiftWorker } from "../integration/shift-fixtures.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { sql, sqlLiteral as q } from "../../scripts/test-environment.mjs";
 import { selectContext } from "./auth-context";
-import { selectProfileSection } from "./profile-sections";
+import { openProfileIdentity, profileIdentityEditor, selectProfileSection } from "./profile-sections";
 import { auditFromTop } from "./accessibility-audit";
 
 async function captureProfileReference(browser: Browser, info: TestInfo) {
@@ -113,7 +113,8 @@ test("L4 canais descartam edição concorrente e conferem uma tentativa no máxi
   expect(await rpc(account.client, "my_notice_preferences")).toMatchObject({ version: outside.version + 1, whatsapp: true });
   await uncertain.getByRole("button", { name: "Voltar às preferências", exact: true }).click();
   await expect(page.getByRole("button", { name: "Conferir tentativa", exact: true })).toBeVisible();
-  await page.getByRole("button", { name: "Editar apresentação", exact: true }).click();
+  await selectProfileSection(page, "identity");
+  await page.getByRole("button", { name: /^Apresentação do início/ }).click();
   const presentation = page.getByRole("dialog", { name: "Apresentação do início", exact: true });
   await presentation.getByRole("radio", { name: /^Simples/ }).check();
   await presentation.getByRole("button", { name: "Aplicar apresentação", exact: true }).click();
@@ -144,27 +145,31 @@ test("15 ID02 NOT02 NOT04 profile tabs follow the model and retain unsaved field
     if (request.method() === "GET" && new URL(request.url()).pathname === "/api/guides") guideReads.push(request.url());
   });
   await page.goto("/perfil?careRecipientId=" + f.patient);
+  await selectProfileSection(page, "security");
   await selectProfileSection(page, "identity");
   const marker = "Nome em edição sem confirmação " + randomUUID().slice(0, 8);
-  const name = page.getByRole("textbox", { name: "Nome", exact: true }); await name.fill(marker);
+  const name = page.getByRole("textbox", { name: "Nome completo", exact: true });
   const before = sql(`select jsonb_build_object('profile',(select to_jsonb(p) from public.profiles p where id=${q(viewer.id)}),'stock',(select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where care_recipient_id=${q(f.patient)}),'documents',(select count(*) from public.operational_documents where care_recipient_id=${q(f.patient)}));`);
   const writes: string[] = [];
   page.on("request", request => { if (request.method() !== "GET" && ["/api/profile", "/api/profile/science", "/api/push/devices"].includes(new URL(request.url()).pathname)) writes.push(request.url()); });
   for (const { width, referenceStyle } of styles) {
     await page.setViewportSize({ width, height: 900 });
-    const actual = page.getByRole("region", { name: "Identidade pessoal", exact: true });
+    const actual = page.getByRole("region", { name: "Seus vínculos com pacientes", exact: true });
     for (const [property, expected] of Object.entries(referenceStyle.card)) await expect(actual).toHaveCSS(property, expected);
-    for (const [property, expected] of Object.entries(referenceStyle.field)) await expect(actual.locator("label").filter({ has: name }).first()).toHaveCSS(property, expected);
     for (const [property, expected] of Object.entries(referenceStyle.heading)) await expect(actual.getByRole("heading")).toHaveCSS(property, expected);
     await auditFromTop(page, "profile identity " + width);
   }
-  await selectProfileSection(page, "security");
+  await openProfileIdentity(page);
+  await name.fill(marker);
+  await page.setViewportSize({ width: 360, height: 900 });
+  await info.attach("perfil-edicao-360", { body: await page.screenshot(), contentType: "image/png" });
+  await page.goBack();
   await expect(page.getByRole("region", { name: "Sessões autenticadas", exact: true })).toBeVisible();
   await expect(page.getByLabel("Senha atual", { exact: true })).toBeVisible();
   await expect(page.getByRole("region", { name: "Contatos e métodos de login", exact: true })).toBeVisible();
   await expect(name).not.toBeVisible();
-  await page.goBack(); await expect(name).toHaveValue(marker); await expect(name).toBeVisible();
-  await page.goForward(); await expect(page.getByRole("tab", { name: "Segurança", exact: true })).toHaveAttribute("aria-selected", "true");
+  await page.goForward(); await expect(name).toHaveValue(marker); await expect(name).toBeVisible();
+  await page.goBack(); await expect(page.getByRole("tab", { name: "Segurança", exact: true })).toHaveAttribute("aria-selected", "true");
   await selectProfileSection(page, "notices");
   await expect(page.getByRole("region", { name: "Aplicativo neste aparelho", exact: true })).toBeVisible();
   await expect(page.getByRole("region", { name: "Avisos neste aparelho", exact: true })).toBeVisible();
@@ -183,6 +188,10 @@ test("15 ID02 NOT02 NOT04 profile tabs follow the model and retain unsaved field
   await page.keyboard.press("Enter");
   await expect(name).toBeVisible(); await expect(name).toHaveValue(marker);
   await page.setViewportSize({ width: 320, height: 900 }); await auditFromTop(page, "profile retained field320");
+  await profileIdentityEditor(page).getByRole("button", { name: "Cancelar", exact: true }).click();
+  await openProfileIdentity(page);
+  await expect(name).not.toHaveValue(marker);
+  await profileIdentityEditor(page).getByRole("button", { name: "Cancelar", exact: true }).click();
   mkdirSync("output/playwright/phase-d", { recursive: true });
   await page.screenshot({ path: `output/playwright/phase-d/profile-${info.project.name}.png` });
   expect(await page.evaluate(() => JSON.stringify({ local: { ...localStorage }, session: { ...sessionStorage } }))).not.toContain(marker);

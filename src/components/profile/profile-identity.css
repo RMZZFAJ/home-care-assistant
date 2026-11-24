@@ -1,0 +1,141 @@
+.hca-account-heading h1 + p { margin-top: .5rem; color: var(--hca-muted); }
+
+.hca-account-identity {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  min-width: 0;
+  padding: 1.3rem 1rem;
+  border: 1px solid var(--hca-line);
+  border-radius: 1.125rem;
+  background: linear-gradient(135deg, #f8fbf9, #edf5f1);
+}
+
+.hca-account-identity h2 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.hca-account-identity > div { min-width: 0; }
+.hca-account-identity h2 + p { color: var(--hca-muted); font-size: .78rem; }
+.hca-account-identity small,
+.hca-account-section > header {
+  display: flex;
+  align-items: center;
+  gap: .45rem;
+}
+
+.hca-account-identity small {
+  margin-top: .5rem;
+  color: var(--hca-teal);
+  font-size: .7rem;
+}
+
+.hca-account-identity small::before { content: ""; width: .35rem; height: .35rem; background: currentColor; border-radius: 50%; }
+
+.hca-account-avatar-edit {
+  position: relative;
+  flex: none;
+  padding: 0;
+  border-radius: 50%;
+}
+
+.hca-account-avatar-edit .hca-avatar {
+  width: 4.15rem;
+  height: 4.15rem;
+  border-radius: 50%;
+  border: 1px solid var(--hca-line);
+  background: var(--hca-paper);
+  font-size: 1.15rem;
+}
+
+.hca-account-avatar-edit > span:last-child {
+  position: absolute;
+  inset: auto -.15rem -.1rem auto;
+  display: grid;
+  width: 1.6rem;
+  height: 1.6rem;
+  place-items: center;
+  border: 1px solid var(--hca-line);
+  border-radius: 50%;
+  background: var(--hca-paper);
+  color: var(--hca-teal);
+}
+
+.hca-account-section {
+  border: 1px solid var(--hca-line);
+  border-radius: 1rem;
+  background: var(--hca-paper);
+}
+
+.hca-account-section > header {
+  justify-content: space-between;
+  padding: .8rem 1rem;
+  border-bottom: 1px solid var(--hca-line);
+  border-radius: 1rem 1rem 0 0;
+  background: #f7faf8;
+}
+
+.hca-account-section h2 { font-size: .9rem; font-weight: 700; }
+.hca-account-section > :is(dl, .hca-account-links) { margin: 0; padding: 1rem; }
+.hca-account-section > details { margin: 0 1rem; padding: .45rem 0 .85rem; border-top: 1px solid var(--hca-line); font-size: .8rem; }
+.hca-account-section > details > summary { justify-content: space-between; }
+.hca-l1 .hca-account-section > details > summary::after { display: none; }
+.hca-account-section > details[open] > summary > svg { transform: rotate(180deg); }
+.hca-account-section > details p { margin-top: .5rem; }
+
+.hca-l1 .hca-account-setting.hca-control {
+  display: grid;
+  width: 100%;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  justify-content: stretch;
+  gap: .65rem;
+  padding: .7rem .2rem;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  text-align: start;
+  white-space: normal;
+}
+
+.hca-account-setting + section { border-top: 1px solid var(--hca-line); }
+.hca-account-setting > span { min-width: 0; }
+.hca-account-setting :is(strong, small) { display: block; overflow-wrap: anywhere; }
+.hca-account-setting small { color: var(--hca-muted); font-weight: 400; }
+.hca-account-form fieldset { display: grid; gap: .8rem; min-width: 0; }
+.hca-account-form select { width: 100%; }
+.hca-account-editor .hca-modal-head { background: #f7faf8; }
+.hca-account-editor .hca-modal-footer > button { flex: 1; }
+
+.hca-photo-sheet > .hca-modal-content {
+  display: flex;
+  flex-direction: column;
+  gap: .8rem;
+}
+
+.hca-photo-sheet > .hca-modal-content > * { flex-shrink: 0; }
+.hca-photo-preview, .hca-photo-actions { display: grid; justify-items: center; gap: .55rem; text-align: center; }
+.hca-photo-preview { padding-block: 1.5rem 1rem; }
+.hca-photo-preview > div {
+  display: grid;
+  width: 8.25rem;
+  height: 8.25rem;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid var(--hca-line);
+  border-radius: 50%;
+  background: var(--hca-tint);
+  color: var(--hca-teal);
+}
+.hca-photo-preview img { width: 100%; height: 100%; object-fit: cover; }
+.hca-photo-preview p, .hca-photo-actions small { color: var(--hca-muted); font-size: .78rem; overflow-wrap: anywhere; }
+.hca-photo-pending {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  gap: .7rem;
+  padding: .8rem;
+  border: 1px solid var(--hca-line);
+  border-radius: .85rem;
+}

@@ -1,4 +1,4 @@
-import { selectProfileSection } from "./profile-sections";
+import { openProfileIdentity, selectProfileSection } from "./profile-sections";
 import { test, expect, type Page } from "@playwright/test";
 import { credentialFixture, credentialRead, reviewPacket, credentialHistory, fixtures, rpc } from "../integration/credential-fixtures.mjs";
 import { officialState } from "../integration/private-draft-fixtures.mjs";
@@ -104,13 +104,14 @@ test("titular altera credencial no próprio perfil; família recebe409 sem rebas
   try {
     const own = await owner.newPage(); await login(own, f, f.subject.email);
     await own.goto("/perfil"); await selectProfileSection(own, "identity");
-    await own.getByLabel("Nome", { exact: true }).fill("Cuidadora fictícia");
+    await openProfileIdentity(own);
+    await own.getByRole("textbox", { name: "Nome completo", exact: true }).fill("Cuidadora fictícia");
     await own.getByLabel("Categoria profissional", { exact: true }).fill("Cuidadora");
     await own.getByLabel("Registro profissional", { exact: true }).fill("");
     await own.locator('select[name="state"]').selectOption("");
     const updated = own.waitForResponse(r => new URL(r.url()).pathname === "/api/profile" && r.request().method() === "POST");
-    await own.getByRole("button", { name: "Salvar perfil", exact: true }).click(); expect((await updated).status()).toBe(200);
-    await expect(own.getByText("Perfil atualizado.", { exact: true })).toBeVisible();
+    await own.getByRole("button", { name: "Salvar alterações", exact: true }).click(); expect((await updated).status()).toBe(200);
+    await expect(own.getByRole("dialog", { name: "Identificação atualizada", exact: true })).toBeVisible();
   } finally { await owner.close(); }
   await prepare(page);
   expect((await submit(page)).status()).toBe(409);

@@ -18,7 +18,7 @@ async function login(page: Page, role: "adminA" | "family", patient?: string, st
   expect(await password.getAttribute("minlength")).toBeNull();
   await page.getByLabel("E-mail", { exact: true }).fill(fixtures[role].email);
   await password.fill(fixturePassword); await page.getByRole("button", { name: "Entrar", exact: true }).click();
-  await expect(page.getByRole("heading", { name: stepUp ? "Meu perfil e segurança" : "Visão geral", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: stepUp ? "Minha conta" : "Visão geral", exact: true })).toBeVisible();
   if (patient) await selectContext(page, patient);
 }
 

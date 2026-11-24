@@ -97,7 +97,7 @@ export function AppWorkspace({
   const [initialized, setInitialized] = useState(false);
   if (!loading && !selecting && value && !initialized) setInitialized(true);
   if ((loading || selecting) && !initialized) return <main id="workspace-content" className="workspace-content" tabIndex={-1} aria-busy="true" />;
-  const customHeading = heading && value?.patient && !choose && !error ? heading(value) : null;
+  const customHeading = heading && value && (account || value.patient) && !choose && !error ? heading(value) : null;
   const contextLabel = value?.activeContext?.mode === "global" ? "Administração global" : roleLabel(value?.patient?.role);
   const preparationReturn = value?.patient?.id === routePatient && value && mayPrepareLocally(value) &&
     !choose && !error && fromPreparation && preparationDestinations.has(pathname)

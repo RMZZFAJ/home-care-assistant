@@ -1,6 +1,6 @@
 import { selectMaterialCategory } from "./material-category";
 import { lastDraftPanel } from "./l1-long-draft-panel";
-import { selectProfileSection } from "./profile-sections";
+import { openProfileIdentity, selectProfileSection } from "./profile-sections";
 import { test, expect, type Page, type Route } from "@playwright/test";
 import { randomUUID, createHash } from "node:crypto";
 import { mkdirSync, readFileSync } from "node:fs";
@@ -38,8 +38,8 @@ async function login(page: Page, patient: string, email = fixtures.family.email)
   await selectContext(page, patient);
 }
 async function profile(page: Page, patient: string) {
-  await page.goto("/perfil?careRecipientId=" + patient);
-  await selectProfileSection(page, "notices");
+  await page.goto("/perfil?careRecipientId=" + patient + "&profileTab=notices");
+  await expect(page.getByRole("tab", { name: "Avisos e aplicativo", exact: true })).toHaveAttribute("aria-selected", "true");
   await openApp(page);
   await expect(
     pwa(page).getByText(
@@ -210,7 +210,8 @@ test("PWA conserva edição em offline, falha e incompatibilidade e só libera a
   await login(page, f.patient);
   await profile(page, f.patient);
   await selectProfileSection(page, "identity");
-  const name = page.getByRole("textbox", { name: "Nome", exact: true });
+  await openProfileIdentity(page);
+  const name = page.getByRole("textbox", { name: "Nome completo", exact: true });
   await name.fill(marker);
   const input = page.locator('input[name="name"]');
   await page.evaluate(() => {
@@ -274,6 +275,8 @@ test("PWA conserva edição em offline, falha e incompatibilidade e só libera a
     "protocol",
   ]) {
     if (failure === "unavailable") {
+      // Browser history can move between account sections while the editor is open.
+      await page.goBack();
       await page.getByLabel("Menu do usuário", { exact: true }).click();
       await page
         .getByRole("menuitem", { name: "Mudar paciente ou função", exact: true })
@@ -296,7 +299,7 @@ test("PWA conserva edição em offline, falha e incompatibilidade e só libera a
     );
     expect(await input.inputValue()).toBe(marker);
     expect(
-      await input.evaluate((element) => Boolean(element.closest("[inert]"))),
+      await input.evaluate((element) => Boolean(element.closest("[hidden]"))),
     ).toBe(true);
     expect(await page.locator(".app-header").evaluate(element => element.hasAttribute("inert"))).toBe(true);
     expect(await banner.evaluate(element => Boolean(element.closest("[inert]")))).toBe(false);
@@ -342,6 +345,7 @@ test("PWA conserva edição em offline, falha e incompatibilidade e só libera a
         exact: true,
       })
       .click();
+    if (failure === "unavailable") await selectProfileSection(page, "identity");
     await expect(name).toBeVisible();
     await expect(name).toHaveValue(marker);
   }
@@ -558,8 +562,9 @@ test("PWA oferece instalação somente por gesto e mantém web quando o worker n
   await guide.getByRole("button", { name: "Entendi", exact: true }).click();
   await pwa(page).getByRole("button", { name: "Voltar", exact: true }).click();
   await selectProfileSection(page, "identity");
+  await openProfileIdentity(page);
   await expect(
-    page.getByRole("textbox", { name: "Nome", exact: true }),
+    page.getByRole("textbox", { name: "Nome completo", exact: true }),
   ).toBeEditable();
 });
 
@@ -572,7 +577,8 @@ test("PWA keeps an open edit after real session revocation but never caches it o
   await login(page, f.patient); await profile(page, f.patient);
   await expect.poll(() => page.evaluate(() => navigator.serviceWorker.controller?.state)).toBe("activated");
   await selectProfileSection(page, "identity");
-  const name = page.getByRole("textbox", { name: "Nome", exact: true }); await name.fill(marker);
+  await openProfileIdentity(page);
+  const name = page.getByRole("textbox", { name: "Nome completo", exact: true }); await name.fill(marker);
   // Read only this browser's real fixture session through the public SSR adapter.
   // The bearer stays in the Node test process and is never printed or injected.
   const inspector = createServerClient(env.url, env.anonKey, { cookies: { getAll: () => context.cookies(), setAll: () => {} } });
@@ -589,8 +595,8 @@ test("PWA keeps an open edit after real session revocation but never caches it o
   const deniedContext = page.waitForResponse(response => new URL(response.url()).pathname === "/api/context" && response.status() === 401);
   await page.evaluate(() => window.dispatchEvent(new Event("hca:data-changed")));
   await deniedContext;
-  const retainedName = page.locator('.hca-profile input[name="name"]');
-  await expect.poll(() => retainedName.evaluate(element => Boolean(element.closest("[inert]")))).toBe(true);
+  const retainedName = page.locator('input[name="name"]');
+  await expect.poll(() => retainedName.evaluate(element => Boolean(element.closest("[hidden]")))).toBe(true);
   await expect(retainedName).toHaveValue(marker);
   const reentry = page.getByRole("link", { name: "Entrar novamente", exact: true });
   await reentry.focus(); await expect(reentry).toBeFocused();

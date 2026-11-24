@@ -17,14 +17,13 @@ import { formatBrazilDate } from "@/lib/receipt";
 import { NewPasswordField } from "./auth/new-password-field";
 import { newPasswordSchema } from "@/lib/validation/password";
 import { useLiveRevision } from "@/lib/use-live-revision";
-import { AvatarSettings } from "./profile/avatar-settings";
+import { ProfileIdentity } from "./profile/profile-identity";
 import { SciencePreferenceSettings } from "./profile/science-preference";
 import { parseProfileRead, type ProfileRead } from "@/lib/validation/profile";
 import { UserGuide } from "@/components/guides/user-guide";
 import { PwaSettings } from "./pwa/pwa-settings";
 import { ProfileTabs } from "./profile/profile-tabs";
 import { PushSettings } from "./pwa/push-settings";
-import { PresentationPreference } from "./profile/presentation-preference";
 import { ChannelPreferences } from "./profile/channel-preferences";
 import { AdministrativePendingRecovery } from "./admin/administrative-pending-recovery";
 type Profile = ProfileRead["data"];
@@ -32,7 +31,11 @@ type Membership = ProfileRead["memberships"][number];
 type Session = ProfileRead["sessions"][number];
 export function ProfileConsole() {
   return (
-    <Workspace title="Meu perfil e segurança" account>
+    <Workspace title="Minha conta" eyebrow="Conta e preferências" account heading={() => <div className="page-heading hca-account-heading"><div>
+      <p className="eyebrow">Conta e preferências</p>
+      <h1>Minha conta</h1>
+      <p>Tudo o que acompanha o seu acesso.</p>
+    </div></div>}>
       {context => <><AdministrativePendingRecovery key={context.userId} userId={context.userId} />
         <ProfileContent key={context.userId} patientSelected={context.activeContext?.mode === "patient" && Boolean(context.patient)} />
       </>}
@@ -74,42 +77,20 @@ function ProfileContent({ patientSelected }: { patientSelected: boolean }) {
       });
     return () => controller.abort();
   }, [readKey]);
-  async function save(
-    event: FormEvent<HTMLFormElement>,
-    action: "update" | "password",
-  ) {
+  async function savePassword(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const element = event.currentTarget;
     const form = new FormData(element);
-    if (action === "password") {
-      const parsed = newPasswordSchema.safeParse(form.get("password"));
-      if (!parsed.success) { setError(parsed.error.issues[0].message); return; }
-    }
+    const parsed = newPasswordSchema.safeParse(form.get("password"));
+    if (!parsed.success) { setError(parsed.error.issues[0].message); return; }
     setBusy(true);
     setError("");
     setMessage("");
     try {
-      await api(
-        "/api/profile",
-        action === "password"
-          ? {
-            action,
-            currentPassword: form.get("currentPassword"),
-            password: form.get("password"),
-          }
-          : {
-            action,
-            name: form.get("name"),
-            registration: form.get("registration"),
-            state: form.get("state") || null,
-            category: form.get("category"),
-          },
-      );
+      await api("/api/profile", { action: "password", currentPassword: form.get("currentPassword"), password: parsed.data });
       window.dispatchEvent(new Event("hca:profile-updated"));
-      setMessage(
-        action === "password" ? "Senha alterada." : "Perfil atualizado.",
-      );
-      if (action !== "update") element.reset();
+      setMessage("Senha alterada.");
+      element.reset();
       setAttempt((value) => value + 1);
     } catch (reason) {
       setError(
@@ -130,74 +111,11 @@ function ProfileContent({ patientSelected }: { patientSelected: boolean }) {
       <PushSettings renderSections={push => (
         <ProfileTabs>
           {{
-            identity: profile ? (<>
-              <SettingsSection title="Identidade pessoal" summary="Nome e identificação profissional">
-                <p className="hca-field-hint">Função e registro são informados por você. Preencha o registro somente quando aplicável à sua função; sem registro aplicável, deixe-o em branco. A família registra sua própria conferência por paciente, sem validação externa automática.</p>
-
-                <p className="mt-2 text-sm text-(--muted)">{profile.email}</p>
-                <form
-                  key={attempt}
-                  className="mt-4 space-y-4"
-                  onSubmit={(event) => void save(event, "update")}
-                >
-                  <fieldset
-                    disabled={busy}
-                    className="grid min-w-0 gap-4 min-[501px]:grid-cols-2"
-                  >
-                    <label className="text-sm font-semibold">
-                      Nome
-                      <input
-                        className={inputClass}
-                        name="name"
-                        defaultValue={profile.full_name}
-                        minLength={2}
-                        maxLength={160}
-                        required
-                        autoComplete="name"
-                      />
-                    </label>
-                    <label className="text-sm font-semibold">
-                      Categoria profissional
-                      <input
-                        className={inputClass}
-                        name="category"
-                        defaultValue={profile.professional_category ?? ""}
-                        maxLength={80}
-                      />
-                    </label>
-                    <label className="text-sm font-semibold">
-                      Registro profissional
-                      <input
-                        className={inputClass}
-                        name="registration"
-                        defaultValue={profile.professional_registration ?? ""}
-                        maxLength={30}
-                      />
-                    </label>
-                    <label className="text-sm font-semibold">
-                      UF
-                      <select
-                        className={inputClass}
-                        name="state"
-                        defaultValue={profile.professional_state ?? ""}
-                      >
-                        <option value="">Não informado</option>
-                        {"AC AL AP AM BA CE DF ES GO MA MT MS MG PA PB PR PE PI RJ RN RS RO RR SC SP SE TO"
-                          .split(" ")
-                          .map((state) => (
-                            <option key={state}>{state}</option>
-                          ))}
-                      </select>
-                    </label>
-                  </fieldset>
-                  <button type="submit" className={primaryClass} disabled={busy}>
-                    Salvar perfil
-                  </button>
-                </form>
-              </SettingsSection>
-              <SettingsSection title="Foto de perfil" summary="Imagem utilizada na identificação da sua conta">
-                <AvatarSettings />
-              </SettingsSection>
+            identity: active => profile ? <>
+              <ProfileIdentity profile={profile} active={active} onChange={() => {
+                window.dispatchEvent(new Event("hca:profile-updated"));
+                setAttempt(value => value + 1);
+              }} />
               <SettingsSection title="Seus vínculos com pacientes" summary="Funções e situação dos seus acessos">
 
                 <ul className="mt-4 space-y-3">
@@ -236,14 +154,14 @@ function ProfileContent({ patientSelected }: { patientSelected: boolean }) {
                   </p>
                 ) : null}
               </SettingsSection>
-            </>) : null,
-            security: profile ? (<>
+            </> : null,
+            security: profile ? <>
               {profile.providers.includes("email") ? (
                 <SettingsSection title="Alterar senha" summary="Proteja seu acesso com autenticação recente">
 
                   <form
                     className="mt-4 space-y-4"
-                    onSubmit={(event) => void save(event, "password")}
+                    onSubmit={(event) => void savePassword(event)}
                   >
                     <label className="block text-sm font-semibold">
                       Senha atual
@@ -267,12 +185,12 @@ function ProfileContent({ patientSelected }: { patientSelected: boolean }) {
                 </Notice>
               )}
               <MfaSettings />
-              <ContactSettings
+              <div id="contatos-de-acesso"><ContactSettings
                 email={profile.email}
                 phone={profile.phone}
                 providers={profile.providers}
                 onChange={() => setAttempt((value) => value + 1)}
-              />
+              /></div>
               <SettingsSection title="Sessões autenticadas" summary="Dispositivos e acessos vinculados à sua conta">
 
                 <ul className="mt-4 space-y-3">
@@ -318,14 +236,13 @@ function ProfileContent({ patientSelected }: { patientSelected: boolean }) {
                   Encerrar outras sessões
                 </button>
               </SettingsSection>
-            </>) : null,
+            </> : null,
             notices: active => <>
               <SettingsSection title="Do seu jeito" summary="Atualizações e ações do vínculo selecionado">
                 <Link className={buttonClass} href="/notificacoes">Central de avisos</Link>
               </SettingsSection>
               <ChannelPreferences active={active} email={profile?.email} phone={profile?.phone} />
               <SciencePreferenceSettings active={active} patientSelected={patientSelected} />
-              <PresentationPreference active={active} />
               <PwaSettings />{push.consent(active)}
             </>,
             devices: push.devices,

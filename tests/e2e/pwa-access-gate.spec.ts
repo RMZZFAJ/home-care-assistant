@@ -6,7 +6,7 @@ import { transformSync } from "esbuild";
 import { setup, fixtures } from "../integration/v4-fixtures.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { selectContext } from "./auth-context";
-import { selectProfileSection } from "./profile-sections";
+import { openProfileIdentity, selectProfileSection } from "./profile-sections";
 
 test.use({ serviceWorkers: "allow" });
 const origin = "http://127.0.0.1:3000";
@@ -196,7 +196,8 @@ test("Preview estável atualiza por confirmação explícita e conserva a outra 
   }
   await inspectApp(page);
   await selectProfileSection(page, "identity");
-  const first = page.getByRole("textbox", { name: "Nome", exact: true });
+  await openProfileIdentity(page);
+  const first = page.getByRole("textbox", { name: "Nome completo", exact: true });
   const originalName = await first.inputValue();
   await first.fill("Edição que será preservada ao cancelar");
   const peer = await context.newPage();
@@ -204,14 +205,17 @@ test("Preview estável atualiza por confirmação explícita e conserva a outra 
     await peer.goto(origin + "/perfil?careRecipientId=" + f.patient);
     await inspectApp(peer);
     await selectProfileSection(peer, "identity");
-    const other = peer.getByRole("textbox", { name: "Nome", exact: true });
+    await openProfileIdentity(peer);
+    const other = peer.getByRole("textbox", { name: "Nome completo", exact: true });
     await other.fill("Edição intacta na outra aba");
     const firstClock = await page.evaluate(() => performance.timeOrigin), peerClock = await peer.evaluate(() => performance.timeOrigin);
     await expect.poll(() => page.evaluate(async () => (await navigator.serviceWorker.getRegistration("/"))?.active?.state)).toBe("activated");
     legacyWorker = false; revision = randomUUID().replaceAll("-", "").slice(0, 24);
+    await page.bringToFront();
     await page.evaluate(async () => (await navigator.serviceWorker.getRegistration("/"))!.update());
     await expect.poll(() => page.evaluate(async () => Boolean((await navigator.serviceWorker.getRegistration("/"))?.waiting))).toBe(true);
     await expect(page.getByRole("status", { name: "Atualização do aplicativo", exact: true })).toHaveCount(0);
+    await page.goBack();
     const connection = await openConnection(page);
     const disclosure = connection.locator("details > summary");
     await expect(disclosure).toHaveText("Ao retomar a conexão");
@@ -240,13 +244,14 @@ test("Preview estável atualiza por confirmação explícita e conserva a outra 
         if (input !== "/api/profile" || init?.method !== "POST") return original(input, init);
         gate.attempts++;
         return new Promise(resolve => {
-          gate.release = () => resolve(Response.json({ ok: true }));
+          gate.release = () => resolve(Response.json({ saved: true }));
         });
       };
     });
-    await page.getByRole("button", { name: "Salvar perfil", exact: true }).click();
+    await page.getByRole("button", { name: "Salvar alterações", exact: true }).click();
     const attempts = () => page.evaluate(() => (window as typeof window & { hcaSendGate: SendGate }).hcaSendGate.attempts);
     await expect.poll(attempts).toBe(1);
+    await page.goBack();
     const duringSend = await openConnection(page);
     const update = duringSend.getByRole("button", { name: "Atualizar esta aba", exact: true });
     try {
@@ -275,6 +280,7 @@ test("Preview estável atualiza por confirmação explícita e conserva a outra 
     await expect(other).toHaveValue("Edição intacta na outra aba");
     expect(await peer.evaluate(() => performance.timeOrigin)).toBe(peerClock);
     await other.fill(originalName);
+    await peer.goBack();
     await (await openConnection(peer)).getByRole("button", { name: "Atualizar esta aba", exact: true }).click();
     await Promise.all([peer.waitForEvent("domcontentloaded"), peer.getByRole("dialog", { name: "Atualizar esta aba?", exact: true }).getByRole("button", { name: "Atualizar agora", exact: true }).click()]);
     await expect(peer.getByRole("dialog", { name: "Esta aba foi atualizada", exact: true })).toBeVisible();

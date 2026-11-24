@@ -51,7 +51,7 @@ test("login, navegação, menus, filtros e quatro wizards são acessíveis e res
     ["/estoque", "Estoques"],
     ["/admin", "Administração"],
     ["/configuracoes", "Permissões, comunicação e regras"],
-    ["/perfil", "Meu perfil e segurança"],
+    ["/perfil", "Minha conta"],
     ["/notificacoes", "Avisos"],
     ["/consumo", "Consumo e faltas"],
     ["/unidades", "Unidades e apresentações"],
