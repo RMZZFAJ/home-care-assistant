@@ -115,46 +115,54 @@ test.describe("administração integrada no ambiente local", () => {
     const finalName = `${originalName} revisado`;
     await section(page, patientId, "Catálogo");
     await page.getByRole("button", { name: "Novo item", exact: true }).click();
-    await page.getByLabel("Nome", { exact: true }).fill(originalName);
+    await page.getByLabel("Nome do material", { exact: true }).fill(originalName);
     await page
-      .getByRole("combobox", { name: "Categoria", exact: true })
+      .getByRole("combobox", { name: "Tipo de material", exact: true })
       .selectOption("higiene");
-    await page.getByLabel("Unidade", { exact: true }).fill("pacote");
+    await page.getByLabel("Unidade de controle", { exact: true }).selectOption("pacote");
     await page
-      .getByLabel("Nomes alternativos, separados por vírgula", { exact: true })
+      .getByLabel("Nomes alternativos", { exact: true })
       .fill("Material auxiliar, Apoio operacional");
-    const created = await submit(page, "Salvar item", "product");
-    expect(created).toMatchObject({ action: "commit", state: "consumed", purpose: "create" });
+    const record = async (action: "Adicionar material" | "Salvar cadastro", result: string) => {
+      await page.getByRole("button", { name: "Revisar material", exact: true }).click();
+      const saved = page.waitForResponse(response => new URL(response.url()).pathname === "/api/admin/catalogue-actions" && response.request().method() === "POST");
+      await page.getByRole("dialog", { name: action + "?", exact: true }).getByRole("button", { name: action, exact: true }).click();
+      const response = await saved;
+      expect(response.ok()).toBe(true);
+      await page.getByRole("dialog", { name: result, exact: true }).getByRole("button", { name: "Concluir", exact: true }).click();
+      return response.json();
+    };
+    const created = await record("Adicionar material", "Material adicionado");
+    expect(created).toMatchObject({ state: "recorded", purpose: "create" });
     const productId = created.outcome.productId as string;
     expect(productId).toBeTruthy();
-    await expect(page.getByRole("dialog", { name: "Adicionar item exclusivo deste paciente", exact: true })).toBeHidden();
-    await expect(page.getByText("Item salvo e auditado.", { exact: true })).toBeVisible();
-    await expect(page.getByText("Consultando catálogo…", { exact: true })).toBeHidden();
+    await expect(page.getByRole("dialog", { name: "Novo material", exact: true })).toBeHidden();
+    await page.locator("[data-product-id]").filter({ hasText: originalName }).click();
+    await page.getByRole("dialog", { name: originalName, exact: true }).getByRole("button", { name: /^Editar cadastro/ }).click();
+    await expect(page.getByRole("dialog", { name: "Editar material", exact: true })).toBeVisible();
     await expect(
-      page.getByRole("cell").filter({ has: page.getByText(originalName, { exact: true }) }),
-    ).toBeVisible();
-    const edit = page.getByRole("button", { name: `Editar ${originalName}`, exact: true });
-    if (test.info().project.use.hasTouch) await edit.tap();
-    else await edit.click();
-    await expect(page.getByRole("dialog", { name: "Editar item", exact: true })).toBeVisible();
-    await expect(
-      page.getByLabel("Nomes alternativos, separados por vírgula", {
+      page.getByLabel("Nomes alternativos", {
         exact: true,
       }),
     ).toHaveValue("Material auxiliar, Apoio operacional");
-    await page.getByLabel("Nome", { exact: true }).fill(finalName);
+    await page.getByLabel("Nome do material", { exact: true }).fill(finalName);
     await page
-      .getByLabel("Nomes alternativos, separados por vírgula", { exact: true })
+      .getByLabel("Nomes alternativos", { exact: true })
       .fill("Material auxiliar revisado, Apoio operacional");
-    await page
-      .getByRole("checkbox", { name: "Item ativo", exact: true })
-      .uncheck();
-    await submit(page, "Salvar item", "product");
+    await record("Salvar cadastro", "Cadastro atualizado");
+    const material = page.getByRole("dialog", { name: finalName, exact: true });
+    await material.getByRole("button", { name: /^Situação e sucessor/ }).click();
+    const identity = page.getByRole("dialog", { name: "Situação e sucessor do material", exact: true });
+    await identity.getByLabel("Ato no catálogo", { exact: true }).selectOption("retire");
+    await identity.getByLabel("Motivo próprio da escolha", { exact: true }).fill("Identidade preservada durante a revisão do cadastro.");
+    await identity.getByRole("button", { name: "Revisar mudança no catálogo", exact: true }).click();
+    await identity.getByRole("button", { name: "Confirmar mudança no catálogo", exact: true }).click();
+    await expect(identity).toHaveCount(0);
+    await material.getByRole("button", { name: "Voltar", exact: true }).click();
     await page.getByRole("combobox", { name: "Situação dos produtos", exact: true }).selectOption("inactive");
-    const article = page.getByRole("row").filter({ has: page.getByRole("cell").filter({ has: page.getByText(finalName, { exact: true }) }) });
+    const article = page.locator("[data-product-id]").filter({ hasText: finalName });
     await expect(article.getByText("Inativo", { exact: true })).toBeVisible();
-    await expect(article).toContainText("higiene");
-    await expect(article.getByText("pacote", { exact: true })).toBeVisible();
+    await expect(article).toContainText("pacote");
     const all = await (
       await page.request.get(
         `/api/catalog?careRecipientId=${patientId}&includeInactive=true`,

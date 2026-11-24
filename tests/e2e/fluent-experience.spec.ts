@@ -191,7 +191,7 @@ test("administração usa listas, painéis de edição e confirmação crítica 
   const areas = page.getByRole("navigation", { name: "Áreas administrativas", exact: true });
   await expect(areas).toBeVisible();
   await areas.locator('a[href*="section=catalog"]').click();
-  await expect(page.getByRole("table", { name: "Produtos do catálogo", exact: true })).toBeVisible();
+  await expect(page.getByRole("region", { name: "Produtos do catálogo", exact: true })).toBeVisible();
   await capture(page, "catalogo-lista", info.project.name);
   await page.getByRole("button", { name: "Novo item", exact: true }).click();
   await page.getByLabel("Nome", { exact: true }).fill("Rascunho visual não gravado");

@@ -29,19 +29,22 @@ test("CFinal019 catálogo e unidade preservam inteiros, código textual e escopo
   await login(page, "adminA", f.patient);
   await page.goto(`/admin?careRecipientId=${f.patient}&section=catalog`);
   await page.getByRole("button", { name: "Novo item", exact: true }).click();
-  const drawer = page.getByRole("dialog", { name: "Adicionar item exclusivo deste paciente", exact: true });
-  const order = drawer.getByLabel("Ordem", { exact: true });
+  const drawer = page.getByRole("dialog", { name: "Novo material", exact: true });
+  const order = drawer.getByLabel("Ordem na lista", { exact: true });
   await expect(order).toHaveAttribute("type", "number");
   for (const value of ["-1", "12.5", "1000001"]) {
     await order.fill(value); expect(await order.evaluate((element: HTMLInputElement) => element.checkValidity()), "invalid order " + value).toBe(false);
   }
   await order.fill("12"); expect(await order.evaluate((element: HTMLInputElement) => element.checkValidity())).toBe(true);
   const name = "Nome livre 001234 / água " + randomUUID().slice(0, 6);
-  await drawer.getByLabel("Nome", { exact: true }).fill(name);
-  await expect(drawer.getByLabel("Nome", { exact: true })).toHaveAttribute("type", "text");
-  await drawer.getByLabel("Unidade", { exact: true }).fill("unidade");
-  const saved = page.waitForResponse(response => new URL(response.url()).pathname === "/api/admin" && response.request().method() === "POST");
-  await drawer.getByRole("button", { name: "Salvar item", exact: true }).click(); expect((await saved).ok()).toBe(true);
+  await drawer.getByLabel("Nome do material", { exact: true }).fill(name);
+  await expect(drawer.getByLabel("Nome do material", { exact: true })).toHaveAttribute("type", "text");
+  await drawer.getByLabel("Unidade de controle", { exact: true }).selectOption("unidade");
+  const saved = page.waitForResponse(response => new URL(response.url()).pathname === "/api/admin/catalogue-actions" && response.request().method() === "POST");
+  await drawer.getByRole("button", { name: "Revisar material", exact: true }).click();
+  await page.getByRole("dialog", { name: "Adicionar material?", exact: true }).getByRole("button", { name: "Adicionar material", exact: true }).click();
+  expect((await saved).ok()).toBe(true);
+  await page.getByRole("dialog", { name: "Material adicionado", exact: true }).getByRole("button", { name: "Concluir", exact: true }).click();
   expect(sql(`select sort_order from public.care_recipient_products where care_recipient_id=${q(f.patient)} and name=${q(name)};`)).toBe("12");
   await page.goto("/unidades?careRecipientId=" + f.patient);
   await page.getByRole("button", { name: "Nova unidade", exact: true }).click();

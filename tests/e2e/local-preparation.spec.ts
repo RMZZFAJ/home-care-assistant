@@ -24,10 +24,12 @@ test("local preparation connects real creation adoption and opening stock withou
  expect((await(await page.request.get(endpoint(f.patient))).json()).data.catalogue.activeProducts).toBe(0);
  await catalogue.click();
  await page.getByRole("link",{name:"Preparar materiais do paciente",exact:true}).click();
- await page.getByRole("button",{name:"Adotar modelo",exact:true}).click();
- const adoption=page.getByRole("dialog",{name:"Adotar modelo existente",exact:true});
- await adoption.getByRole("combobox",{name:"Produto modelo",exact:true}).selectOption(model);await adoption.getByRole("button",{name:"Adotar modelo",exact:true}).click();
- await expect(page.getByText("Modelo adicionado ao catálogo deste paciente.",{exact:true})).toBeVisible();
+ await page.getByRole("button",{name:/^Adotar um modelo/}).click();
+ const adoption=page.getByRole("dialog",{name:"Adotar modelo de material",exact:true});
+ await adoption.getByRole("combobox",{name:"Modelo disponível",exact:true}).selectOption(model);
+ await adoption.getByRole("button",{name:"Revisar adoção",exact:true}).click();
+ await page.getByRole("dialog",{name:"Adotar este modelo?",exact:true}).getByRole("button",{name:"Adotar modelo",exact:true}).click();
+ await page.getByRole("dialog",{name:"Modelo adotado",exact:true}).getByRole("button",{name:"Concluir",exact:true}).click();
  await page.getByRole("link",{name:"Voltar à preparação",exact:true}).click();
  const material=page.getByRole("dialog",{name:"Materiais e apresentações",exact:true});
  await expect(material).toBeVisible();

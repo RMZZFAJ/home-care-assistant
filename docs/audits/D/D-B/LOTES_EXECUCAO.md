@@ -5150,6 +5150,54 @@ dependem do novo esquema. A consulta não aplicou migrations nem disparou
 avisos. O SonarCloud passou e o CodeRabbit pulou a análise incremental.
 Na [CI do commit][ci-2b7f8ad7], Linux, Windows e banco passaram. Os sete
 grupos de navegador estavam em execução na conferência seguinte.
+Em uma conferência posterior, `mobile-1` e `ios-2` já tinham falhado.
+Os logs dos dois grupos repetem falhas nas comparações de permissão, na
+reemissão de convite e na saída da continuação de acesso. `ios-2` também
+registrou overflow de 3 px na preparação local a 320 px e falhas em dois
+destinos de aviso. A CI ainda estava em execução nessa leitura.
+Na leitura seguinte, `chromium-1` e `chromium-2` também já haviam falhado.
 
 [preview-2b7f8ad7]: https://vercel.com/rmzzfajs-projects/home-care-assistant/GG35HJrDTyAEwQ5wWxsK2reXYoHD
 [ci-2b7f8ad7]: https://github.com/RMZZFAJ/home-care-assistant/actions/runs/45486440078
+
+### E10-07 — Catálogo por tipo e confirmação de material
+
+O catálogo apresenta a busca pelo nome e pelos nomes alternativos, os
+tipos em abas e a situação do cadastro na própria linha. O painel do material
+reúne unidade, precisão, identidade, descrição e ações. A seleção de
+situação e a paginação foram mantidas para consultar itens inativos e listas
+maiores do que o exemplo do laboratório.
+
+O cadastro, a edição e a adoção partem da referência vigente. A comparação
+de possível duplicata abre em modal e permite consultar o item encontrado.
+A identificação parecida pode seguir para revisão. Uma colisão exata de
+nome ou alias exige identificação distinta, conforme a validação do
+catálogo. A mesma identidade conserva a unidade registrada em operações
+anteriores. Situação permanece uma ação própria, com motivo.
+
+O formulário guarda seus campos enquanto está aberto. A confirmação
+registra o resultado com a chave da tentativa, sem criar uma preparação.
+A consulta recupera o resultado original ou encerra uma tentativa sem
+efeito. O catálogo mostra a proposta quando a atuação é global. A decisão
+local conserva os estoques e registra somente o cadastro correspondente.
+
+| Migration | Supabase local | Supabase remoto |
+| --- | --- | --- |
+| `20261124212833` | Aplicada | Pendente |
+
+Três integrações com Auth real verificaram gravação única junto a uma
+preparação anterior, isolamento da consulta, fechamento de tentativa sem
+efeito, edição concorrente e adoção depois de decisão independente.
+
+Passaram os casos dirigidos de Chromium para cadastro, edição, inativação,
+adoção na preparação local, recuperação de resposta perdida, foco por
+teclado, isolamento de leitura, busca em mais de mil itens e consulta a
+recibos anteriores. O cenário E10-07 confrontou a edição concorrente com a
+referência real, preservou o preenchimento até nova confirmação e conferiu
+estoque e ausência de nova preparação. As capturas da lista e do modal de
+duplicata foram comparadas com o cenário de referência a 360 e 412 px.
+O campo de busca passou na verificação de espaçamento nessas larguras.
+
+Situação e sucessor, unidades e apresentações seguem nos fluxos existentes
+nesta etapa. A migração desses editores, o histórico do material e a
+retirada do acesso comum aos comprovantes seguem em E10-08 a E10-10.

@@ -19,6 +19,89 @@ const fields = (name = "Material " + randomUUID()) => ({
   name, category: "higiene", unit: "pacote", aliases: "", description: "", sortOrder: "0", isActive: true,
 });
 const productCount = (patient) => sql(`select count(*) from public.care_recipient_products where care_recipient_id=${sqlLiteral(patient)};`);
+const reviewedRead = (client, args, selection = null) => rpc(client, "reviewed_catalogue_reference", { ...args, p_selection: selection });
+const reviewedWrite = "reviewed_catalogue_command";
+const reviewedPacket = (args, fields, referenceHash) =>
+  ({ ...args, p_key: randomUUID(), p_fields: fields, p_reference_hash: referenceHash });
+const lookup = packet => ({ ...packet, p_fields: null, p_reference_hash: null });
+
+test("L4 reviewed catalogue create records one exact outcome alongside a prior draft and closes absent attempts", async () => {
+  const { patient, admin } = await setup();
+  try {
+    const args = scope(patient), reference = await reviewedRead(admin, args);
+    const before = Number(productCount(patient));
+    const prior = await rpc(admin, commandName, packet(args, "save", { fields: fields("Preenchimento anterior"), hash: reference.hash }));
+    const intent = reviewedPacket(args, fields(), reference.hash);
+    const [recorded, repeated] = await Promise.all([rpc(admin, reviewedWrite, intent), rpc(admin, reviewedWrite, intent)]);
+    assert.deepEqual(repeated, recorded);
+    assert.equal(recorded.state, "recorded");
+    assert.equal(recorded.ownerId, fixtures.adminA.id);
+    assert.equal(Number(productCount(patient)), before + 1);
+    assert.equal((await read(admin, args)).draft.id, prior.id);
+    assert.deepEqual(await rpc(admin, reviewedWrite, lookup(intent)), recorded);
+    assert.equal((await admin.rpc(reviewedWrite, { ...intent, p_fields: fields() })).error?.code, "23505");
+    assert.equal((await admin.rpc(reviewedWrite, { ...lookup(intent), p_purpose: "adopt" })).error?.code, "42501");
+
+    const other = await actor("global", patient);
+    assert.equal((await rpc(other, reviewedWrite, lookup(intent))).state, "closed");
+    const late = reviewedPacket(args, fields(), reference.hash);
+    assert.equal((await rpc(admin, reviewedWrite, lookup(late))).state, "closed");
+    assert.equal((await rpc(admin, reviewedWrite, late)).state, "closed");
+    assert.equal(Number(productCount(patient)), before + 1);
+    assert.equal(sql(`select count(*) from private.catalogue_preparations where patient_id=${sqlLiteral(patient)};`), "1");
+    assert.equal(sql(`select has_table_privilege('authenticated','private.reviewed_catalogue_actions','select') or has_function_privilege('anon','public.reviewed_catalogue_command(uuid,text,text,text,uuid,jsonb,text)','execute');`), "f");
+  } finally { sql(`update public.care_recipients set is_active=false where id=${sqlLiteral(patient)};`); }
+});
+
+test("L4 reviewed edit compares the current item and preserves the stock ledger, identity and unit", async () => {
+  const { patient, products: [id], admin } = await setup();
+  try {
+    const args = scope(patient, "edit", id);
+    const prior = await reviewedRead(admin, args);
+    assert.equal(prior.unitLocked, true);
+    assert.ok(prior.units.some(unit => unit.code === prior.item.unit));
+    const form = { ...fields("Novo nome controlado"), unit: prior.item.unit, aliases: "Outro nome", description: "Controle", sortOrder: "23" };
+    const ledger = () => sql(`select coalesce(jsonb_agg(to_jsonb(m) order by m.id)::text,'[]') from public.stock_movements m where care_recipient_id=${sqlLiteral(patient)};`);
+    const before = ledger();
+    const intent = reviewedPacket(args, form, prior.hash);
+    await rpc(admin, reviewedWrite, reviewedPacket(args, { ...form, description: "Atualização concorrente" }, prior.hash));
+    assert.equal((await admin.rpc(reviewedWrite, intent)).error?.code, "PT409");
+    const fresh = await reviewedRead(admin, args);
+    assert.notEqual(fresh.hash, prior.hash);
+    assert.equal((await admin.rpc(reviewedWrite, reviewedPacket(args, { ...form, isActive: false }, fresh.hash))).error?.code, "22023");
+    const saved = await rpc(admin, reviewedWrite, reviewedPacket(args, form, fresh.hash));
+    assert.deepEqual(saved.outcome, { productId: id });
+    const { item } = await reviewedRead(admin, args);
+    assert.equal(item.description, form.description);
+    assert.equal(item.sort_order, 23);
+    assert.equal(item.unit, prior.item.unit);
+    assert.equal(item.is_active, true);
+    assert.equal(ledger(), before);
+  } finally { sql(`update public.care_recipients set is_active=false where id=${sqlLiteral(patient)};`); }
+});
+
+test("L4 reviewed global model adoption creates one proposal and copies the original identity after local approval", async () => {
+  const { patient, admin } = await setup();
+  const modelId = "test-reviewed-" + randomUUID();
+  try {
+    sql(`insert into public.products(id,name,category,unit,is_active) values(${sqlLiteral(modelId)},${sqlLiteral(modelId)}, 'higiene','unidade',true);`);
+    const global = await actor("global"), args = scope(patient, "adopt", null, "global");
+    const { models } = await reviewedRead(global, args);
+    const before = Number(productCount(patient));
+    const intent = reviewedPacket(args, { modelId }, models.find(model => model.id === modelId).hash);
+    const recorded = await rpc(global, reviewedWrite, intent);
+    assert.equal(Number(productCount(patient)), before);
+    assert.equal((await admin.rpc(reviewedWrite, lookup(intent))).error?.code, "42501");
+    await rpc(admin, "configure_patient_access", { p_patient: patient, p_kind: "administration", p_change: {},
+      p_key: randomUUID(), p_version: 1, p_request_id: recorded.outcome.proposalId, p_decision: "approve" });
+    assert.equal(Number(productCount(patient)), before + 1);
+    assert.equal((await reviewedRead(admin, scope(patient, "edit", modelId))).item.product_id, modelId);
+    assert.deepEqual(await rpc(global, reviewedWrite, lookup(intent)), recorded);
+    assert.equal((await reviewedRead(global, args)).models.some(model => model.id === modelId), false);
+  } finally {
+    sql(`update public.care_recipients set is_active=false where id=${sqlLiteral(patient)}; update public.products set is_active=false where id=${sqlLiteral(modelId)};`);
+  }
+});
 
 test("catalogue draft is owner and context scoped, CAS protects other devices, and discard clears only its own fields", async () => {
   const f = await setup(), another = await setup();

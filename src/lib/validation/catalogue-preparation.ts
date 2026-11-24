@@ -38,6 +38,7 @@ const fieldsByPurpose = {
   unit_create: unitFields, unit_configure: precisionFields,
   presentation_create: presentationFields, presentation_edit: presentationFields, identity: identityFields,
 };
+const referenceHash = z.string().regex(/^[a-f0-9]{64}$/);
 
 export function validCatalogueScope(scope: z.infer<typeof catalogueScope>) {
   return (scope.targetId !== null) === ["edit", "presentation_edit", "identity"].includes(scope.purpose)
@@ -52,7 +53,7 @@ export const catalogueAttempt = catalogueScope.extend({
   id: z.uuid().nullable(),
   revision: z.number().int().min(0).max(2_147_483_646),
   fields: z.union([catalogueProductFields, modelFields, unitFields, precisionFields, presentationFields, identityFields]).nullable(),
-  referenceHash: z.string().regex(/^[a-f0-9]{64}$/).nullable(),
+  referenceHash: referenceHash.nullable(),
 }).superRefine((input, ctx) => {
   const writing = input.action === "save" || input.action === "commit";
   if (!validCatalogueScope(input)
@@ -138,7 +139,7 @@ export function verifyCatalogueReceipt(userId: string, attempt: CatalogueAttempt
   return result;
 }
 
-function matchesCatalogueOutcome(attempt: CatalogueAttempt, result: CatalogueOutcome) {
+function matchesCatalogueOutcome(attempt: Pick<CatalogueAttempt, "fields" | "purpose" | "targetId" | "mode">, result: CatalogueOutcome) {
   const { fields, purpose, targetId, mode } = attempt;
   if (purpose === "unit_create") return "unitId" in result;
   if (mode === "global") return "proposalId" in result;
@@ -155,6 +156,44 @@ function matchesCatalogueOutcome(attempt: CatalogueAttempt, result: CatalogueOut
   if (purpose === "unit_configure") return "productId" in fields && result.productId === fields.productId;
   return purpose === "create";
 }
+
+export const reviewedCataloguePointer = catalogueScope.extend({ key: z.uuid() }).refine(validCatalogueScope);
+export const reviewedCatalogueCommand = catalogueScope.extend({
+  key: z.uuid(),
+  intent: z.strictObject({ fields: catalogueAttempt.shape.fields.unwrap(), referenceHash }).nullable(),
+}).refine(input => validCatalogueScope(input) && (!input.intent || fieldsByPurpose[input.purpose].safeParse(input.intent.fields).success),
+  "Confira os dados e a referência desta alteração do catálogo.");
+
+const reviewedCatalogueReceipt = catalogueScope.extend({
+  key: z.uuid(), ownerId: z.uuid(), state: z.enum(["closed", "recorded"]), outcome: outcome.nullable(),
+});
+export type ReviewedCataloguePointer = z.infer<typeof reviewedCataloguePointer>;
+export type ReviewedCatalogueCommand = z.infer<typeof reviewedCatalogueCommand>;
+export type ReviewedCatalogueReceipt = z.infer<typeof reviewedCatalogueReceipt>;
+
+export function verifyReviewedCatalogueReceipt(userId: string, attempt: ReviewedCatalogueCommand, value: unknown) {
+  const result = reviewedCatalogueReceipt.parse(value);
+  if (result.ownerId !== userId || result.patientId !== attempt.patientId || result.mode !== attempt.mode
+    || result.purpose !== attempt.purpose || result.targetId !== attempt.targetId || result.key !== attempt.key
+    || (result.outcome !== null) !== (result.state === "recorded")
+    || (result.outcome && !matchesCatalogueOutcome({ ...attempt, fields: attempt.intent?.fields ?? null }, result.outcome))) {
+    throw new Error("O resultado recebido não corresponde a esta alteração do catálogo.");
+  }
+  return result;
+}
+
+const productModel = z.strictObject({
+  id: catalogueProductId, name: z.string(), unit: z.string(), category: catalogueProductFields.shape.category,
+  aliases: z.array(z.string()), hash: referenceHash,
+});
+export const reviewedCatalogueProductReference = z.union([
+  z.strictObject({ models: z.array(productModel) }),
+  z.strictObject({
+    item: z.record(z.string(), z.unknown()).nullable(), hash: referenceHash,
+    units: z.array(z.strictObject({ code: z.string(), name: z.string() })), unitLocked: z.boolean(),
+  }),
+]);
+export type ReviewedCatalogueProductReference = z.infer<typeof reviewedCatalogueProductReference>;
 
 export function catalogueCommitFor(...purposes: CatalogueScope["purpose"][]) {
   return z.strictObject({

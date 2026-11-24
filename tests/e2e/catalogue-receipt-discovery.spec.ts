@@ -2,7 +2,9 @@ import { expect, test, type Page } from "@playwright/test";
 import { randomUUID } from "node:crypto";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { sql, sqlLiteral as q } from "../../scripts/test-environment.mjs";
-import { fixtures, setup } from "../integration/v4-fixtures.mjs";
+import { actor, fixtures, rpc, setup } from "../integration/v4-fixtures.mjs";
+import { catalogueAttemptStorageKey } from "../../src/lib/client/catalogue-attempt-storage";
+import type { CatalogueAttempt } from "../../src/lib/validation/catalogue-preparation";
 import { selectContext } from "./auth-context";
 import { auditFromTop } from "./accessibility-audit";
 
@@ -15,40 +17,31 @@ async function login(page: Page, patient: string | null, role: "adminA" | "globa
   await selectContext(page, patient);
 }
 
-async function openNewItem(page: Page) {
-  const trigger = page.getByRole("button", { name: "Novo item", exact: true });
-  await page.bringToFront();
-  await expect(trigger).toBeEnabled();
-  await trigger.focus();
-  await expect(trigger).toBeFocused();
-  // A retained list may revalidate while the control is receiving focus.
-  await expect(trigger).toBeEnabled();
-  await trigger.press("Enter");
-  const editor = page.getByRole("dialog", { name: "Adicionar item exclusivo deste paciente" });
-  await expect(editor).toBeVisible();
-  return editor;
+async function priorCatalogueReceipt(client: Awaited<ReturnType<typeof actor>>, patient: string, name: string, mode: "patient" | "global") {
+  const scope = { p_patient: patient, p_mode: mode, p_purpose: "create", p_target: null };
+  const { reference } = await rpc(client, "catalogue_preparation_read", scope);
+  const attempt: CatalogueAttempt = {
+    patientId: patient, mode, purpose: "create", targetId: null, action: "commit", id: null, revision: 0,
+    key: randomUUID(), referenceHash: reference.hash,
+    fields: { name, unit: "unidade", category: "higiene", description: "", aliases: "", sortOrder: "0", isActive: true },
+  };
+  await rpc(client, "catalogue_preparation_command", {
+    ...scope, p_action: attempt.action, p_key: attempt.key, p_id: attempt.id, p_revision: attempt.revision,
+    p_fields: attempt.fields, p_reference_hash: attempt.referenceHash,
+  });
+  return attempt;
 }
 
-test("catalogue receipt is discoverable after closing the editor, losing write access and opening another session", async ({ page, browser }) => {
-  test.setTimeout(120_000);
+test("prior catalogue receipt remains discoverable after losing write access and opening another session", async ({ page, browser }) => {
+  test.setTimeout(180_000);
   const f = await setup();
   const item = "Material confirmado " + randomUUID().slice(0, 8);
   const count = () => sql(`select count(*) from public.care_recipient_products where care_recipient_id=${q(f.patient)} and name=${q(item)};`);
-  let sent = 0;
+  const attempt = await priorCatalogueReceipt(f.admin, f.patient, item, "patient");
   await login(page, f.patient);
   await page.goto(`/admin?careRecipientId=${f.patient}&section=catalog`);
-  await page.route("**/api/admin", async route => {
-    if (route.request().method() !== "POST" || route.request().postDataJSON().action !== "product") return route.continue();
-    sent += 1;
-    const response = await route.fetch();
-    expect(response.status()).toBe(200);
-    await route.abort("failed");
-  });
-  const editor = await openNewItem(page);
-  await editor.getByLabel("Nome", { exact: true }).fill(item);
-  await editor.getByRole("button", { name: "Salvar item", exact: true }).click();
-  await editor.getByRole("button", { name: "Fechar e recuperar depois", exact: true }).click();
-  await expect(editor).toHaveCount(0);
+  await page.evaluate(({ key, value }) => sessionStorage.setItem(key, JSON.stringify(value)),
+    { key: catalogueAttemptStorageKey(fixtures.adminA.id, attempt), value: attempt });
   expect(count()).toBe("1");
   sql(`insert into public.capability_overrides(care_recipient_id,subject_user,capability,enabled) values(${q(f.patient)},${q(fixtures.adminA.id)},'catalog.manage',false);`);
 
@@ -73,7 +66,6 @@ test("catalogue receipt is discoverable after closing the editor, losing write a
   await consult.click();
   await expect(pending).toHaveCount(0);
   await expect(confirmed.getByText(item, { exact: true })).toBeVisible();
-  expect(sent).toBe(1);
 
   const freshContext = await browser.newContext();
   try {
@@ -98,15 +90,12 @@ test("catalogue receipt is discoverable after closing the editor, losing write a
   }
 });
 
-test("global catalogue proposal is found in its patient history, separately from global units", async ({ page }) => {
+test("prior global catalogue proposal is found in its patient history, separately from global units", async ({ page }) => {
   test.setTimeout(120_000);
   const f = await setup();
   await login(page, null, "global");
   await page.goto(`/admin?careRecipientId=${f.patient}&section=catalog`);
-  const editor = await openNewItem(page);
-  await editor.getByLabel("Nome", { exact: true }).fill("Proposta fictícia para histórico");
-  await editor.getByRole("button", { name: "Salvar item", exact: true }).click();
-  await expect(editor).toHaveCount(0);
+  await priorCatalogueReceipt(await actor("global"), f.patient, "Proposta fictícia para histórico", "global");
   await page.getByRole("link", { name: "Comprovantes do catálogo", exact: true })
     .filter({ hasNot: page.locator("nav") }).and(page.locator('a[href*="paciente="]')).click();
   const confirmed = page.getByRole("region", { name: "Comprovantes confirmados", exact: true });

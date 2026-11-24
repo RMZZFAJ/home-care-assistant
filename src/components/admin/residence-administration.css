@@ -52,6 +52,22 @@
 .hca-residence-rules .hca-guide-row:disabled { color: inherit; cursor: default; }
 .hca-residence-rules-empty { padding: 16px; color: var(--hca-muted); font-size: 13px; }
 .hca-residence-rules > .hca-notice-rules-filter { padding: 12px 16px; border-bottom: 1px solid var(--hca-line); }
+.hca-catalogue-add { justify-self: start; min-height: 36px; }
+.hca-catalogue-search { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px; padding: 6px; border: 1px solid var(--hca-line); border-radius: 15px; background: #fff; }
+.hca-catalogue-search .hca-text-input { border-color: transparent; }
+.hca-l1 .hca-catalogue-search .hca-input-adornment > input.hca-text-input { padding-inline-start: 38px; font-size: 12px; }
+.hca-catalogue-search > button { align-self: center; }
+.hca-catalogue-types { display: flex; overflow-x: auto; border-bottom: 1px solid var(--hca-line); }
+.hca-catalogue-types > button { flex: none; border-radius: 0; border-bottom: 2px solid transparent; padding-inline: 10px; font-size: 13px; }
+.hca-catalogue-types > button[aria-pressed="true"] { color: var(--hca-teal); border-bottom-color: var(--hca-teal); font-weight: 700; }
+.hca-catalogue-status { display: flex; justify-content: end; }
+.hca-l1 .hca-catalogue-status > select.hca-text-input { min-height: 34px; width: auto; min-width: 120px; font-size: 12px; }
+.hca-catalogue-group > header > h3, .hca-residence-rules > header > h3 { font-size: 15px; font-weight: 700; line-height: 1.4; }
+.hca-residence-admin-section .hca-catalogue-row { min-height: 82px; }
+.hca-catalogue-row .hca-guide-row-label { min-width: 0; overflow-wrap: anywhere; }
+.hca-catalogue-duplicate .hca-modal-footer { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); }
+.hca-catalogue-duplicate .hca-modal-footer > :last-child { grid-column: 1 / -1; }
+@media (max-width: 600px) { .hca-catalogue-add { width: 100%; } }
 .hca-notice-channel-disabled { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
 .hca-notice-channel-disabled small { display: block; color: var(--hca-muted); }
 .hca-overlay:has(> .hca-drawer-viewport > .hca-residence-settings-sheet) > .hca-modal-backdrop { inset: var(--app-header-height) 0 0; }

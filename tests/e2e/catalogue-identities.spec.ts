@@ -37,21 +37,20 @@ const modal = (page: Page) =>
     name: "Situação e sucessor do material",
     exact: true,
   });
+async function openIdentity(page: Page) {
+  await page.getByRole("region", { name: "Produtos do catálogo", exact: true }).getByRole("button", { name: /^Material fictício V4 0/ }).click();
+  await page.getByRole("dialog", { name: "Material fictício V4 0", exact: true }).getByRole("button", { name: /^Situação e sucessor/ }).click();
+}
 async function open(page: Page, patient: string, inactive = false) {
   await page.goto(`/admin?careRecipientId=${patient}&section=catalog`);
   await expect(
-    page.getByRole("heading", { name: "Catálogo do paciente", exact: true }),
+    page.getByRole("heading", { name: "Catálogo", exact: true }),
   ).toBeVisible();
   if (inactive)
     await page
       .getByRole("combobox", { name: "Situação dos produtos", exact: true })
       .selectOption("inactive");
-  await page
-    .getByRole("button", {
-      name: "Situação e sucessor: Material fictício V4 0",
-      exact: true,
-    })
-    .click();
+  await openIdentity(page);
   await expect(
     modal(page).getByRole("region", {
       name: "Material de origem",
@@ -167,7 +166,7 @@ test("sucessor de outra unidade preserva PDF e saldos; resposta perdida recupera
   ).toBeVisible();
   await page.reload();
   await page.getByRole("combobox", { name: "Situação dos produtos", exact: true }).selectOption("inactive");
-  await page.getByRole("button", { name: "Situação e sucessor: Material fictício V4 0", exact: true }).click();
+  await openIdentity(page);
   await expect(modal(page).getByRole("button", { name: "Recuperar mesma intenção", exact: true })).toBeVisible();
   expect(packets).toHaveLength(1);
   sql(
@@ -302,7 +301,7 @@ test("sucessor de outra unidade preserva PDF e saldos; resposta perdida recupera
   );
   await noRead;
   await expect(
-    page.getByRole("heading", { name: "Catálogo do paciente", exact: true }),
+    page.getByRole("region", { name: "Produtos do catálogo", exact: true }),
   ).toHaveCount(0);
   const denied = await page.request.post("/api/catalog/identities", {
     data: packets[0],

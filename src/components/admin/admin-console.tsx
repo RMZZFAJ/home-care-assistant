@@ -2,7 +2,7 @@
 
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type RefObject } from "react";
 import { useCommandIntent } from "@/lib/client/use-command-intent";
 import { ApiError } from "@/lib/client/api";
 import { governanceCommandConfirmed } from "@/lib/validation/governance";
@@ -64,12 +64,14 @@ export function AdminConsole() {
   const section = params.get("section");
   const technical = section === "operations";
   const people = section === "memberships" || section === "invitations";
+  const catalogue = section === "catalog";
+  const catalogueHeadingRef = useRef<HTMLHeadingElement>(null);
   const overview = !section || section === "patient" || !Object.hasOwn(labels, section);
   const administrativeCapabilities = ["access.manage", "catalog.manage", "audit.read"];
   return (
     <Workspace
-      title={technical ? "Central técnica" : people ? "Pessoas e convites" : "Administração"}
-      eyebrow={technical ? "Administração global" : people ? "Organização da residência" : undefined}
+      title={technical ? "Central técnica" : people ? "Pessoas e convites" : catalogue ? "Catálogo" : "Administração"}
+      eyebrow={technical ? "Administração global" : people || catalogue ? "Organização da residência" : undefined}
       administration
       administrationCapabilities={administrativeCapabilities}
       administrationReadRecovery={section === "catalog"}
@@ -87,7 +89,10 @@ export function AdminConsole() {
             {available ? <p className="hca-residence-admin-subtitle">Organize o acesso e o trabalho da residência.</p> : null}
           </div></div>
         </>;
-      } : undefined}
+      } : catalogue ? () => <div className="page-heading hca-residence-admin-heading"><div>
+        <p className="eyebrow">Organização da residência</p><h1 ref={catalogueHeadingRef} tabIndex={-1}>Catálogo</h1>
+        <p className="hca-residence-admin-subtitle">Materiais desta residência, sempre identificados por tipo.</p>
+      </div></div> : undefined}
     >
       {(context) => overview ? <ResidenceAdministration
         key={`${context.userId}:${context.patient?.id ?? "global"}:${context.activeContext?.mode}:${section ?? "overview"}`}
@@ -95,13 +100,14 @@ export function AdminConsole() {
         <PatientAdmin
           key={(context.patient?.id ?? "global") + ":" + (params.get("section") ?? "overview")}
           context={context}
+          catalogueHeadingRef={catalogueHeadingRef}
         />
       )}
     </Workspace>
   );
 }
 
-function PatientAdmin({ context }: { context: WorkspaceContext }) {
+function PatientAdmin({ context, catalogueHeadingRef }: { context: WorkspaceContext; catalogueHeadingRef: RefObject<HTMLHeadingElement | null> }) {
   const globalMode =
     context.activeContext?.mode === "global" &&
     context.globalAdministrationAllowed === true;
@@ -278,25 +284,13 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
           permanecer autorizada.
         </Notice>
       ) : null}
-      {section !== "operations" && section !== "memberships" && section !== "invitations" && <p className="text-sm text-(--muted)">
+      {section !== "catalog" && section !== "operations" && section !== "memberships" && section !== "invitations" && <p className="text-sm text-(--muted)">
         {globalMode
           ? "Administração global e por paciente."
           : "Todas as alterações desta área se limitam ao paciente selecionado."}
       </p>}
-      {patientId && (section === "memberships" || section === "invitations") ? <PeopleNavigation patientId={patientId} area={section} globalMode={globalMode} /> :
+      {section === "catalog" ? null : patientId && (section === "memberships" || section === "invitations") ? <PeopleNavigation patientId={patientId} area={section} globalMode={globalMode} /> :
         <AdministrationNavigation context={context} section={section === "overview" ? null : section} />}
-      {section === "catalog" && allowed ? (
-        <Link className={buttonClass} href="/unidades">
-          Unidades e apresentações / scanner
-        </Link>
-      ) : null}
-      {section === "catalog" && patientId ? (
-        <Link className={buttonClass} href={"/comprovantes-catalogo?" + new URLSearchParams({
-          [globalMode ? "paciente" : "careRecipientId"]: patientId,
-        })}>
-          Comprovantes do catálogo
-        </Link>
-      ) : null}
       {error && (
         <Notice error>
           {error}
@@ -314,17 +308,23 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
       {queueRefreshing&&!loading?<Notice>Atualizando fila de notificações…</Notice>:null}
       <fieldset disabled={busy} hidden={readDenied} className="min-w-0 space-y-5">
         {section === "catalog" && patientId ? (
-          <CatalogueManagement
+          <><CatalogueManagement
             key={JSON.stringify([context.userId, patientId, globalMode])}
             userId={context.userId}
             globalMode={globalMode}
             writable={allowed}
             patientId={patientId}
+            headingRef={catalogueHeadingRef}
             onIdentitySaved={async (message) => {
               setMessage(message);
               if (allowed) await load();
             }}
-          />
+          /><div className="hca-form-stack">
+            <Link className={buttonClass} href={"/comprovantes-catalogo?" + new URLSearchParams({
+              [globalMode ? "paciente" : "careRecipientId"]: patientId,
+            })}>Comprovantes do catálogo</Link>
+            <AdministrationNavigation context={context} section="catalog" />
+          </div></>
         ) : null}
         {section === "memberships" && patientId && !readDenied ? (
           <MembershipManagement

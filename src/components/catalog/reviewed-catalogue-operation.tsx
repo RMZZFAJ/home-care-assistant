@@ -1,0 +1,135 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
+import { z } from "zod";
+import { DocumentOperationFailureDialog, operationRecoveryLimit } from "@/components/documents/document-operation-failure-dialog";
+import { ActionButton } from "@/components/ui/controls";
+import { useOperationActivity } from "@/components/ui/operation-activity";
+import { Dialog } from "@/components/ui/overlays";
+import { api, ApiError } from "@/lib/client/api";
+import { reviewedCataloguePointer, verifyReviewedCatalogueReceipt, type CatalogueScope, type ReviewedCatalogueCommand, type ReviewedCatalogueReceipt } from "@/lib/validation/catalogue-preparation";
+
+const endpoint = "/api/admin/catalogue-actions";
+const retainedAttempt = z.strictObject({ pointer: reviewedCataloguePointer, lookups: z.number().int().min(0).max(operationRecoveryLimit) });
+type Pending = z.infer<typeof retainedAttempt>;
+type Failure = { key: string; cause: unknown; uncertain: boolean };
+
+export function reviewedCatalogueUrl({ patientId, mode, purpose, targetId }: CatalogueScope, selection?: string) {
+  return endpoint + "?" + new URLSearchParams({
+    ...(patientId ? { patientId } : {}), mode, purpose, ...(targetId ? { targetId } : {}), ...(selection ? { selection } : {}),
+  });
+}
+
+export function useReviewedCatalogueOperation(userId: string, context: Pick<CatalogueScope, "patientId" | "mode">, purposes: readonly CatalogueScope["purpose"][]) {
+  const { patientId, mode } = context;
+  const storageKey = `hca:catalogue-action:${userId}:${patientId ?? "general"}:${mode}:${purposes.join(",")}`;
+  const [pending, setPending] = useState<Pending | null>(null);
+  const [ready, setReady] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [failure, setFailure] = useState<Failure | null>(null);
+  const [result, setResult] = useState<ReviewedCatalogueReceipt | null>(null);
+  const controllerRef = useRef<AbortController | null>(null);
+  const runningRef = useRef(false);
+  useOperationActivity(busy, { title: "Conferindo a alteração do catálogo" });
+
+  useEffect(() => {
+    const controller = new AbortController();
+    controllerRef.current = controller;
+    queueMicrotask(() => {
+      if (controller.signal.aborted) return;
+      try {
+        const saved = retainedAttempt.safeParse(JSON.parse(sessionStorage.getItem(storageKey) ?? "null")).data;
+        if (saved && saved.pointer.patientId === patientId && saved.pointer.mode === mode && purposes.includes(saved.pointer.purpose))
+          setPending(saved);
+      } catch { /* The open tab can still use the exact reference if storage is unavailable. */ }
+      setReady(true);
+    });
+    return () => controller.abort();
+  }, [mode, patientId, purposes, storageKey]);
+
+  function keep(value: Pending | null) {
+    setPending(value);
+    try {
+      if (value) sessionStorage.setItem(storageKey, JSON.stringify(value));
+      else sessionStorage.removeItem(storageKey);
+    } catch { /* Retain the reference in memory while this surface is open. */ }
+  }
+
+  async function run(command: ReviewedCatalogueCommand, lookups: number) {
+    const signal = controllerRef.current?.signal;
+    if (!signal || signal.aborted || !ready || runningRef.current || result) return;
+    const { intent, ...pointer } = command;
+    runningRef.current = true;
+    keep({ pointer, lookups });
+    setBusy(true);
+    setFailure(null);
+    try {
+      const confirmed = verifyReviewedCatalogueReceipt(userId, command, await api<unknown>(endpoint, command, signal));
+      if (signal.aborted) return;
+      keep(null);
+      setResult(confirmed);
+    } catch (cause) {
+      if (signal.aborted) return;
+      const rejected = intent !== null && cause instanceof ApiError && cause.status >= 400 && cause.status < 500
+        && cause.status !== 408 && !["PERSISTENCE_UNCONFIRMED", "RECONCILIATION_REQUIRED", "IDEMPOTENCY_CONFLICT"].includes(cause.code ?? "");
+      if (rejected) keep(null);
+      setFailure({ key: pointer.key, cause, uncertain: !rejected });
+    } finally {
+      runningRef.current = false;
+      if (!signal.aborted) setBusy(false);
+    }
+  }
+
+  return {
+    busy, pending, failure, result, blocked: !ready || busy || Boolean(pending || result),
+    submit: (scope: CatalogueScope, intent: NonNullable<ReviewedCatalogueCommand["intent"]>) => {
+      if (pending || scope.patientId !== patientId || scope.mode !== mode || !purposes.includes(scope.purpose)) return;
+      return run({ ...scope, key: crypto.randomUUID(), intent }, 0);
+    },
+    recover: () => {
+      if (pending && pending.lookups < operationRecoveryLimit) return run({ ...pending.pointer, intent: null }, pending.lookups + 1);
+    },
+    openRecovery: () => pending && setFailure({ key: pending.pointer.key, cause: null, uncertain: true }),
+    closeFailure: () => setFailure(null), closeResult: () => setResult(null),
+  };
+}
+
+export function ReviewedCatalogueFeedback({ operation, onFinish, onReview }: {
+  operation: ReturnType<typeof useReviewedCatalogueOperation>;
+  onFinish: (receipt: ReviewedCatalogueReceipt) => void;
+  onReview?: () => void;
+}) {
+  const { pending, failure, result, busy } = operation;
+  const canCompare = failure?.cause instanceof ApiError && failure.cause.status === 409 && !failure.uncertain;
+  const action = failure?.uncertain && pending && pending.lookups < operationRecoveryLimit
+    ? { label: "Conferir resultado", onClick: () => void operation.recover() }
+    : canCompare && onReview ? { label: "Conferir cadastro atual", onClick: onReview } : undefined;
+  const closed = result?.state === "closed";
+  const proposed = result?.outcome && "proposalId" in result.outcome;
+  const title = closed ? "Tentativa encerrada" : proposed ? "Proposta registrada"
+    : result?.purpose === "adopt" ? "Modelo adotado" : result?.purpose === "create" ? "Material adicionado" : "Cadastro atualizado";
+  function finish() {
+    if (!result) return;
+    operation.closeResult();
+    onFinish(result);
+  }
+  return <>
+    {pending && !busy && !failure
+      ? <ActionButton onClick={operation.openRecovery}>Conferir resultado pendente</ActionButton> : null}
+    {failure && !busy ? <DocumentOperationFailureDialog
+      title={failure.uncertain ? "A resposta do catálogo não chegou" : "Não foi possível registrar no catálogo"}
+      description={failure.uncertain ? "Consulte a tentativa original para saber se o cadastro foi gravado."
+        : failure.cause instanceof Error ? failure.cause.message : "Confira os dados antes de confirmar."}
+      outcome={failure.uncertain ? "uncertain" : "rejected"} cause={failure.cause}
+      operation="Alterar catálogo" fallbackCode="CATALOGO_RESULTADO_NAO_CONFIRMADO" attemptReference={failure.key}
+      attempts={pending?.lookups ?? 0} guidance="Use a referência para identificar a tentativa no catálogo."
+      action={action} exhaustedMessage={pending?.lookups === operationRecoveryLimit ? "Copie os detalhes e avise o responsável pelo sistema." : undefined}
+      closeLabel="Voltar" onClose={operation.closeFailure}
+    /> : null}
+    {result ? <Dialog open title={title} success={!closed} onClose={finish}
+      subtitle={closed ? "A consulta confirmou que esta tentativa não alterou o catálogo."
+        : proposed ? "Outro administrador da residência decide a proposta em Pessoas e propostas."
+          : "O material está identificado no catálogo. Os estoques mantêm seus registros."}
+      footer={<ActionButton variant="primary" onClick={finish}>Concluir</ActionButton>}>{null}</Dialog> : null}
+  </>;
+}

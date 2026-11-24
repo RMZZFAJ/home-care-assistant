@@ -2293,3 +2293,23 @@ outra atualização. `closed` confirma a ausência sob lock e impede que essa
 chave seja aplicada depois pela rota revisada. A consulta revalida autoria,
 residência, modo e finalidade. Limites por custódia disparam a avaliação
 de alertas e preservam todos os movimentos de estoque.
+
+## Confirmações do catálogo
+
+`GET /api/admin/catalogue-actions` recebe `patientId`, `mode`, `purpose`
+e `targetId` quando a ação seleciona um cadastro existente. Nesta etapa,
+o cadastro, a edição e a adoção consultam a referência vigente. A resposta
+inclui os modelos elegíveis ou o cadastro, as unidades disponíveis e a
+indicação de unidade preservada pelo histórico.
+
+`POST /api/admin/catalogue-actions` recebe esse escopo, `key` e
+`intent: { fields, referenceHash }`. O banco revalida a referência e a
+autorização antes de gravar o ato e seu resultado na mesma transação.
+Cada chave identifica a própria tentativa. A consulta com `intent: null`
+devolve `recorded` e o resultado original, ou `closed` quando a consulta
+confirma ausência e encerra a chave. A atuação global sobre material
+registra uma proposta sujeita a decisão local. Os campos ficam no formulário
+até a confirmação. A tentativa guarda o hash e a referência oficial.
+
+Os endpoints históricos de preparação permanecem usados pelos editores de
+situação, unidades e apresentações durante a transição do L4.

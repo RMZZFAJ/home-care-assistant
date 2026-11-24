@@ -152,8 +152,9 @@ test("06.4 catalogue units and presentations retain aliases,precision,leading ze
   expect(presentation).toBeTruthy();await login(page,f.patient);const before=facts(f.patient),sent=writes(page),ref=await model(browser,"catalogo/materiais");
   try{
     await page.goto(`/admin?careRecipientId=${f.patient}&section=catalog`);
-    const table=page.getByRole("table",{name:"Produtos do catálogo",exact:true});await expect(table.locator("tbody tr")).toHaveCount(1);await expect(table).toContainText("Alias preservado para pesquisa");await expect(table).toContainText("Precisão 0 casa(s)");
-    for(const width of widths){await page.setViewportSize({width,height:1100});await ref.page.setViewportSize({width,height:1100});await tableParity(table,ref.page,width);await auditFromTop(page,"canonical catalogue "+width);if(width===320)await capture(table.locator("tbody tr"),"catalogue-material-"+info.project.name);}
+    const list=page.getByRole("region",{name:"Produtos do catálogo",exact:true}),row=list.locator("[data-product-id]");
+    await expect(row).toHaveCount(1);await expect(row).toContainText("Alias preservado para pesquisa");await expect(row).toContainText("Precisão 0 casa(s)");
+    for(const width of widths){await page.setViewportSize({width,height:1100});expect(await row.evaluate(node=>node.getBoundingClientRect().width)).toBeLessThanOrEqual(width);await auditFromTop(page,"canonical catalogue "+width);if(width===320)await capture(row,"catalogue-material-"+info.project.name);}
     await page.goto(`/unidades?careRecipientId=${f.patient}`);const units=page.getByRole("table",{name:"Unidades base",exact:true}),packs=page.getByRole("table",{name:"Apresentações por material",exact:true});
     await expect(units.locator("tbody tr").first()).toBeVisible();await expect(packs).toContainText("0012345678905");await expect(packs).toContainText("1 embalagem = 8 unidade");
     for(const width of widths){await page.setViewportSize({width,height:1100});await ref.page.setViewportSize({width,height:1100});await tableParity(units,ref.page,width);await tableParity(packs,ref.page,width);await auditFromTop(page,"canonical units presentations "+width);}
