@@ -6,6 +6,7 @@ import { actor, rpc, setup, issue, request, fixtures, env } from "./v4-fixtures.
 import { sql, sqlLiteral } from "../../scripts/test-environment.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { whileAdvisoryWaits } from "./lock-barrier.mjs";
+import { shiftWorker } from "./shift-fixtures.mjs";
 
 const current = client => rpc(client, "my_requisition_science_preference");
 async function prefer(client, mode) { return rpc(client, "set_requisition_science_preference", { p_mode: mode, p_consent: mode !== "manual", p_version: (await current(client)).version, p_key: randomUUID() }); }
@@ -55,10 +56,43 @@ test("P02 personal preferences require explicit consent, preserve versions under
     const manual = await prefer(family, "manual");
     const recovered = await rpc(family, "set_requisition_science_preference", args);
     assert.equal(recovered.mode, "manual"); assert.equal(recovered.version, manual.version); assert.equal(recovered.savedVersion, saved.version);
+    const receipt = await rpc(family, "my_science_preference_attempt", { p_key: args.p_key });
+    assert.deepEqual({ mode: receipt.mode, version: receipt.version, saved: receipt.savedVersion, id: receipt.attemptId },
+      { mode: "manual", version: manual.version, saved: saved.version, id: args.p_key });
+    assert.equal((await rpc(other, "my_science_preference_attempt", { p_key: args.p_key })).savedVersion, null);
     const visible = await other.from("requisition_science_preferences").select("user_id");
     assert.ifError(visible.error); assert.ok(visible.data.every(row => row.user_id === fixtures.reader.id));
     assert.ok((await family.from("requisition_science_preferences").update({ mode: "manual" }).eq("user_id", fixtures.family.id)).error);
   } finally { await prefer(family, "manual"); }
+});
+
+test("L4 channels preserve the profile and legacy bits, reject a competing version and expose only the owner's receipt", async () => {
+  const f = await setup(), person = await shiftWorker(f.patient, "family"), other = await shiftWorker(f.patient, "reader");
+  const client = person.client, id = sqlLiteral(person.id);
+  sql(`update public.profiles set notification_preferences='{"scienceAutomatic":false,"legacyChoice":true}'::jsonb where id=${id};`);
+  const initial = await rpc(client, "my_notice_preferences");
+  assert.deepEqual({ internal: initial.internal, email: initial.email, whatsapp: initial.whatsapp }, { internal: true, email: false, whatsapp: false });
+  const identity = { p_name: "Nome fictício atualizado", p_registration: "", p_state: null, p_category: "", p_preferences: null };
+  await rpc(client, "update_my_profile", identity);
+  assert.deepEqual(await rpc(client, "my_notice_preferences"), initial);
+  const args = { p_internal: false, p_email: true, p_whatsapp: false, p_version: initial.version, p_key: randomUUID() };
+  const competing = { ...args, p_internal: true, p_key: randomUUID() };
+  const outcomes = await Promise.all([client.rpc("set_my_notice_preferences", args), client.rpc("set_my_notice_preferences", competing)]);
+  assert.deepEqual(outcomes.map(value => value.error?.code ?? "saved").sort(), ["PT409", "saved"]);
+  const winner = outcomes[0].error ? competing : args;
+  const saved = await rpc(client, "my_notice_preferences", { p_key: winner.p_key });
+  assert.equal(saved.version, initial.version + 1);
+  assert.equal(saved.savedVersion, saved.version);
+  assert.equal(saved.email, true);
+  assert.equal(saved.internal, winner.p_internal);
+  assert.equal((await rpc(other.client, "my_notice_preferences", { p_key: winner.p_key })).savedVersion, null);
+  assert.equal((await client.rpc("set_my_notice_preferences", { ...winner, p_email: false })).error?.code, "23505");
+  assert.deepEqual(await rpc(client, "set_my_notice_preferences", winner), saved);
+  await rpc(client, "update_my_profile", identity);
+  assert.deepEqual(await rpc(client, "my_notice_preferences", { p_key: winner.p_key }), saved);
+  assert.equal(sql(`select notification_preferences->>'legacyChoice' from public.profiles where id=${id};`), "true");
+  assert.equal(sql(`select count(*) from private.notice_preference_receipts where user_id=${id};`), "1");
+  assert.equal(sql("select not has_table_privilege('authenticated','private.notice_preference_receipts','select');"), "t");
 });
 
 test("P02 tacit SCI uses the prior opt-in at official emission, system authorship and policy/preference versions without retroactivity", async () => {

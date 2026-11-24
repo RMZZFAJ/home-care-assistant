@@ -4044,8 +4044,42 @@ Os seis cenários finais de avisos, ocorrências e recuperação passaram em
 Chromium móvel e WebKit no perfil iPhone. Um timeout de login apareceu em
 rodada anterior e o cenário passou nas reexecuções dirigidas sem retry.
 As capturas de 360 e 412 px estão em `output/playwright/l4-inbox/`.
-As preferências, a apresentação final do sino e os estados de aparelhos
-continuam em execução no E11.
+
+### E11-03 — Preferências pessoais, consentimento e resultado
+
+Os canais ficam em Avisos e aplicativo, em painel próprio, e usam a versão
+atual da conta. Salvar a identidade pessoal preserva os canais. Preferências
+existentes mantêm efeito no envio segundo a política e o contato verificado.
+
+O painel de ciência oferece manual, diálogo e tácita. A confirmação de
+diálogo ou tácita pede consentimento expresso. Regras, elegibilidade e
+registros anteriores continuam sob os contratos das requisições. Um conflito
+fecha a edição anterior e consulta a versão atual. Uma gravação incerta
+oferece duas consultas do mesmo identificador e depois os dados de suporte.
+O cliente consulta o comprovante do titular com GET em vez de reenviar o POST.
+
+A apresentação do início usa a escolha do aparelho. No modo simples, avisos,
+escala e movimentações complementares começam recolhidos. Tarefas e alertas
+de estoque conservam a exposição já definida para o perfil.
+
+| Migration | Local | Remoto |
+| --- | --- | --- |
+| `20261124105211_l4_personal_notice_preferences` | Aplicada | Pendente |
+
+A integração com Auth real cobriu oito casos. Canais concorrentes foram
+serializados pela versão, o comprovante ficou restrito ao titular e ciência
+tácita continuou vinculada à emissão e ao consentimento anterior.
+O banco local registrou 373 migrations. A migration deste incremento aguarda
+a atualização do banco remoto junto aos demais contratos pendentes.
+
+Quatro testes dirigidos de canais e ciência passaram sem retentativas em
+Android e iOS emulados. Conferiram a abertura da versão atual após conflito,
+a recuperação sem novo POST e a mudança de apresentação do início. As
+capturas de canais em 360 e 412 px ficam em `output/playwright/l4-preferences/`.
+O painel segue os interruptores e o rodapé da v2 e usa o cabeçalho e o
+indicador de foco compartilhados da aplicação.
+
+A apresentação final do sino e os estados de aparelhos continuam em execução.
 
 ### E12-01 — Guias e ajuda na tarefa
 

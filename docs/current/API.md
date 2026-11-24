@@ -332,7 +332,8 @@ documentais também exigem expectedVersion para detectar concorrência.
 - **Rota:** /api/profile/science
 
   **Contrato:** GET da preferência própria; POST versionado e idempotente,
-  com consentimento expresso para diálogo/tácita
+  com consentimento expresso para diálogo/tácita. GET com `attempt` consulta
+  o comprovante da tentativa do titular.
 
 - **Rota:** /api/requisitions/:id/archive
 
@@ -454,7 +455,15 @@ documentais também exigem expectedVersion para detectar concorrência.
 
 - **Rota:** /api/profile
 
-  **Contrato:** Perfil, foto, contatos, preferências e sessões
+  **Contrato:** Perfil, foto, contatos e sessões. Atualizar dados pessoais
+  preserva os canais quando a carga omite `preferences`.
+
+- **Rota:** /api/profile/notices
+
+  **Contrato:** GET dos canais e da versão da pessoa autenticada. O POST
+  salva `internal`, `email` e `whatsapp` com `expectedVersion` e
+  `idempotencyKey`. GET com `attempt` retorna a preferência atual e
+  `savedVersion` quando há comprovante próprio para a mesma tentativa.
 
 - **Rota:** /api/patient-settings
 

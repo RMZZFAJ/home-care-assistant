@@ -127,13 +127,14 @@ test("V4: dois usuários ao vivo, duplicidade contextual, ciência dialogada e c
     await login(family, "family", patient);
     await family.goto("/perfil?careRecipientId=" + patient);
     await selectProfileSection(family, "notices");
-    await family.getByRole("combobox", { name: "Modalidade pessoal", exact: true }).selectOption("dialog");
-    await family.getByRole("checkbox", { name: "Confirmo expressamente esta preferência pessoal.", exact: true }).check();
-    await family.getByRole("button", { name: "Revisar preferência", exact: true }).click();
-    await family.getByRole("dialog", { name: "Revisar preferência de ciência", exact: true }).getByRole("button", { name: "Confirmar preferência", exact: true }).click();
-    await expect(
-      family.getByText("Preferência salva.", { exact: false }),
-    ).toBeVisible();
+    await family.getByRole("button", { name: "Editar preferência de ciência", exact: true }).click();
+    const preference = family.getByRole("dialog", { name: "Ciência de requisições", exact: true });
+    await preference.getByRole("radio", { name: /^Diálogo antes de abrir/ }).check();
+    await preference.getByRole("button", { name: "Revisar consentimento", exact: true }).click();
+    const confirmation = family.getByRole("dialog", { name: "Confirmar minha preferência", exact: true });
+    await confirmation.getByRole("checkbox", { name: "Compreendi e concordo com esta forma de registrar minha ciência.", exact: true }).check();
+    await confirmation.getByRole("button", { name: "Confirmar preferência", exact: true }).click();
+    await expect(family.getByRole("dialog", { name: "Preferência salva", exact: true })).toBeVisible();
     await family.goto("/historico?careRecipientId=" + patient);
     await login(pro, "professional", patient);
     const receipt = (

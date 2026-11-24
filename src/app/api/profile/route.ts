@@ -81,7 +81,7 @@ const schema = z.discriminatedUnion("action", [
           scienceWhatsApp: z.boolean().default(false),
           scienceAutomatic: z.boolean().default(false),
         })
-        .strict(),
+        .strict().optional(),
     })
     .strict(),
   z
@@ -125,7 +125,7 @@ export async function POST(request: Request) {
         p_registration: input.registration,
         p_state: input.state,
         p_category: input.category,
-        p_preferences: input.preferences,
+        p_preferences: input.preferences ?? null,
       });
     else if (input.action === "password") {
       const {

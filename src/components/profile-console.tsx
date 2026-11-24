@@ -1,6 +1,7 @@
 "use client";
 import { SettingsSection } from "@/components/forms/settings-section";
 import { useEffect, useState, type FormEvent } from "react";
+import Link from "next/link";
 import {
   api,
   ApiError,
@@ -24,6 +25,7 @@ import { PwaSettings } from "./pwa/pwa-settings";
 import { ProfileTabs } from "./profile/profile-tabs";
 import { PushSettings } from "./pwa/push-settings";
 import { PresentationPreference } from "./profile/presentation-preference";
+import { ChannelPreferences } from "./profile/channel-preferences";
 import { AdministrativePendingRecovery } from "./admin/administrative-pending-recovery";
 type Profile = ProfileRead["data"];
 type Membership = ProfileRead["memberships"][number];
@@ -31,11 +33,13 @@ type Session = ProfileRead["sessions"][number];
 export function ProfileConsole() {
   return (
     <Workspace title="Meu perfil e segurança" account>
-      {context => <><AdministrativePendingRecovery key={context.userId} userId={context.userId} /><ProfileContent /></>}
+      {context => <><AdministrativePendingRecovery key={context.userId} userId={context.userId} />
+        <ProfileContent key={context.userId} patientSelected={context.activeContext?.mode === "patient" && Boolean(context.patient)} />
+      </>}
     </Workspace>
   );
 }
-function ProfileContent() {
+function ProfileContent({ patientSelected }: { patientSelected: boolean }) {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [memberships, setMemberships] = useState<Membership[]>([]);
   const [sessions, setSessions] = useState<Session[]>([]);
@@ -99,14 +103,6 @@ function ProfileContent() {
             registration: form.get("registration"),
             state: form.get("state") || null,
             category: form.get("category"),
-            preferences: {
-              internal: form.has("internal"),
-              whatsapp: form.has("whatsapp"),
-              email: form.has("email"),
-              scienceExpress: profile?.notification_preferences.scienceExpress ?? true,
-              scienceWhatsApp: profile?.notification_preferences.scienceWhatsApp ?? false,
-              scienceAutomatic: profile?.notification_preferences.scienceAutomatic ?? false,
-            },
           },
       );
       window.dispatchEvent(new Event("hca:profile-updated"));
@@ -135,8 +131,7 @@ function ProfileContent() {
         <ProfileTabs>
           {{
             identity: profile ? (<>
-              <PresentationPreference />
-              <SettingsSection title="Identidade pessoal" summary="Nome, identificação profissional e preferências">
+              <SettingsSection title="Identidade pessoal" summary="Nome e identificação profissional">
                 <p className="hca-field-hint">Função e registro são informados por você. Preencha o registro somente quando aplicável à sua função; sem registro aplicável, deixe-o em branco. A família registra sua própria conferência por paciente, sem validação externa automática.</p>
 
                 <p className="mt-2 text-sm text-(--muted)">{profile.email}</p>
@@ -194,34 +189,6 @@ function ProfileContent() {
                           ))}
                       </select>
                     </label>
-                    <div className="sm:col-span-2">
-                      <p className="mb-2 text-sm font-semibold">
-                        Preferências de notificações
-                      </p>
-                      {[
-                        ["internal", "No aplicativo"],
-                        ["whatsapp", "WhatsApp"],
-                        ["email", "E-mail"],
-                      ].map(([key, label]) => (
-                        <label
-                          key={key}
-                          className="mr-5 inline-flex min-h-11 items-center gap-2 text-sm"
-                        >
-                          <input
-                            type="checkbox"
-                            name={key}
-                            defaultChecked={
-                              profile.notification_preferences[key] ?? true
-                            }
-                          />
-                          {label}
-                        </label>
-                      ))}
-                      <p className="text-xs text-(--muted)">
-                        Canais externos dependem de configuração e validação do
-                        contato. Preferências não concedem permissões.
-                      </p>
-                    </div>
                   </fieldset>
                   <button type="submit" className={primaryClass} disabled={busy}>
                     Salvar perfil
@@ -352,7 +319,15 @@ function ProfileContent() {
                 </button>
               </SettingsSection>
             </>) : null,
-            notices: <><PwaSettings />{push.consent}{profile ? <SciencePreferenceSettings /> : null}</>,
+            notices: active => <>
+              <SettingsSection title="Do seu jeito" summary="Atualizações e ações do vínculo selecionado">
+                <Link className={buttonClass} href="/notificacoes">Central de avisos</Link>
+              </SettingsSection>
+              <ChannelPreferences active={active} email={profile?.email} phone={profile?.phone} />
+              <SciencePreferenceSettings active={active} patientSelected={patientSelected} />
+              <PresentationPreference active={active} />
+              <PwaSettings />{push.consent}
+            </>,
             devices: push.devices,
             help: profile ? active => <SettingsSection title="Guias e ajuda" summary="Reabrir orientações e guardar seu progresso">
               <UserGuide active={active} />
