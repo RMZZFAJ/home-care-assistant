@@ -4785,3 +4785,46 @@ compartilhado pelo Preview e pela produção encontrou 362. A migration deste
 checkpoint depende de publicação e validação do ambiente candidato. O banco
 compartilhado permanece sujeito à incompatibilidade de contingências já
 registrada acima.
+
+### E10-02 — Convites da residência e retorno de acesso
+
+Pessoas e Convites compartilham o cabeçalho e as abas com totais reais no
+contexto local. A administração global conserva a consulta de pessoas e o
+fluxo de proposta. Convites mostra função, situação e validade, com criação
+em diálogo, detalhes em painel e confirmação separada para reemitir ou
+revogar. A lista usa e-mail como identificação quando o destinatário ainda
+não tem uma identidade confirmada. O resultado permite copiar o link para
+encaminhamento manual.
+
+A chamada de administração registra uma chave por tentativa. A recuperação
+consulta a chave original e fecha uma tentativa ainda ausente. O segredo
+do link é apresentado ao confirmar a primeira geração. Uma resposta
+perdida pode ser recuperada como operação registrada, com reemissão
+explícita para obter outro link. O histórico distingue recusa de revogação,
+inclusive após reemissão. As opções usam a situação e a validade revisadas.
+
+Cadastro, consulta, aceite e recusa passaram a conferir a capacidade
+efetiva de administração da pessoa que emitiu o convite. A retirada da
+exceção invalida seus convites pendentes e preserva os vínculos aceitos.
+O teste também confirmou que a reemissão invalida o link anterior e que
+contas inadequadas e links terminais recebem apenas o estado autorizado.
+
+**Ver acesso disponível** abre o diálogo de orientação previsto no
+laboratório e oferece retorno ao seletor real. O diálogo mantém o contexto
+restrito fora de seu conteúdo. O painel de pessoa, a jornada visual de
+aceite e a retirada das preparações persistentes de vínculo continuam
+como frentes abertas de E10-02.
+
+Dois testes dirigidos com Auth local passaram, incluindo concessão e retirada
+da exceção, recusa seguida de reemissão e revogação pelo desligamento.
+Os três cenários de navegador passaram em Android e iPhone emulados. A
+criação, a reemissão e a revogação passaram novamente após o ajuste visual.
+As capturas de 360 e 412 px em `output/playwright/l4-residencia` confirmam
+o padrão de abas e cartão. O cabeçalho e a navegação seguem o workspace do
+produto. O build local e as verificações dirigidas passaram.
+
+| Migration | Supabase local | Supabase remoto |
+| --- | --- | --- |
+| `20261124161308` | Aplicada | Pendente |
+
+O Supabase local contém 377 migrations nesta conferência.

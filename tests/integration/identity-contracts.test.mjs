@@ -60,6 +60,71 @@ test("invitation preview separates anonymous/wrong account/eligible/terminal sta
   assert.deepEqual(await preview(intended, decline.hash), { state: "declined" });
 });
 
+test("L4 invitation authority follows the individual access exception through registration, acceptance and withdrawal", async () => {
+  const f = await setup(), holder = await actor("professional", f.patient), intended = await signIn("adminB");
+  const anonymous = createClient(env.url, env.anonKey, options);
+  const global = await actor("global");
+  const grant = async enabled => {
+    const current = await rpc(f.admin, "patient_governance", { p_patient: f.patient });
+    return rpc(f.admin, "configure_patient_access", {
+      p_patient: f.patient, p_kind: "capability", p_key: randomUUID(), p_version: current.data.version,
+      p_change: { capability: "access.manage", subjectUser: fixtures.professional.id, reviewedRole: "professional", confirmIndividual: true, enabled },
+    });
+  };
+  const hash = () => createHash("sha256").update(randomBytes(32)).digest("hex");
+  const permit = (p_token_hash) => rpc(anonymous, "invitation_registration_allowed", { p_token_hash, p_email: fixtures.adminB.email });
+  const preview = (p_token_hash) => rpc(intended, "invitation_preview", { p_token_hash });
+  const next = (p_intent, p_token_hash = null) => ({ p_patient: f.patient, p_key: randomUUID(), p_intent, p_token_hash, p_expires_at: new Date(Date.now() + 3600_000).toISOString() });
+  const create = (tokenHash) => next({ action: "create", email: fixtures.adminB.email, role: "professional" }, tokenHash);
+  try {
+    assert.equal((await holder.rpc("administrative_invitation_command", create(hash()))).error?.code, "42501");
+    assert.equal((await global.rpc("administrative_invitations", { p_patient: f.patient })).error?.code, "42501");
+    await grant(true);
+    const delayed = create(hash());
+    assert.deepEqual(await rpc(holder, "administrative_invitation_command", { p_patient: f.patient, p_key: delayed.p_key }), { state: "closed" });
+    assert.deepEqual(await rpc(holder, "administrative_invitation_command", delayed), { state: "closed" });
+    assert.deepEqual(await rpc(holder, "administrative_invitations", { p_patient: f.patient }), []);
+    const accepted = hash();
+    assert.equal((await rpc(holder, "administrative_invitation_command", create(accepted))).executed, true);
+    assert.equal(await permit(accepted), true);
+    assert.equal((await preview(accepted)).state, "ready");
+    const member = await rpc(intended, "accept_invitation", { p_token_hash: accepted });
+    assert.equal(member.care_recipient_id, f.patient);
+    assert.equal(member.role, "professional");
+
+    const declined = hash(), replacement = hash();
+    const { invitation } = await rpc(holder, "administrative_invitation_command", create(declined));
+    await rpc(intended, "decline_invitation", { p_token_hash: declined });
+    const list = await rpc(holder, "administrative_invitations", { p_patient: f.patient });
+    assert.equal(list.find(row => row.id === invitation.id).status, "declined");
+    const result = await rpc(holder, "administrative_invitation_command", next({ action: "reissue", id: invitation.id, status: "declined", expiresAt: invitation.expires_at }, replacement));
+    assert.deepEqual(await preview(declined), { state: "invalid" });
+    assert.equal((await intended.rpc("decline_invitation", { p_token_hash: declined })).error?.code, "42501");
+    assert.equal((await preview(replacement)).state, "ready");
+
+    await grant(null);
+    assert.equal(await permit(replacement), false);
+    assert.deepEqual(await preview(replacement), { state: "revoked" });
+    assert.equal((await intended.rpc("accept_invitation", { p_token_hash: replacement })).error?.code, "42501");
+    assert.equal((await intended.rpc("decline_invitation", { p_token_hash: replacement })).error?.code, "42501");
+    assert.equal((await preview(accepted)).state, "accepted");
+    const revoked = await rpc(f.admin, "administrative_invitation_command", next({ action: "revoke", id: invitation.id, expiresAt: result.invitation.expires_at, status: "pending" }));
+    assert.equal(revoked.invitation.status, "revoked");
+    assert.deepEqual(await preview(replacement), { state: "revoked" });
+
+    const beforeRenewal = hash(), afterRenewal = hash();
+    const another = await rpc(f.admin, "administrative_invitation_command", create(beforeRenewal));
+    await rpc(intended, "decline_invitation", { p_token_hash: beforeRenewal });
+    await rpc(f.admin, "administrative_invitation_command", next({ action: "reissue", id: another.invitation.id, status: "declined", expiresAt: another.invitation.expires_at }, afterRenewal));
+    await rpc(f.admin, "admin_set_membership_status", { p_care_recipient_id: f.patient, p_user_id: fixtures.adminB.id, p_status: "revoked" });
+    assert.deepEqual(await preview(afterRenewal), { state: "revoked" });
+    const finalList = await rpc(f.admin, "administrative_invitations", { p_patient: f.patient });
+    assert.equal(finalList.find(row => row.id === another.invitation.id).status, "revoked");
+  } finally {
+    sql(`update public.care_recipients set is_active=false where id=${sqlLiteral(f.patient)};`);
+  }
+});
+
 function revision(id) { return BigInt(sql(`select coalesce((select revision from private.workspace_revisions where user_id=${sqlLiteral(id)}),0);`)); }
 test("profile updates notify their real private Realtime consumers with revision-only messages", { timeout: 35_000 }, async () => {
   const f = await setup(), own = await actor("family", f.patient), peer = await actor("professional", f.patient), outsider = await unrelatedIdentity();

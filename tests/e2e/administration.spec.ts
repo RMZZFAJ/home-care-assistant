@@ -1,7 +1,7 @@
 import { selectDocumentSection } from "./document-sections";
 import { selectContext } from "./auth-context";
 import { expect, test, type Page } from "@playwright/test";
-import { readFileSync } from "node:fs";
+import { mkdirSync, readFileSync } from "node:fs";
 import { randomUUID } from "node:crypto";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { setup } from "../integration/v4-fixtures.mjs";
@@ -81,7 +81,7 @@ test.describe("administração integrada no ambiente local", () => {
     const navigation = page.getByRole("navigation", { name: "Áreas administrativas", exact: true });
     if (name === "Convites") {
       await navigation.getByRole("link", { name: /^Pessoas e convites/ }).click();
-      await page.getByRole("link", { name, exact: true }).click();
+      await page.getByRole("navigation", { name: "Pessoas e convites", exact: true }).getByRole("link", { name: /^Convites/ }).click();
     } else if (name === "Destinatários") {
       await navigation.getByRole("link", { name: /^Regras e destinatários/ }).click();
       await page.getByRole("navigation", { name: "Destinatários e alertas" }).getByRole("link", { name, exact: true }).click();
@@ -275,68 +275,111 @@ test.describe("administração integrada no ambiente local", () => {
 
   test("convite é criado, reemitido e revogado pela interface", async ({
     page,
-  }) => {
+  }, info) => {
     await login(page);
     const patientId = await createPatient(page);
-    const email = `manual-${randomUUID()}@example.invalid`;
+    const email = `paula.${randomUUID().slice(0, 8)}@example.invalid`;
     await section(page, patientId, "Convites");
-    await page.getByLabel("E-mail do convidado", { exact: true }).fill(email);
-    await page
-      .getByRole("combobox", { name: "Função neste paciente", exact: true })
-      .selectOption("family");
-    const created = await submit(page, "Criar convite", "invitation");
-    await expect(page.getByLabel("Link", { exact: true })).toHaveValue(
-      created.invitationUrl,
-    );
+    const nextCommand = (action: string) => page.waitForResponse(response =>
+      new URL(response.url()).pathname === "/api/admin/invitations" && response.request().method() === "POST" && response.request().postDataJSON().intent?.action === action);
+    await page.getByRole("button", { name: "Novo convite", exact: true }).click();
+    const editor = page.getByRole("dialog", { name: "Novo convite", exact: true });
+    await editor.getByLabel("E-mail do destinatário", { exact: true }).fill(email);
+    await editor.getByRole("combobox", { name: "Função neste paciente", exact: true }).selectOption("family");
+    const creation = nextCommand("create");
+    await editor.getByRole("button", { name: "Criar convite", exact: true }).click();
+    const creationResponse = await creation;
+    expect(creationResponse.ok()).toBeTruthy();
+    const created = await creationResponse.json();
+    const success = page.getByRole("dialog", { name: "Convite criado", exact: true });
+    await expect(success.getByLabel("Link", { exact: true })).toHaveValue(created.invitationUrl);
     expect(new URL(created.invitationUrl).origin).toBe(
       process.env.NEXT_PUBLIC_APP_URL,
     );
     expect(new URL(created.invitationUrl).hash).toMatch(/^#token=/);
-    expect(created.data).not.toHaveProperty("token_hash");
-    const row = page
-      .getByRole("listitem")
-      .filter({ has: page.getByText(email, { exact: true }) });
+    expect(created.invitation).not.toHaveProperty("token_hash");
+    await success.getByRole("button", { name: "Concluir", exact: true }).click();
+    const row = page.getByRole("list", { name: "Convites da residência", exact: true }).getByRole("button").filter({ hasText: email });
     await expect(row).toBeVisible();
-    const rotation = page.waitForResponse(
-      (response) =>
-        new URL(response.url()).pathname === "/api/admin" &&
-        response.request().method() === "POST" &&
-        response.request().postDataJSON().action === "resendInvitation",
-    );
-    await row
-      .getByRole("button", { name: "Reemitir link", exact: true })
-      .click();
+    await expect(page.getByRole("navigation", { name: "Pessoas e convites", exact: true }).getByRole("link", { name: /^Convites/ })).toContainText("1");
+    const evidence = "output/playwright/l4-residencia";
+    mkdirSync(evidence, { recursive: true });
+    for (const width of [360, 412]) {
+      await page.setViewportSize({ width, height: 900 });
+      expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(width);
+      await page.screenshot({ path: `${evidence}/app-invitations-${info.project.name}-${width}.png`, scale: "css" });
+    }
+    await row.click();
+    const details = page.getByRole("dialog", { name: "Convite da residência", exact: true });
+    await details.getByRole("button", { name: "Reemitir link", exact: true }).click();
+    const rotation = nextCommand("reissue");
+    await page.getByRole("dialog", { name: "Reemitir convite?", exact: true }).getByRole("button", { name: "Reemitir convite", exact: true }).click();
     const rotatedResponse = await rotation;
     expect(rotatedResponse.ok()).toBeTruthy();
     const rotated = await rotatedResponse.json();
     expect(rotated.invitationUrl).not.toBe(created.invitationUrl);
-    await expect(page.getByLabel("Link", { exact: true })).toHaveValue(
-      rotated.invitationUrl,
-    );
-    const revocation = page.waitForResponse(
-      (response) =>
-        new URL(response.url()).pathname === "/api/admin" &&
-        response.request().method() === "POST" &&
-        response.request().postDataJSON().action === "revokeInvitation",
-    );
-    await row.getByRole("button", { name: "Revogar", exact: true }).click();
+    const replacement = page.getByRole("dialog", { name: "Novo link disponível", exact: true });
+    await expect(replacement.getByLabel("Link", { exact: true })).toHaveValue(rotated.invitationUrl);
+    const expiredLink = new URLSearchParams(new URL(created.invitationUrl).hash.slice(1)).get("token");
+    const oldPreview = await page.request.post("/api/invitations/preview", { data: { token: expiredLink } });
+    expect((await oldPreview.json()).data).toEqual({ state: "invalid" });
+    await replacement.getByRole("button", { name: "Concluir", exact: true }).click();
+    await row.click();
+    await details.getByRole("button", { name: "Revogar", exact: true }).click();
+    const revocation = nextCommand("revoke");
+    await page.getByRole("dialog", { name: "Revogar convite?", exact: true }).getByRole("button", { name: "Revogar convite", exact: true }).click();
     expect((await revocation).ok()).toBeTruthy();
     await expect(
-      page.getByText("Convite revogado.", { exact: true }),
+      page.getByRole("dialog", { name: "Convite revogado", exact: true }),
     ).toBeVisible();
     const persisted = await (
       await page.request.get(
-        `/api/admin?section=invitations&careRecipientId=${patientId}`,
+        `/api/admin/invitations?careRecipientId=${patientId}`,
       )
     ).json();
     expect(persisted.data).toHaveLength(1);
     expect(persisted.data[0]).toMatchObject({
-      id: created.data.id,
+      id: created.invitation.id,
       email,
       role: "family",
       status: "revoked",
     });
     expect(persisted.data[0]).not.toHaveProperty("token_hash");
+  });
+
+  test("E10-02 recupera convite após perder a resposta sem gerar um segundo link", async ({ page }) => {
+    await login(page);
+    const patientId = await createPatient(page);
+    const email = `residencia-${randomUUID()}@example.invalid`;
+    await section(page, patientId, "Convites");
+    await page.getByRole("button", { name: "Novo convite", exact: true }).click();
+    const editor = page.getByRole("dialog", { name: "Novo convite", exact: true });
+    await editor.getByLabel("E-mail do destinatário", { exact: true }).fill(email);
+    let original: { careRecipientId: string; key: string; intent: object } | undefined;
+    await page.route("**/api/admin/invitations", async route => {
+      if (route.request().method() !== "POST") { await route.continue(); return; }
+      original = route.request().postDataJSON();
+      expect((await route.fetch()).status()).toBe(200);
+      await route.abort();
+    });
+    await editor.getByRole("button", { name: "Criar convite", exact: true }).click();
+    const failure = page.getByRole("dialog", { name: "Não foi possível confirmar o convite", exact: true });
+    await expect(failure).toBeVisible();
+    await page.unroute("**/api/admin/invitations");
+    await page.reload();
+    await page.getByRole("button", { name: "Conferir resultado", exact: true }).click();
+    const request = page.waitForRequest(req => req.method() === "POST" && new URL(req.url()).pathname === "/api/admin/invitations");
+    await failure.getByRole("button", { name: "Conferir resultado", exact: true }).click();
+    expect((await request).postDataJSON()).toEqual({ careRecipientId: patientId, key: original?.key, intent: null });
+    const result = page.getByRole("dialog", { name: "Convite criado", exact: true });
+    await expect(result.getByText(/Para encaminhar um link, reemita/)).toBeVisible();
+    await expect(result.getByLabel("Link", { exact: true })).toHaveCount(0);
+    const replay = await page.request.post("/api/admin/invitations", { data: original });
+    expect(replay.ok()).toBeTruthy();
+    expect(await replay.json()).not.toHaveProperty("invitationUrl");
+    const { data } = await (await page.request.get(`/api/admin/invitations?careRecipientId=${patientId}`)).json();
+    expect(data).toHaveLength(1);
+    expect(data[0]).toMatchObject({ email, status: "pending" });
   });
 
   test("seletores administrativos salvam destinatário e limites por produto e custódia", async ({

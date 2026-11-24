@@ -53,13 +53,25 @@ function ResidenceRow({ icon, title, details, badge }: { icon: IconName; title: 
 }
 
 export function ResidenceAdministrationUnavailable() {
-  return <section className="hca-residence-admin-denied" aria-labelledby="residence-admin-denied">
+  const [available, setAvailable] = useState(false);
+  const openerRef = useRef<HTMLButtonElement>(null);
+  return <><section className="hca-residence-admin-denied" aria-labelledby="residence-admin-denied">
     <span className="hca-residence-admin-lock"><Icon name="lock" width={29} height={29} /></span>
     <div><p className="eyebrow">Administração</p><h2 id="residence-admin-denied">Administração indisponível</h2></div>
     <p>Seu vínculo atual não permite administrar esta residência.</p>
     <p className="hca-residence-admin-note"><Icon name="shield" />As informações da residência permanecem protegidas.</p>
-    <ActionLink href="/" variant="primary">Ver acesso disponível</ActionLink>
-  </section>;
+    <ActionButton ref={openerRef} variant="primary" onClick={() => setAvailable(true)}>Ver acesso disponível</ActionButton>
+  </section>
+    {available ? <Dialog open title="Acessos disponíveis" kicker="Organização da residência" headingIcon="lock"
+      finalFocus={openerRef} onClose={() => setAvailable(false)} footer={<>
+        <ActionButton onClick={() => setAvailable(false)}>Fechar</ActionButton>
+        <ActionLink href="/" variant="primary">Ver meus acessos</ActionLink>
+      </>}>
+      <div className="hca-invitation-content"><strong>Nenhuma administração disponível nesta residência</strong>
+        <p>Volte ao início e use o seletor de contexto para consultar seus outros vínculos.</p>
+      </div>
+    </Dialog> : null}
+  </>;
 }
 
 export function ResidenceAdministration({ context, initialEdit }: { context: WorkspaceContext; initialEdit: boolean }) {

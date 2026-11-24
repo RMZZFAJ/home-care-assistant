@@ -284,6 +284,13 @@ test("E10-01 global identification remains a proposal and a reader receives no a
     await expect(page.getByRole("navigation", { name: "Áreas administrativas" })).toHaveCount(0);
     await expect(page.getByRole("region", { name: "Residência selecionada" })).toHaveCount(0);
     expect((await page.request.get(`/api/admin/residence?patientId=${f.patient}`)).status()).toBe(403);
+    const available = page.getByRole("button", { name: "Ver acesso disponível", exact: true });
+    await available.click();
+    const access = page.getByRole("dialog", { name: "Acessos disponíveis", exact: true });
+    await expect(access.getByRole("link", { name: "Ver meus acessos", exact: true })).toHaveAttribute("href", "/");
+    await expect(access).not.toContainText(proposedName);
+    await access.getByRole("button", { name: "Fechar", exact: true }).click();
+    await expect(available).toBeFocused();
     for (const width of [360, 412]) {
       await page.setViewportSize({ width, height: 900 });
       await page.screenshot({ path: `${residenceEvidence}/app-lost-${info.project.name}-${width}.png` });

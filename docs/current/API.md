@@ -1072,6 +1072,24 @@ Convites são criados, reemitidos e revogados por administração local;
 registro e aceite usam /api/invitations/register e /api/invitations/accept.
 O administrador nunca recebe a senha de outra identidade.
 
+`GET /api/admin/invitations` recebe `careRecipientId` e devolve a lista
+da residência sob a capacidade efetiva `access.manage`. O estado de recusa
+vem da última decisão registrada. O hash e o segredo do link ficam fora da
+consulta.
+
+`POST /api/admin/invitations` recebe `careRecipientId`, `key` e `intent`.
+`intent.action` é `create`, `reissue` ou `revoke`. Reemissão e revogação
+conferem ID, situação e validade revisados. O servidor devolve o novo link
+somente após a primeira criação ou reemissão daquela chave. A operação
+gera o link para encaminhamento manual.
+
+Com `intent: null`, o comando consulta a mesma chave. Ele retorna a
+operação registrada e a situação atual ou encerra a tentativa ausente.
+Uma reexecução com chave encerrada fica sem efeito. Se a resposta com o link
+se perdeu, a geração de outro link exige reemissão explícita no convite
+confirmado. Revogar uma concessão individual de `access.manage` também
+impede cadastro, aceite e recusa pelos convites pendentes emitidos com ela.
+
 Administração local aplica alterações do próprio paciente imediatamente.
 Administração global propõe mudanças no paciente; a aprovação exige outra
 identidade com administração local. Trocar o perfil ativo não permite aprovar
