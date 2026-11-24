@@ -26,7 +26,6 @@ import { Field, RoleSelect, text, type Row } from "./admin-fields";
 import { administrativeOutcomeText } from "./administrative-preparation-editor";
 import type { AdministrativeOutcome } from "@/lib/validation/administrative-preparation";
 import { AlertSettings } from "./alert-settings";
-import { PatientRegistration } from "./patient-registration";
 import {
   AdministrationNavigation,
   administrationAreas,
@@ -37,6 +36,8 @@ import { GlobalAccounts } from "./global-accounts";
 import { AuditHistory } from "./audit-history";
 import { useLiveRevision } from "@/lib/use-live-revision";
 import { OperationsConsole } from "./operations-console";
+import { ResidenceAdministration, ResidenceAdministrationUnavailable } from "./residence-administration";
+import { Icon } from "@/components/ui/icon";
 import "./administration.css";
 
 type Section =
@@ -68,20 +69,36 @@ const labels: Record<Section, string> = {
 };
 export function AdminConsole() {
   const params = useSearchParams();
-  const technical = params.get("section") === "operations";
+  const section = params.get("section");
+  const technical = section === "operations";
+  const overview = !section || section === "patient" || !Object.hasOwn(labels, section);
+  const administrativeCapabilities = ["access.manage", "catalog.manage", "audit.read"];
   return (
     <Workspace
       title={technical ? "Central técnica" : "Administração"}
       eyebrow={technical ? "Administração global" : undefined}
       administration
-      administrationCapabilities={[
-        "access.manage",
-        "catalog.manage",
-        "audit.read",
-      ]}
-      administrationReadRecovery={params.get("section") === "catalog"}
+      administrationCapabilities={administrativeCapabilities}
+      administrationReadRecovery={section === "catalog"}
+      administrationUnavailable={overview ? <ResidenceAdministrationUnavailable /> : undefined}
+      heading={overview ? context => {
+        const global = context.activeContext?.mode === "global" && context.globalAdministrationAllowed;
+        const available = global || administrativeCapabilities.some(capability => can(context, capability));
+        return <>
+          {global && context.patient ? <div className="hca-residence-admin-banner"><Icon name="info" />
+            <p><strong>Atuação administrativa</strong> As propostas locais dependem da decisão de outro administrador do paciente.</p>
+          </div> : null}
+          <div className="page-heading hca-residence-admin-heading"><div>
+            <p className="eyebrow">{available ? "Organização da residência" : "Home Care Assistant"}</p>
+            <h1>{available ? "Administração" : "Acesso à residência"}</h1>
+            {available ? <p className="hca-residence-admin-subtitle">Organize o acesso e o trabalho da residência.</p> : null}
+          </div></div>
+        </>;
+      } : undefined}
     >
-      {(context) => (
+      {(context) => overview ? <ResidenceAdministration
+        key={`${context.userId}:${context.patient?.id ?? "global"}:${context.activeContext?.mode}:${section ?? "overview"}`}
+        context={context} initialEdit={section === "patient"} /> : (
         <PatientAdmin
           key={(context.patient?.id ?? "global") + ":" + (params.get("section") ?? "overview")}
           context={context}
@@ -107,7 +124,6 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
   const [rows, setRows] = useState<Row[]>([]);
   const [directory, setDirectory] = useState<Row[]>([]);
   const [catalog, setCatalog] = useState<Row[]>([]);
-  const [editing, setEditing] = useState<Row | null>(null);
   const [page, setPage] = useState(1);
   const [notificationTotal, setNotificationTotal] = useState(0);
   const [loading, setLoading] = useState(
@@ -208,7 +224,6 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
   }, [load, queueRevision]);
   async function confirmed(result: AdministrativeResult, packet: AdministrativeIntent) {
     setMessage(result.pendingApproval ? "Proposta global registrada. Um administrador local distinto deve aprovar em Permissões, comunicação e regras." : packet.success);
-    setEditing(null);
     setConfirmationRevision(value => value + 1);
     if (result.invitationUrl) setInvitationUrl(result.invitationUrl);
     if (packet.payload.action === "historicalImport") setReport(result.data);
@@ -320,9 +335,12 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
         </Link>
       ) : null}
       {section === "memberships" && patientId ? (
-        <Link className={buttonClass} href="/configuracoes?area=people">
-          Permissões e alterações com dupla aprovação
-        </Link>
+        <div className="hca-toolbar">
+          {!globalMode ? <Link className={buttonClass} href={`/admin?section=invitations&careRecipientId=${patientId}`}>Convites</Link> : null}
+          <Link className={buttonClass} href={`/configuracoes?area=people&careRecipientId=${patientId}`}>
+            Permissões e alterações com dupla aprovação
+          </Link>
+        </div>
       ) : null}
       {error && (
         <Notice error>
@@ -358,16 +376,6 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
       )}
       {queueRefreshing&&!loading?<Notice>Atualizando fila de notificações…</Notice>:null}
       <fieldset disabled={busy} hidden={readDenied} className="min-w-0 space-y-5">
-        {section === "patient" && (
-          <PatientRegistration
-            destinations={administrationAreas(context).filter(area => ["memberships", "catalog", "alerts"].includes(area.section)).map(area => ({ href: `/admin?section=${area.section}&careRecipientId=${patientId}`, title: area.title }))}
-            patient={context.patient}
-            globalMode={globalMode}
-            creating={Boolean(editing)}
-            onToggle={() => setEditing(editing ? null : {})}
-            handle={handle}
-          />
-        )}
         {section === "catalog" && patientId ? (
           <CatalogueManagement
             key={JSON.stringify([context.userId, patientId, globalMode])}

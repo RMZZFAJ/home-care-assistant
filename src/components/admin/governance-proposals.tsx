@@ -37,7 +37,7 @@ export function GovernanceProposals({ context, directory, version, revision, bus
     if (next.toString() !== params.toString()) router.push("/configuracoes?" + next, { scroll: false });
   }
   const local = context.activeContext?.mode === "patient" && can(context, "access.manage");
-  return <section className="ui-card hca-governance-proposals space-y-4" aria-label="Propostas de configuração" aria-busy={loading}>
+  return <section id="propostas" className="ui-card hca-governance-proposals space-y-4" aria-label="Propostas de configuração" aria-busy={loading}>
     <h2 className="font-semibold">Propostas de configuração</h2>
     <p>Paciente: {patient.display_name}. Compare a configuração vigente e a proposta antes de decidir. Consultar não altera permissões.</p>
     <form className="hca-toolbar" onSubmit={event => {

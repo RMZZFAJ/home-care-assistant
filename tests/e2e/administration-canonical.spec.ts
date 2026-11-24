@@ -12,14 +12,15 @@ import { auditFromTop } from "./accessibility-audit";
 test.setTimeout(180_000);
 const widths = [320, 390, 768, 1024, 1440];
 const referenceUrl = pathToFileURL(resolve("Home_Care_Assistant_Modelo_Integral.html")).href;
+const residenceEvidence = "output/playwright/l4-residencia";
 const facts = (patient: string) => sql(`select jsonb_build_object(
   'settings',(select to_jsonb(s) from public.patient_settings s where care_recipient_id=${q(patient)}),
   'changes',(select jsonb_agg(to_jsonb(c) order by id) from public.access_change_requests c where care_recipient_id=${q(patient)}),
   'members',(select jsonb_agg(to_jsonb(m) order by user_id) from public.care_recipient_memberships m where care_recipient_id=${q(patient)}),
   'stock',(select jsonb_agg(to_jsonb(s) order by id) from public.stock_movements s where care_recipient_id=${q(patient)}));`);
-async function login(page: Page, patient: string) {
+async function login(page: Page, patient: string | null, name = "adminA") {
   await page.goto("/login");
-  await page.getByLabel("E-mail", { exact: true }).fill(fixtures.adminA.email);
+  await page.getByLabel("E-mail", { exact: true }).fill(fixtures[name].email);
   await page.getByLabel("Senha", { exact: true }).fill(fixturePassword);
   await page.getByRole("button", { name: "Entrar", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Visão geral", exact: true })).toBeVisible();
@@ -112,26 +113,35 @@ test("E10-04 consulta todas as permissões e grava a alteração somente depois 
 
 test("15 ADM02 ADM03 patient resources and policy follow the model without changing facts by navigation", async ({ page, browser }, info) => {
   const f = await setup(); await login(page, f.patient);
-  await page.goto(`/admin?section=patient&careRecipientId=${f.patient}`);
-  const card = page.getByRole("region", { name: "Cadastro do paciente", exact: true });
-  await expect(card).toBeVisible();
+  await page.goto(`/admin?careRecipientId=${f.patient}`);
+  const identification = page.getByRole("button", { name: /^Identificação da residência/ });
+  await expect(identification).toBeEnabled();
   const before = facts(f.patient), writes: string[] = [];
   page.on("request", request => { if (new URL(request.url()).pathname.startsWith("/api/") && request.method() !== "GET") writes.push(request.url()); });
   const reference = await browser.newContext();
   try {
+    mkdirSync(residenceEvidence, { recursive: true });
     const model = await reference.newPage(); await model.route(/^https?:/, route => route.abort());
-    await model.goto(referenceUrl + "#administracao/residencia");
-    const destinations = page.getByRole("navigation", { name: "Destinos autorizados do paciente", exact: true });
+    await model.goto(pathToFileURL(resolve("hca-laboratorio-04-v2-aprovado.html")).href + "#E10-01/overview");
+    const frame = model.locator("#device-frame");
+    const destinations = page.getByRole("navigation", { name: "Áreas administrativas", exact: true });
     const hrefs = await destinations.getByRole("link").evaluateAll(nodes => nodes.map(node => node.getAttribute("href")));
-    expect(hrefs).toHaveLength(3); expect(hrefs.every(href => href?.includes(f.patient))).toBe(true);
-    for (const width of widths) {
-      await page.setViewportSize({ width, height: 900 }); await model.setViewportSize({ width, height: 900 }); await model.screenshot();
-      await compare(card, model.locator(".card.pad").first(), cardProperties);
-      await compare(card.getByRole("heading"), model.locator(".card.pad h2").first(), ["font-size", "font-weight"]);
-      await compare(card.locator(".hca-field > label").first(), model.locator(".field").first(), ["font-size", "font-weight"]);
-      const columns = await card.locator("form").evaluate(node => getComputedStyle(node).gridTemplateColumns.split(" ").length);
-      expect(columns).toBe(width <= 500 ? 1 : 2);
-      await auditFromTop(page, "administration resources " + width);
+    expect(hrefs.every(href => href?.includes(f.patient))).toBe(true);
+    await expect(destinations.getByRole("link", { name: /^Pessoas e convites/ })).toContainText("5 vínculos ativos");
+    for (const width of [360, 412]) {
+      await model.getByRole("combobox", { name: "Visualização", exact: true }).selectOption(String(width));
+      await page.setViewportSize({ width, height: 900 });
+      await expect(frame.getByRole("heading", { name: "Organização", exact: true })).toBeVisible();
+      await auditFromTop(page, `E10-01 administration ${width}`);
+      await info.attach(`L4-residence-${width}`, { body: await frame.screenshot(), contentType: "image/png" });
+      await info.attach(`residence-${width}`, { body: await page.screenshot({ path: `${residenceEvidence}/app-overview-${info.project.name}-${width}.png` }), contentType: "image/png" });
+      await identification.click();
+      const editor = page.getByRole("dialog", { name: "Identificação da residência", exact: true });
+      await expect(editor.getByRole("switch", { name: "Residência ativa" })).toBeChecked();
+      await expect(editor.getByRole("textbox", { name: "Nome do paciente" })).toHaveValue(/^Homologação fictícia V4/);
+      await info.attach(`residence-editor-${width}`, { body: await page.screenshot({ path: `${residenceEvidence}/app-edit-${info.project.name}-${width}.png` }), contentType: "image/png" });
+      await editor.getByRole("button", { name: "Voltar", exact: true }).click();
+      await expect(identification).toBeFocused();
     }
     await page.goto(`/configuracoes?careRecipientId=${f.patient}`);
     const policy = page.getByRole("region", { name: "Política do paciente", exact: true }); await expect(policy).toBeVisible();
@@ -174,6 +184,113 @@ test("15 ADM02 ADM03 patient resources and policy follow the model without chang
     await expect(page.getByRole("region", { name: "Matriz de permissões", exact: true })).toBeVisible();
     expect(facts(f.patient)).toBe(before); expect(writes).toEqual([]);
   } finally { await reference.close(); await page.unrouteAll({ behavior: "wait" }); }
+});
+
+test("E10-01 recovers a lost identification response once and closes an unregistered attempt", async ({ page }) => {
+  const f = await setup();
+  const before = JSON.parse(facts(f.patient));
+  await login(page, f.patient);
+  await page.goto(`/admin?section=patient&careRecipientId=${f.patient}`);
+  const editor = page.getByRole("dialog", { name: "Identificação da residência", exact: true });
+  const name = "Residência de Mariana Borges";
+  await editor.getByRole("textbox", { name: "Nome do paciente" }).fill(name);
+  await editor.getByRole("button", { name: "Salvar identificação", exact: true }).click();
+  const review = page.getByRole("dialog", { name: "Salvar identificação?", exact: true });
+  await expect(review).toContainText(name);
+  let originalKey: string | undefined;
+  await page.route("**/api/admin/residence", async route => {
+    const command = route.request().postDataJSON();
+    if (command?.action !== "save") { await route.continue(); return; }
+    originalKey = command.key;
+    expect((await route.fetch()).status()).toBe(200);
+    await route.abort();
+  });
+  await review.getByRole("button", { name: "Salvar identificação", exact: true }).click();
+  await expect(page.getByRole("dialog", { name: "Não foi possível confirmar o resultado", exact: true })).toBeVisible();
+  await page.unroute("**/api/admin/residence");
+  await page.reload();
+  await expect(editor).toHaveCount(0);
+  await page.getByRole("button", { name: "Conferir resultado", exact: true }).click();
+  const recovery = page.getByRole("dialog", { name: "Não foi possível confirmar o resultado", exact: true });
+  const call = page.waitForRequest(request => request.method() === "POST" && new URL(request.url()).pathname === "/api/admin/residence");
+  await recovery.getByRole("button", { name: "Conferir resultado", exact: true }).click();
+  expect((await call).postDataJSON()).toEqual({ patientId: f.patient, key: originalKey, action: "recover" });
+  await page.getByRole("dialog", { name: "Identificação atualizada", exact: true }).getByRole("button", { name: "Concluir", exact: true }).click();
+  await expect(page.getByRole("region", { name: "Residência selecionada" })).toContainText(name);
+  expect(sql(`select count(*) from public.audit_events where entity_id=${q(f.patient)} and action='recipient.updated';`)).toBe("2");
+
+  const key = randomUUID();
+  const current = await (await page.request.get(`/api/admin/residence?patientId=${f.patient}`)).json();
+  const save = { patientId: f.patient, key, action: "save", version: current.version, before: current.identity, identity: { ...current.identity, displayName: "Envio atrasado" } };
+  const close = await page.request.post("/api/admin/residence", { data: { patientId: f.patient, key, action: "recover" } });
+  expect(await close.json()).toEqual({ state: "closed" });
+  expect(await (await page.request.post("/api/admin/residence", { data: save })).json()).toEqual({ state: "closed" });
+  expect(sql(`select display_name from public.care_recipients where id=${q(f.patient)};`)).toBe(name);
+  expect(JSON.parse(facts(f.patient))).toMatchObject({ members: before.members, stock: before.stock });
+
+  // A change through the preserved administrative contract can supersede the
+  // identity without changing the governance settings version.
+  await rpc(await actor("adminA", f.patient), "admin_upsert_recipient", {
+    p_id: f.patient, p_display_name: "Identificação mais recente", p_is_active: true, p_is_development: true,
+  });
+  const stale = await page.request.post("/api/admin/residence", { data: { ...save, key: randomUUID() } });
+  expect(stale.status()).toBe(409);
+  expect(await stale.json()).toMatchObject({ code: "VERSION_CONFLICT" });
+  expect(sql(`select display_name from public.care_recipients where id=${q(f.patient)};`)).toBe("Identificação mais recente");
+  sql(`update public.care_recipients set is_active=false where id=${q(f.patient)};`);
+});
+
+test("E10-01 global identification remains a proposal and a reader receives no administrative data", async ({ page }, info) => {
+  const f = await setup();
+  const url = `/admin?careRecipientId=${f.patient}`;
+  const original = sql(`select display_name from public.care_recipients where id=${q(f.patient)};`);
+  const proposedName = `Residência de Marta Dias ${f.patient.slice(0, 8)}`;
+  try {
+    await login(page, null, "global");
+    await page.goto(url);
+    await expect(page.getByText("Atuação administrativa", { exact: true })).toBeVisible();
+    await page.getByRole("link", { name: /^Preparar nova residência/ }).click();
+    await expect(page.getByRole("heading", { name: "Nova residência", exact: true })).toBeVisible();
+    await page.getByRole("button", { name: "Cancelar", exact: true }).click();
+    await page.getByRole("dialog", { name: "Sair deste preenchimento?", exact: true }).getByRole("button", { name: "Sair", exact: true }).click();
+    await expect(page).toHaveURL(new RegExp(`/admin\\?careRecipientId=${f.patient}$`));
+    for (const width of [360, 412]) {
+      await page.setViewportSize({ width, height: 900 });
+      await expect(page.getByRole("button", { name: /^Identificação da residência/ })).toBeEnabled();
+      await page.screenshot({ path: `${residenceEvidence}/app-global-${info.project.name}-${width}.png` });
+    }
+    await page.getByRole("button", { name: /^Identificação da residência/ }).click();
+    const editor = page.getByRole("dialog", { name: "Identificação da residência", exact: true });
+    await editor.getByRole("textbox", { name: "Nome do paciente" }).fill(proposedName);
+    await editor.getByRole("button", { name: "Salvar identificação", exact: true }).click();
+    const review = page.getByRole("dialog", { name: "Salvar identificação?", exact: true });
+    await review.getByRole("button", { name: "Registrar proposta", exact: true }).click();
+    await expect(page.getByRole("dialog", { name: "Proposta registrada", exact: true })).toBeVisible();
+    expect(sql(`select display_name from public.care_recipients where id=${q(f.patient)};`)).toBe(original);
+    expect(sql(`select count(*) from public.access_change_requests where care_recipient_id=${q(f.patient)} and status='pending' and proposed->>'operation'='recipient';`)).toBe("1");
+    const proposal = JSON.parse(sql(`select json_build_object('id',id,'version',base_version) from public.access_change_requests where care_recipient_id=${q(f.patient)} and proposed->>'operation'='recipient';`));
+    const decision = { p_patient: f.patient, p_kind: "administration", p_change: {}, p_version: proposal.version, p_request_id: proposal.id, p_decision: "approve" };
+    const selfApproval = await (await actor("global", f.patient)).rpc("configure_patient_access", { ...decision, p_key: randomUUID() });
+    expect(selfApproval.error?.code).toBe("42501");
+    const approved = await rpc(await actor("adminA", f.patient), "configure_patient_access", { ...decision, p_key: randomUUID() });
+    expect(approved.status).toBe("applied");
+    expect(sql(`select display_name from public.care_recipients where id=${q(f.patient)};`)).toBe(proposedName);
+    await page.getByRole("button", { name: "Concluir", exact: true }).click();
+    await page.getByLabel("Menu do usuário", { exact: true }).click();
+    await page.getByRole("menuitem", { name: "Sair", exact: true }).click();
+    await login(page, f.patient, "reader");
+    await page.goto(url);
+    await expect(page.getByRole("heading", { name: "Administração indisponível", exact: true })).toBeVisible();
+    await expect(page.getByRole("navigation", { name: "Áreas administrativas" })).toHaveCount(0);
+    await expect(page.getByRole("region", { name: "Residência selecionada" })).toHaveCount(0);
+    expect((await page.request.get(`/api/admin/residence?patientId=${f.patient}`)).status()).toBe(403);
+    for (const width of [360, 412]) {
+      await page.setViewportSize({ width, height: 900 });
+      await page.screenshot({ path: `${residenceEvidence}/app-lost-${info.project.name}-${width}.png` });
+    }
+  } finally {
+    sql(`update public.care_recipients set is_active=false where id=${q(f.patient)};`);
+  }
 });
 
 test("15 ADM04 NOT03 proposals retain comparison and notice rules recover a failed read without a write", async ({ page, browser }, info) => {

@@ -175,6 +175,8 @@ export function databaseError(
       "Confira os horários da residência em Configurações de plantões antes de revisar novamente.",
       409,
     );
+  if (error?.code === "PT409" && message === "stale residence identification")
+    throw new ApiError("VERSION_CONFLICT", "A identificação da residência mudou. Consulte os dados atuais e revise novamente.", 409);
   if (error?.code === "PT409" && message === "stale residence hours")
     throw new ApiError(
       "VERSION_CONFLICT",

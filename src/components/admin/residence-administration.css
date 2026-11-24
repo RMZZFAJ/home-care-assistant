@@ -1,0 +1,98 @@
+.hca-residence-admin { display: grid; min-width: 0; gap: 17px; }
+.hca-residence-admin-subtitle { margin-top: 8px; color: var(--hca-muted); font-size: 14px; line-height: 1.5; }
+.hca-residence-admin-banner, .hca-residence-admin-scope, .hca-residence-admin-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  color: var(--hca-muted);
+  font-size: 12px;
+  line-height: 1.55;
+}
+.hca-residence-admin-banner {
+  align-items: center;
+  background: #edf5f1;
+  border-bottom: 1px solid var(--hca-line);
+  margin: 0 0 17px;
+  padding: 7px 13px;
+}
+.hca-residence-admin-banner > svg, .hca-residence-admin-note > svg { flex: none; color: var(--hca-teal); }
+.hca-residence-admin-banner strong, .hca-residence-admin-scope strong { color: var(--hca-ink); }
+.hca-residence-admin-scope { align-items: center; border-bottom: 1px solid var(--hca-line); padding: 9px 0 16px; }
+.hca-residence-admin-scope small { display: block; margin-top: 2px; }
+.hca-residence-admin-hero {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 13px;
+  background: linear-gradient(120deg, var(--hca-paper), #f6faf7);
+  border: 1px solid var(--hca-line);
+  border-radius: 20px;
+  box-shadow: var(--hca-shadow);
+}
+.hca-residence-admin-hero .hca-guide-row-icon { width: 39px; height: 39px; }
+.hca-residence-admin-hero > .hca-status { align-self: flex-start; }
+.hca-residence-admin-section {
+  min-width: 0;
+  overflow: hidden;
+  background: var(--hca-paper);
+  border: 1px solid var(--hca-line);
+  border-radius: 16px;
+}
+.hca-residence-admin-section > header { background: #f8faf8; padding: 15px 16px; border-bottom: 1px solid var(--hca-line); }
+.hca-residence-admin-section h2 { font-size: 15px; font-weight: 700; line-height: 1.45; }
+.hca-residence-admin-section > div { padding: 14px 16px; }
+.hca-residence-admin-section .hca-guide-row { min-height: 71px; padding: 12px; }
+.hca-residence-admin-section .hca-guide-row:first-child { border-top: 0; }
+.hca-residence-admin-section .hca-guide-row-label { gap: 5px; }
+.hca-residence-admin-section .hca-guide-row-icon { width: 38px; height: 38px; border: 1px solid var(--hca-line); background: #f0f5ef; }
+.hca-residence-admin-section .hca-status { justify-self: start; }
+.hca-residence-admin-note { padding: 12px; border: 1px solid var(--hca-line); border-radius: 11px; background: #f4f8f3; }
+.hca-residence-admin-denied {
+  display: grid;
+  justify-items: center;
+  gap: 15px;
+  min-width: 0;
+  max-width: 490px;
+  margin-inline: auto;
+  padding: 28px 22px;
+  border: 1px solid var(--hca-line);
+  border-radius: 18px;
+  background: var(--hca-paper);
+}
+.hca-residence-admin-denied > p { color: var(--hca-muted); text-align: center; font-size: 14px; }
+.hca-residence-admin-denied > div { justify-self: stretch; }
+.hca-residence-admin-denied h2 { margin-top: 5px; font-size: 23px; font-weight: 720; letter-spacing: -.4px; line-height: 1.2; }
+.hca-residence-admin-lock {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border: 1px solid var(--hca-line);
+  border-radius: 23px;
+  background: #eaf2e9;
+  color: #64866e;
+}
+.hca-residence-edit-form { display: grid; gap: 18px; }
+.hca-residence-identification .hca-modal-footer > :is(button, a) { flex: 1; min-width: 0; white-space: normal; }
+.hca-residence-active-switch {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--hca-line);
+}
+.hca-residence-active-switch strong, .hca-residence-active-switch small { display: block; }
+.hca-residence-active-switch small, .hca-residence-edit-hint { color: var(--hca-muted); line-height: 1.55; font-size: 12px; }
+.hca-residence-active-switch small { margin-top: 4px; }
+.hca-residence-edit-hint { display: flex; align-items: flex-start; gap: 9px; margin: 11px 0; }
+.hca-residence-edit-hint svg { flex: none; color: var(--hca-teal); width: 16px; height: 16px; }
+.hca-residence-registration-options { font-size: 12px; }
+.hca-residence-registration-options > summary { cursor: pointer; color: var(--hca-muted); }
+@media (max-width: 500px) {
+  .hca-residence-admin-banner { margin-inline: -12px; }
+  .hca-residence-admin-heading { margin-bottom: 21px; }
+  .hca-residence-identification .hca-modal-content { padding-inline: 14px; }
+}

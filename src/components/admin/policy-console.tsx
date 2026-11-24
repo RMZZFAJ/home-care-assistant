@@ -329,6 +329,10 @@ function Policies({ context }: { context: WorkspaceContext }) {
       <PolicyNavigation tab={tab} scheduleAccess={can(context, "schedule.types.manage")} />
       <div hidden={tab !== "rules"}>
         <PolicyRules key={patientId} revision={attempt} settings={settings} directory={data.directory} busy={busy} locked={locked} recovery={recovery} error={error} message={message} versionKey={patientId + ":" + (editingVersion ?? data.data.version) + ":" + attempt} onStartEditing={() => { setMessage(""); setEditingVersion(data.data.version); }} save={saveSettings} />
+        <nav aria-label="Destinatários e alertas" className="hca-toolbar mt-4">
+          <Link className="hca-control hca-control--secondary" href={`/admin?section=notificationRecipients&careRecipientId=${patientId}`}><Icon name="users" />Destinatários</Link>
+          <Link className="hca-control hca-control--secondary" href={`/admin?section=alerts&careRecipientId=${patientId}`}><Icon name="bell" />Alertas de estoque</Link>
+        </nav>
       </div>
       {tab === "permissions" ? (
         <PermissionMatrix

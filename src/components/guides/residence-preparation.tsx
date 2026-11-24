@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState, type FormEvent, type RefObject } from "react";
 import { z } from "zod";
 import { api, ApiError, Notice, primaryClass, Workspace, type WorkspaceContext } from "@/components/workspace";
@@ -43,14 +43,18 @@ const initial: Fields = {
 };
 
 export function ResidencePreparationPage() {
+  const params = useSearchParams();
+  const administration = params.get("from") === "administration";
+  const patient = z.uuid().safeParse(params.get("returnPatient"));
+  const returnTo = administration ? "/admin" + (patient.success ? "?careRecipientId=" + patient.data : "") : "/guias";
   return <Workspace title="Nova residência" eyebrow="Administração global">{context =>
     context.activeContext?.mode === "global" && context.globalAdministrationAllowed ?
-      <ResidenceRegistration key={context.userId} context={context} /> :
-      <Notice>Somente a administração global inicia uma residência. <Link href="/guias">Voltar aos guias</Link></Notice>
+      <ResidenceRegistration key={context.userId} context={context} returnTo={returnTo} /> :
+      <Notice>Somente a administração global inicia uma residência. <Link href={returnTo}>{administration ? "Voltar à administração" : "Voltar aos guias"}</Link></Notice>
   }</Workspace>;
 }
 
-function ResidenceRegistration({ context }: { context: WorkspaceContext }) {
+function ResidenceRegistration({ context, returnTo }: { context: WorkspaceContext; returnTo: string }) {
   const router = useRouter();
   const storage = "hca:residence-creation:" + context.userId;
   const [fields, setFields] = useState<Fields>(initial);
@@ -219,7 +223,7 @@ function ResidenceRegistration({ context }: { context: WorkspaceContext }) {
 
   const nameOf = (id: string) => receipt?.people?.[id] ?? names[id] ?? "Identidade registrada";
   return <>
-    {receipt ? <CreatedResidence receipt={receipt} context={context} headingRef={receiptHeadingRef} nameOf={nameOf} onNew={beginAgain} /> :
+    {receipt ? <CreatedResidence receipt={receipt} context={context} headingRef={receiptHeadingRef} nameOf={nameOf} onNew={beginAgain} returnTo={returnTo} /> :
       <form className="hca-residence-preparation" ref={formRef} aria-label="Preparação da residência" noValidate onSubmit={event => void prepareReview(event)}>
         <section className="ui-card hca-residence-intro">
           <span><Icon name="home" /></span>
@@ -293,7 +297,7 @@ function ResidenceRegistration({ context }: { context: WorkspaceContext }) {
     {cancel ? <Dialog open title={unresolved ? "Fechar a consulta da criação?" : "Sair deste preenchimento?"}
       onClose={() => setCancel(false)} footer={<>
         <ActionButton onClick={() => setCancel(false)}>Continuar</ActionButton>
-        <ActionButton variant="primary" onClick={() => router.push("/guias")}>Sair</ActionButton>
+        <ActionButton variant="primary" onClick={() => router.push(returnTo)}>Sair</ActionButton>
       </>}>
       <p>{unresolved ? "A solicitação já foi enviada. Confira o resultado da mesma tentativa ao retornar." : "Os dados desta tela serão descartados. Nenhuma residência foi criada."}</p>
     </Dialog> : null}
@@ -333,9 +337,9 @@ const tasks = [
   { title: "Comunicação e orientação", icon: "bell", text: "Confira os canais e a orientação inicial da residência." },
 ] as const;
 
-function CreatedResidence({ receipt, context, headingRef, nameOf, onNew }: {
+function CreatedResidence({ receipt, context, headingRef, nameOf, onNew, returnTo }: {
   receipt: ResidenceCreationReceipt; context: WorkspaceContext; headingRef: RefObject<HTMLHeadingElement | null>;
-  nameOf: (id: string) => string; onNew: () => void;
+  nameOf: (id: string) => string; onNew: () => void; returnTo: string;
 }) {
   const [task, setTask] = useState<string | null>(null);
   const local = context.patients.some(patient => patient.id === receipt.patientId && patient.hasMembership);
@@ -354,7 +358,7 @@ function CreatedResidence({ receipt, context, headingRef, nameOf, onNew }: {
     </section>
     <Notice>Para consultar dados da residência, selecione um vínculo local autorizado.</Notice>
     <div className="hca-residence-actions">
-      <Link className="hca-control hca-control--secondary" href="/guias">Voltar aos guias</Link>
+      <Link className="hca-control hca-control--secondary" href={returnTo}>{returnTo === "/guias" ? "Voltar aos guias" : "Voltar à administração"}</Link>
       <ActionButton variant="primary" onClick={onNew}><Icon name="plus" />Nova residência</ActionButton>
     </div>
     {task ? <Dialog open title="Continue no vínculo local" headingIcon="lock" onClose={() => setTask(null)}

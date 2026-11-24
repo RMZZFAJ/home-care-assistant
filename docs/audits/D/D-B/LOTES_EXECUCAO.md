@@ -4725,3 +4725,63 @@ rollback. A execução completa na CI continua pendente de investigação.
 
 [preview-d4a53e44]: https://home-care-assistant-1b1tmx7gp-rmzzfajs-projects.vercel.app
 [ci-d4a53e44]: https://github.com/RMZZFAJ/home-care-assistant/actions/runs/45413280504
+
+### E10-01 — Administração da residência
+
+A visão de Administração segue as seções e ações do laboratório v2.
+Identificação abre em diálogo e a revisão antecede a gravação. O cartão
+mostra o cadastro confirmado e as ações usam totais reais de vínculos,
+convites válidos e propostas pendentes. O contexto global identifica a
+atuação administrativa. A edição global cria uma proposta para decisão
+local independente. Um vínculo sem gestão recebe a tela de acesso
+indisponível. A revogação confirmada continua usando a proteção compartilhada
+do workspace, que retira os dados da sessão.
+
+A rota anterior `section=patient` abre a mesma identificação em diálogo.
+Preparar nova residência leva ao fluxo único de E12-03 e retorna à
+administração de origem ao encerrar. Guias conserva seu próprio retorno.
+O cadastro de desenvolvimento, a auditoria, a importação histórica, a fila e
+a Central técnica são extensões da referência nesta visão. As ações ficam
+nos respectivos contextos autorizados. A opção
+de desenvolvimento fica recolhida na identificação global. Destinatários e
+alertas de estoque ficam acessíveis pelas regras da residência.
+
+O cabeçalho, o seletor e a navegação inferior seguem o workspace real dos
+lotes anteriores. O cartão de acesso indisponível oferece retorno à visão
+geral autorizada. No laboratório, a ação equivalente abre um diálogo de
+orientação. A equivalência desse retorno permanece na conferência conjunta
+de acesso e desligamento de E10-02.
+
+Na validação local, o painel global manteve o contexto anterior durante uma
+troca de perfil no WebKit. O painel renderizava a lista de 11.903 cadastros
+da base local. A preparação do teste passou a selecionar o vínculo dentro
+de Administração, onde o cenário é exercitado. A causa da demora no painel
+global ainda precisa de confirmação.
+
+A edição local usa o registro oficial de governança. A consulta de recuperação
+usa apenas a chave da tentativa confirmada. Sob a mesma trava da gravação,
+o banco retorna o resultado ou encerra a tentativa ausente. Um envio tardio
+com a chave encerrada não reaplica a edição. Um conflito de versão ou
+identificação exige abrir e revisar a referência atual.
+
+As capturas do aplicativo e do laboratório ficam em
+`output/playwright/l4-residencia`, nas larguras de 360 e 412 px. Os cenários
+dirigidos de consulta, edição e autorização passaram em Chromium/Android e
+WebKit/iPhone emulados, com Auth local real. Foram conferidos recuperação
+após perda da resposta, bloqueio de envio tardio, conflito de identificação,
+proposta com aprovação independente e recusa de leitura administrativa
+pelo perfil de leitura. A edição preservou vínculos e movimentos de estoque.
+Os testes de criação, reemissão e revogação de convite, destinatários e
+limites de estoque passaram pelos novos caminhos nos dois navegadores.
+Build de produção local, ESLint dirigido, Markdown e guarda das migrations
+históricas passaram.
+
+| Migration | Supabase local | Supabase remoto |
+| --- | --- | --- |
+| `20261124153444_l4_residence_administration.sql` | Aplicada | Pendente |
+
+O Supabase local contém 376 migrations. A última conferência do banco
+compartilhado pelo Preview e pela produção encontrou 362. A migration deste
+checkpoint depende de publicação e validação do ambiente candidato. O banco
+compartilhado permanece sujeito à incompatibilidade de contingências já
+registrada acima.

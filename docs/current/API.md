@@ -1030,6 +1030,25 @@ pública para saldo negativo. Transferência entre custódias usa ENT.
 
 ## Administração, identidade e canais
 
+`GET /api/admin/residence?patientId=<uuid>` retorna a identificação atual, a
+versão das regras e os totais de vínculos ativos, convites pendentes dentro da
+validade e propostas pendentes. A autorização é a administração da residência
+selecionada ou a atuação global. A resposta omite os dados dos destinatários e
+o conteúdo das propostas.
+
+`POST /api/admin/residence` usa `action=save` com `patientId`, `key`, `version`,
+`before` e `identity` para confirmar a edição revisada. O comando reaproveita
+a governança e a auditoria do paciente. Uma alteração local autorizada retorna
+`applied`. A atuação global retorna uma proposta `pending` para decisão local
+independente. Uma referência desatualizada exige nova revisão. A criação usa
+o fluxo de preparação de residência.
+
+Em caso de resposta perdida, `action=recover` recebe o mesmo `patientId` e
+`key`. Sob a trava da governança, devolve o estado oficial ou encerra a
+tentativa sem alteração. Um envio atrasado com a chave encerrada não aplica a
+edição. A interface mantém apenas a referência da tentativa submetida, com
+até duas consultas de recuperação.
+
 GET /api/admin/membership-impact recebe careRecipientId/userId e exige gestão
 local ativa. O alvo precisa ter vínculo neste paciente. membership_impact retorna
 ENT pendentes com aceite/trânsito por material, regularizações designadas, BAL

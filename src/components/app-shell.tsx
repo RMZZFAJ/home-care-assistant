@@ -29,6 +29,7 @@ export function AppWorkspace({
   administration = false,
   administrationCapabilities = ["access.manage"],
   administrationReadRecovery = false,
+  administrationUnavailable,
   compact = false,
   account = false,
   documentPage = false,
@@ -40,6 +41,7 @@ export function AppWorkspace({
   administration?: boolean;
   administrationCapabilities?: string[];
   administrationReadRecovery?: boolean;
+  administrationUnavailable?: ReactNode;
   compact?: boolean;
   account?: boolean;
   documentPage?: boolean;
@@ -97,7 +99,7 @@ export function AppWorkspace({
   const [initialized, setInitialized] = useState(false);
   if (!loading && !selecting && value && !initialized) setInitialized(true);
   if ((loading || selecting) && !initialized) return <main id="workspace-content" className="workspace-content" tabIndex={-1} aria-busy="true" />;
-  const customHeading = heading && value && (account || value.patient) && !choose && !error ? heading(value) : null;
+  const customHeading = heading && value && (account || value.patient || administration && value.activeContext?.mode === "global") && !choose && !error ? heading(value) : null;
   const contextLabel = value?.activeContext?.mode === "global" ? "Administração global" : roleLabel(value?.patient?.role);
   const preparationReturn = value?.patient?.id === routePatient && value && mayPrepareLocally(value) &&
     !choose && !error && fromPreparation && preparationDestinations.has(pathname)
@@ -221,7 +223,7 @@ export function AppWorkspace({
             Nenhum paciente autorizado está vinculado à sua conta.
           </FeedbackBanner>
         ) : administration && !canAdminister && !canRecover ? (
-          <FeedbackBanner tone="error">
+          administrationUnavailable ?? <FeedbackBanner tone="error">
             Seu vínculo não permite administrar este paciente.
           </FeedbackBanner>
         ) : (

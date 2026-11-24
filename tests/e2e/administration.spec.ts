@@ -70,7 +70,7 @@ test.describe("administração integrada no ambiente local", () => {
       sql(
         `insert into public.care_recipient_memberships(care_recipient_id,user_id,role) values('${patient}','${fixtures()[role].id}','${role === "adminA" ? "admin" : role === "shared" ? "reader" : "professional"}') on conflict do nothing;`,
       );
-    await page.reload();
+    await page.goto(`/admin?careRecipientId=${patient}`);
     await selectContext(page, patient);
     return patient;
   }
@@ -78,8 +78,17 @@ test.describe("administração integrada no ambiente local", () => {
   async function section(page: Page, patientId: string, name: string) {
     await page.goto(`/admin?careRecipientId=${patientId}`);
     await selectContext(page, patientId);
-    const areas: Record<string, string> = { "Paciente": "patient", "Catálogo": "catalog", "Vínculos": "memberships", "Convites": "invitations", "Alertas": "alerts", "Destinatários": "notificationRecipients", "Importação histórica": "import", "Contas globais": "profiles" };
-    await page.getByRole("navigation", { name: "Áreas administrativas", exact: true }).locator('a[href*="section=' + areas[name] + '"]').click();
+    const navigation = page.getByRole("navigation", { name: "Áreas administrativas", exact: true });
+    if (name === "Convites") {
+      await navigation.getByRole("link", { name: /^Pessoas e convites/ }).click();
+      await page.getByRole("link", { name, exact: true }).click();
+    } else if (name === "Destinatários") {
+      await navigation.getByRole("link", { name: /^Regras e destinatários/ }).click();
+      await page.getByRole("navigation", { name: "Destinatários e alertas" }).getByRole("link", { name, exact: true }).click();
+    } else {
+      const areas: Record<string, string> = { "Catálogo": "catalog", "Vínculos": "memberships", "Importação histórica": "import" };
+      await navigation.locator('a[href*="section=' + areas[name] + '"]').click();
+    }
     await expect(page.getByText("Carregando", { exact: false })).toHaveCount(0);
   }
 
