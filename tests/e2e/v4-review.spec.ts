@@ -93,12 +93,17 @@ test("V4 review: matriz reconcilia horários, intervalo, versões e falhas sem s
         idempotencyKey: randomUUID(),
         expectedVersion: (await governance(other)).version,
       });
+    const complete = (name: string) =>
+      page.getByRole("dialog", { name, exact: true }).getByRole("button", { name: "Concluir", exact: true }).click();
+    const rejected = page.getByRole("dialog", { name: "Não foi possível registrar a configuração", exact: true });
+    const review = rejected.getByRole("button", { name: "Revisar configuração vigente", exact: true });
     await expect(page.getByText("Arquivamento 7 dias após conclusão ou cancelamento", { exact: true })).toBeVisible();
     await revisePolicy({ archiveDays: 8 });
     await expect(page.getByText("Arquivamento 8 dias após conclusão ou cancelamento", { exact: true })).toBeVisible({ timeout: 45000 });
     await page.getByRole("button", { name: "Editar Mensagens e lembretes", exact: true }).click();
     await page.getByLabel("Primeiro lembrete (horas)", { exact: true }).fill("3");
     await page.getByRole("button", { name: "Registrar política", exact: true }).click();
+    await complete("Regra registrada");
     await expect.poll(async () => (await governance(page)).settings.reminderHours).toBe(3);
     expect((await governance(page)).settings.archiveDays).toBe(8);
     await expect(page.getByRole("dialog")).toHaveCount(0);
@@ -115,16 +120,17 @@ test("V4 review: matriz reconcilia horários, intervalo, versões e falhas sem s
     await refresh;
     await expect(archiveDays).toHaveValue("9");
     await page.getByRole("button", { name: "Registrar política", exact: true }).click();
-    await expect(page.getByRole("alert").filter({ hasText: "configuração mudou em outra sessão" })).toBeVisible();
+    await expect(rejected).toBeVisible();
     await expect(archiveDays).toHaveValue("9");
     await expect(archiveDays).toBeDisabled();
-    await page.getByRole("dialog").getByRole("button", { name: "Revisar configuração vigente", exact: true }).click();
+    await review.click();
     await expect(page.getByRole("dialog")).toHaveCount(0);
     await expect(page.getByRole("button", { name: "Editar Arquivamento", exact: true })).toBeFocused();
     await page.getByRole("button", { name: "Editar Arquivamento", exact: true }).click();
     await expect(archiveDays).toHaveValue("10");
     await archiveDays.fill("11");
     await page.getByRole("button", { name: "Registrar política", exact: true }).click();
+    await complete("Regra registrada");
     await expect.poll(async () => (await governance(page)).settings.archiveDays).toBe(11);
     await expect(page.getByRole("dialog")).toHaveCount(0);
     await page.getByRole("navigation", { name: "Áreas da configuração", exact: true }).getByRole("link", { name: "Avisos", exact: true }).click();
@@ -150,6 +156,7 @@ test("V4 review: matriz reconcilia horários, intervalo, versões e falhas sem s
     ] as const) {
       await field.selectOption(value);
       await saveRule.click();
+      await complete("Regra de aviso registrada");
       await expect(cell).toHaveCount(0);
       await expect.poll(async () => (await persisted())?.[key]).toBe(value === "" ? null : Number(value));
       await openRule();
@@ -158,12 +165,13 @@ test("V4 review: matriz reconcilia horários, intervalo, versões e falhas sem s
     await cooldown.fill("23");
     await start.selectOption("20");
     await saveRule.click();
+    await complete("Regra de aviso registrada");
     await expect(cell).toHaveCount(0);
     await expect.poll(async () => (await persisted())?.quiet_start).toBe(20);
     expect((await persisted()).cooldown_minutes).toBe(23);
     await openRule();
     let conflict = true;
-    await page.route("**/api/patient-settings", async (route) => {
+    await page.route("**/api/admin/residence-rules", async (route) => {
       if (route.request().method() === "POST" && conflict) {
         conflict = false;
         // Inject a concurrent server revision while this browser write is paused.
@@ -177,14 +185,10 @@ test("V4 review: matriz reconcilia horários, intervalo, versões e falhas sem s
     });
     await end.selectOption("6");
     await saveRule.click();
-    await expect(
-      page
-        .getByRole("alert")
-        .filter({ hasText: "configuração mudou em outra sessão" }).first(),
-    ).toBeVisible();
-    await expect(end).toBeDisabled();
-    await cell.getByRole("button", { name: "Revisar configuração vigente", exact: true }).click();
-    await cell.getByRole("button", { name: "Abrir versão atual", exact: true }).click();
+    await expect(rejected).toBeVisible();
+    await review.click();
+    await expect(cell).toHaveCount(0);
+    await openRule();
     await expect(end).toBeEnabled();
     await expect(end).toHaveValue("");
     expect((await persisted()).quiet_start).toBe(20);
@@ -192,12 +196,13 @@ test("V4 review: matriz reconcilia horários, intervalo, versões e falhas sem s
     await page.unrouteAll({ behavior: "wait" });
     await end.selectOption("6");
     await saveRule.click();
+    await complete("Regra de aviso registrada");
     await expect(cell).toHaveCount(0);
     await expect.poll(async () => (await persisted())?.quiet_end).toBe(6);
     await openRule();
     for (const failure of ["permission", "network"]) {
       let once = true;
-      await page.route("**/api/patient-settings", async (route) => {
+      await page.route("**/api/admin/residence-rules", async (route) => {
         if (route.request().method() === "POST" && once) {
           once = false;
           if (failure === "network") await route.abort("failed");
@@ -213,16 +218,17 @@ test("V4 review: matriz reconcilia horários, intervalo, versões e falhas sem s
       });
       await start.selectOption("19");
       await saveRule.click();
-      await expect(page.getByRole("alert").first()).toBeVisible();
       if (failure === "network") {
-        await expect(start).toBeDisabled();
         expect((await persisted()).quiet_start).toBe(20);
-        await cell.getByRole("button", { name: "Recuperar mesma alteração", exact: true }).click();
-        await cell.getByRole("button", { name: "Abrir versão atual", exact: true }).click();
+        await page.getByRole("dialog", { name: "A resposta da configuração não chegou", exact: true })
+          .getByRole("button", { name: "Conferir resultado", exact: true }).click();
+        await complete("Tentativa encerrada");
+      } else {
+        await rejected.getByRole("button", { name: "Voltar", exact: true }).click();
       }
       await expect(start).toBeEnabled();
       await expect(start).toHaveValue("19");
-      expect((await persisted()).quiet_start).toBe(failure === "network" ? 19 : 20);
+      expect((await persisted()).quiet_start).toBe(20);
       expect((await persisted()).cooldown_minutes).toBe(23);
       await page.unrouteAll({ behavior: "wait" });
     }

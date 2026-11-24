@@ -28,9 +28,11 @@ export async function POST(request: Request) {
   return api("residence.rules.configure", async () => {
     const command = await readJson(request, residenceRuleCommand);
     const { client } = await authenticate();
+    const intent = command.intent;
     const { data, error } = await client.rpc("reviewed_residence_rule_command", {
       p_patient: command.patientId, p_mode: command.mode, p_purpose: command.purpose, p_key: command.key,
-      p_fields: command.intent?.fields ?? null, p_reference_hash: command.intent?.referenceHash ?? null,
+      p_fields: intent && "fields" in intent ? intent.fields : intent,
+      p_reference_hash: intent && "referenceHash" in intent ? intent.referenceHash : null,
     });
     if (error?.code === "PT409" && error.message === "stale administrative preparation reference") {
       throw new ApiError("VERSION_CONFLICT", "A configuração mudou durante a edição. Confira a versão atual antes de confirmar.", 409);

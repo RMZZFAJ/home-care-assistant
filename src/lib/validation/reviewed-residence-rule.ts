@@ -45,23 +45,37 @@ export const residenceRecipients = z.strictObject({
   choices: z.array(z.strictObject({ id: z.uuid(), name: z.string(), role: z.string() })),
 });
 
-export const residenceRulePointer = residenceRuleScope.extend({ key: z.uuid() });
+const versionedPurpose = z.enum(["settings", "notification_rule"]);
+export const residenceRulePointer = residenceRuleScope.extend({
+  purpose: z.union([residenceRuleScope.shape.purpose, versionedPurpose]), key: z.uuid(),
+});
 export const residenceRuleCommand = residenceRulePointer.extend({
-  intent: z.strictObject({ fields: z.union([threshold, recipient]), referenceHash: hash }).nullable(),
-}).refine(({ purpose, intent }) => !intent || ("productId" in intent.fields) === (purpose === "alertRule"));
+  intent: z.union([
+    z.strictObject({ fields: z.union([threshold, recipient]), referenceHash: hash }),
+    z.strictObject({ change: z.record(z.string(), z.unknown()), expectedVersion: z.number().int().min(1).max(2147483647) }),
+  ]).nullable(),
+}).refine(({ purpose, intent }) => {
+  if (!intent) return true;
+  if ("expectedVersion" in intent) return versionedPurpose.safeParse(purpose).success;
+  return purpose === ("productId" in intent.fields ? "alertRule" : "notificationRecipient");
+});
 
 const result = z.discriminatedUnion("state", [
   residenceRulePointer.extend({ state: z.literal("closed"), outcome: z.null() }),
-  residenceRulePointer.extend({ state: z.literal("recorded"), outcome: administrativeOutcome }),
+  residenceRulePointer.extend({ state: z.literal("recorded"), outcome: z.union([
+    administrativeOutcome, z.strictObject({ kind: z.literal("policy"), action: versionedPurpose, recordId: z.uuid() }),
+  ]) }),
 ]);
 
 export function verifyResidenceRule(command: ResidenceRuleCommand, value: unknown) {
   const received = result.parse(value);
   const { outcome } = received;
-  const fields = command.intent?.fields;
+  const fields = command.intent && "fields" in command.intent ? command.intent.fields : null;
+  const versioned = versionedPurpose.safeParse(command.purpose).success;
   if (received.key !== command.key || received.patientId !== command.patientId || received.mode !== command.mode
     || received.purpose !== command.purpose || (outcome && (outcome.kind === "proposal") !== (command.mode === "global"))
-    || (outcome?.kind === "local" && (outcome.action !== command.purpose
+    || (outcome?.kind === "policy" && outcome.action !== command.purpose)
+    || (outcome?.kind === "local" && (versioned || outcome.action !== command.purpose
       || (fields && ("productId" in fields ? outcome.productId !== fields.productId : outcome.userId !== fields.recipientUserId))))) {
     throw new Error("O resultado não corresponde à alteração de regra ou destinatário.");
   }
@@ -70,6 +84,8 @@ export function verifyResidenceRule(command: ResidenceRuleCommand, value: unknow
 
 export type ResidenceRuleQuery = z.infer<typeof residenceRuleQuery>;
 export type ResidenceRuleScope = z.infer<typeof residenceRuleScope>;
+export type ResidenceRuleOperationScope = Omit<z.infer<typeof residenceRulePointer>, "key">;
+export type ReferencedResidenceRuleIntent = Extract<NonNullable<ResidenceRuleCommand["intent"]>, { referenceHash: string }>;
 export type ResidenceRuleCommand = z.infer<typeof residenceRuleCommand>;
 export type ResidenceRuleReference = z.infer<typeof residenceRuleReference>;
 export type ResidenceRuleResult = z.infer<typeof result>;

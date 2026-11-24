@@ -314,6 +314,7 @@ test("V4: matrizes móveis, múltiplos canais no contrato visual e proposta glob
   await expect(notice.getByRole("switch", { name: "Aplicativo", exact: true })).toBeChecked();
   await notice.getByRole("switch", { name: "WhatsApp (contrato visual)", exact: true }).check();
   await notice.getByRole("button", { name: "Salvar regra", exact: true }).click();
+  await page.getByRole("dialog", { name: "Regra de aviso registrada", exact: true }).getByRole("button", { name: "Concluir", exact: true }).click();
   await expect
     .poll(async () => {
       const response = await page.request.get(
@@ -347,9 +348,7 @@ test("V4: matrizes móveis, múltiplos canais no contrato visual e proposta glob
     await global
       .getByRole("button", { name: "Propor regra", exact: true })
       .click();
-    await expect(
-      global.getByRole("status").filter({ hasText: "Proposta global registrada." }),
-    ).toBeVisible();
+    await global.getByRole("dialog", { name: "Proposta registrada", exact: true }).getByRole("button", { name: "Concluir", exact: true }).click();
     await page
       .getByRole("navigation", { name: "Áreas da configuração", exact: true }).getByRole("link", { name: "Pessoas e propostas", exact: true }).click();
     const list = page.getByRole("region", { name: "Propostas de configuração", exact: true });

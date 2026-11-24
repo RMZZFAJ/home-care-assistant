@@ -21,7 +21,7 @@ const days = ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sáb
 export function PolicyRules({ settings, directory, busy, locked, recovery, revision, error, message, versionKey, onStartEditing, save, globalMode }: {
   settings: Settings; directory: { id: string; name: string; role: string }[]; busy: boolean; error: string; message: string; versionKey: string;
   locked: boolean; recovery: ReactNode; revision: number; globalMode: boolean;
-  onStartEditing: () => void; save: (event: FormEvent<HTMLFormElement>) => Promise<boolean>;
+  onStartEditing: () => void; save: (event: FormEvent<HTMLFormElement>) => Promise<void>;
 }) {
   type Editor = { group: string; baseline: Settings; opener: HTMLElement };
   const [editorState, setEditorState] = useState<(Editor & { revision: number }) | null>(null);
@@ -49,7 +49,7 @@ export function PolicyRules({ settings, directory, busy, locked, recovery, revis
         <Icon name="check" />{globalMode ? "Propor regra" : "Registrar política"}</ActionButton></>}>
       {error ? <Notice error>{error}</Notice> : null}{message ? <Notice>{message}</Notice> : null}
       {recovery}
-      <form id={formId} key={versionKey} className="hca-form hca-policy-rules-form" onSubmit={async (event) => { if (await save(event)) setEditorState(current => current === editor ? null : current); }}>
+      <form id={formId} key={versionKey} className="hca-form hca-policy-rules-form" onSubmit={save}>
         <fieldset disabled={locked} className="hca-form min-w-0">
         <div hidden={editor.group !== "bal"} className="hca-form">
           <FormField label="Dia do BAL"><SelectField name="balDay" defaultValue={String(values.balDay ?? "")}><option value="">Não configurado</option>{days.map((day, index) => <option key={day} value={index}>{day}</option>)}</SelectField></FormField>

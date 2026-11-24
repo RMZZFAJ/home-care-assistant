@@ -22,14 +22,15 @@ function availableChannels(data: Data, event: string) {
   return data.channels.filter(channel => !data.eventChannels || data.eventChannels[event]?.includes(channel.code));
 }
 
-export function NotificationMatrix({ patientId, version, busy, configure, configurationError, recovery, globalMode }: {
-  patientId: string; version: number; busy: boolean; globalMode: boolean;
-  configure: (change: Record<string, unknown>, expectedVersion: number) => Promise<boolean>;
+export function NotificationMatrix({ patientId, version, formRevision, busy, locked, configure, configurationError, recovery, globalMode }: {
+  patientId: string; version: number; formRevision: number; busy: boolean; locked: boolean; globalMode: boolean;
+  configure: (change: Record<string, unknown>, expectedVersion: number) => Promise<void>;
   configurationError?: string; recovery?: ReactNode;
 }) {
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState("");
-  const [editor, setEditor] = useState<Editor | null>(null);
+  const [editing, setEditing] = useState<(Editor & { formRevision: number }) | null>(null);
+  const editor = editing?.formRevision === formRevision ? editing : null;
   const [snapshot, setSnapshot] = useState<{ data: Data; version: number } | null>(null);
   const [error, setError] = useState("");
   const [attempt, setAttempt] = useState(0);
@@ -43,7 +44,7 @@ export function NotificationMatrix({ patientId, version, busy, configure, config
       if (!controller.signal.aborted) { setSnapshot(null); setError(reason instanceof Error ? reason.message : "Não foi possível carregar as regras de avisos."); }
     });
     return () => controller.abort();
-  }, [url, version, attempt, revision]);
+  }, [url, version, formRevision, attempt, revision]);
   const data = snapshot?.data;
   const searchText = search.trim().toLocaleLowerCase("pt-BR");
   const events = data?.events.filter(event => documentEventLabel(event).toLocaleLowerCase("pt-BR").includes(searchText)) ?? [];
@@ -63,24 +64,27 @@ export function NotificationMatrix({ patientId, version, busy, configure, config
             const roleNames = [...new Set(eventRules.map(rule => roles[rule.subject_role as keyof typeof roles]))];
             const channels = availableChannels(data, event).filter(channel => eventRules.length ? eventRules.some(rule => rule.channels.includes(channel.code)) : channel.code === "internal");
             const summary = [roleFilter ? roles[roleFilter as keyof typeof roles] : roleNames.join(", ") || "Configuração padrão", ...channels.map(channel => channel.label)].join(" · ");
-            return <button key={event} type="button" className="hca-guide-row" disabled={busy || snapshot.version !== version}
-              onClick={action => setEditor({ event, role: roleFilter || eventRules[0]?.subject_role || "family", opener: action.currentTarget, data, version: snapshot.version })}>
+            return <button key={event} type="button" className="hca-guide-row" aria-disabled={locked || snapshot.version !== version}
+              onClick={action => {
+                if (locked || snapshot.version !== version) return;
+                setEditing({ event, role: roleFilter || eventRules[0]?.subject_role || "family", opener: action.currentTarget, data, version: snapshot.version, formRevision });
+              }}>
               <span className="hca-guide-row-icon"><Icon name={event === "stock.alert" ? "box" : "bell"} /></span>
               <span className="hca-guide-row-label"><strong>{documentEventLabel(event)}</strong><small>{summary}</small></span><Icon name="chevron" width={15} height={15} />
             </button>;
           }) : <p className="hca-residence-rules-empty">Nenhum evento corresponde à busca.</p>}</div>
         </>}
     </section>
-    {editor ? <NoticeRuleEditor editor={editor} setRole={role => setEditor({ ...editor, role })} globalMode={globalMode}
+    {editor ? <NoticeRuleEditor editor={editor} setRole={role => setEditing({ ...editor, role })} globalMode={globalMode}
       stale={snapshot?.version !== editor.version || version !== editor.version} reload={snapshot?.version === version
-        ? () => setEditor({ ...editor, data: snapshot.data, version: snapshot.version }) : undefined}
-      busy={busy} configurationError={configurationError} recovery={recovery} onClose={() => setEditor(null)}
-      onSave={async change => { if (await configure(change, editor.version)) { setEditor(null); setAttempt(n => n + 1); } }} /> : null}
+        ? () => setEditing({ ...editor, data: snapshot.data, version: snapshot.version }) : undefined}
+      busy={busy} locked={locked} configurationError={configurationError} recovery={recovery} onClose={() => setEditing(null)}
+      onSave={change => configure(change, editor.version)} /> : null}
   </>;
 }
 
-function NoticeRuleEditor({ editor, setRole, globalMode, busy, stale, reload, configurationError, recovery, onClose, onSave }: {
-  editor: Editor; setRole: (value: string) => void; globalMode: boolean; busy: boolean;
+function NoticeRuleEditor({ editor, setRole, globalMode, busy, locked, stale, reload, configurationError, recovery, onClose, onSave }: {
+  editor: Editor; setRole: (value: string) => void; globalMode: boolean; busy: boolean; locked: boolean;
   stale: boolean; reload?: () => void;
   configurationError?: string; recovery?: ReactNode; onClose: () => void; onSave: (change: Record<string, unknown>) => Promise<void>;
 }) {
@@ -94,7 +98,7 @@ function NoticeRuleEditor({ editor, setRole, globalMode, busy, stale, reload, co
   const supportsPdf = event !== "req.registered_author";
   async function submit(eventSubmit: FormEvent<HTMLFormElement>) {
     eventSubmit.preventDefault();
-    if (busy || stale) return;
+    if (locked || stale) return;
     const form = new FormData(eventSubmit.currentTarget);
     const hour = (name: string) => form.get(name) === "" ? null : Number(form.get(name));
     const channels = [...selected.filter(code => !available.some(channel => channel.code === code)), ...form.getAll("channel")];
@@ -103,16 +107,16 @@ function NoticeRuleEditor({ editor, setRole, globalMode, busy, stale, reload, co
   }
   return <RecordDrawer title={documentEventLabel(event)} subtitle={`Regra para a função ${roles[role as keyof typeof roles]}`}
     kicker="Organização da residência" popupClassName="hca-preference-sheet hca-residence-settings-sheet"
-    headingIcon="bell" restoreFocusTo={editor.opener} busy={busy && !recovery} onClose={onClose} keyboardScrollable exitDialog
-    footer={close => <><ActionButton onClick={close}>Voltar</ActionButton><ActionButton variant="primary" type="submit" form={formId} disabled={busy || stale}>
+    headingIcon="bell" restoreFocusTo={editor.opener} busy={busy} onClose={onClose} keyboardScrollable exitDialog
+    footer={close => <><ActionButton onClick={close}>Voltar</ActionButton><ActionButton variant="primary" type="submit" form={formId} disabled={locked || stale}>
       <Icon name="check" />{globalMode ? "Propor regra" : "Salvar regra"}</ActionButton></>}>
     {configurationError ? <FeedbackBanner tone="error">{configurationError}</FeedbackBanner> : null}{recovery}
     {stale ? <FeedbackBanner tone="warning">A configuração mudou durante a edição. {reload ? <ActionButton onClick={reload}>Abrir versão atual</ActionButton> : null}</FeedbackBanner> : null}
-    <FormField label="Função"><SelectField value={role} disabled={busy} onChange={value => setRole(value.currentTarget.value)}>
+    <FormField label="Função"><SelectField value={role} disabled={locked} onChange={value => setRole(value.currentTarget.value)}>
       {Object.entries(roles).map(([code, label]) => <option key={code} value={code}>{label}</option>)}
     </SelectField></FormField>
     <form key={`${role}:${editor.version}`} id={formId} className="hca-form" onSubmit={submit}>
-      <fieldset disabled={busy || stale} className="hca-form min-w-0">
+      <fieldset disabled={locked || stale} className="hca-form min-w-0">
       <FormField label="Comportamento no aplicativo"><SelectField name="mode" defaultValue={current?.mode ?? "optional"}>
         <option value="optional">Conforme preferência pessoal</option><option value="required">Obrigatório no aplicativo</option><option value="silent">Silencioso no aplicativo</option>
       </SelectField></FormField>

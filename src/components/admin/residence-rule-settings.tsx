@@ -8,7 +8,7 @@ import { Icon, type IconName } from "@/components/ui/icon";
 import { api } from "@/lib/client/api";
 import { formatQuantity, quantity, validQuantity } from "@/lib/quantity";
 import { useLiveRevision } from "@/lib/use-live-revision";
-import { residenceRecipients, residenceThresholds, residenceRuleReference, type ResidenceRuleCommand, type ResidenceRuleReference, type ResidenceRuleScope, type ResidenceRecipients, type ResidenceThresholds } from "@/lib/validation/reviewed-residence-rule";
+import { residenceRecipients, residenceThresholds, residenceRuleReference, type ReferencedResidenceRuleIntent, type ResidenceRuleReference, type ResidenceRuleScope, type ResidenceRecipients, type ResidenceThresholds } from "@/lib/validation/reviewed-residence-rule";
 import { ResidenceRuleFeedback, residenceRuleEndpoint, useResidenceRuleOperation } from "./residence-rule-operation";
 import "../guides/guides.css";
 import "./residence-administration.css";
@@ -17,7 +17,7 @@ const custodies = { CARE_TEAM: "Equipe", FAMILY: "Família" } as const;
 const channels = { internal: "Aplicativo", email: "E-mail", whatsapp: "WhatsApp" } as const;
 const groups = { family: "Família", supervision: "Supervisão", care_team: "Equipe de cuidado", other: "Outro" } as const;
 type Picked = { selection: string; option: string };
-type Fields = NonNullable<ResidenceRuleCommand["intent"]>["fields"];
+type Fields = ReferencedResidenceRuleIntent["fields"];
 type ThresholdData = { kind: "alertRule"; data: ResidenceThresholds };
 type RecipientData = { kind: "notificationRecipient"; data: ResidenceRecipients };
 type Read = ThresholdData | RecipientData;
@@ -214,7 +214,7 @@ export function ResidenceRuleSettings({ scope, userId }: { scope: ResidenceRuleS
     </section>
     {threshold ? <FeedbackBanner>Os limites acompanham o saldo da custódia selecionada. Salvar uma regra não movimenta estoque.</FeedbackBanner> : null}
     {snapshot && editor ? <RuleEditor snapshot={snapshot} editor={editor} scope={scope} operation={operation} onClose={() => setEditor(null)} focusFallback={addRef} /> : null}
-    <ResidenceRuleFeedback operation={operation} threshold={threshold} focus={addRef}
+    <ResidenceRuleFeedback operation={operation} purpose={scope.purpose} focus={addRef}
       onFinish={() => { setEditor(null); setRevision(value => value + 1); }} />
   </>;
 }

@@ -271,31 +271,76 @@ test("D3 regra preserva a tentativa incerta e distingue confirmação de falha n
   await page.getByRole("button", { name: "Editar Arquivamento", exact: true }).click();
   const drawer = page.getByRole("dialog"), field = drawer.getByLabel("Arquivar após conclusão ou cancelamento (dias)", { exact: true });
   await field.fill("12");
-  const packets: unknown[] = []; let first = true;
-  await page.route("**/api/patient-settings", async route => {
+  const packets: { key: string; intent: unknown }[] = []; let failedLookup = false;
+  await page.route("**/api/admin/residence-rules", async route => {
     if (route.request().method() !== "POST") return route.continue();
-    packets.push(route.request().postDataJSON());
-    if (first) { first = false; await route.abort("failed"); } else await route.continue();
+    const packet = route.request().postDataJSON();
+    packets.push(packet);
+    if (packet.intent) {
+      expect((await route.fetch()).status()).toBe(200);
+      await route.abort("failed");
+    } else if (!failedLookup) {
+      failedLookup = true;
+      await route.fulfill({ status: 503, json: { code: "UNAVAILABLE", error: "Consulta indisponível." } });
+    } else await route.continue();
   });
   await drawer.getByRole("button", { name: "Propor regra", exact: true }).click();
-  await expect(drawer.getByRole("button", { name: "Recuperar mesma alteração", exact: true })).toBeEnabled();
-  await expect(field).toHaveValue("12"); await expect(field).toBeDisabled(); expect(count(f.patient)).toBe(0);
-  await drawer.getByRole("button", { name: "Recuperar mesma alteração", exact: true }).click();
-  await expect(drawer).toHaveCount(0); expect(packets).toHaveLength(2); expect(packets[1]).toEqual(packets[0]); expect(count(f.patient)).toBe(1);
+  const uncertain = page.getByRole("dialog", { name: "A resposta da configuração não chegou", exact: true });
+  const check = uncertain.getByRole("button", { name: "Conferir resultado", exact: true });
+  const proposed = page.getByRole("dialog", { name: "Proposta registrada", exact: true });
+  await expect(check).toBeEnabled();
+  expect(count(f.patient)).toBe(1);
+  const verifyLookupCount = async () => {
+    await uncertain.getByText("Ajuda para resolver", { exact: true }).click();
+    await expect(uncertain.getByText(/Tentativas de recuperação: 1/)).toBeVisible();
+  };
+  await check.click();
+  await verifyLookupCount();
+  await page.reload();
+  await page.getByRole("button", { name: "Conferir resultado pendente", exact: true }).click();
+  await verifyLookupCount();
+  await check.click();
+  await proposed.getByRole("button", { name: "Concluir", exact: true }).click();
+  await expect(drawer).toHaveCount(0);
+  expect(packets).toHaveLength(3);
+  expect(packets[0].intent).toMatchObject({ change: { archiveDays: 12 } });
+  for (const lookup of packets.slice(1)) expect(lookup).toEqual({ ...packets[0], intent: null });
+  expect(count(f.patient)).toBe(1);
   await page.unrouteAll({ behavior: "wait" });
   await page.getByRole("button", { name: "Editar Arquivamento", exact: true }).click(); await field.fill("13");
-  let failRead = false;
-  await page.route("**/api/patient-settings**", async route => {
-    if (route.request().method() === "POST") { const response = await route.fetch(); expect(response.status()).toBe(200); failRead = true; await route.fulfill({ response }); }
-    else if (failRead) { failRead = false; await route.abort("failed"); } else await route.continue();
-  });
   await drawer.getByRole("button", { name: "Propor regra", exact: true }).click();
+  await expect(proposed).toBeVisible();
+  const configRead = (url: URL) => url.pathname === "/api/patient-settings" && url.searchParams.get("careRecipientId") === f.patient;
+  await page.route(configRead, route => route.abort("failed"));
+  await proposed.getByRole("button", { name: "Concluir", exact: true }).click();
   await expect(drawer).toHaveCount(0);
   await expect(page.getByRole("alert").filter({ hasText: "A ação foi confirmada, mas a consulta posterior falhou" })).toBeVisible();
-  await expect(page.getByRole("button", { name: "Recuperar mesma alteração", exact: true })).toHaveCount(0);
+  await page.unroute(configRead);
+  await expect(page.getByRole("button", { name: "Conferir resultado pendente", exact: true })).toHaveCount(0);
   expect(count(f.patient)).toBe(2);
   await page.getByRole("button", { name: "Consultar configuração novamente", exact: true }).click();
   await expect(page.getByRole("button", { name: "Editar Arquivamento", exact: true })).toBeEnabled();
+  expect(count(f.patient)).toBe(2);
+
+  const unanswered: { key: string; intent: unknown }[] = [];
+  await page.route("**/api/admin/residence-rules", async route => {
+    unanswered.push(route.request().postDataJSON());
+    await route.abort("failed");
+  });
+  await page.getByRole("button", { name: "Editar Arquivamento", exact: true }).click();
+  await field.fill("14");
+  await drawer.getByRole("button", { name: "Propor regra", exact: true }).click();
+  for (let attempt = 0; attempt < 2; attempt++) {
+    const sent = page.waitForRequest(request => request.method() === "POST" && new URL(request.url()).pathname === "/api/admin/residence-rules");
+    await check.click();
+    await sent;
+    await expect.poll(() => unanswered.length).toBe(attempt + 2);
+    await expect(uncertain.locator("pre")).toContainText("Tentativas de recuperação: " + (attempt + 1));
+  }
+  await expect(uncertain.getByText("Copie os detalhes e avise o responsável pelo sistema.", { exact: true })).toBeVisible();
+  await expect(uncertain.getByRole("button", { name: "Copiar detalhes", exact: true })).toBeVisible();
+  await expect(check).toHaveCount(0);
+  for (const lookup of unanswered.slice(1)) expect(lookup).toEqual({ ...unanswered[0], intent: null });
   expect(count(f.patient)).toBe(2);
 });
 

@@ -27,12 +27,14 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { roles } from "./admin-fields";
 import { useLiveRevision } from "@/lib/use-live-revision";
 import { shortNameChange } from "@/lib/validation/governance";
+import type { ResidenceRuleResult } from "@/lib/validation/reviewed-residence-rule";
 import { useCommandIntent } from "@/lib/client/use-command-intent";
 import { GovernanceProposals } from "./governance-proposals";
 import { governanceCommandConfirmed } from "@/lib/validation/governance";
 import { residencePolicyDefaults } from "@/lib/governance-presentation";
 import { ResidenceRuleSettings } from "./residence-rule-settings";
 import { FeedbackBanner } from "@/components/ui/feedback";
+import { ResidenceRuleFeedback, useResidenceRuleOperation } from "./residence-rule-operation";
 
 const ruleAreas = ["rules", "notifications", "thresholds"];
 type ConfigurationPacket = { careRecipientId: string; kind: string; change: Record<string, unknown>; idempotencyKey: string; expectedVersion: number; requestId?: string; decision?: string };
@@ -135,12 +137,15 @@ function Policies({ context }: { context: WorkspaceContext }) {
   const [reviewing, setReviewing] = useState(false);
   const [confirming, setConfirming] = useState(false);
   const [conflict, setConflict] = useState(false);
-  const busy = command.busy || invitationBusy || reviewing || confirming;
-  const locked = busy || command.uncertain || conflict;
   const params = useSearchParams();
   const tab = [...ruleAreas, "permissions", "people"].includes(params.get("area") ?? "") ? params.get("area")! : "rules";
   const rulesArea = ruleAreas.includes(tab);
   const mode = context.activeContext?.mode === "global" ? "global" : "patient";
+  const policyOperation = useResidenceRuleOperation(context.userId, { patientId, mode, purpose: "settings" });
+  const noticeOperation = useResidenceRuleOperation(context.userId, { patientId, mode, purpose: "notification_rule" });
+  const busy = command.busy || invitationBusy || reviewing || confirming || policyOperation.busy || noticeOperation.busy;
+  const reviewedConflict = policyOperation.versionConflict || noticeOperation.versionConflict;
+  const locked = busy || command.uncertain || conflict || policyOperation.blocked || noticeOperation.blocked || reviewedConflict;
   const savingRef = useRef(false);
   const currentVersionRef = useRef<number | null>(null);
   const [invitationUrl, setInvitationUrl] = useState("");
@@ -170,8 +175,16 @@ function Policies({ context }: { context: WorkspaceContext }) {
       });
     return () => controller.abort();
   }, [patientId, readAttempt, liveRevision]);
-  async function confirmed(result: ConfigurationResult) {
+  async function refreshConfirmed() {
     setConfirming(true);
+    try {
+      const authoritative = await api<PolicyData>("/api/patient-settings?careRecipientId=" + patientId);
+      if (authoritative.data.version >= (currentVersionRef.current ?? 0)) { currentVersionRef.current = authoritative.data.version; setData(authoritative); }
+      await context.refresh();
+    } catch (reason) { setError("A ação foi confirmada, mas a consulta posterior falhou. " + (reason instanceof Error ? reason.message : "Atualize esta seção.")); }
+    finally { setEditingVersion(null); setConfirming(false); setAttempt(value => value + 1); }
+  }
+  async function confirmed(result: ConfigurationResult) {
     setInvitationUrl(result.invitationUrl ?? "");
     setInvitationRecovery(result.invitationRecovery ?? null);
     setMessage(result.data.status === "awaiting_acceptance"
@@ -179,24 +192,31 @@ function Policies({ context }: { context: WorkspaceContext }) {
       : result.data.status === "pending"
         ? "Proposta global registrada. Referência: " + result.data.id + ". Um administrador local distinto deve aprovar."
         : "Configuração aplicada no paciente.");
-    setEditingVersion(null);
-    try {
-      const authoritative = await api<PolicyData>("/api/patient-settings?careRecipientId=" + patientId);
-      if (authoritative.data.version >= (currentVersionRef.current ?? 0)) { currentVersionRef.current = authoritative.data.version; setData(authoritative); }
-      await context.refresh();
-    } catch (reason) { setError("A ação foi confirmada, mas a consulta posterior falhou. " + (reason instanceof Error ? reason.message : "Atualize esta seção.")); }
-    finally { setConfirming(false); setAttempt(value => value + 1); }
+    await refreshConfirmed();
     return true;
   }
   async function reviewCurrent() {
     if (busy) return;
     setReviewing(true); setError("");
+    policyOperation.closeFailure(); noticeOperation.closeFailure();
     try {
       const authoritative = await api<PolicyData>("/api/patient-settings?careRecipientId=" + patientId);
       if (authoritative.data.version >= (currentVersionRef.current ?? 0)) { currentVersionRef.current = authoritative.data.version; setData(authoritative); }
       setEditingVersion(null); setAttempt(value => value + 1); setConflict(false);
+      policyOperation.clearVersionConflict(); noticeOperation.clearVersionConflict();
     } catch (reason) { setError(reason instanceof Error ? reason.message : "Não foi possível consultar a configuração vigente. Sua edição continua preservada."); }
     finally { setReviewing(false); }
+  }
+  async function configureVersioned(kind: "settings" | "notification_rule", change: Record<string, unknown>, expectedVersion: number) {
+    if (locked || savingRef.current) return;
+    const operation = kind === "settings" ? policyOperation : noticeOperation;
+    savingRef.current = true;
+    setError(""); setMessage("");
+    try {
+      await operation.submit({ change, expectedVersion });
+    } finally {
+      savingRef.current = false;
+    }
   }
   function failed(reason: unknown) {
     if (reason instanceof ApiError && reason.status === 409) setConflict(true);
@@ -244,8 +264,9 @@ function Policies({ context }: { context: WorkspaceContext }) {
     } catch (reason) { setError(reason instanceof Error ? reason.message : "Não foi possível reemitir o convite."); }
     finally { savingRef.current = false; setInvitationBusy(false); }
   }
-  function saveSettings(event: FormEvent<HTMLFormElement>) {
+  async function saveSettings(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (!data || locked) return;
     const form = new FormData(event.currentTarget);
     const change: Record<string, unknown> = {};
     for (const key of [
@@ -282,9 +303,9 @@ function Policies({ context }: { context: WorkspaceContext }) {
     catch (reason) {
       setError(reason instanceof Error ? reason.message : "Confira o nome curto.");
       const input = event.currentTarget.elements.namedItem("patientShortName"); if (input instanceof HTMLElement) input.focus();
-      return Promise.resolve(false);
+      return;
     }
-    return configure("settings", change);
+    await configureVersioned("settings", change, editingVersion ?? data.data.version);
   }
   if (!data)
     return (
@@ -296,6 +317,12 @@ function Policies({ context }: { context: WorkspaceContext }) {
   const settings = { ...residencePolicyDefaults, ...data.data.settings };
   const recovery = command.uncertain ? <Notice error>O resultado da alteração ainda não foi confirmado. O conteúdo e a chave da tentativa estão preservados. <ActionButton disabled={busy} onClick={async () => { setError(""); try { await confirmed(await command.recover()); } catch (reason) { failed(reason); } }}>Recuperar mesma alteração</ActionButton></Notice>
     : conflict ? <Notice error>Revise a configuração vigente antes de preparar outra intenção. <ActionButton disabled={busy} onClick={() => void reviewCurrent()}>Revisar configuração vigente</ActionButton></Notice> : null;
+  const reviewVersioned = () => void reviewCurrent();
+  const versionedRecovery = reviewedConflict && !policyOperation.failure && !noticeOperation.failure
+    ? <ActionButton disabled={busy} onClick={reviewVersioned}>Revisar configuração vigente</ActionButton> : null;
+  const finishVersioned = (state: ResidenceRuleResult["state"]) => {
+    if (state === "recorded") void refreshConfirmed();
+  };
   return (
     <div className="space-y-5">
       {rulesArea ? <>
@@ -310,6 +337,7 @@ function Policies({ context }: { context: WorkspaceContext }) {
       {error ? <Notice error>{error}{!command.uncertain && !conflict ? <ActionButton onClick={() => { setError(""); setReadAttempt(value => value + 1); }}>Consultar configuração novamente</ActionButton> : null}</Notice> : null}
       {message ? <Notice>{message}</Notice> : null}
       {recovery}
+      {versionedRecovery}
       {invitationRecovery ? <Notice>{invitationRecovery.notice}{context.activeContext?.mode === "patient" && context.patient?.role === "admin" ? <button className={buttonClass} disabled={busy} onClick={() => void reissueInvitation(invitationRecovery.invitationId)}>Reemitir convite e invalidar link anterior</button> : <p>Um administrador local deve reemitir o convite.</p>}</Notice> : null}
       {invitationUrl ? (
         <Notice>
@@ -325,7 +353,7 @@ function Policies({ context }: { context: WorkspaceContext }) {
       ) : null}
       <PolicyNavigation tab={tab} scheduleAccess={can(context, "schedule.types.manage")} />
       <div hidden={tab !== "rules"}>
-        <PolicyRules key={patientId} revision={attempt} settings={settings} directory={data.directory} busy={busy} locked={locked} recovery={recovery} error={error} message={message} globalMode={mode === "global"} versionKey={patientId + ":" + (editingVersion ?? data.data.version) + ":" + attempt} onStartEditing={() => { setMessage(""); setEditingVersion(data.data.version); }} save={saveSettings} />
+        <PolicyRules key={patientId} revision={attempt} settings={settings} directory={data.directory} busy={busy} locked={locked} recovery={versionedRecovery} error={error} message={message} globalMode={mode === "global"} versionKey={patientId + ":" + (editingVersion ?? data.data.version) + ":" + attempt} onStartEditing={() => { setMessage(""); setError(""); setEditingVersion(data.data.version); }} save={saveSettings} />
       </div>
       {tab === "permissions" ? (
         <PermissionMatrix
@@ -349,10 +377,12 @@ function Policies({ context }: { context: WorkspaceContext }) {
         <NotificationMatrix
           patientId={patientId}
           version={data.data.version}
-          busy={locked}
-          recovery={recovery}
+          formRevision={attempt}
+          busy={busy}
+          locked={locked}
+          recovery={versionedRecovery}
           globalMode={mode === "global"}
-          configure={(change, version) => configure("notification_rule", change, undefined, undefined, version)}
+          configure={(change, version) => configureVersioned("notification_rule", change, version)}
           configurationError={error}
         />
         <FeedbackBanner>A configuração não comprova que uma mensagem foi entregue. Destino verificado, consentimento e autorização continuam necessários.</FeedbackBanner>
@@ -405,6 +435,8 @@ function Policies({ context }: { context: WorkspaceContext }) {
             refreshConfiguration={() => { setReadAttempt(value => value + 1); void context.refresh(); }} />
         </>
       ) : null}
+      <ResidenceRuleFeedback operation={policyOperation} purpose="settings" onFinish={finishVersioned} onReview={reviewVersioned} />
+      <ResidenceRuleFeedback operation={noticeOperation} purpose="notification_rule" onFinish={finishVersioned} onReview={reviewVersioned} />
     </div>
   );
 }

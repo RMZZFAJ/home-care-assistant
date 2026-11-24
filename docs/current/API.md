@@ -2280,10 +2280,16 @@ O estado `destinationVerified` confirma somente o destino cadastrado.
 Consentimento, autorização e disponibilidade do transporte são aplicados
 nas rotinas de aviso.
 
-`POST /api/admin/residence-rules` recebe o mesmo escopo e uma chave `key`.
-`intent` contém os campos revisados e `referenceHash`. Envie `intent: null`
-para consultar a mesma chave após perda da resposta. O retorno `recorded`
-inclui o resultado oficial. `closed` marca a ausência sob lock e impede
-que a mesma tentativa seja aplicada mais tarde. A atuação global registra
-uma proposta. Os limites por custódia disparam a avaliação de alertas e
-preservam todos os movimentos de estoque.
+`POST /api/admin/residence-rules` recebe `patientId`, `mode`, `purpose`
+e uma chave `key`. Para `alertRule` e `notificationRecipient`, `intent`
+contém `fields` e `referenceHash`. Para `settings` e `notification_rule`,
+`intent` contém `change` e `expectedVersion`. Essas duas finalidades usam
+o contrato versionado de governança. A atuação local registra a alteração
+oficial. A atuação global registra uma proposta para decisão local.
+
+Envie `intent: null` para consultar a mesma chave após perda da resposta.
+`recorded` devolve a referência oficial daquela tentativa, mesmo após
+outra atualização. `closed` confirma a ausência sob lock e impede que essa
+chave seja aplicada depois pela rota revisada. A consulta revalida autoria,
+residência, modo e finalidade. Limites por custódia disparam a avaliação
+de alertas e preservam todos os movimentos de estoque.

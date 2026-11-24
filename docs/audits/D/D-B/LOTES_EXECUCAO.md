@@ -5083,13 +5083,17 @@ descarta os campos sem criar rascunho. Após uma resposta perdida, a aba
 preserva somente a chave e a contagem de consultas da operação oficial.
 O banco confirma o registro ou encerra a chave para bloquear um envio
 atrasado. Uma atuação global produz proposta a ser decidida por outro
-administrador local. Regras por evento e políticas continuam usando o
-contrato versionado de configuração. A recuperação desses dois tipos
-ainda precisa ser integrada ao modal de resultado de L4.
+administrador local. Regras por evento e políticas conservam o contrato
+versionado de configuração e usam os modais de resultado de L4. Se a
+resposta se perder, a consulta retoma a referência da operação na mesma aba,
+inclusive depois de recarregá-la. A aba guarda a chave e a contagem de
+consultas. Após duas consultas sem confirmação, o diálogo oferece os detalhes
+para copiar. Um conflito de versão solicita a consulta da configuração vigente.
 
 | Migration | Supabase local | Supabase remoto |
 | --- | --- | --- |
 | `20261124195346` | Aplicada | Pendente |
+| `20261124205347` | Aplicada | Pendente |
 
 Dez integrações com Auth real passaram, incluindo preservação dos
 movimentos de estoque, rejeição de referência antiga, reenvio idempotente,
@@ -5108,6 +5112,20 @@ falha, destinatários e limites pelos seletores administrativos, nome curto,
 recuperação de proposta, horários de silêncio e matriz de canais. As
 alterações visuais finais foram verificadas em build de produção.
 
+A atualização versionada passou em quatro integrações dirigidas com Auth
+local. Elas cobrem a política gravada uma vez sob concorrência, a recuperação
+do resultado exato após outra alteração, a chave fechada sem efeito e a
+proposta de aviso recuperável após decisão local independente.
+
+Quatro cenários dirigidos em Chromium passaram com build de produção.
+Incluem retorno de foco, validação de nome curto, versão concorrente,
+matriz de canais e aprovação local de proposta. A recuperação passou também
+em Android e iPhone emulados. O teste recarrega a aba, consulta duas vezes
+a chave original e verifica a oferta de copiar detalhes quando o resultado
+segue incerto. Quando o banco confirma a ausência, os campos continuam na
+edição aberta para nova confirmação deliberada. A leitura posterior a um
+resultado confirmado pode falhar sem invalidar a alteração já registrada.
+
 A [CI publicada de f503dc01][ci-f503dc01] concluiu as duas validações de
 código e 901 de 902 integrações. Os navegadores foram pulados por causa da
 integração de criação de residência sob troca de contexto. O teste obteve
@@ -5118,3 +5136,20 @@ autor e do responsável na fixture permitiu observar a troca real. O teste
 dirigido passou com a recusa esperada e o rollback verificado.
 
 [ci-f503dc01]: https://github.com/RMZZFAJ/home-care-assistant/actions/runs/45473773430
+
+O commit `2b7f8ad7` foi publicado na [PR 8 em rascunho][pr-residence-preview].
+O [deploy de Preview][preview-2b7f8ad7] ficou Ready. O endereço configurado
+confere com a branch. Supabase, assinatura e confiança de PDF, Web Push e
+worker constam no ambiente. A verificação registrou HTTP 200 no login,
+runtime, manifesto, service worker e página offline. A consulta de regras
+da residência sem sessão retornou HTTP 401.
+
+Preview e produção apontam para o mesmo Supabase, com 362 das 382 migrations
+do commit. As 20 pendências impedem validar no Preview as jornadas que
+dependem do novo esquema. A consulta não aplicou migrations nem disparou
+avisos. O SonarCloud passou e o CodeRabbit pulou a análise incremental.
+Na [CI do commit][ci-2b7f8ad7], Linux, Windows e banco passaram. Os sete
+grupos de navegador estavam em execução na conferência seguinte.
+
+[preview-2b7f8ad7]: https://vercel.com/rmzzfajs-projects/home-care-assistant/GG35HJrDTyAEwQ5wWxsK2reXYoHD
+[ci-2b7f8ad7]: https://github.com/RMZZFAJ/home-care-assistant/actions/runs/45486440078
