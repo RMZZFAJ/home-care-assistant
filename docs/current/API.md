@@ -2329,3 +2329,23 @@ Os endpoints de leitura de apresentações continuam recebendo o código
 textual, inclusive seus zeros iniciais, e fornecem as versões oficiais.
 Os endpoints anteriores de preparação continuam disponíveis aos
 consumidores do contrato anterior durante a transição do L4.
+
+### Histórico oficial do material
+
+`GET /api/catalog/history` recebe `careRecipientId`, `productId` e
+`page` opcional. API e banco exigem autorização de catálogo no vínculo
+local ativo. A resposta traz a identidade atual, até 20 eventos oficiais
+e a indicação de próxima página. Cada evento tem referência estável,
+autoria preservada quando disponível, instante e os campos registrados
+antes e depois da alteração.
+
+O histórico reúne cadastro, situação e versões de apresentação. A
+migration `20261124232228` começa a registrar os campos de cadastro.
+Atos de situação e versões de embalagem já preservados continuam
+consultáveis. Uma definição de embalagem capturada antes do versionamento
+pode aparecer como referência anterior de uma edição real.
+
+O histórico possui acesso próprio e dados de atos confirmados. A consulta
+técnica em `/api/admin/catalogue-preparations/receipts` e a recuperação
+por chave em `/api/admin/catalogue-actions` continuam com o escopo de
+titular, residência e modo definidos em seus contratos.

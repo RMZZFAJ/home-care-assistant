@@ -15,7 +15,6 @@ const actions: { label: string; description: string; href: string; icon: IconNam
   { label: "Meu perfil e segurança", description: "Contato, preferências, senha e autenticação", href: "/perfil", icon: "user" },
   { label: "Administração do paciente", description: "Pessoas, catálogo e regras autorizadas", href: "/admin", icon: "settings", capability: "access.manage" },
   { label: "Unidades e apresentações", description: "Apresentações e medidas dos produtos", href: "/unidades", icon: "stock", capability: "catalog.manage" },
-  { label: "Comprovantes do catálogo", description: "Consultar suas confirmações e tentativas pendentes", href: "/comprovantes-catalogo", icon: "history" },
   { label: "Guias e ajuda", description: "Orientações do seu papel e continuidade do cuidado", href: "/guias", icon: "help" },
   { label: "Verificar documento", description: "Consultar a emissão e conferir um arquivo recebido", href: "/verificar", icon: "check" },
 ];

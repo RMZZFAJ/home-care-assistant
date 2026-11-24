@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useCallback, useRef, useState, type RefObject } from "react";
 import { CatalogueIdentityManagement } from "@/components/catalog/catalogue-identity-management";
+import { MaterialHistoryDrawer } from "@/components/catalog/catalogue-material-history";
 import { ReviewedCatalogueFeedback, useReviewedCatalogueOperation } from "@/components/catalog/reviewed-catalogue-operation";
 import { RecordDrawer } from "@/components/forms/record-drawer";
 import { ActionButton, DefinitionGrid, Pill, SelectField, TextInput } from "@/components/ui/controls";
@@ -44,6 +45,7 @@ export function CatalogueManagement({ writable, userId, globalMode, patientId, h
   const [page, setPage] = useState(1);
   const [product, setProduct] = useState<OpenProduct | null>(null);
   const [identity, setIdentity] = useState<OpenProduct | null>(null);
+  const [history, setHistory] = useState<{ id: string | null; opener: HTMLElement } | null>(null);
   const [editor, setEditor] = useState<{ purpose: ProductPurpose; id: string | null; opener: HTMLElement } | null>(null);
   const [referenceRevision, setReferenceRevision] = useState(0);
   const [identityRevision, setIdentityRevision] = useState(0);
@@ -129,13 +131,20 @@ export function CatalogueManagement({ writable, userId, globalMode, patientId, h
         <Link className="hca-guide-row" href={"/unidades?careRecipientId=" + patientId}>
           <span className="hca-guide-row-icon"><Icon name="layers" /></span>
           <span className="hca-guide-row-label"><strong>Unidades e apresentações</strong><small>Unidade de controle, embalagem e código</small></span><Icon name="chevron" width={15} height={15} />
-        </Link></div>
+        </Link>
+        {!globalMode ? <button type="button" className="hca-guide-row" onClick={event => setHistory({ id: null, opener: event.currentTarget })}>
+          <span className="hca-guide-row-icon"><Icon name="history" /></span>
+          <span className="hca-guide-row-label"><strong>Histórico de alterações</strong><small>Veja o que mudou no cadastro dos materiais</small></span><Icon name="chevron" width={15} height={15} />
+        </button> : null}</div>
       </section>
       <FeedbackBanner>O catálogo organiza os materiais. Quantidades físicas continuam nos estoques da família e da equipe.</FeedbackBanner>
     </> : null}
     {writable && detail && product ? <ProductDetails item={detail} opener={product.opener} fallback={headingRef}
       globalMode={globalMode} locked={locked} onClose={() => setProduct(null)} openEdit={opener => openEditor("edit", detail.id, opener)}
+      openHistory={opener => setHistory({ id: detail.id, opener })}
       openIdentity={opener => { setIdentityRevision(0); setIdentity({ id: detail.id, opener }); }} /> : null}
+    {!globalMode && writable && history ? <MaterialHistoryDrawer
+      patientId={patientId} productId={history.id} products={rows} opener={history.opener} fallback={headingRef} onClose={() => setHistory(null)} /> : null}
     {writable && identity ? <CatalogueIdentityManagement
       key={identity.id} operation={identityOperation} referenceRevision={identityRevision}
       patientId={patientId} productId={identity.id} products={rows}
@@ -161,10 +170,11 @@ export function CatalogueManagement({ writable, userId, globalMode, patientId, h
   </section>;
 }
 
-function ProductDetails({ item, opener, fallback, globalMode, locked, onClose, openEdit, openIdentity }: {
+function ProductDetails({ item, opener, fallback, globalMode, locked, onClose, openEdit, openIdentity, openHistory }: {
   item: CatalogueCollectionItem; opener: HTMLElement; fallback: RefObject<HTMLElement | null>;
   globalMode: boolean; locked: boolean; onClose: () => void;
   openEdit: (opener: HTMLElement) => void; openIdentity: (opener: HTMLElement) => void;
+  openHistory: (opener: HTMLElement) => void;
 }) {
   return <RecordDrawer title={item.name} subtitle="Cadastro do material" headingIcon={categoryIcon[item.category] ?? "box"}
     kicker="Organização da residência" popupClassName="hca-preference-sheet hca-residence-settings-sheet"
@@ -193,6 +203,11 @@ function ProductDetails({ item, opener, fallback, globalMode, locked, onClose, o
         onClick={event => { if (!locked) openIdentity(event.currentTarget); }}>
         <span className="hca-guide-row-icon"><Icon name="history" /></span>
         <span className="hca-guide-row-label"><strong>Situação e sucessor</strong><small>Inativar, reativar ou orientar novas escolhas</small></span><Icon name="chevron" width={15} height={15} />
+      </button> : null}
+      {!globalMode ? <button type="button" className="hca-guide-row" onClick={event => openHistory(event.currentTarget)}>
+        <span className="hca-guide-row-icon"><Icon name="history" /></span>
+        <span className="hca-guide-row-label"><strong>Histórico do material</strong><small>Alterações confirmadas no cadastro</small></span>
+        <Icon name="chevron" width={15} height={15} />
       </button> : null}</div>
     </section>
     <FeedbackBanner>O histórico conserva a identidade do material. Alterações no cadastro preservam o saldo.</FeedbackBanner>

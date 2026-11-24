@@ -316,9 +316,6 @@ function PatientAdmin({ context, catalogueHeadingRef }: { context: WorkspaceCont
             patientId={patientId}
             headingRef={catalogueHeadingRef}
           /><div className="hca-form-stack">
-            <Link className={buttonClass} href={"/comprovantes-catalogo?" + new URLSearchParams({
-              [globalMode ? "paciente" : "careRecipientId"]: patientId,
-            })}>Comprovantes do catálogo</Link>
             <AdministrationNavigation context={context} section="catalog" />
           </div></>
         ) : null}

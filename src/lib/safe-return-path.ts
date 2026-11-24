@@ -27,7 +27,6 @@ export function safeReturnPath(value: string | null, origin: string): string {
       "/notificacoes",
       "/consumo",
       "/unidades",
-      "/comprovantes-catalogo",
       "/mais",
       "/guias",
       "/entregas",

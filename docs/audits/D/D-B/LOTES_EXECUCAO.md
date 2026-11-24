@@ -4639,11 +4639,9 @@ COM, regularização ENT, estoque familiar, administração de acesso, balanço
 e consumo. O aceite integrado continua sujeito à CI do candidato e à
 validação no Preview. As migrations locais aguardam a transição do banco
 compartilhado com a produção.
-Os cenários restantes de E10 ainda precisam de conferência de paridade
-com a v2. O acesso a comprovantes de catálogo ainda aparece nas áreas
-comuns de Administração e Unidades. O fluxo também usa a preparação
-persistente em formulários do catálogo. A retirada dessas superfícies
-deve conservar a consulta dos registros oficiais e das tentativas.
+As seções E10-01 a E10-10 registram a execução e a validação dirigidas
+da administração e do catálogo. A confirmação do lote depende da
+verificação integrada do candidato, incluindo a CI e o banco do Preview.
 
 ### Pendências da CI publicada em `a08742dc`
 
@@ -5223,6 +5221,12 @@ A verificação preservou a configuração e o esquema publicados.
 O SonarCloud aprovou o Quality Gate do SHA. A revisão automática do
 [CodeRabbit][coderabbit-8bec6567] foi pulada porque o serviço não conseguiu
 retomar o ponto incremental. A [CI do SHA][ci-8bec6567] estava em execução.
+Na leitura seguinte, Linux, Windows, banco e `ios-1` haviam passado.
+`chromium-1`, `chromium-2`, `mobile-1`, `ios-2` e `ios-3` haviam falhado.
+O log de `chromium-1` voltou a registrar problemas nas comparações de
+permissão, na reemissão de convite e na saída da continuação de acesso.
+A execução encerrou em falha, com `mobile-2` cancelado. Ela corresponde
+ao SHA publicado, anterior a E10-08–E10-10.
 
 [preview-8bec6567]: https://vercel.com/rmzzfajs-projects/home-care-assistant/8VJEV1yXGr9KtEiNDnXQyGHgTh
 [coderabbit-8bec6567]: https://github.com/RMZZFAJ/home-care-assistant/pull/8#issuecomment-7084927300
@@ -5287,5 +5291,41 @@ larguras e cores forçadas, com comparação visual a 360 e 412 px.
 O reteste final mediu a separação da lupa e do texto nos dois campos de
 busca a 360 e 412 px.
 
-E10-09 reutiliza o contrato de `20261124212833`, sem nova migration. O
-histórico geral do material e a retirada da central comum seguem em E10-10.
+E10-09 reutiliza o contrato de `20261124212833`, sem nova migration.
+
+### E10-10 — Histórico oficial e conferência da edição
+
+O histórico abre pelo material ou pela ação de histórico no catálogo,
+que permite escolher o material. Os eventos têm agrupamento por dia,
+autoria, instante, comparação e referência copiável no detalhe. Erro de
+consulta permite dois retestes naquele acesso e cópia dos detalhes. A
+reconsulta bem-sucedida confirma a atualização no diálogo compartilhado.
+
+O banco projeta somente fatos oficiais do mesmo paciente e material. A
+migration passa a registrar o antes e o depois dos campos de cadastro.
+O histórico reutiliza a autoria e as versões nativas de situação e
+embalagem. Cadastros anteriores que não tinham essa trilha permanecem
+consultáveis pelo cadastro atual e pelos atos oficiais que já existem.
+
+A central de comprovantes saiu da navegação comum e a rota da tela foi
+retirada. A leitura técnica permanece restrita ao titular e escopo
+originais. Na apresentação, resposta perdida consulta a mesma chave.
+Quando o servidor confirma a ausência, a edição aberta mantém os campos
+e permite uma nova confirmação. Uma consulta confirmada recupera a
+versão original, inclusive depois de uma atualização posterior.
+
+| Migration | Supabase local | Supabase remoto |
+| --- | --- | --- |
+| `20261124232228` | Aplicada, 385 versões | Pendente |
+
+A simulação de publicação listou 23 migrations pendentes no remoto
+compartilhado. O destino continua sujeito à verificação conjunta de
+Preview e produção registrada em E10-07.
+
+Passaram 19 integrações de histórico, situação e apresentações com Auth
+local e 17 testes unitários de autenticação e retorno. Seis cenários
+dirigidos passaram no Chromium entre a rodada e os retestes. Eles
+conferiram a comparação de versões, a cópia da referência, o limite de
+retentativas, a recusa de leitura fora do escopo e os dois resultados da
+consulta de uma edição. As capturas de 360 e 412 px foram comparadas com o
+laboratório. O botão de atualização ficou visível ao abrir o painel.

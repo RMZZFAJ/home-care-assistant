@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useState } from "react";
 import { RecordDrawer } from "@/components/forms/record-drawer";
 import { ActionButton, DefinitionGrid, LoadingIndicator, TextInput } from "@/components/ui/controls";
@@ -94,7 +93,6 @@ function Units({ context }: { context: WorkspaceContext }) {
     </section>
     {patientId ? <PresentationManagement userId={context.userId} patientId={patientId} writable={writable} /> : null}
     <p className="hca-residence-admin-note"><Icon name="history" width={16} height={16} />O fator descreve uma embalagem. Movimentos já registrados preservam a equivalência usada na ocasião.</p>
-    <Link className="hca-control justify-self-start" href="/comprovantes-catalogo">Comprovantes do catálogo</Link>
     {detail ? <RecordDrawer title="Unidade de medida" subtitle={detail.unit.name} kicker="Organização da residência" headingIcon="box"
       onClose={() => setDetail(null)} trackChanges={false} restoreFocusTo={detail.opener}
       popupClassName="hca-preference-sheet hca-residence-settings-sheet" footer={close => <>

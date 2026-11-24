@@ -28,7 +28,6 @@ export function recentDestinationAllowed(target: RecentDestination, context: Con
     "/balancos": ["bal.read"], "/escalas": ["schedule.read.own", "schedule.read.team"],
     "/consumo": ["consumption.report", "consumption.confirm"], "/entregas": ["ent.read"],
     "/configuracoes": ["access.manage"], "/unidades": ["catalog.manage"],
-    "/comprovantes-catalogo": ["catalog.manage"],
     "/fichas": ["req.create", "com.create", "ent.create", "bal.create"],
   };
   if (routeCaps[url.pathname]) return has(...routeCaps[url.pathname]);
