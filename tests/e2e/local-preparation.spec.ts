@@ -14,7 +14,7 @@ const physical=(patient:string)=>sql("select jsonb_build_object('stock',(select 
 test("local preparation connects real creation adoption and opening stock without turning metadata into physical approval",async({page},info)=>{
  const f=await preparedPatient(),model="local-opening-"+randomUUID();
  sql("insert into public.products(id,name,category,unit,is_active) values("+[q(model),q("Material fictício de abertura guiada"),q("higiene"),q("unidade"),"true"].join(",")+")");
- await login(page,"family",f.patient);await page.goto("/guias");await page.getByRole("link",{name:"Acompanhar preparação local",exact:true}).click();
+ await login(page,"family",f.patient);await page.goto("/guias");await page.getByRole("link",{name:/^Preparação da residência/}).click();
  await expect(page.getByRole("heading",{name:"Preparação local",exact:true})).toBeVisible();
  await expect(page.getByRole("complementary",{name:"Preparação que precisa de atenção",exact:true})).toBeVisible();
  expect((await(await page.request.get(endpoint(f.patient))).json()).data.catalogue.activeProducts).toBe(0);
