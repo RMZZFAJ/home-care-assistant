@@ -4,6 +4,12 @@ O [fechamento A–D da PR 7](docs/audits/FECHAMENTO_PR7.md) reúne os critérios
 e as pendências para a próxima etapa. Este acompanhamento conserva o
 histórico dos incrementos de D-B.
 
+**24/11 — Preparação local.** As áreas da residência abrem painéis com
+dados do vínculo e a data da consulta. O retorno do catálogo, do estoque
+e dos demais destinos reabre a área de origem. A lista móvel rola acima
+do rodapé.
+[Registro de L4](docs/audits/D/D-B/LOTES_EXECUCAO.md#e12-02--preparação-local-e-retorno-à-tarefa).
+
 **24/11 — Criação de residência.** A revisão confere a conta administradora.
 A confirmação registra o cadastro, o vínculo inicial, a configuração do
 guia e o comprovante juntos. Após perda da resposta, a consulta recupera

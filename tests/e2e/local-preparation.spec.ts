@@ -1,5 +1,8 @@
 import { expect,test,type Page } from "@playwright/test";
 import {randomUUID} from "node:crypto";
+import {mkdirSync} from "node:fs";
+import {resolve} from "node:path";
+import {pathToFileURL} from "node:url";
 import {preparedPatient} from "../integration/local-preparation-fixtures.mjs";
 import {setup,fixtures} from "../integration/v4-fixtures.mjs";
 import {sql,sqlLiteral as q} from "../../scripts/test-environment.mjs";
@@ -11,19 +14,26 @@ async function login(page:Page,role:string,patient:string|null){await page.goto(
 const endpoint=(patient:string)=>"/api/guides/preparation?careRecipientId="+patient;
 const physical=(patient:string)=>sql("select jsonb_build_object('stock',(select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where care_recipient_id="+q(patient)+"),'documents',(select jsonb_agg(to_jsonb(d) order by id) from public.operational_documents d where care_recipient_id="+q(patient)+"));");
 
-test("local preparation connects real creation adoption and opening stock without turning metadata into physical approval",async({page},info)=>{
+test("local preparation connects real creation adoption and opening stock without turning metadata into physical approval",async({page,browser},info)=>{
  const f=await preparedPatient(),model="local-opening-"+randomUUID();
  sql("insert into public.products(id,name,category,unit,is_active) values("+[q(model),q("Material fictício de abertura guiada"),q("higiene"),q("unidade"),"true"].join(",")+")");
  await login(page,"family",f.patient);await page.goto("/guias");await page.getByRole("link",{name:/^Preparação da residência/}).click();
- await expect(page.getByRole("heading",{name:"Preparação local",exact:true})).toBeVisible();
- await expect(page.getByRole("complementary",{name:"Preparação que precisa de atenção",exact:true})).toBeVisible();
+ await expect(page.getByRole("heading",{name:"Preparação da residência",exact:true})).toBeVisible();
+ const catalogue=page.getByRole("button",{name:/^Materiais e apresentações/});
+ await expect(catalogue).toContainText("Nenhum material ativo");
  expect((await(await page.request.get(endpoint(f.patient))).json()).data.catalogue.activeProducts).toBe(0);
+ await catalogue.click();
  await page.getByRole("link",{name:"Preparar materiais do paciente",exact:true}).click();
  await page.getByRole("button",{name:"Adotar modelo",exact:true}).click();
  const adoption=page.getByRole("dialog",{name:"Adotar modelo existente",exact:true});
  await adoption.getByRole("combobox",{name:"Produto modelo",exact:true}).selectOption(model);await adoption.getByRole("button",{name:"Adotar modelo",exact:true}).click();
  await expect(page.getByText("Modelo adicionado ao catálogo deste paciente.",{exact:true})).toBeVisible();
- await page.goto("/preparacao-local?careRecipientId="+f.patient);await expect(page.getByRole("complementary",{name:"Preparação que precisa de atenção",exact:true})).toHaveCount(0);
+ await page.getByRole("link",{name:"Voltar à preparação",exact:true}).click();
+ const material=page.getByRole("dialog",{name:"Materiais e apresentações",exact:true});
+ await expect(material).toBeVisible();
+ await material.getByRole("button",{name:"Voltar à preparação",exact:true}).click();
+ await expect(catalogue).toContainText("1 material ativo");
+ await page.getByRole("button",{name:/^Estoque e custódias/}).click();
  await page.getByRole("link",{name:"Preparar estoque familiar",exact:true}).click();
  await page.getByRole("button",{name:"Movimentar estoque familiar",exact:true}).click();
  const movement=page.getByRole("dialog",{name:/^(Movimentar estoque familiar|Confirmar movimentação familiar)$/});
@@ -34,9 +44,28 @@ test("local preparation connects real creation adoption and opening stock withou
  const data=(await(await page.request.get(endpoint(f.patient))).json()).data;
  expect(data.catalogue.activeProducts).toBe(1);expect(data.stock.familyMovements).toBe(1);expect(data.stock.teamMovements).toBe(0);
  const continuity=page.getByRole("region",{name:"Conferência física e continuidade",exact:true});await expect(continuity).toContainText("não confirma estoque físico");
+ const reference=await browser.newContext({viewport:{width:1280,height:900}});
+ mkdirSync("output/playwright/l4/reference",{recursive:true});
+ try {
+  const model=await reference.newPage();
+  await model.route(/^https?:/,route=>route.abort());
+  await model.goto(pathToFileURL(resolve("hca-laboratorio-04-v2-aprovado.html")).href+"#E12-02/local");
+  const frame=model.locator("#device-frame");
+  await expect(frame.getByRole("heading",{name:"Áreas da preparação",exact:true})).toBeVisible();
+  for(const width of [360,412]){
+   await model.getByRole("combobox",{name:"Visualização",exact:true}).selectOption(String(width));
+   const size=await frame.boundingBox();
+   if(!size)throw new Error("O laboratório não exibiu a área comparada.");
+   await page.setViewportSize({width,height:Math.round(size.height)});
+   await auditFromTop(page,"E12-02 local preparation "+width);
+   await frame.screenshot({path:"output/playwright/l4/reference/local-preparation-"+width+".png"});
+   await page.screenshot({path:"output/playwright/l4/local-preparation-"+info.project.name+"-"+width+".png"});
+  }
+ } finally {await reference.close();}
  for(const width of [320,390,768,1024,1440]){await page.setViewportSize({width,height:950});await auditFromTop(page,"local preparation "+width);}
  await page.setViewportSize({width:390,height:950});await page.evaluate(()=>window.scrollTo({top:0,behavior:"instant"}));await page.screenshot({path:"output/playwright/phase-d/local-preparation-"+info.project.name+".png",fullPage:true});
- await page.getByRole("button",{name:"Atualizar preparação local",exact:true}).click();await expect(page.getByRole("status").filter({hasText:"Consultando registros da preparação"})).toHaveCount(0);
+ await page.getByRole("button",{name:"Atualizar situação",exact:true}).click();
+ await expect(page.getByRole("dialog",{name:"Consultando a preparação",exact:true})).toHaveCount(0);
  expect(physical(f.patient)).toBe(before);expect(sql("select count(*) from public.stock_movements where care_recipient_id="+q(f.patient)+" and product_id="+q(model))).toBe("1");
 });
 
@@ -45,16 +74,23 @@ test("local preparation preserves restricted values and recovers read failures w
  await login(page,"adminA",f.patient);const before=physical(f.patient);let writes=0;
  page.on("request",request=>{if(new URL(request.url()).pathname===new URL(endpoint(f.patient),page.url()).pathname&&request.method()!=="GET")writes++;});
  await page.goto("/preparacao-local?careRecipientId="+f.patient);
- const stock=page.getByRole("region",{name:"Estoque físico por custódia",exact:true});await expect(stock.getByText("Acesso restrito a esta informação",{exact:true})).toHaveCount(2);
+ const stock=page.getByRole("button",{name:/^Estoque e custódias/});
+ await stock.click();
+ const stockPanel=page.getByRole("dialog",{name:"Estoque e custódias",exact:true});
+ await expect(stockPanel.getByText("Acesso restrito a esta informação",{exact:true})).toHaveCount(2);
+ await stockPanel.getByRole("button",{name:"Voltar à preparação",exact:true}).click();
+ await expect(stock).toBeFocused();
  const result=await page.request.get(endpoint(f.patient));expect(result.status()).toBe(200);expect(result.headers()["cache-control"]).toContain("no-store");const valid=(await result.json()).data;
- const retry=page.getByRole("button",{name:"Atualizar preparação local",exact:true});
+ const retry=page.getByRole("button",{name:"Atualizar situação",exact:true});
+ const failure=page.getByRole("dialog",{name:"Não foi possível consultar a preparação",exact:true});
  for(const status of [503,200]){
   await page.route("**/api/guides/preparation?*",route=>route.fulfill({status,contentType:"application/json",body:JSON.stringify(status===200?{data:{...valid,patientId:randomUUID(),patient:{...valid.patient,name:"OUTRO PACIENTE NÃO PODE APARECER"}}}:{error:"Consulta de preparação temporariamente indisponível."})}),{times:1});
-  await retry.focus();await retry.press("Enter");await expect(page.getByRole("main").getByRole("alert")).toBeVisible();await expect(retry).toBeFocused();await expect(page.getByText("OUTRO PACIENTE NÃO PODE APARECER",{exact:true})).toHaveCount(0);
-  await retry.press("Enter");await expect(page.getByRole("main").getByRole("alert")).toHaveCount(0);
+  await retry.focus();await retry.press("Enter");await expect(failure).toBeVisible();await expect(page.getByText("OUTRO PACIENTE NÃO PODE APARECER",{exact:true})).toHaveCount(0);
+  await failure.getByRole("button",{name:"Consultar novamente",exact:true}).click();await expect(failure).toHaveCount(0);
+  await expect(stock).toBeVisible();
  }
  await page.route("**/api/guides/preparation?*",route=>route.fulfill({status:403,contentType:"application/json",body:JSON.stringify({error:"Consulta não autorizada."})}),{times:1});
- await retry.press("Enter");await expect(page.getByRole("main").getByRole("alert")).toContainText("Consulta não autorizada");await expect(stock).toHaveCount(0);
+ await retry.press("Enter");await expect(failure).toContainText("Consulta não autorizada");await expect(stock).toHaveCount(0);
  for(const query of ["","careRecipientId=invalid","careRecipientId="+f.patient+"&careRecipientId="+f.patient,"careRecipientId="+f.patient+"&role=admin"])expect((await page.request.get("/api/guides/preparation?"+query)).status()).toBe(400);
  expect((await page.request.get(endpoint(f.patient.toUpperCase()))).status()).toBe(200);expect(writes).toBe(0);expect(physical(f.patient)).toBe(before);
 });

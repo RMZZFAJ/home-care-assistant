@@ -3942,6 +3942,31 @@ comparações das superfícies com os dados e contratos reais.
 - A regressão de preparação local voltou a localizar o link pelo rótulo
   aprovado. O caminho dos Guias à adoção do material e à movimentação
   familiar passou no Chromium. O ajuste de teste foi publicado em `a08742dc`.
+  O [Preview desse commit](https://home-care-assistant-a4aip4max-rmzzfajs-projects.vercel.app)
+  respondeu nas mesmas rotas e o SonarCloud passou. O CodeRabbit pulou a
+  revisão com 274 arquivos para o limite de 100.
+
+### E12-02 — Preparação local e retorno à tarefa
+
+- A preparação apresenta a data da leitura e seis áreas em cartões da v2.
+  Cada painel mostra apenas os dados devolvidos para o vínculo vigente.
+  Os destinos existentes preservam o paciente, e o retorno reabre a área
+  do painel. Convites, catálogo, custódias, escalas, balanços e comunicação
+  mantêm os próprios controles e contratos.
+- A atualização consulta os registros com a camada de carregamento padrão.
+  Uma falha temporária mantém a consulta anterior e identifica sua data.
+  Uma recusa retira os dados da consulta. O diálogo oferece até duas novas
+  tentativas e os detalhes para suporte. Consultar a preparação não registra
+  presença, recebimento, ciência ou conferência física.
+- A comparação em 360 e 412 px registra os cartões e o rodapé da v2 junto
+  ao cabeçalho e à navegação compartilhados. A primeira rodada encontrou
+  cobertura parcial de botões em 320 e 360 px. No celular, a lista agora
+  rola em uma área que termina acima do rodapé e da navegação.
+- O incremento usa a API de consulta existente e dispensa migration.
+  Os nove testes finais passaram em Chromium, Android e iOS emulados.
+  A verificação incluiu as larguras de 320 a 1440 px, o retorno do catálogo
+  ao painel de origem, a movimentação familiar, a recusa global e a
+  recuperação da consulta sem gravar nem exibir dados de outro paciente.
 
 ### E12-03 — Criação de residência
 
