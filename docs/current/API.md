@@ -2268,3 +2268,22 @@ continua em `purchaseProgress.identificationPending`. A identificação por
 `resolve_purchase_extra` pode ocorrer depois da compra ou chegada de outras
 linhas. Ela conserva o ID da ficha e acrescenta a linha autorizada sem criar
 compra ou lançamento de estoque.
+
+## Regras e destinatários por residência
+
+`GET /api/admin/residence-rules` recebe `patientId`, `mode` e `purpose`.
+As finalidades `alertRule` e `notificationRecipient` retornam configurações
+e escolhas permitidas para o contexto ativo. `selection` e `option`,
+quando enviados juntos, selecionam material e custódia ou conta e canal.
+A resposta inclui a configuração atual e o hash exigido na confirmação.
+O estado `destinationVerified` confirma somente o destino cadastrado.
+Consentimento, autorização e disponibilidade do transporte são aplicados
+nas rotinas de aviso.
+
+`POST /api/admin/residence-rules` recebe o mesmo escopo e uma chave `key`.
+`intent` contém os campos revisados e `referenceHash`. Envie `intent: null`
+para consultar a mesma chave após perda da resposta. O retorno `recorded`
+inclui o resultado oficial. `closed` marca a ausência sob lock e impede
+que a mesma tentativa seja aplicada mais tarde. A atuação global registra
+uma proposta. Os limites por custódia disparam a avaliação de alertas e
+preservam todos os movimentos de estoque.

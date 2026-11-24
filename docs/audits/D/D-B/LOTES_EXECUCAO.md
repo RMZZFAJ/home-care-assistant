@@ -5054,3 +5054,67 @@ passaram novamente.
 A recuperação no painel foi exercitada com o vínculo de administração
 vigente. A retomada pela interface após uma decisão retirar o próprio
 acesso de quem confirmou ainda precisa de verificação específica.
+
+### E10-06 — Regras, avisos e limites de estoque
+
+A área **Regras e avisos** reúne as abas **Regras**, **Avisos** e
+**Estoque**. Os endereços anteriores de destinatários e alertas levam à
+aba correspondente. O painel de regras mantém separadas a revisão do
+balanço, a ciência da requisição, as mensagens e o arquivamento.
+
+Avisos reúne destinatários e regras por evento. A consulta de destinos
+mostra se o canal externo aguarda verificação. A edição da regra permite
+trocar a função, conferir a disponibilidade por evento, escolher os canais
+e ajustar comportamento, arquivo, intervalo e silêncio externo antes de
+salvar. A busca e o filtro por função complementam os exemplos do
+laboratório. E-mail e WhatsApp aparecem como indisponíveis quando o
+evento ou a configuração do ambiente não oferece o canal.
+A pessoa e o canal identificam o registro conforme o banco. O painel de
+edição conserva essa identificação. A ação **Adicionar** permite cadastrar
+outro par de pessoa e canal.
+
+Estoque distingue os limites da Equipe e da Família pela identidade e
+unidade do material. A regra acompanha apenas a custódia selecionada.
+Inclui a criação para outros materiais do catálogo, ausente no exemplo
+com dois limites preenchidos do laboratório.
+
+Destinatários e limites são confirmados diretamente no diálogo. Sair
+descarta os campos sem criar rascunho. Após uma resposta perdida, a aba
+preserva somente a chave e a contagem de consultas da operação oficial.
+O banco confirma o registro ou encerra a chave para bloquear um envio
+atrasado. Uma atuação global produz proposta a ser decidida por outro
+administrador local. Regras por evento e políticas continuam usando o
+contrato versionado de configuração. A recuperação desses dois tipos
+ainda precisa ser integrada ao modal de resultado de L4.
+
+| Migration | Supabase local | Supabase remoto |
+| --- | --- | --- |
+| `20261124195346` | Aplicada | Pendente |
+
+Dez integrações com Auth real passaram, incluindo preservação dos
+movimentos de estoque, rejeição de referência antiga, reenvio idempotente,
+fechamento de tentativa sem efeito, decisão local independente e omissão
+de dados quando o vínculo ou a residência não autoriza a consulta.
+Os dois cenários dirigidos de limites e destinatários passaram em
+Chromium, Android e iPhone emulados, sem repetição na rodada válida.
+Os testes de destinatários conferiram foco e acessibilidade e capturaram
+o produto e o cenário de destino pendente do laboratório a 360 e 412 px.
+As capturas foram comparadas nessas larguras. Os editores usam o painel
+compartilhado com o cabeçalho do aplicativo visível, título de contexto,
+campos na ordem do cenário e rodapé com a ação de gravação.
+
+Passaram as regressões de política da residência, leitura de avisos após
+falha, destinatários e limites pelos seletores administrativos, nome curto,
+recuperação de proposta, horários de silêncio e matriz de canais. As
+alterações visuais finais foram verificadas em build de produção.
+
+A [CI publicada de f503dc01][ci-f503dc01] concluiu as duas validações de
+código e 901 de 902 integrações. Os navegadores foram pulados por causa da
+integração de criação de residência sob troca de contexto. O teste obteve
+`57014` por espera excedida antes da recusa esperada, `42501`.
+A fixture mantinha o autor da troca entre as identidades bloqueadas pela
+criação, o que impedia a gravação da auditoria da troca. A separação do
+autor e do responsável na fixture permitiu observar a troca real. O teste
+dirigido passou com a recusa esperada e o rollback verificado.
+
+[ci-f503dc01]: https://github.com/RMZZFAJ/home-care-assistant/actions/runs/45473773430

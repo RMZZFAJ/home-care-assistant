@@ -85,7 +85,7 @@ test.describe("administração integrada no ambiente local", () => {
       await page.getByRole("navigation", { name: "Pessoas e convites", exact: true }).getByRole("link", { name: /^Convites/ }).click();
     } else if (name === "Destinatários") {
       await navigation.getByRole("link", { name: /^Regras e destinatários/ }).click();
-      await page.getByRole("navigation", { name: "Destinatários e alertas" }).getByRole("link", { name, exact: true }).click();
+      await page.getByRole("navigation", { name: "Áreas da configuração", exact: true }).getByRole("link", { name: "Avisos", exact: true }).click();
     } else {
       const areas: Record<string, string> = { "Catálogo": "catalog", "Vínculos": "memberships", "Importação histórica": "import" };
       await navigation.locator('a[href*="section=' + areas[name] + '"]').click();
@@ -405,73 +405,35 @@ test.describe("administração integrada no ambiente local", () => {
       ).ok(),
     ).toBeTruthy();
     await section(page, patientId, "Destinatários");
-    await page
-      .getByRole("combobox", { name: "Conta destinatária", exact: true })
-      .selectOption({ label: "Teste professional" });
-    await page
-      .getByRole("combobox", { name: "Grupo", exact: true })
-      .selectOption("family");
-    await page
-      .getByRole("combobox", { name: "Canal", exact: true })
-      .selectOption("internal");
-    await page
-      .getByRole("checkbox", {
-        name: "Família: receber também alertas da equipe",
-        exact: true,
-      })
-      .check();
-    await submit(page, "Salvar destinatário", "notificationRecipient");
-    await expect(
-      page.getByText("Destinatário de notificações salvo.", { exact: true }),
-    ).toBeVisible();
-    await expect(
-      page.getByText("Teste professional · family · internal", { exact: true }),
-    ).toBeVisible();
-    const settings = await (
-      await page.request.get(
-        `/api/admin?section=notificationRecipients&careRecipientId=${patientId}`,
-      )
-    ).json();
+    const recipients = page.getByRole("region", { name: "Destinatários", exact: true });
+    await recipients.getByRole("button", { name: "Adicionar", exact: true }).click();
+    const recipient = page.getByRole("dialog", { name: "Adicionar destinatário", exact: true });
+    await recipient.getByRole("combobox", { name: "Pessoa vinculada", exact: true }).selectOption({ label: "Teste professional" });
+    await recipient.getByRole("combobox", { name: "Canal", exact: true }).selectOption("internal");
+    await recipient.getByRole("combobox", { name: "Grupo", exact: true }).selectOption("family");
+    await recipient.getByRole("switch", { name: "Receber alertas da equipe", exact: true }).check();
+    await recipient.getByRole("button", { name: "Salvar destinatário", exact: true }).click();
+    await page.getByRole("dialog", { name: "Destinatário registrado", exact: true }).getByRole("button", { name: "Concluir", exact: true }).click();
+    await expect(recipients.getByRole("button", { name: /Teste professional.*Família.*Aplicativo/ })).toBeVisible();
+    const settings = await (await page.request.get(`/api/admin?section=notificationRecipients&careRecipientId=${patientId}`)).json();
     expect(settings.data).toHaveLength(1);
     expect(settings.data[0]).toMatchObject({
-      recipient_user_id: userId,
-      recipient_group: "family",
-      channel: "internal",
-      is_enabled: true,
-      include_team_alerts: true,
+      recipient_user_id: userId, recipient_group: "family", channel: "internal", is_enabled: true, include_team_alerts: true,
     });
-    await page.getByRole("button", { name: "Outras áreas", exact: true }).click();
-    await page.getByRole("menuitem", { name: "Alertas de estoque", exact: true }).click();
-    await page
-      .getByRole("combobox", { name: "Item do catálogo", exact: true })
-      .selectOption({ label: "Fralda" });
-    await page.getByRole("combobox", { name: "Custódia", exact: true })
-      .selectOption({ label: "Equipe de cuidado" });
-    await page.getByLabel("Limite baixo", { exact: true }).fill("5");
-    await page.getByLabel("Limite crítico", { exact: true }).fill("2");
-    await page
-      .getByRole("checkbox", { name: "Regra habilitada", exact: true })
-      .check();
-    await submit(page, "Salvar regra", "alertRule");
-    await expect(
-      page.getByText(
-        "Fralda · CARE_TEAM · baixo: 5 · crítico: 2 · habilitada",
-        { exact: true },
-      ),
-    ).toBeVisible();
-    const alerts = await (
-      await page.request.get(
-        `/api/admin?section=alerts&careRecipientId=${patientId}`,
-      )
-    ).json();
+    await page.getByRole("navigation", { name: "Áreas da configuração", exact: true }).getByRole("link", { name: "Estoque", exact: true }).click();
+    await page.getByRole("button", { name: "Adicionar limite", exact: true }).click();
+    const limit = page.getByRole("dialog", { name: "Limite de estoque", exact: true });
+    await limit.getByRole("combobox", { name: "Material", exact: true }).selectOption({ label: "Fralda" });
+    await limit.getByRole("combobox", { name: "Estoque", exact: true }).selectOption("CARE_TEAM");
+    await limit.getByRole("textbox", { name: "Avisar estoque baixo a partir de", exact: true }).fill("5");
+    await limit.getByRole("textbox", { name: "Avisar estoque crítico a partir de", exact: true }).fill("2");
+    await limit.getByRole("switch", { name: "Regra habilitada", exact: true }).check();
+    await limit.getByRole("button", { name: "Salvar limite", exact: true }).click();
+    await page.getByRole("dialog", { name: "Limite registrado", exact: true }).getByRole("button", { name: "Concluir", exact: true }).click();
+    await expect(page.getByRole("button", { name: /Fralda.*Equipe.*baixo: 5.*crítico: 2.*Ativo/ })).toBeVisible();
+    const alerts = await (await page.request.get(`/api/admin?section=alerts&careRecipientId=${patientId}`)).json();
     expect(alerts.data).toHaveLength(1);
-    expect(alerts.data[0]).toMatchObject({
-      product_id: "fralda",
-      location: "CARE_TEAM",
-      low_threshold: 5,
-      critical_threshold: 2,
-      is_enabled: true,
-    });
+    expect(alerts.data[0]).toMatchObject({ product_id: "fralda", location: "CARE_TEAM", low_threshold: 5, critical_threshold: 2, is_enabled: true });
   });
 
   test("importação histórica revisada preserva itens extras e estoque desconhecido no comprovante", async ({

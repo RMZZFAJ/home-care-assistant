@@ -268,7 +268,7 @@ test("D3 proposta administrativa recupera a mesma intenção e ambas as entradas
 test("D3 regra preserva a tentativa incerta e distingue confirmação de falha na consulta posterior", async ({ page }) => {
   const f = await setup(); await login(page, "global", null);
   await page.goto("/configuracoes?careRecipientId=" + f.patient);
-  await page.getByRole("button", { name: "Editar Encerramento e histórico", exact: true }).click();
+  await page.getByRole("button", { name: "Editar Arquivamento", exact: true }).click();
   const drawer = page.getByRole("dialog"), field = drawer.getByLabel("Arquivar após conclusão ou cancelamento (dias)", { exact: true });
   await field.fill("12");
   const packets: unknown[] = []; let first = true;
@@ -277,25 +277,25 @@ test("D3 regra preserva a tentativa incerta e distingue confirmação de falha n
     packets.push(route.request().postDataJSON());
     if (first) { first = false; await route.abort("failed"); } else await route.continue();
   });
-  await drawer.getByRole("button", { name: "Registrar política", exact: true }).click();
+  await drawer.getByRole("button", { name: "Propor regra", exact: true }).click();
   await expect(drawer.getByRole("button", { name: "Recuperar mesma alteração", exact: true })).toBeEnabled();
   await expect(field).toHaveValue("12"); await expect(field).toBeDisabled(); expect(count(f.patient)).toBe(0);
   await drawer.getByRole("button", { name: "Recuperar mesma alteração", exact: true }).click();
   await expect(drawer).toHaveCount(0); expect(packets).toHaveLength(2); expect(packets[1]).toEqual(packets[0]); expect(count(f.patient)).toBe(1);
   await page.unrouteAll({ behavior: "wait" });
-  await page.getByRole("button", { name: "Editar Encerramento e histórico", exact: true }).click(); await field.fill("13");
+  await page.getByRole("button", { name: "Editar Arquivamento", exact: true }).click(); await field.fill("13");
   let failRead = false;
   await page.route("**/api/patient-settings**", async route => {
     if (route.request().method() === "POST") { const response = await route.fetch(); expect(response.status()).toBe(200); failRead = true; await route.fulfill({ response }); }
     else if (failRead) { failRead = false; await route.abort("failed"); } else await route.continue();
   });
-  await drawer.getByRole("button", { name: "Registrar política", exact: true }).click();
+  await drawer.getByRole("button", { name: "Propor regra", exact: true }).click();
   await expect(drawer).toHaveCount(0);
   await expect(page.getByRole("alert").filter({ hasText: "A ação foi confirmada, mas a consulta posterior falhou" })).toBeVisible();
   await expect(page.getByRole("button", { name: "Recuperar mesma alteração", exact: true })).toHaveCount(0);
   expect(count(f.patient)).toBe(2);
   await page.getByRole("button", { name: "Consultar configuração novamente", exact: true }).click();
-  await expect(page.getByRole("button", { name: "Editar Encerramento e histórico", exact: true })).toBeEnabled();
+  await expect(page.getByRole("button", { name: "Editar Arquivamento", exact: true })).toBeEnabled();
   expect(count(f.patient)).toBe(2);
 });
 

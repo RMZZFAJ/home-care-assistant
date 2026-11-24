@@ -301,31 +301,19 @@ test("V4: matrizes móveis, múltiplos canais no contrato visual e proposta glob
   });
   await page.goto("/configuracoes?careRecipientId=" + patient);
   await page
-    .getByRole("navigation", { name: "Áreas da configuração", exact: true }).getByRole("link", { name: "Notificações", exact: true }).click();
-  const channel = page.getByRole("checkbox", {
-    name: "Requisição emitida · Familiar · WhatsApp (contrato visual)",
-    exact: true,
-  });
-  await channel.check();
-  await expect(channel).toBeChecked();
-  await expect(
-    page.getByRole("heading", {
-      name: "Arquivamento manual justificado",
-      exact: true,
-    }),
-  ).toBeVisible();
-  await expect(
-    page.getByRole("checkbox", {
-      name: "Arquivamento manual justificado · Familiar · WhatsApp (contrato visual)",
-      exact: true,
-    }),
-  ).toHaveCount(0);
-  await expect(
-    page.getByRole("checkbox", {
-      name: "Requisição emitida · Familiar · Aplicativo",
-      exact: true,
-    }),
-  ).toBeChecked();
+    .getByRole("navigation", { name: "Áreas da configuração", exact: true }).getByRole("link", { name: "Avisos", exact: true }).click();
+  const rules = page.getByRole("region", { name: "Regras de avisos", exact: true });
+  await rules.getByRole("combobox", { name: "Função nas notificações", exact: true }).selectOption("family");
+  await rules.getByRole("button", { name: /^Arquivamento manual justificado/ }).click();
+  const unavailable = page.getByRole("dialog", { name: "Arquivamento manual justificado", exact: true });
+  await expect(unavailable.getByRole("switch", { name: /WhatsApp/ })).toHaveCount(0);
+  await expect(unavailable.getByText(/WhatsApp.*Canal indisponível/)).toBeVisible();
+  await unavailable.getByRole("button", { name: "Voltar", exact: true }).click();
+  await rules.getByRole("button", { name: /^Requisição emitida/ }).click();
+  const notice = page.getByRole("dialog", { name: "Requisição emitida", exact: true });
+  await expect(notice.getByRole("switch", { name: "Aplicativo", exact: true })).toBeChecked();
+  await notice.getByRole("switch", { name: "WhatsApp (contrato visual)", exact: true }).check();
+  await notice.getByRole("button", { name: "Salvar regra", exact: true }).click();
   await expect
     .poll(async () => {
       const response = await page.request.get(
@@ -338,8 +326,7 @@ test("V4: matrizes móveis, múltiplos canais no contrato visual e proposta glob
       return row?.channels?.length;
     })
     .toBe(2);
-  await page
-    .getByRole("navigation", { name: "Áreas da configuração", exact: true }).getByRole("link", { name: "Permissões", exact: true }).click();
+  await page.goto("/configuracoes?area=permissions&careRecipientId=" + patient);
   await expect(
     page.getByRole("region", { name: "Matriz de permissões", exact: true }),
   ).toBeVisible();
@@ -355,10 +342,10 @@ test("V4: matrizes móveis, múltiplos canais no contrato visual e proposta glob
     const global = await other.newPage();
     await login(global, "global", null);
     await global.goto("/configuracoes?careRecipientId=" + patient);
-    await global.getByRole("button", { name: "Editar Encerramento e histórico", exact: true }).click();
+    await global.getByRole("button", { name: "Editar Arquivamento", exact: true }).click();
     await global.getByLabel("Arquivar após conclusão ou cancelamento (dias)").fill("9");
     await global
-      .getByRole("button", { name: "Registrar política", exact: true })
+      .getByRole("button", { name: "Propor regra", exact: true })
       .click();
     await expect(
       global.getByRole("status").filter({ hasText: "Proposta global registrada." }),

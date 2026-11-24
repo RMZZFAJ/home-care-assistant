@@ -152,7 +152,11 @@ test("a saved responsibility must remain a real active distinct identity and fai
 });
 
 test("creation rechecks global authority after an observed identity lock and rolls back patient, membership, preparation revision and intent",async()=>{
-  const f=await setup(),global=await actor("global"),content=body(),draft=await rpc(global,"residence_preparation_command",save(content));
+  const f=await setup(),global=await actor("global");
+  // Context selection audits the actor through a profile FK. Keep the actor
+  // outside the identities locked by the residence so the switch can commit.
+  const content={...body(),ownerId:fixtures.professional.id};
+  const draft=await rpc(global,"residence_preparation_command",save(content));
   const before=sql(`select jsonb_build_object('patients',(select count(*) from public.care_recipients),'draft',(select to_jsonb(d) from private.residence_preparations d where id=${sqlLiteral(draft.id)}),'commands',(select count(*) from private.phase_d3_commands where owner_id=${sqlLiteral(fixtures.global.id)}));`);
   const args={p_id:draft.id,p_expected:1,p_action:"create",p_content:content,p_step:1,p_key:randomUUID()};
   const result=await whileRowWaits("profiles",fixtures.family.id,"residence_preparation_command",()=>global.rpc("residence_preparation_command",args),async()=>{await rpc(global,"select_active_context",{p_patient:f.patient});});

@@ -18,22 +18,20 @@ const packet=(args,action,{fields=null,hash=null,draft=null}={})=>({
 const command="administrative_preparation_command";
 const alert=(productId,lowThreshold="5")=>({productId,location:"CARE_TEAM",lowThreshold,criticalThreshold:"2",isEnabled:true});
 
-test("administrative partial fields are private, versioned and discardable without native alert effects",async()=>{
+test("stock and recipient configuration no longer create administrative drafts or effects",async()=>{
   const f=await setup(),args=scope(f.patient,"alertRule"),{reference}=await read(f.admin,args);
   const fields=alert("","em revisão"),initial=packet(args,"save",{fields,hash:reference.hash});
-  const first=await rpc(f.admin,command,initial);
-  assert.deepEqual((await read(f.admin,args)).draft.fields,fields);
-  assert.deepEqual((await read(f.admin,args,null,null,initial.p_key)).receipt,first);
-  const other=await actor("global",f.patient);
-  assert.equal((await read(other,args)).draft,null);
-  assert.equal((await read(other,args,null,null,initial.p_key)).receipt,null);
-  const saves=["7","8"].map(value=>packet(args,"save",{draft:first,fields:{...fields,lowThreshold:value},hash:reference.hash}));
-  const results=await Promise.all(saves.map(save=>f.admin.rpc(command,save)));
-  assert.equal(results.filter(result=>!result.error).length,1);
-  assert.equal(results.find(result=>result.error)?.error.code,"PT409");
-  const latest=(await read(f.admin,args)).draft;
-  assert.equal((await rpc(f.admin,command,packet(args,"discard",{draft:latest}))).state,"discarded");
+  assert.equal((await f.admin.rpc(command,initial)).error?.code,"PT409");
+  assert.equal((await read(f.admin,args)).draft,null);
+  assert.equal((await read(f.admin,args,null,null,initial.p_key)).receipt,null);
+  const recipientArgs=scope(f.patient,"notificationRecipient"),user=fixtures.professional.id;
+  const recipientFields={recipientUserId:user,recipientGroup:"family",channel:"internal",destination:"",isEnabled:true,includeTeamAlerts:true};
+  const recipientReference=(await read(f.admin,recipientArgs,user,"internal")).reference;
+  const saveRecipient=packet(recipientArgs,"save",{fields:recipientFields,hash:recipientReference.hash});
+  assert.equal((await f.admin.rpc(command,saveRecipient)).error?.code,"PT409");
+  assert.equal((await read(f.admin,recipientArgs)).draft,null);
   assert.equal(sql(`select count(*) from public.stock_alert_rules where care_recipient_id=${q(f.patient)};`),"0");
+  assert.equal(sql(`select count(*) from public.recipient_notification_settings where care_recipient_id=${q(f.patient)};`),"0");
 });
 
 test("native alert confirmation and retries share one receipt and retain stale-reference fields",async()=>{
@@ -48,17 +46,16 @@ test("native alert confirmation and retries share one receipt and retain stale-r
   assert.equal((await read(f.admin,args,null,null,intent.p_key)).receipt.id,results[0].id);
 });
 
-test("recipient confirmation preserves own fields and refuses an outdated member eligibility reference",async()=>{
+test("recipient confirmation refuses an outdated member eligibility reference and retains an exact receipt",async()=>{
   const f=await setup(),args=scope(f.patient,"notificationRecipient"),user=fixtures.professional.id;
   const fields={recipientUserId:user,recipientGroup:"family",channel:"internal",destination:"",isEnabled:true,includeTeamAlerts:true};
   const {reference}=await read(f.admin,args,user,"internal");
-  const saved=await rpc(f.admin,command,packet(args,"save",{fields,hash:reference.hash}));
   sql(`update public.care_recipient_memberships set status='revoked' where care_recipient_id=${q(f.patient)} and user_id=${q(user)};`);
-  assert.equal((await f.admin.rpc(command,packet(args,"commit",{fields,hash:reference.hash,draft:saved}))).error?.code,"PT409");
-  assert.deepEqual((await read(f.admin,args)).draft.fields,fields);
+  assert.equal((await f.admin.rpc(command,packet(args,"commit",{fields,hash:reference.hash}))).error?.code,"PT409");
+  assert.equal((await read(f.admin,args)).draft,null);
   sql(`update public.care_recipient_memberships set status='active' where care_recipient_id=${q(f.patient)} and user_id=${q(user)};`);
   const current=(await read(f.admin,args,user,"internal")).reference;
-  const final=packet(args,"commit",{fields,hash:current.hash,draft:saved});
+  const final=packet(args,"commit",{fields,hash:current.hash});
   const result=await rpc(f.admin,command,final);
   assert.deepEqual(await rpc(f.admin,command,final),result);
   assert.equal(result.outcome.userId,user);

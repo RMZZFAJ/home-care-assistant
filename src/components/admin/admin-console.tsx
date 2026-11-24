@@ -17,14 +17,9 @@ import {
   Workspace,
   type WorkspaceContext,
 } from "@/components/workspace";
-import {
-  NotificationSettings,
-  NotificationQueue,
-} from "./notification-settings";
+import { NotificationQueue } from "./notification-settings";
 import { type Row } from "./admin-fields";
-import { administrativeOutcomeText } from "./administrative-preparation-editor";
 import type { AdministrativeOutcome } from "@/lib/validation/administrative-preparation";
-import { AlertSettings } from "./alert-settings";
 import {
   AdministrationNavigation,
   administrationAreas,
@@ -46,11 +41,9 @@ type Section =
   | "catalog"
   | "memberships"
   | "invitations"
-  | "alerts"
   | "audit"
   | "import"
   | "profiles"
-  | "notificationRecipients"
   | "notifications"
   | "operations";
 type AdministrativeResult = { data?: unknown; pendingApproval?: boolean };
@@ -60,11 +53,9 @@ const labels: Record<Section, string> = {
   catalog: "Catálogo",
   memberships: "Vínculos",
   invitations: "Convites",
-  alerts: "Alertas",
   audit: "Auditoria",
   import: "Importação histórica",
   profiles: "Contas globais",
-  notificationRecipients: "Destinatários",
   notifications: "Notificações",
   operations: "Central técnica",
 };
@@ -125,7 +116,6 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
     administrationAreas(context).some((area) => area.section === section);
   const [rows, setRows] = useState<Row[]>([]);
   const [directory, setDirectory] = useState<Row[]>([]);
-  const [catalog, setCatalog] = useState<Row[]>([]);
   const [page, setPage] = useState(1);
   const [notificationTotal, setNotificationTotal] = useState(0);
   const [loading, setLoading] = useState(
@@ -173,7 +163,7 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
           undefined,
           signal,
         ),
-        ["memberships", "notificationRecipients"].includes(section)
+        section === "memberships"
           ? api<{ data: Row[] }>(
               section === "memberships" && globalMode
                 ? "/api/admin?section=profiles"
@@ -182,20 +172,12 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
               signal,
             )
           : Promise.resolve({ data: [] as Row[] }),
-        section === "alerts"
-          ? api<{ data: Row[] }>(
-              `/api/catalog?careRecipientId=${patientId}&includeInactive=true`,
-              undefined,
-              signal,
-            )
-          : Promise.resolve({ data: [] as Row[] }),
       ]).then(
-        ([result, people, products]) => {
+        ([result, people]) => {
           if (signal?.aborted || sequence !== loadSequenceRef.current) return;
           setRows(result.data ?? []);
           setNotificationTotal(result.total ?? 0);
           setDirectory(people.data);
-          setCatalog(products.data);
           setLoading(false);
           setReadError("");
           setReadDenied(false);
@@ -232,7 +214,7 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
     return result;
   }
   function preparationConfirmed(outcome: AdministrativeOutcome) {
-    setMessage(["alerts", "notificationRecipients", "memberships"].includes(section) ? "" : administrativeOutcomeText(outcome));
+    setMessage("");
     void (async () => {
       if (outcome.kind==="local" && ["membership","membershipStatus"].includes(outcome.action)) await context.refresh();
       await load();
@@ -361,13 +343,6 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
         {(section === "memberships" || section === "invitations") && patientId ? <Link className={buttonClass} href={`/admin?careRecipientId=${patientId}`} prefetch={false}>
           <Icon name="back" />Voltar à administração
         </Link> : null}
-        {section === "notificationRecipients" && (
-          <NotificationSettings
-            rows={rows}
-            members={directory}
-            patientId={patientId!} userId={context.userId} globalMode={globalMode} onConfirmed={preparationConfirmed}
-          />
-        )}
         {section === "notifications" && (
           <>
             <NotificationQueue
@@ -408,9 +383,6 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
               </nav>
             )}
           </>
-        )}
-        {section === "alerts" && (
-          <AlertSettings rows={rows} products={catalog} patientId={patientId!} userId={context.userId} globalMode={globalMode} onConfirmed={preparationConfirmed} />
         )}
         {section === "audit" ? <AuditHistory patientId={patientId!} /> : null}
         {section === "operations" && globalMode ? <OperationsConsole key={context.userId} actorId={context.userId} /> : null}

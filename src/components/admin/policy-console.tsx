@@ -31,6 +31,10 @@ import { useCommandIntent } from "@/lib/client/use-command-intent";
 import { GovernanceProposals } from "./governance-proposals";
 import { governanceCommandConfirmed } from "@/lib/validation/governance";
 import { residencePolicyDefaults } from "@/lib/governance-presentation";
+import { ResidenceRuleSettings } from "./residence-rule-settings";
+import { FeedbackBanner } from "@/components/ui/feedback";
+
+const ruleAreas = ["rules", "notifications", "thresholds"];
 type ConfigurationPacket = { careRecipientId: string; kind: string; change: Record<string, unknown>; idempotencyKey: string; expectedVersion: number; requestId?: string; decision?: string };
 type ConfigurationResult = { data: { id: string; status: string }; invitationUrl?: string; invitationRecovery?: { invitationId: string; notice: string } };
 type PolicyData = {
@@ -56,9 +60,10 @@ export function PolicyConsole() {
   const params = useSearchParams();
   const scheduleArea = params.get("area") === "schedules";
   const permissionArea = params.get("area") === "permissions";
+  const peopleArea = params.get("area") === "people";
   const day = params.get("day");
   return (
-    <Workspace title={scheduleArea ? "Configurações de plantões" : permissionArea ? "Permissões" : "Permissões, comunicação e regras"}
+    <Workspace title={scheduleArea ? "Configurações de plantões" : permissionArea ? "Permissões" : peopleArea ? "Pessoas e propostas" : "Regras e avisos"}
       eyebrow={permissionArea ? "Organização da residência" : undefined} administration>
       {(context) =>
         context.patient && scheduleArea ? (
@@ -81,7 +86,7 @@ export function PolicyConsole() {
         ) : context.patient &&
         (can(context, "access.manage") ||
           context.activeContext?.mode === "global") ? (
-          <Policies key={context.patient.id} context={context} />
+          <Policies key={`${context.userId}:${context.patient.id}:${context.activeContext?.mode}`} context={context} />
         ) : (
           <Notice>Selecione um paciente que você administra.</Notice>
         )
@@ -93,11 +98,14 @@ export function PolicyConsole() {
 function PolicyNavigation({ tab, scheduleAccess }: { tab: string; scheduleAccess: boolean }) {
   const params = useSearchParams();
   const router = useRouter();
-  const areas: [string, string, IconName][] = [
+  const rules = ruleAreas.includes(tab);
+  const areas: [string, string, IconName][] = rules ? [
+    ["rules", "Regras", "settings"], ["notifications", "Avisos", "bell"], ["thresholds", "Estoque", "box"],
+  ] : [
     ["rules", "Regras", "settings"], ["permissions", "Permissões", "shield"],
-    ["notifications", "Notificações", "bell"], ["people", "Pessoas e propostas", "users"],
+    ["notifications", "Avisos", "bell"], ["people", "Pessoas e propostas", "users"],
   ];
-  if (scheduleAccess || tab === "schedules") areas.push(["schedules", "Plantões", "calendar"]);
+  if (!rules && (scheduleAccess || tab === "schedules")) areas.push(["schedules", "Plantões", "calendar"]);
   return <nav aria-label="Áreas da configuração" className="hca-configuration-tabs hca-document-tab-list">
     {areas.map(([area, label, icon]) => {
       const query = new URLSearchParams(params.toString());
@@ -130,7 +138,9 @@ function Policies({ context }: { context: WorkspaceContext }) {
   const busy = command.busy || invitationBusy || reviewing || confirming;
   const locked = busy || command.uncertain || conflict;
   const params = useSearchParams();
-  const tab = ["rules", "permissions", "notifications", "people"].includes(params.get("area") ?? "") ? params.get("area")! : "rules";
+  const tab = [...ruleAreas, "permissions", "people"].includes(params.get("area") ?? "") ? params.get("area")! : "rules";
+  const rulesArea = ruleAreas.includes(tab);
+  const mode = context.activeContext?.mode === "global" ? "global" : "patient";
   const savingRef = useRef(false);
   const currentVersionRef = useRef<number | null>(null);
   const [invitationUrl, setInvitationUrl] = useState("");
@@ -288,7 +298,10 @@ function Policies({ context }: { context: WorkspaceContext }) {
     : conflict ? <Notice error>Revise a configuração vigente antes de preparar outra intenção. <ActionButton disabled={busy} onClick={() => void reviewCurrent()}>Revisar configuração vigente</ActionButton></Notice> : null;
   return (
     <div className="space-y-5">
-      {tab === "permissions" ? <p className="text-sm text-(--muted)">Perfis da residência e exceções de cada pessoa.</p> : <p className="text-sm text-(--muted)">
+      {rulesArea ? <>
+        <p className="text-sm text-(--muted)">Ajustes da residência com o efeito de cada escolha.</p>
+        {mode === "global" ? <FeedbackBanner heading="Mudanças sujeitas à decisão local">Você registra propostas. Outro administrador da residência decide quando serão aplicadas.</FeedbackBanner> : null}
+      </> : tab === "permissions" ? <p className="text-sm text-(--muted)">Perfis da residência e exceções de cada pessoa.</p> : <p className="text-sm text-(--muted)">
         {context.activeContext?.mode === "global"
           ? "Atuação global: mudanças neste paciente geram propostas para aprovação local."
           : "Atuação local: alterações autorizadas são aplicadas imediatamente."}{" "}
@@ -312,11 +325,7 @@ function Policies({ context }: { context: WorkspaceContext }) {
       ) : null}
       <PolicyNavigation tab={tab} scheduleAccess={can(context, "schedule.types.manage")} />
       <div hidden={tab !== "rules"}>
-        <PolicyRules key={patientId} revision={attempt} settings={settings} directory={data.directory} busy={busy} locked={locked} recovery={recovery} error={error} message={message} versionKey={patientId + ":" + (editingVersion ?? data.data.version) + ":" + attempt} onStartEditing={() => { setMessage(""); setEditingVersion(data.data.version); }} save={saveSettings} />
-        <nav aria-label="Destinatários e alertas" className="hca-toolbar mt-4">
-          <Link className="hca-control hca-control--secondary" href={`/admin?section=notificationRecipients&careRecipientId=${patientId}`}><Icon name="users" />Destinatários</Link>
-          <Link className="hca-control hca-control--secondary" href={`/admin?section=alerts&careRecipientId=${patientId}`}><Icon name="bell" />Alertas de estoque</Link>
-        </nav>
+        <PolicyRules key={patientId} revision={attempt} settings={settings} directory={data.directory} busy={busy} locked={locked} recovery={recovery} error={error} message={message} globalMode={mode === "global"} versionKey={patientId + ":" + (editingVersion ?? data.data.version) + ":" + attempt} onStartEditing={() => { setMessage(""); setEditingVersion(data.data.version); }} save={saveSettings} />
       </div>
       {tab === "permissions" ? (
         <PermissionMatrix
@@ -335,15 +344,22 @@ function Policies({ context }: { context: WorkspaceContext }) {
         />
       ) : null}
       {tab === "notifications" ? (
+        <>
+        <ResidenceRuleSettings userId={context.userId} scope={{ patientId, mode, purpose: "notificationRecipient" }} />
         <NotificationMatrix
           patientId={patientId}
           version={data.data.version}
           busy={locked}
           recovery={recovery}
-          configure={configure}
+          globalMode={mode === "global"}
+          configure={(change, version) => configure("notification_rule", change, undefined, undefined, version)}
           configurationError={error}
         />
+        <FeedbackBanner>A configuração não comprova que uma mensagem foi entregue. Destino verificado, consentimento e autorização continuam necessários.</FeedbackBanner>
+        </>
       ) : null}
+      {tab === "thresholds" ? <ResidenceRuleSettings key="thresholds" userId={context.userId} scope={{ patientId, mode, purpose: "alertRule" }} /> : null}
+      {rulesArea ? <Link className="hca-control hca-control--secondary" prefetch={false} href={`/admin?careRecipientId=${patientId}`}><Icon name="back" />Voltar à administração</Link> : null}
       {tab === "people" ? (
         <>
           <section className="ui-card">

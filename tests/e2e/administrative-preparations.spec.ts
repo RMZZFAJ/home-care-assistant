@@ -3,83 +3,113 @@ import { fixtures, rpc, setup } from "../integration/v4-fixtures.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { sql, sqlLiteral as q } from "../../scripts/test-environment.mjs";
 import { selectContext } from "./auth-context";
-import { auditFromTop } from "./accessibility-audit";
+import { audit } from "./accessibility-audit";
+import { resolve } from "node:path";
+import { pathToFileURL } from "node:url";
+import { shiftWorker } from "../integration/shift-fixtures.mjs";
 import { openMembershipDetails } from "./membership-panel";
 
-async function login(page: Page, patient: string) {
+async function login(page: Page, patient: string, email = fixtures.adminA.email) {
   await page.goto("/login");
-  await page.getByLabel("E-mail", { exact: true }).fill(fixtures.adminA.email);
+  await page.getByLabel("E-mail", { exact: true }).fill(email, { timeout: 30_000 });
   await page.getByLabel("Senha", { exact: true }).fill(fixturePassword);
   await page.getByRole("button", { name: "Entrar", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Visão geral", exact: true })).toBeVisible();
   await selectContext(page, patient);
 }
 
-test("alert preparation resumes partial fields, compares a changed rule and recovers one native confirmation from the profile", async ({ page }) => {
-  test.setTimeout(120_000);
-  const f = await setup(), productId = f.products[0];
-  await login(page,f.patient);
+test("E10-06 revisa limite por custódia e recupera a resposta perdida sem rascunho", async ({ page }) => {
+  test.setTimeout(160_000);
+  const f = await setup(), product = f.products[0], account = await shiftWorker(f.patient, "admin");
+  await login(page, f.patient, account.email);
   await page.goto(`/admin?careRecipientId=${f.patient}&section=alerts`);
-  await page.getByRole("combobox",{name:"Item do catálogo",exact:true}).selectOption(productId);
-  await page.getByLabel("Limite baixo",{exact:true}).fill("7");
-  await page.getByLabel("Limite crítico",{exact:true}).fill("");
-  await page.getByRole("button",{name:"Salvar preenchimento privado",exact:true}).click();
-  await expect(page.getByText(/Preenchimento privado salvo/)).toBeVisible();
-  await page.reload();
-  await expect(page.getByLabel("Limite crítico",{exact:true})).toHaveValue("");
-  await expect(page.getByLabel("Limite baixo",{exact:true})).toHaveValue("7");
-  await expect(page.getByRole("button",{name:"Salvar regra",exact:true})).toBeEnabled();
-  await rpc(f.admin,"configure_stock_alert",{p_care_recipient_id:f.patient,p_product_id:productId,p_location:"CARE_TEAM",p_low_threshold:4,p_critical_threshold:1,p_is_enabled:true});
-  await page.getByLabel("Limite crítico",{exact:true}).fill("2");
-  await page.getByRole("checkbox",{name:"Regra habilitada",exact:true}).check();
-  await page.getByRole("button",{name:"Salvar regra",exact:true}).click();
-  await page.getByRole("button",{name:"Adotar referência atual e manter meus campos",exact:true}).click();
-  await expect(page.getByLabel("Limite baixo",{exact:true})).toHaveValue("7");
-  let sent=0;
-  await page.route("**/api/admin",async route=>{
-    if(route.request().method()!=="POST" || route.request().postDataJSON().action!=="alertRule") return route.continue();
-    sent++;
-    const response=await route.fetch();
-    expect(response.ok(),await response.text()).toBe(true);
+  await expect(page.getByRole("heading", { name: "Regras e avisos", exact: true })).toBeVisible();
+  const add = page.getByRole("button", { name: "Adicionar limite", exact: true });
+  const dialog = page.getByRole("dialog", { name: "Limite de estoque", exact: true });
+  const low = dialog.getByRole("textbox", { name: "Avisar estoque baixo a partir de", exact: true });
+  const high = dialog.getByRole("textbox", { name: "Avisar estoque crítico a partir de", exact: true });
+  const save = dialog.getByRole("button", { name: "Salvar limite", exact: true });
+  await add.click();
+  await dialog.getByRole("combobox", { name: "Material", exact: true }).selectOption(product);
+  await dialog.getByRole("combobox", { name: "Estoque", exact: true }).selectOption("CARE_TEAM");
+  await expect(low).toBeVisible();
+  await low.fill("7"); await high.fill("2");
+  await expect(dialog.getByRole("button", { name: /preenchimento privado/ })).toHaveCount(0);
+  await rpc(f.admin, "configure_stock_alert", { p_care_recipient_id: f.patient, p_product_id: product,
+    p_location: "CARE_TEAM", p_low_threshold: 4, p_critical_threshold: 1, p_is_enabled: true });
+  await save.click();
+  const rejected = page.getByRole("dialog", { name: "Não foi possível registrar a configuração", exact: true });
+  await expect(rejected).toContainText("A configuração mudou durante a edição.");
+  await rejected.getByRole("button", { name: "Voltar", exact: true }).click();
+  await dialog.getByRole("button", { name: "Consultar configuração atual", exact: true }).click();
+  await expect(low).toHaveValue(/^[4][,0]*$/);
+  await low.fill("7"); await high.fill("2");
+  let submissions = 0;
+  await page.route("**/api/admin/residence-rules", async route => {
+    if (route.request().method() !== "POST" || !route.request().postDataJSON().intent) return route.continue();
+    submissions++;
+    const response = await route.fetch();
+    expect(response.ok(), await response.text()).toBe(true);
     await route.abort("failed");
   });
-  await page.getByRole("button",{name:"Salvar regra",exact:true}).click();
-  await page.getByRole("link",{name:"Abrir recuperação no meu perfil",exact:true}).click();
-  const recovery=page.getByRole("region",{name:"Recuperar alterações administrativas",exact:true});
-  await recovery.getByRole("button",{name:"Consultar confirmação administrativa",exact:true}).click();
-  await expect(recovery.getByText("Alteração salva e auditada.",{exact:true})).toBeVisible();
-  expect(sent).toBe(1);
-  expect(sql(`select low_threshold::text from public.stock_alert_rules where care_recipient_id=${q(f.patient)} and product_id=${q(productId)};`)).toBe("7.000000");
+  await save.click();
+  await expect(page.getByRole("dialog", { name: "A resposta da configuração não chegou", exact: true })).toBeVisible();
+  await page.reload();
+  await page.getByRole("button", { name: "Conferir resultado", exact: true }).click();
+  await page.getByRole("dialog", { name: "A resposta da configuração não chegou", exact: true })
+    .getByRole("button", { name: "Conferir resultado", exact: true }).click();
+  const confirmed = page.getByRole("dialog", { name: "Limite registrado", exact: true });
+  await expect(confirmed).toContainText("O saldo foi preservado.");
+  await confirmed.getByRole("button", { name: "Concluir", exact: true }).click();
+  expect(submissions).toBe(1);
+  expect(sql(`select low_threshold::text from public.stock_alert_rules where care_recipient_id=${q(f.patient)} and product_id=${q(product)};`)).toBe("7.000000");
   expect(sql(`select count(*) from public.audit_events where action='stock.alert.configured' and metadata->>'care_recipient_id'=${q(f.patient)};`)).toBe("2");
 });
 
-test("recipient draft keeps account, channel and family opt-in through reload and exact native save",async({page})=>{
-  test.setTimeout(120_000);
-  const f=await setup();
-  await login(page,f.patient);
+test("E10-06 cadastra destinatário pendente e descarta edição voluntária sem gravar", async ({ page, browser }, info) => {
+  test.setTimeout(160_000);
+  const f = await setup(), account = await shiftWorker(f.patient, "admin");
+  await login(page, f.patient, account.email);
   await page.goto(`/admin?careRecipientId=${f.patient}&section=notificationRecipients`);
-  await page.getByRole("combobox",{name:"Conta destinatária",exact:true}).selectOption(fixtures.professional.id);
-  await page.getByRole("combobox",{name:"Grupo",exact:true}).selectOption("family");
-  await page.getByRole("checkbox",{name:"Família: receber também alertas da equipe",exact:true}).check();
-  await page.getByRole("button",{name:"Salvar preenchimento privado",exact:true}).click();
-  await expect(page.getByText(/Preenchimento privado salvo/)).toBeVisible();
-  await page.reload();
-  await expect(page.getByRole("combobox",{name:"Conta destinatária",exact:true})).toHaveValue(fixtures.professional.id);
-  await expect(page.getByRole("checkbox",{name:"Família: receber também alertas da equipe",exact:true})).toBeChecked();
-  for (const width of [320,390,768,1150,1440]) {
-    await page.setViewportSize({width,height:900});
-    await auditFromTop(page,"administrative-recipient-"+width);
-  }
-  await page.getByRole("button",{name:"Salvar destinatário",exact:true}).click();
-  await expect(page.getByRole("status").filter({hasText:"Destinatário de notificações salvo."})).toBeVisible();
+  const recipients = page.getByRole("region", { name: "Destinatários", exact: true });
+  const add = recipients.getByRole("button", { name: "Adicionar", exact: true });
+  const dialog = page.getByRole("dialog", { name: "Adicionar destinatário", exact: true });
+  await add.click();
+  await dialog.getByRole("combobox", { name: "Pessoa vinculada", exact: true }).selectOption(fixtures.professional.id);
+  await dialog.getByRole("combobox", { name: "Canal", exact: true }).selectOption("email");
+  await dialog.getByRole("textbox", { name: "Destino", exact: true }).fill("pendente@example.invalid");
+  await dialog.getByRole("switch", { name: "Receber alertas da equipe", exact: true }).check();
+  await dialog.getByRole("button", { name: "Salvar destinatário", exact: true }).click();
+  const saved = page.getByRole("dialog", { name: "Destinatário registrado", exact: true });
+  await expect(saved).toBeVisible();
+  await saved.getByRole("button", { name: "Concluir", exact: true }).click();
+  const row = recipients.getByRole("button", { name: /Teste professional.*Confirmar destino/ });
+  await row.click();
+  const editing = page.getByRole("dialog", { name: "Destinatário de avisos", exact: true });
+  await expect(editing).toContainText("E-mail aguardando confirmação");
   expect(JSON.parse(sql(`select jsonb_build_object('recipient',recipient_user_id,'include',include_team_alerts,'channel',channel) from public.recipient_notification_settings where care_recipient_id=${q(f.patient)};`)))
-    .toEqual({recipient:fixtures.professional.id,include:true,channel:"internal"});
-  await page.getByRole("button",{name:"Iniciar outro preenchimento",exact:true}).click();
-  await expect(page.getByRole("combobox",{name:"Conta destinatária",exact:true})).toHaveValue("");
-  await page.getByRole("combobox",{name:"Conta destinatária",exact:true}).selectOption(fixtures.professional.id);
-  await page.getByRole("button",{name:"Salvar destinatário",exact:true}).click();
-  await expect(page.getByRole("button",{name:"Iniciar outro preenchimento",exact:true})).toBeVisible();
-  expect(sql(`select include_team_alerts from public.recipient_notification_settings where care_recipient_id=${q(f.patient)};`)).toBe("f");
+    .toEqual({ recipient: fixtures.professional.id, include: true, channel: "email" });
+  const reference = await browser.newContext();
+  try {
+    const lab = await reference.newPage();
+    await lab.route(/^https?:/, route => route.abort());
+    await lab.goto(pathToFileURL(resolve("hca-laboratorio-04-v2-aprovado.html")).href + "#E10-06/unverified");
+    const frame = lab.locator("#device-frame");
+    for (const width of [360, 412]) {
+      await page.setViewportSize({ width, height: 900 });
+      await lab.getByRole("combobox", { name: "Visualização", exact: true }).selectOption(String(width));
+      await expect(frame.getByText("E-mail aguardando confirmação", { exact: true })).toBeVisible();
+      await audit(page, "E10-06 destinatário " + width);
+      await info.attach(`laboratório-destinatário-${width}`, { body: await frame.screenshot(), contentType: "image/png" });
+      await info.attach(`produto-destinatário-${width}`, { body: await page.screenshot(), contentType: "image/png" });
+    }
+  } finally { await reference.close(); await page.bringToFront(); }
+  await editing.getByRole("textbox", { name: "Destino", exact: true }).fill("alterado@example.invalid");
+  await editing.getByRole("button", { name: "Voltar", exact: true }).click();
+  await page.getByRole("dialog", { name: "Sair sem concluir?", exact: true }).getByRole("button", { name: "Sair e descartar", exact: true }).click();
+  await expect(row).toBeFocused();
+  await row.click();
+  await expect(editing.getByRole("textbox", { name: "Destino", exact: true })).toHaveValue("pendente@example.invalid");
   expect((await page.request.get("/api/admin?section=profiles&profilePage=1")).status()).toBe(403);
 });
 

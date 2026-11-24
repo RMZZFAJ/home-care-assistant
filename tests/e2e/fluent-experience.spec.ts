@@ -218,12 +218,12 @@ test("administração usa listas, painéis de edição e confirmação crítica 
   await page.getByRole("button", { name: "Voltar à alteração", exact: true }).click();
   await page.getByRole("dialog", { name: "Movimentar e corrigir estoque familiar", exact: true }).getByRole("button", { name: "Voltar", exact: true }).click();
   await capture(page, "permissoes-matriz", info.project.name);
-  await page.getByRole("navigation", { name: "Áreas da configuração", exact: true }).getByRole("link", { name: "Notificações", exact: true }).click();
-  await expect(page.getByRole("table", { name: "Canais por evento e função", exact: true })).toBeVisible();
+  await page.getByRole("navigation", { name: "Áreas da configuração", exact: true }).getByRole("link", { name: "Avisos", exact: true }).click();
+  await expect(page.getByRole("region", { name: "Regras de avisos", exact: true }).getByRole("button", { name: /^Requisição emitida/ })).toBeVisible();
   await capture(page, "notificacoes-matriz", info.project.name);
   await page.getByRole("navigation", { name: "Áreas da configuração", exact: true }).getByRole("link", { name: "Regras", exact: true }).click();
   await capture(page, "politicas-resumo", info.project.name);
-  await page.getByRole("button", { name: "Editar Encerramento e histórico", exact: true }).click();
+  await page.getByRole("button", { name: "Editar Arquivamento", exact: true }).click();
   await expect(page.getByLabel("Arquivar após conclusão ou cancelamento (dias)", { exact: true })).toBeVisible();
   await page.keyboard.press("Escape");
   await page.goto("/unidades?careRecipientId=" + patientA);

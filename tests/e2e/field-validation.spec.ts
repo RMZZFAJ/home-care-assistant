@@ -307,14 +307,14 @@ test("C031 política diferencia manter, alterar, branco, espaços e remover sem 
   await page.goto("/configuracoes?careRecipientId=" + f.patient);
   const packets: { change: Record<string, unknown> }[] = [];
   page.on("request", request => { if (new URL(request.url()).pathname === "/api/patient-settings" && request.method() === "POST") packets.push(request.postDataJSON()); });
-  const open = () => page.getByRole("button", { name: "Editar Comunicação e lembretes", exact: true }).click();
-  const drawer = page.getByRole("dialog", { name: "Comunicação e lembretes", exact: true });
+  const open = () => page.getByRole("button", { name: "Editar Mensagens e lembretes", exact: true }).click();
+  const drawer = page.getByRole("dialog", { name: "Mensagens e lembretes", exact: true });
   const mode = drawer.getByRole("combobox", { name: "O que fazer com o nome curto", exact: true });
   const name = drawer.getByRole("textbox", { name: "Nome curto nas mensagens", exact: true });
   const save = drawer.getByRole("button", { name: "Registrar política", exact: true });
   await open(); await expect(mode).toHaveValue("keep"); await expect(name).toBeDisabled(); await save.click();
   await expect(drawer).toHaveCount(0); expect(state(f.patient).settings.patientShortName).toBe("Nome anterior");
-  await expect(page.getByRole("button", { name: "Editar Comunicação e lembretes", exact: true })).toBeFocused();
+  await expect(page.getByRole("button", { name: "Editar Mensagens e lembretes", exact: true })).toBeFocused();
   expect(Object.hasOwn(packets[0].change, "patientShortName")).toBe(false);
   await open(); await mode.selectOption("change");
   const before = count(f.patient);
@@ -327,11 +327,11 @@ test("C031 política diferencia manter, alterar, branco, espaços e remover sem 
   for (const width of [1440, 768, 390, 320]) { await page.setViewportSize({ width, height: 900 }); await fieldGeometry(drawer, "C031-controles-" + width); await audit(page, "C031-nome-curto-" + width); }
   await capture(page, "C031-nome-curto", info.project.name);
   await name.fill("  Nome novo  "); await save.click(); await expect(drawer).toHaveCount(0);
-  await expect(page.getByRole("button", { name: "Editar Comunicação e lembretes", exact: true })).toBeFocused();
+  await expect(page.getByRole("button", { name: "Editar Mensagens e lembretes", exact: true })).toBeFocused();
   expect(state(f.patient).settings.patientShortName).toBe("Nome novo");
   expect(packets[1].change.patientShortName).toBe("Nome novo");
   await open(); await mode.selectOption("remove"); await expect(name).toBeDisabled(); await save.click(); await expect(drawer).toHaveCount(0);
-  await expect(page.getByRole("button", { name: "Editar Comunicação e lembretes", exact: true })).toBeFocused();
+  await expect(page.getByRole("button", { name: "Editar Mensagens e lembretes", exact: true })).toBeFocused();
   expect(state(f.patient).settings.patientShortName).toBeNull();
   expect(packets).toHaveLength(3); expect(packets[2].change.patientShortName).toBeNull();
   expect(state(other.patient)).toEqual(otherBefore);

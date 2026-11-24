@@ -1,266 +1,134 @@
 "use client";
-import { TableFrame } from "@/components/ui/table-frame";
-import { ActionButton, CheckboxField, DataTable, DataTableBody, DataTableCell, DataTableHead, DataTableHeading, DataTableRow, SelectField, TextInput } from "@/components/ui/controls";
-import { useEffect, useRef, useState, type ReactNode } from "react";
-import { api, ApiError, inputClass, Notice } from "@/components/workspace";
-import { documentEventLabel } from "@/lib/notifications/event-labels";
-import { roles } from "./admin-fields";
-import { HelpTooltip } from "@/components/ui/floating";
-import { Icon } from "@/components/ui/primitives";
+
+import { useEffect, useId, useState, type FormEvent, type ReactNode } from "react";
 import { RecordDrawer } from "@/components/forms/record-drawer";
+import { ActionButton, CheckboxField, FormField, LoadingIndicator, Pill, SelectField, TextInput } from "@/components/ui/controls";
+import { FeedbackBanner } from "@/components/ui/feedback";
+import { Icon } from "@/components/ui/primitives";
+import { api } from "@/lib/client/api";
+import { documentEventLabel } from "@/lib/notifications/event-labels";
+import { useLiveRevision } from "@/lib/use-live-revision";
+import { roles } from "./admin-fields";
+
 type Rule = {
-  event: string;
-  subject_role: string;
-  channels: string[];
-  include_pdf: boolean;
-  cooldown_minutes: number;
-  quiet_start: number | null;
-  quiet_end: number | null;
-  mode: string;
+  event: string; subject_role: string; channels: string[]; include_pdf: boolean;
+  cooldown_minutes: number; quiet_start: number | null; quiet_end: number | null; mode: string;
 };
-type Data = {
-  rules: Rule[];
-  channels: { code: string; label: string }[];
-  events: string[];
-  eventChannels?: Record<string, string[]>;
-};
-export function NotificationMatrix({
-  patientId,
-  version,
-  busy,
-  configure,
-  configurationError = "",
-  recovery,
-}: {
-  patientId: string;
-  version: number;
-  busy: boolean;
-  configure: (
-    kind: string,
-    change: Record<string, unknown>,
-  ) => Promise<boolean>;
-  configurationError?: string;
-  recovery?: ReactNode;
+type Data = { rules: Rule[]; channels: { code: string; label: string }[]; events: string[]; eventChannels?: Record<string, string[]> };
+type Editor = { event: string; role: string; opener: HTMLElement; data: Data; version: number };
+const defaultChannels = [{ code: "internal", label: "Aplicativo" }, { code: "email", label: "E-mail" }, { code: "whatsapp", label: "WhatsApp" }];
+
+function availableChannels(data: Data, event: string) {
+  return data.channels.filter(channel => !data.eventChannels || data.eventChannels[event]?.includes(channel.code));
+}
+
+export function NotificationMatrix({ patientId, version, busy, configure, configurationError, recovery, globalMode }: {
+  patientId: string; version: number; busy: boolean; globalMode: boolean;
+  configure: (change: Record<string, unknown>, expectedVersion: number) => Promise<boolean>;
+  configurationError?: string; recovery?: ReactNode;
 }) {
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState("");
-  const [editor, setEditor] = useState<{ event: string; role: string; opener: HTMLElement } | null>(null);
-  const [data, setData] = useState<Data | null>(null);
+  const [editor, setEditor] = useState<Editor | null>(null);
+  const [snapshot, setSnapshot] = useState<{ data: Data; version: number } | null>(null);
   const [error, setError] = useState("");
-  const [readAttempt, setReadAttempt] = useState(0);
-  const [reading, setReading] = useState(true);
-  const savingRef = useRef(false);
-  const [pending, setPending] = useState(false);
+  const [attempt, setAttempt] = useState(0);
+  const revision = useLiveRevision();
+  const url = `/api/notification-rules?careRecipientId=${patientId}`;
   useEffect(() => {
-    if (savingRef.current) return;
     const controller = new AbortController();
-    queueMicrotask(() => { if (!controller.signal.aborted) setReading(true); });
-    void api<Data>(
-      "/api/notification-rules?careRecipientId=" + patientId,
-      undefined,
-      controller.signal,
-    )
-      .then((result) => {
-        if (!controller.signal.aborted) {
-          setData(result);
-          setError("");
-        }
-      })
-      .catch((reason) => {
-        if (!controller.signal.aborted) {
-          if (reason instanceof ApiError && [401, 403, 404].includes(reason.status)) setData(null);
-          setError(reason.message);
-        }
-      })
-      .finally(() => {
-        if (!controller.signal.aborted) setReading(false);
-      });
-    return () => controller.abort();
-  }, [patientId, version, readAttempt]);
-  if (!data)
-    return (
-      <Notice error={Boolean(error)}>
-        {error || "Carregando matriz de notificações…"}
-        {error ? <ActionButton disabled={reading} onClick={() => setReadAttempt(value => value + 1)}>Consultar regras de avisos novamente</ActionButton> : null}
-      </Notice>
-    );
-  const update = async (
-    event: string,
-    role: string,
-    patch: Record<string, unknown>,
-  ) => {
-    const current = data.rules.find(
-      (row) => row.event === event && row.subject_role === role,
-    );
-    if (busy || reading || error || savingRef.current) return;
-    savingRef.current = true;
-    setPending(true);
-    setError("");
-    const optimistic: Rule = {
-      event,
-      subject_role: role,
-      channels: current?.channels ?? ["internal"],
-      include_pdf: current?.include_pdf ?? true,
-      cooldown_minutes: current?.cooldown_minutes ?? 0,
-      quiet_start: current?.quiet_start ?? null,
-      quiet_end: current?.quiet_end ?? null,
-      mode: current?.mode ?? "optional",
-      ...current,
-      ...(patch.cooldownMinutes !== undefined
-        ? { cooldown_minutes: Number(patch.cooldownMinutes) }
-        : {}),
-      ...(patch.quietStart !== undefined
-        ? { quiet_start: patch.quietStart as number | null }
-        : {}),
-      ...(patch.quietEnd !== undefined
-        ? { quiet_end: patch.quietEnd as number | null }
-        : {}),
-      ...(patch.channels ? { channels: patch.channels as string[] } : {}),
-      ...(patch.includePdf !== undefined
-        ? { include_pdf: Boolean(patch.includePdf) }
-        : {}),
-      ...(patch.mode ? { mode: String(patch.mode) } : {}),
-    };
-    setData({
-      ...data,
-      rules: [
-        ...data.rules.filter(
-          (row) => row.event !== event || row.subject_role !== role,
-        ),
-        optimistic,
-      ],
+    void api<Data>(url, undefined, controller.signal).then(data => {
+      if (!controller.signal.aborted) { setSnapshot({ data, version }); setError(""); }
+    }).catch(reason => {
+      if (!controller.signal.aborted) { setSnapshot(null); setError(reason instanceof Error ? reason.message : "Não foi possível carregar as regras de avisos."); }
     });
-    try {
-      await configure("notification_rule", {
-        event,
-        role,
-        channels: current?.channels ?? ["internal"],
-        includePdf: current?.include_pdf ?? true,
-        cooldownMinutes: current?.cooldown_minutes ?? 0,
-        quietStart: current?.quiet_start ?? null,
-        quietEnd: current?.quiet_end ?? null,
-        mode: current?.mode ?? "optional",
-        ...patch,
-      });
-      const authoritative = await api<Data>(
-        "/api/notification-rules?careRecipientId=" + patientId,
-      );
-      setData(authoritative);
-    } catch {
-      setError(
-        "Não foi possível confirmar a configuração. Recarregue a matriz antes de continuar.",
-      );
-    } finally {
-      savingRef.current = false;
-      setPending(false);
-    }
-  };
-  const columns = Object.entries(roles).filter(([role]) => !roleFilter || role === roleFilter);
-  const available = (event: string) => data.channels.filter((channel) => !data.eventChannels || data.eventChannels[event]?.includes(channel.code));
-  return <section aria-label="Matriz de notificações" className="ui-card hca-admin-card">
-    {error ? <Notice error>{error} <ActionButton disabled={reading} onClick={() => setReadAttempt(value => value + 1)}>Consultar regras de avisos novamente</ActionButton></Notice> : null}
-    {reading ? <p role="status">Consultando regras de avisos…</p> : null}
-    <div className="hca-section-heading"><div><h2>Eventos × funções · múltiplos canais</h2><p>Canais disponíveis conforme o provedor; destino verificado, consentimento e autorização continuam obrigatórios.</p></div></div>
-    <div className="hca-toolbar"><TextInput type="search" aria-label="Pesquisar eventos de notificação" placeholder="Buscar evento" leading={<Icon name="search" />} value={search} onChange={controlEvent => { const controlValue = controlEvent.currentTarget.value; return setSearch(controlValue); }} /><SelectField aria-label="Função nas notificações" value={roleFilter} onChange={(event) => setRoleFilter(event.target.value)}><option value="">Todas as funções</option>{Object.entries(roles).map(([role, label]) => <option key={role} value={role}>{label}</option>)}</SelectField></div>
-    <TableFrame className="hca-records hca-matrix-scroll" label="Tabela de notificações; rolagem horizontal por função"><DataTable className="hca-table hca-matrix" aria-label="Canais por evento e função"><DataTableHead><DataTableRow><DataTableHeading>Evento</DataTableHeading>{columns.map(([role, label]) => <DataTableHeading key={role}>{label}</DataTableHeading>)}</DataTableRow></DataTableHead><DataTableBody>{data.events.filter((event) => documentEventLabel(event).toLocaleLowerCase("pt-BR").includes(search.toLocaleLowerCase("pt-BR"))).map((event) => <DataTableRow key={event}><DataTableCell className="hca-matrix-name"><h3>{documentEventLabel(event)}</h3></DataTableCell>{columns.map(([role, label]) => {
-      const rule = data.rules.find((row) => row.event === event && row.subject_role === role), selected = rule?.channels ?? ["internal"];
-      return <DataTableCell key={role}><div className="hca-channel-cell">{available(event).map((channel) => <HelpTooltip key={channel.code} content={channel.label}><CheckboxField className="hca-channel-checkbox" label={<Icon name={channel.code === "internal" ? "bell" : channel.code === "email" ? "forms" : "team"} />} aria-label={documentEventLabel(event) + " · " + label + " · " + channel.label} disabled={busy || pending || reading || Boolean(error)} checked={selected.includes(channel.code)} onChange={controlEvent => { const controlValue = controlEvent.currentTarget.checked; return void update(event, role, { channels: controlValue ? [...selected, channel.code] : selected.filter((code) => code !== channel.code) }); }} /></HelpTooltip>)}<ActionButton variant="quiet"  aria-label={"Opções de " + documentEventLabel(event) + " · " + label} disabled={busy || pending || reading || Boolean(error)} onClick={(value) => setEditor({ event, role, opener: value.currentTarget })} >{<Icon name="more" />}</ActionButton></div>
-      {editor?.event === event && editor.role === role ? <RecordDrawer title={documentEventLabel(event) + " · " + label} onClose={() => setEditor(null)} busy={busy || pending} recovery={recovery} restoreFocusTo={editor.opener} trackChanges={false}>{error || configurationError ? <Notice error>{error || configurationError}</Notice> : null}<div className="hca-form"><p className="hca-field-hint">Cada alteração é salva e confirmada pelo servidor.</p>
-                      <label className="block text-xs">
-                        Comportamento
-                        <select
-                          className={inputClass}
-                          disabled={busy || pending || reading || Boolean(error)}
-                          value={rule?.mode ?? "optional"}
-                          onChange={(change) =>
-                            update(event, role, { mode: change.target.value })
-                          }
-                        >
-                          <option value="optional">
-                            Conforme preferências pessoais
-                          </option>
-                          <option value="required">
-                            Obrigatório no aplicativo
-                          </option>
-                          <option value="silent">
-                            Silencioso no aplicativo
-                          </option>
-                        </select>
-                      </label>
-                      <label className="flex min-h-11 items-center gap-2 text-xs">
-                        <input
-                          type="checkbox"
-                          disabled={
-                            busy || pending || event === "req.registered_author"
-                          }
-                          checked={
-                            event !== "req.registered_author" &&
-                            (rule?.include_pdf ?? true)
-                          }
-                          onChange={(change) =>
-                            update(event, role, {
-                              includePdf: change.target.checked,
-                            })
-                          }
-                        />
-                        Incluir PDF compatível
-                      </label>
-                      <label className="block text-xs">
-                        Intervalo mínimo (min)
-                        <input
-                          type="number"
-                          className={inputClass}
-                          min={0}
-                          max={10080}
-                          disabled={busy || pending || reading || Boolean(error)}
-                          key={rule?.cooldown_minutes ?? 0}
-                          defaultValue={rule?.cooldown_minutes ?? 0}
-                          onBlur={async (change) => {
-                            if (
-                              change.target.checkValidity() &&
-                              Number(change.target.value) !==
-                                (rule?.cooldown_minutes ?? 0)
-                            )
-                              await update(event, role, {
-                                cooldownMinutes: Number(change.target.value),
-                              });
-                          }}
-                        />
-                      </label>
-                      <p className="mt-2 text-xs">
-                        Silêncio externo (hora de Brasília). Avisos no
-                        aplicativo continuam disponíveis.
-                      </p>
-                      {["quiet_start", "quiet_end"].map((field, index) => (
-                        <label className="block text-xs" key={field}>
-                          {index ? "Fim" : "Início"}
-                          <select
-                            className={inputClass}
-                            disabled={busy || pending || reading || Boolean(error)}
-                            aria-label={index ? "Fim" : "Início"}
-                            value={
-                              rule?.[field as "quiet_start" | "quiet_end"] ?? ""
-                            }
-                            onChange={(change) =>
-                              update(event, role, {
-                                [index ? "quietEnd" : "quietStart"]:
-                                  change.target.value === ""
-                                    ? null
-                                    : Number(change.target.value),
-                              })
-                            }
-                          >
-                            <option value="">Não configurado</option>
-                            {Array.from({ length: 24 }, (_, hour) => (
-                              <option key={hour} value={hour}>
-                                {hour}:00
-                              </option>
-                            ))}
-                          </select>
-                        </label>
-                      ))}
+    return () => controller.abort();
+  }, [url, version, attempt, revision]);
+  const data = snapshot?.data;
+  const searchText = search.trim().toLocaleLowerCase("pt-BR");
+  const events = data?.events.filter(event => documentEventLabel(event).toLocaleLowerCase("pt-BR").includes(searchText)) ?? [];
+  return <>
+    <section aria-label="Regras de avisos" className="hca-residence-admin-section hca-residence-rules">
+      <header><h2>Regras de avisos</h2></header>
+      {error ? <FeedbackBanner tone="error">{error} <ActionButton onClick={() => { setError(""); setAttempt(n => n + 1); }}>Consultar regras de avisos novamente</ActionButton></FeedbackBanner>
+        : !snapshot || !data ? <p role="status" className="hca-residence-rules-empty"><LoadingIndicator compact /> Carregando regras de avisos…</p> : <>
+          <div className="hca-toolbar hca-notice-rules-filter">
+            <TextInput type="search" aria-label="Pesquisar eventos de notificação" placeholder="Buscar evento" leading={<Icon name="search" />} value={search} onChange={event => setSearch(event.currentTarget.value)} />
+            <SelectField aria-label="Função nas notificações" value={roleFilter} onChange={event => setRoleFilter(event.currentTarget.value)}>
+              <option value="">Todas as funções</option>{Object.entries(roles).map(([role, label]) => <option key={role} value={role}>{label}</option>)}
+            </SelectField>
+          </div>
+          <div>{events.length ? events.map(event => {
+            const eventRules = data.rules.filter(rule => rule.event === event && (!roleFilter || rule.subject_role === roleFilter));
+            const roleNames = [...new Set(eventRules.map(rule => roles[rule.subject_role as keyof typeof roles]))];
+            const channels = availableChannels(data, event).filter(channel => eventRules.length ? eventRules.some(rule => rule.channels.includes(channel.code)) : channel.code === "internal");
+            const summary = [roleFilter ? roles[roleFilter as keyof typeof roles] : roleNames.join(", ") || "Configuração padrão", ...channels.map(channel => channel.label)].join(" · ");
+            return <button key={event} type="button" className="hca-guide-row" disabled={busy || snapshot.version !== version}
+              onClick={action => setEditor({ event, role: roleFilter || eventRules[0]?.subject_role || "family", opener: action.currentTarget, data, version: snapshot.version })}>
+              <span className="hca-guide-row-icon"><Icon name={event === "stock.alert" ? "box" : "bell"} /></span>
+              <span className="hca-guide-row-label"><strong>{documentEventLabel(event)}</strong><small>{summary}</small></span><Icon name="chevron" width={15} height={15} />
+            </button>;
+          }) : <p className="hca-residence-rules-empty">Nenhum evento corresponde à busca.</p>}</div>
+        </>}
+    </section>
+    {editor ? <NoticeRuleEditor editor={editor} setRole={role => setEditor({ ...editor, role })} globalMode={globalMode}
+      stale={snapshot?.version !== editor.version || version !== editor.version} reload={snapshot?.version === version
+        ? () => setEditor({ ...editor, data: snapshot.data, version: snapshot.version }) : undefined}
+      busy={busy} configurationError={configurationError} recovery={recovery} onClose={() => setEditor(null)}
+      onSave={async change => { if (await configure(change, editor.version)) { setEditor(null); setAttempt(n => n + 1); } }} /> : null}
+  </>;
+}
 
-      </div></RecordDrawer> : null}</DataTableCell>;
-    })}</DataTableRow>)}</DataTableBody></DataTable></TableFrame>
-  </section>;
+function NoticeRuleEditor({ editor, setRole, globalMode, busy, stale, reload, configurationError, recovery, onClose, onSave }: {
+  editor: Editor; setRole: (value: string) => void; globalMode: boolean; busy: boolean;
+  stale: boolean; reload?: () => void;
+  configurationError?: string; recovery?: ReactNode; onClose: () => void; onSave: (change: Record<string, unknown>) => Promise<void>;
+}) {
+  const { event, role, data } = editor;
+  const formId = useId();
+  const current = data.rules.find(rule => rule.event === event && rule.subject_role === role);
+  const available = availableChannels(data, event);
+  const visibleChannels = defaultChannels.map(channel => available.find(candidate => candidate.code === channel.code) ?? channel)
+    .concat(available.filter(channel => !defaultChannels.some(candidate => candidate.code === channel.code)));
+  const selected = current?.channels ?? ["internal"];
+  const supportsPdf = event !== "req.registered_author";
+  async function submit(eventSubmit: FormEvent<HTMLFormElement>) {
+    eventSubmit.preventDefault();
+    if (busy || stale) return;
+    const form = new FormData(eventSubmit.currentTarget);
+    const hour = (name: string) => form.get(name) === "" ? null : Number(form.get(name));
+    const channels = [...selected.filter(code => !available.some(channel => channel.code === code)), ...form.getAll("channel")];
+    await onSave({ event, role, channels, includePdf: supportsPdf && form.has("includePdf"),
+      cooldownMinutes: Number(form.get("cooldown")), quietStart: hour("quietStart"), quietEnd: hour("quietEnd"), mode: form.get("mode") });
+  }
+  return <RecordDrawer title={documentEventLabel(event)} subtitle={`Regra para a função ${roles[role as keyof typeof roles]}`}
+    kicker="Organização da residência" popupClassName="hca-preference-sheet hca-residence-settings-sheet"
+    headingIcon="bell" restoreFocusTo={editor.opener} busy={busy && !recovery} onClose={onClose} keyboardScrollable exitDialog
+    footer={close => <><ActionButton onClick={close}>Voltar</ActionButton><ActionButton variant="primary" type="submit" form={formId} disabled={busy || stale}>
+      <Icon name="check" />{globalMode ? "Propor regra" : "Salvar regra"}</ActionButton></>}>
+    {configurationError ? <FeedbackBanner tone="error">{configurationError}</FeedbackBanner> : null}{recovery}
+    {stale ? <FeedbackBanner tone="warning">A configuração mudou durante a edição. {reload ? <ActionButton onClick={reload}>Abrir versão atual</ActionButton> : null}</FeedbackBanner> : null}
+    <FormField label="Função"><SelectField value={role} disabled={busy} onChange={value => setRole(value.currentTarget.value)}>
+      {Object.entries(roles).map(([code, label]) => <option key={code} value={code}>{label}</option>)}
+    </SelectField></FormField>
+    <form key={`${role}:${editor.version}`} id={formId} className="hca-form" onSubmit={submit}>
+      <fieldset disabled={busy || stale} className="hca-form min-w-0">
+      <FormField label="Comportamento no aplicativo"><SelectField name="mode" defaultValue={current?.mode ?? "optional"}>
+        <option value="optional">Conforme preferência pessoal</option><option value="required">Obrigatório no aplicativo</option><option value="silent">Silencioso no aplicativo</option>
+      </SelectField></FormField>
+      {visibleChannels.map(channel => available.some(candidate => candidate.code === channel.code)
+        ? <CheckboxField key={channel.code} className="hca-setting-switch" role="switch" name="channel" value={channel.code} label={channel.label} defaultChecked={selected.includes(channel.code)} />
+        : <div key={channel.code} className="hca-notice-channel-disabled"><span>{channel.label}<small>Canal indisponível para este evento no contexto atual</small></span><Pill tone="neutral">Indisponível</Pill></div>)}
+      <CheckboxField className="hca-setting-switch" role="switch" name="includePdf" label="Incluir o arquivo quando disponível" disabled={!supportsPdf} defaultChecked={supportsPdf && (current?.include_pdf ?? true)} />
+      <FormField label="Intervalo mínimo entre avisos (minutos)"><TextInput name="cooldown" type="number" min={0} max={10080} required defaultValue={current?.cooldown_minutes ?? 0} /></FormField>
+      <fieldset className="hca-form"><legend>Silêncio externo (hora de Brasília)</legend>
+        {([ ["quietStart", "Início", current?.quiet_start], ["quietEnd", "Fim", current?.quiet_end] ] as const).map(([name, label, value]) =>
+          <FormField key={name} label={label}><SelectField name={name} defaultValue={value ?? ""}>
+            <option value="">Não configurado</option>{Array.from({ length: 24 }, (_, hour) => <option key={hour} value={hour}>{hour}:00</option>)}
+          </SelectField></FormField>)}
+      </fieldset>
+      <p className="hca-field-hint">Uma regra obrigatória no aplicativo não dispensa consentimento para um canal externo.</p>
+      </fieldset>
+    </form>
+  </RecordDrawer>;
 }

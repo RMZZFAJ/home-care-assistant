@@ -12,8 +12,6 @@ const areas: { section: string; title: string; description: string; group: strin
   { section: "memberships", title: "Pessoas e vínculos", description: "Funções locais e situação dos vínculos.", group: "Organização", capability: "access.manage", icon: "team" },
   { section: "invitations", title: "Convites", description: "Convites, reemissão e aceite das contas.", group: "Organização", capability: "access.manage", icon: "plus" },
   { section: "catalog", title: "Catálogo", description: "Produtos e apresentações administrados pela família.", group: "Materiais", capability: "catalog.manage", icon: "stock" },
-  { section: "alerts", title: "Alertas de estoque", description: "Limites de saldo por custódia e produto.", group: "Materiais", capability: "access.manage", icon: "bell" },
-  { section: "notificationRecipients", title: "Destinatários", description: "Destinos pessoais e preferências de comunicação.", group: "Comunicação e controle", capability: "access.manage", icon: "team" },
   { section: "notifications", title: "Fila de notificações", description: "Acompanhar envios, falhas e reprocessamentos.", group: "Comunicação e controle", capability: "access.manage", icon: "bell" },
   { section: "audit", title: "Auditoria", description: "Eventos e responsáveis preservados no histórico.", group: "Comunicação e controle", capability: "audit.read", icon: "history" },
   { section: "import", title: "Importação histórica", description: "Pré-validar e incorporar fontes físicas revisadas.", group: "Comunicação e controle", capability: "access.manage", icon: "upload" },

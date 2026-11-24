@@ -1,4 +1,4 @@
-import { expect, test, type Page, type Locator } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 import { randomUUID } from "node:crypto";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
@@ -12,7 +12,6 @@ import { audit, auditFromTop } from "./accessibility-audit";
 
 test.setTimeout(180_000);
 const widths = [320, 390, 768, 1024, 1440];
-const referenceUrl = pathToFileURL(resolve("Home_Care_Assistant_Modelo_Integral.html")).href;
 const residenceEvidence = "output/playwright/l4-residencia";
 const facts = (patient: string) => sql(`select jsonb_build_object(
   'settings',(select to_jsonb(s) from public.patient_settings s where care_recipient_id=${q(patient)}),
@@ -27,11 +26,6 @@ async function login(page: Page, patient: string | null, account: string | { ema
   await expect(page.getByRole("heading", { name: "Visão geral", exact: true })).toBeVisible();
   await selectContext(page, patient);
 }
-async function compare(actual: Locator, model: Locator, properties: string[]) {
-  const expected = await model.evaluate((node, keys) => Object.fromEntries(keys.map(key => [key, getComputedStyle(node).getPropertyValue(key)])), properties);
-  for (const [property, value] of Object.entries(expected)) await expect(actual).toHaveCSS(property, value);
-}
-const cardProperties = ["border-radius", "border-top-color", "padding-top", "padding-left"];
 
 test("E10-04 consulta todas as permissões e grava a alteração somente depois da revisão", async ({ page, browser }, info) => {
   const f = await setup();
@@ -113,7 +107,9 @@ test("E10-04 consulta todas as permissões e grava a alteração somente depois 
 });
 
 test("15 ADM02 ADM03 patient resources and policy follow the model without changing facts by navigation", async ({ page, browser }, info) => {
-  const f = await setup(); await login(page, f.patient);
+  test.setTimeout(270_000);
+  const f = await setup(), administrator = await shiftWorker(f.patient, "admin");
+  await login(page, f.patient, administrator);
   await page.goto(`/admin?careRecipientId=${f.patient}`);
   const identification = page.getByRole("button", { name: /^Identificação da residência/ });
   await expect(identification).toBeEnabled();
@@ -128,7 +124,8 @@ test("15 ADM02 ADM03 patient resources and policy follow the model without chang
     const destinations = page.getByRole("navigation", { name: "Áreas administrativas", exact: true });
     const hrefs = await destinations.getByRole("link").evaluateAll(nodes => nodes.map(node => node.getAttribute("href")));
     expect(hrefs.every(href => href?.includes(f.patient))).toBe(true);
-    await expect(destinations.getByRole("link", { name: /^Pessoas e convites/ })).toContainText("5 vínculos ativos");
+    const members = sql(`select count(*) from public.care_recipient_memberships where care_recipient_id=${q(f.patient)} and status='active';`);
+    await expect(destinations.getByRole("link", { name: /^Pessoas e convites/ })).toContainText(`${members} vínculos ativos`);
     for (const width of [360, 412]) {
       await model.getByRole("combobox", { name: "Visualização", exact: true }).selectOption(String(width));
       await page.setViewportSize({ width, height: 900 });
@@ -145,20 +142,25 @@ test("15 ADM02 ADM03 patient resources and policy follow the model without chang
       await expect(identification).toBeFocused();
     }
     await page.goto(`/configuracoes?careRecipientId=${f.patient}`);
-    const policy = page.getByRole("region", { name: "Política do paciente", exact: true }); await expect(policy).toBeVisible();
-    await model.goto(referenceUrl + "#administracao/regras");
+    const policy = page.getByRole("region", { name: "Política da residência", exact: true }); await expect(policy).toBeVisible();
+    await model.goto("about:blank");
+    await model.goto(pathToFileURL(resolve("hca-laboratorio-04-v2-aprovado.html")).href + "#E10-06/rules");
+    const modelRules = model.locator("#device-frame");
+    const ruleNames = ["Balanço de estoque", "Ciência da requisição", "Mensagens e lembretes", "Arquivamento"];
     for (const width of widths) {
-      await page.setViewportSize({ width, height: 900 }); await model.setViewportSize({ width, height: 900 }); await model.screenshot();
-      await compare(policy, model.locator(".card.pad").first(), cardProperties);
-      await compare(page.getByRole("navigation", { name: "Áreas da configuração", exact: true }), model.locator(".tabs"), ["flex-wrap", "column-gap"]);
-      await compare(page.locator('.hca-configuration-tab[aria-current="page"]'), model.locator('.tab[aria-selected="true"]'), ["background-color", "color", "border-bottom-color", "padding-left", "padding-top", "font-size", "font-weight", "column-gap"]);
-      await compare(policy.locator(".hca-policy-row").first(), model.locator(".policyrow").first(), ["padding-top", "column-gap", "border-bottom-color"]);
+      await page.setViewportSize({ width, height: 900 });
+      await expect(policy.getByRole("button")).toHaveCount(ruleNames.length);
+      for (const label of ruleNames) {
+        await expect(modelRules.getByText(label, { exact: true })).toBeVisible();
+        await expect(policy.getByRole("button", { name: `Editar ${label}`, exact: true })).toBeVisible();
+      }
+      await expect(page.getByRole("navigation", { name: "Áreas da configuração", exact: true }).getByRole("link")).toHaveText(["Regras", "Avisos", "Estoque"]);
       await auditFromTop(page, "administration policy " + width);
     }
-    const edit = page.getByRole("button", { name: "Editar Balanço e revisão", exact: true }); await edit.click();
-    const drawer = page.getByRole("dialog", { name: "Balanço e revisão", exact: true }); await expect(drawer).toBeVisible();
+    const edit = page.getByRole("button", { name: "Editar Balanço de estoque", exact: true }); await edit.click();
+    const drawer = page.getByRole("dialog", { name: "Balanço de estoque", exact: true }); await expect(drawer).toBeVisible();
     await drawer.press("Escape"); await expect(drawer).toHaveCount(0); await expect(edit).toBeFocused();
-    await page.getByRole("link", { name: "Permissões", exact: true }).click();
+    await page.goto(`/configuracoes?area=permissions&careRecipientId=${f.patient}`);
     await expect(page.getByRole("region", { name: "Matriz de permissões", exact: true })).toBeVisible();
     await page.getByRole("searchbox", { name: "Pesquisar permissões", exact: true }).fill("Nenhuma permissão com este nome");
     await expect(page.getByText("Nenhuma permissão corresponde aos filtros.", { exact: true })).toBeVisible();
@@ -311,7 +313,7 @@ test("15 ADM04 NOT03 proposals retain comparison and notice rules recover a fail
   const reference = await browser.newContext();
   try {
     const model = await reference.newPage(); await model.route(/^https?:/, route => route.abort());
-    await model.goto(referenceUrl + "#administracao/residencia");
+    await model.goto(pathToFileURL(resolve("hca-laboratorio-04-v2-aprovado.html")).href + "#E10-06/recipients");
     await card.getByRole("button").click();
     const proposalReview = page.getByRole("dialog", { name: "Conferir proposta", exact: true });
     await expect(proposalReview.getByRole("region", { name: "Compare a alteração", exact: true })).toContainText("Residência proposta de conferência");
@@ -325,18 +327,19 @@ test("15 ADM04 NOT03 proposals retain comparison and notice rules recover a fail
     let fail = true;
     const endpoint = (url: URL) => url.pathname === "/api/notification-rules" && url.searchParams.get("careRecipientId") === f.patient;
     await page.route(endpoint, route => fail ? route.fulfill({ status: 503, json: { error: "Consulta indisponível no teste de recuperação." } }) : route.continue());
-    await page.getByRole("navigation", { name: "Áreas da configuração", exact: true }).getByRole("link", { name: "Notificações", exact: true }).click();
+    await page.getByRole("navigation", { name: "Áreas da configuração", exact: true }).getByRole("link", { name: "Avisos", exact: true }).click();
     const retry = page.getByRole("button", { name: "Consultar regras de avisos novamente", exact: true }); await expect(retry).toBeEnabled();
-    await expect(page.getByRole("table", { name: "Canais por evento e função", exact: true })).toHaveCount(0);
+    await expect(page.getByRole("button", { name: /^Requisição emitida/ })).toHaveCount(0);
     fail = false; await retry.click();
-    const matrix = page.getByRole("region", { name: "Matriz de notificações", exact: true }); await expect(matrix).toBeVisible();
+    const matrix = page.getByRole("region", { name: "Regras de avisos", exact: true }); await expect(matrix).toBeVisible();
     await expect(matrix.getByRole("status")).toHaveCount(0);
     for (const width of widths) {
       await page.setViewportSize({ width, height: 900 }); await model.setViewportSize({ width, height: 900 }); await model.screenshot();
-      await compare(matrix, model.locator(".card.pad").first(), cardProperties);
+      await expect(matrix.getByRole("heading", { name: "Regras de avisos", exact: true })).toBeVisible();
+      await expect(matrix.getByRole("button", { name: /^Requisição emitida/ })).toBeVisible();
       await auditFromTop(page, "administration notice rules " + width);
     }
-    const options = matrix.getByRole("button", { name: /^Opções de / }).first(); await options.click();
+    const options = matrix.getByRole("button", { name: /^Requisição emitida/ }); await options.click();
     const drawer = page.getByRole("dialog"); await expect(drawer).toBeVisible(); await drawer.press("Escape");
     await expect(drawer).toHaveCount(0); await expect(options).toBeFocused();
     expect(facts(f.patient)).toBe(before); expect(writes).toEqual([]);

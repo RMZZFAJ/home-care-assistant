@@ -60,8 +60,9 @@ function currentSettingsLink(change: GovernanceProposal) {
   else if (change.kind === "membership") return "/admin?section=memberships&" + params;
   else if (change.kind === "administration") {
     const sections: Record<string, string> = { recipient: "residence", product: "catalog", adoptProduct: "catalog",
-      membershipStatus: "memberships", alertRule: "alerts", notificationRecipient: "notificationRecipients" };
+      membershipStatus: "memberships" };
     const name = change.proposed.operation;
+    if (name === "alertRule" || name === "notificationRecipient") params.set("area", name === "alertRule" ? "thresholds" : "notifications");
     if (typeof name === "string" && Object.hasOwn(sections, name)) return "/admin?section=" + sections[name] + "&" + params;
   }
   return "/configuracoes?" + params;

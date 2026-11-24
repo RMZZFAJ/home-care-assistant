@@ -96,18 +96,23 @@ test("V4 review: matriz reconcilia horários, intervalo, versões e falhas sem s
     await expect(page.getByText("Arquivamento 7 dias após conclusão ou cancelamento", { exact: true })).toBeVisible();
     await revisePolicy({ archiveDays: 8 });
     await expect(page.getByText("Arquivamento 8 dias após conclusão ou cancelamento", { exact: true })).toBeVisible({ timeout: 45000 });
-    await page.getByRole("button", { name: "Editar Comunicação e lembretes", exact: true }).click();
+    await page.getByRole("button", { name: "Editar Mensagens e lembretes", exact: true }).click();
     await page.getByLabel("Primeiro lembrete (horas)", { exact: true }).fill("3");
     await page.getByRole("button", { name: "Registrar política", exact: true }).click();
     await expect.poll(async () => (await governance(page)).settings.reminderHours).toBe(3);
     expect((await governance(page)).settings.archiveDays).toBe(8);
     await expect(page.getByRole("dialog")).toHaveCount(0);
-    await page.getByRole("button", { name: "Editar Encerramento e histórico", exact: true }).click();
+    await page.getByRole("button", { name: "Editar Arquivamento", exact: true }).click();
     const archiveDays = page.getByLabel("Arquivar após conclusão ou cancelamento (dias)", { exact: true });
     await expect(archiveDays).toHaveValue("8");
     await archiveDays.fill("9");
+    const refresh = page.waitForResponse(async response => {
+      const url = new URL(response.url());
+      return response.ok() && response.request().method() === "GET" && url.pathname === "/api/patient-settings"
+        && url.searchParams.get("careRecipientId") === patient && (await response.json()).data?.settings?.archiveDays === 10;
+    }, { timeout: 45_000 });
     await revisePolicy({ archiveDays: 10 });
-    await expect(page.getByText("Política v" + (await governance(other)).version, { exact: false })).toBeVisible({ timeout: 45000 });
+    await refresh;
     await expect(archiveDays).toHaveValue("9");
     await page.getByRole("button", { name: "Registrar política", exact: true }).click();
     await expect(page.getByRole("alert").filter({ hasText: "configuração mudou em outra sessão" })).toBeVisible();
@@ -115,51 +120,48 @@ test("V4 review: matriz reconcilia horários, intervalo, versões e falhas sem s
     await expect(archiveDays).toBeDisabled();
     await page.getByRole("dialog").getByRole("button", { name: "Revisar configuração vigente", exact: true }).click();
     await expect(page.getByRole("dialog")).toHaveCount(0);
-    await expect(page.getByRole("button", { name: "Editar Encerramento e histórico", exact: true })).toBeFocused();
-    await page.getByRole("button", { name: "Editar Encerramento e histórico", exact: true }).click();
+    await expect(page.getByRole("button", { name: "Editar Arquivamento", exact: true })).toBeFocused();
+    await page.getByRole("button", { name: "Editar Arquivamento", exact: true }).click();
     await expect(archiveDays).toHaveValue("10");
     await archiveDays.fill("11");
     await page.getByRole("button", { name: "Registrar política", exact: true }).click();
     await expect.poll(async () => (await governance(page)).settings.archiveDays).toBe(11);
     await expect(page.getByRole("dialog")).toHaveCount(0);
-    await page.getByRole("navigation", { name: "Áreas da configuração", exact: true }).getByRole("link", { name: "Notificações", exact: true }).click();
-    await page.getByRole("button", { name: "Opções de Requisição emitida · Familiar", exact: true }).click();
-    const cell = page.getByRole("dialog");
+    await page.getByRole("navigation", { name: "Áreas da configuração", exact: true }).getByRole("link", { name: "Avisos", exact: true }).click();
+    const cell = page.getByRole("dialog", { name: "Requisição emitida", exact: true });
+    const openRule = async () => {
+      await page.getByRole("region", { name: "Regras de avisos", exact: true }).getByRole("button", { name: /^Requisição emitida/ }).click();
+      await cell.getByLabel("Função", { exact: true }).selectOption("family");
+    };
+    const saveRule = cell.getByRole("button", { name: "Salvar regra", exact: true });
     const start = cell.getByLabel("Início", { exact: true }),
       end = cell.getByLabel("Fim", { exact: true }),
-      cooldown = cell.getByLabel("Intervalo mínimo (min)", { exact: true });
+      cooldown = cell.getByRole("spinbutton", { name: "Intervalo mínimo entre avisos (minutos)", exact: true });
     const persisted = async () => {
-      const r = await page.request.get(
-        "/api/notification-rules?careRecipientId=" + patient,
-      );
+      const r = await page.request.get("/api/notification-rules?careRecipientId=" + patient);
       return (await r.json()).rules.find(
-        (r: { event: string; subject_role: string }) =>
-          r.event === "req.issued" && r.subject_role === "family",
+        (r: { event: string; subject_role: string }) => r.event === "req.issued" && r.subject_role === "family",
       );
     };
+    await openRule();
     for (const [field, value, key] of [
-      [start, "21", "quiet_start"],
-      [end, "7", "quiet_end"],
-      [start, "", "quiet_start"],
-      [end, "", "quiet_end"],
+      [start, "21", "quiet_start"], [end, "7", "quiet_end"],
+      [start, "", "quiet_start"], [end, "", "quiet_end"],
     ] as const) {
       await field.selectOption(value);
-      await expect(field).toBeEnabled();
-      await expect
-        .poll(async () => (await persisted())?.[key])
-        .toBe(value === "" ? null : Number(value));
+      await saveRule.click();
+      await expect(cell).toHaveCount(0);
+      await expect.poll(async () => (await persisted())?.[key]).toBe(value === "" ? null : Number(value));
+      await openRule();
       await expect(field).toHaveValue(value);
     }
     await cooldown.fill("23");
-    await cooldown.blur();
-    await expect(cooldown).toBeEnabled();
-    await expect
-      .poll(async () => (await persisted())?.cooldown_minutes)
-      .toBe(23);
     await start.selectOption("20");
-    await expect(start).toBeEnabled();
+    await saveRule.click();
+    await expect(cell).toHaveCount(0);
     await expect.poll(async () => (await persisted())?.quiet_start).toBe(20);
     expect((await persisted()).cooldown_minutes).toBe(23);
+    await openRule();
     let conflict = true;
     await page.route("**/api/patient-settings", async (route) => {
       if (route.request().method() === "POST" && conflict) {
@@ -174,21 +176,25 @@ test("V4 review: matriz reconcilia horários, intervalo, versões e falhas sem s
       await route.continue();
     });
     await end.selectOption("6");
+    await saveRule.click();
     await expect(
       page
         .getByRole("alert")
-        .filter({ hasText: "configuração mudou em outra sessão" }),
+        .filter({ hasText: "configuração mudou em outra sessão" }).first(),
     ).toBeVisible();
     await expect(end).toBeDisabled();
     await cell.getByRole("button", { name: "Revisar configuração vigente", exact: true }).click();
+    await cell.getByRole("button", { name: "Abrir versão atual", exact: true }).click();
     await expect(end).toBeEnabled();
     await expect(end).toHaveValue("");
     expect((await persisted()).quiet_start).toBe(20);
     expect((await persisted()).cooldown_minutes).toBe(23);
     await page.unrouteAll({ behavior: "wait" });
     await end.selectOption("6");
-    await expect(end).toBeEnabled();
+    await saveRule.click();
+    await expect(cell).toHaveCount(0);
     await expect.poll(async () => (await persisted())?.quiet_end).toBe(6);
+    await openRule();
     for (const failure of ["permission", "network"]) {
       let once = true;
       await page.route("**/api/patient-settings", async (route) => {
@@ -206,14 +212,17 @@ test("V4 review: matriz reconcilia horários, intervalo, versões e falhas sem s
         } else await route.continue();
       });
       await start.selectOption("19");
+      await saveRule.click();
       await expect(page.getByRole("alert").first()).toBeVisible();
       if (failure === "network") {
         await expect(start).toBeDisabled();
         expect((await persisted()).quiet_start).toBe(20);
         await cell.getByRole("button", { name: "Recuperar mesma alteração", exact: true }).click();
+        await cell.getByRole("button", { name: "Abrir versão atual", exact: true }).click();
       }
       await expect(start).toBeEnabled();
-      await expect(start).toHaveValue(failure === "network" ? "19" : "20");
+      await expect(start).toHaveValue("19");
+      expect((await persisted()).quiet_start).toBe(failure === "network" ? 19 : 20);
       expect((await persisted()).cooldown_minutes).toBe(23);
       await page.unrouteAll({ behavior: "wait" });
     }
