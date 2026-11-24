@@ -356,7 +356,8 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
             patientName={context.patient?.display_name ?? "Residência"}
           />
         ) : null}
-        {section === "invitations" && patientId ? <InvitationManagement patientId={patientId} userId={context.userId} /> : null}
+        {section === "invitations" && patientId ? <InvitationManagement key={patientId + ":" + (params.get("invitationId") ?? "")}
+          patientId={patientId} userId={context.userId} initialInvitationId={params.get("invitationId")} /> : null}
         {(section === "memberships" || section === "invitations") && patientId ? <Link className={buttonClass} href={`/admin?careRecipientId=${patientId}`} prefetch={false}>
           <Icon name="back" />Voltar à administração
         </Link> : null}

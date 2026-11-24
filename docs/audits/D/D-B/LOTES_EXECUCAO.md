@@ -5004,3 +5004,53 @@ o teste passou a usar uma conta fictícia com o vínculo do cenário.
 Build de produção, tipos, lint e guard das 84 migrations passaram.
 O modal final foi comparado com o cenário de conflito do laboratório em
 360 e 412 px. A comparação e o fundo do modal passaram nos três navegadores.
+
+### E10-05 — Propostas de alteração e decisão independente
+
+A área Pessoas e propostas mostra as propostas nas seções de decisão, aceite
+e histórico. Cada registro abre o painel de conferência com residência, autor,
+decisor quando disponível, situação e comparação entre valores vigentes e
+propostos. A lista mantém a busca, os filtros e a paginação por data e
+identificador usados pelo sistema. Esses controles complementam o cenário
+do laboratório, que mostra uma proposta por vez.
+
+A aprovação ou rejeição exige confirmação no diálogo e autenticação local
+de um administrador distinto do autor. A aprovação exige a mesma referência
+consultada, que inclui a proposta, a versão e os dados vigentes. Uma proposta
+superada oferece consulta à configuração atual e acesso à área de origem
+para preparar outra alteração. O registro anterior continua no histórico.
+
+A tentativa oficial guarda a decisão e a referência no banco. Após perda
+da resposta, a aba conserva a chave e a contagem de consultas, com até duas
+tentativas de recuperação. A consulta confirma o registro ou encerra a chave
+sem decisão e bloqueia um envio atrasado com a mesma chave. O caso de vínculo
+registra a aprovação local e mantém o aceite do destinatário pendente. A
+reemissão abre o convite correspondente no fluxo de convites da residência,
+com confirmação de que o link anterior deixará de valer.
+
+| Migration | Supabase local | Supabase remoto |
+| --- | --- | --- |
+| `20261124184414` | Aplicada | Pendente |
+
+O projeto local tem 381 migrations. O remoto vinculado tem 362, com 19
+pendentes em relação ao checkout antes da publicação deste incremento.
+
+Passaram 50 unitários de leitura e apresentação, três integrações com Auth
+real e 12 execuções dirigidas em Chromium, Android e iPhone emulados. Os
+casos de navegador cobriram filtro, paginação até a proposta mais antiga,
+leituras inválidas, resultado perdido com recarga, proposta superada e
+reemissão do convite ainda sem aceite. O cenário de leitura percorreu 101
+pendências e 101 decisões preservadas. A comparação visual com L4 v2 foi
+inspecionada em 360 e 412 px. O painel real usa o drawer compartilhado e
+mostra as versões e a referência do registro, além dos campos da amostra.
+
+Quatro cenários existentes passaram no Chromium. Eles cobrem remoção de
+vínculo, aprovação na administração global, edição de avisos e comparação de
+cinco tipos de proposta sem acesso cruzado entre residências. O último
+detectou a necessidade de foco por teclado na área rolável a 320 px. Após o
+ajuste, esse cenário e a recuperação de proposta após perda da resposta
+passaram novamente.
+
+A recuperação no painel foi exercitada com o vínculo de administração
+vigente. A retomada pela interface após uma decisão retirar o próprio
+acesso de quem confirmou ainda precisa de verificação específica.

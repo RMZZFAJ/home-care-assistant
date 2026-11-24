@@ -50,7 +50,7 @@ export async function GET(request: Request) {
     };
     if (auth.isGlobalAdmin && uuid.safeParse(requested).success) {
       const page = await readChanges(requested!);
-      if (params.get("changesOnly") === "true") return NextResponse.json(page);
+      if (params.get("changesOnly") === "true") return NextResponse.json(page, { headers: { "cache-control": "private, no-store" } });
       return NextResponse.json({ ...await rpc(auth.client, "patient_governance", { p_patient: requested }) as object, changes: page.changes, changePage: { ...page, changes: undefined } });
     }
     const patient = await patientContext(
@@ -59,7 +59,7 @@ export async function GET(request: Request) {
     );
     if (params.get("changesOnly") === "true") {
       await patientContext(auth, patient.id, "manage");
-      return NextResponse.json(await readChanges(patient.id));
+      return NextResponse.json(await readChanges(patient.id), { headers: { "cache-control": "private, no-store" } });
     }
     const settings = await auth.client
       .from("patient_settings")

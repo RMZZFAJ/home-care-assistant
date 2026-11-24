@@ -365,10 +365,11 @@ test("V4: matrizes móveis, múltiplos canais no contrato visual e proposta glob
     ).toBeVisible();
     await page
       .getByRole("navigation", { name: "Áreas da configuração", exact: true }).getByRole("link", { name: "Pessoas e propostas", exact: true }).click();
-    await expect(
-      page.getByRole("button", { name: "Aprovar proposta", exact: true }),
-    ).toBeVisible({ timeout: 20000 });
-    await page
+    const list = page.getByRole("region", { name: "Propostas de configuração", exact: true });
+    await list.getByRole("article").filter({ hasText: "Regras do paciente" }).getByRole("button").click();
+    await page.getByRole("dialog", { name: "Conferir proposta", exact: true })
+      .getByRole("button", { name: "Aprovar proposta", exact: true }).click();
+    await page.getByRole("dialog", { name: "Aprovar esta proposta?", exact: true })
       .getByRole("button", { name: "Aprovar proposta", exact: true })
       .click();
     await expect

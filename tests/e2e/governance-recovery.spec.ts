@@ -1,7 +1,10 @@
 import { expect, test, type Page } from "@playwright/test";
 import { randomUUID } from "node:crypto";
 import { mkdirSync } from "node:fs";
+import { resolve } from "node:path";
+import { pathToFileURL } from "node:url";
 import { actor, fixtures, rpc, setup, adjustCapability } from "../integration/v4-fixtures.mjs";
+import { shiftWorker } from "../integration/shift-fixtures.mjs";
 import { sql, sqlLiteral } from "../../scripts/test-environment.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { selectContext } from "./auth-context";
@@ -10,9 +13,11 @@ import type { ReviewedMembershipCommand } from "../../src/lib/validation/reviewe
 
 test.setTimeout(180_000);
 mkdirSync("output/playwright/phase-d", { recursive: true });
-async function login(page: Page, role: "global" | "adminA", patient: string | null) {
+async function login(page: Page, account: "global" | "adminA" | { email: string }, patient: string | null) {
   await page.goto("/login");
-  await page.getByLabel("E-mail", { exact: true }).fill(fixtures[role].email);
+  const email = page.getByLabel("E-mail", { exact: true });
+  await expect(email).toBeVisible({ timeout: 30_000 });
+  await email.fill(typeof account === "string" ? fixtures[account].email : account.email);
   await page.getByLabel("Senha", { exact: true }).fill(fixturePassword);
   await page.getByRole("button", { name: "Entrar", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Visão geral", exact: true })).toBeVisible();
@@ -20,6 +25,120 @@ async function login(page: Page, role: "global" | "adminA", patient: string | nu
 }
 test.afterEach(async ({ page }) => { await page.unrouteAll({ behavior: "wait" }); });
 const count = (patient: string) => Number(sql(`select count(*) from public.access_change_requests where care_recipient_id=${sqlLiteral(patient)};`));
+
+test("E10-05 confirma uma proposta, recupera a resposta perdida e abre a configuração atual de uma proposta superada", async ({ page, browser }, info) => {
+  const f = await setup(), author = await actor("global"), reviewer = await shiftWorker(f.patient, "admin");
+  const create = (days: number) => rpc(author, "configure_patient_access", {
+    p_patient: f.patient, p_kind: "settings", p_change: { archiveDays: days }, p_key: randomUUID(), p_version: 1,
+  });
+  const approved = await create(43), obsolete = await create(31);
+  const before = sql(`select version from public.patient_settings where care_recipient_id=${sqlLiteral(f.patient)};`);
+  await page.goto("/login");
+  await page.getByLabel("E-mail", { exact: true }).fill(reviewer.email);
+  await page.getByLabel("Senha", { exact: true }).fill(fixturePassword);
+  await page.getByRole("button", { name: "Entrar", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Visão geral", exact: true })).toBeVisible();
+  await selectContext(page, f.patient);
+  await page.goto("/configuracoes?area=people&careRecipientId=" + f.patient);
+  const list = page.getByRole("region", { name: "Propostas de configuração", exact: true });
+  const row = (id: string) => list.getByRole("article", { name: "Proposta " + id.slice(0, 8), exact: true }).getByRole("button");
+  const review = page.getByRole("dialog", { name: "Conferir proposta", exact: true });
+  const confirm = page.getByRole("dialog", { name: "Aprovar esta proposta?", exact: true });
+  const packets: { careRecipientId: string; proposalId: string; attemptKey: string; intent: unknown }[] = [];
+  let lookups = 0;
+  await page.route("**/api/patient-settings/proposals", async route => {
+    const packet = route.request().postDataJSON();
+    packets.push(packet);
+    if (packet.intent) {
+      const committed = await route.fetch();
+      expect(committed.status()).toBe(200);
+      return route.abort("connectionreset");
+    }
+    lookups++;
+    return lookups === 1 ? route.fulfill({ status: 503, json: { error: "Consulta temporariamente indisponível" } }) : route.continue();
+  });
+  await row(approved.id).click();
+  const values = review.getByRole("region", { name: "Compare a alteração", exact: true });
+  await expect(values).toContainText("43");
+  await expect(values.getByText("7", { exact: true })).toBeVisible();
+  if (info.project.name === "chromium") {
+    const reference = await browser.newContext({ viewport: { width: 1280, height: 900 }, isMobile: false, hasTouch: false, deviceScaleFactor: 1 });
+    try {
+      const model = await reference.newPage();
+      await model.route(/^https?:/, route => route.abort());
+      await model.goto(pathToFileURL(resolve("hca-laboratorio-04-v2-aprovado.html")).href + "#E10-05/pending");
+      await model.getByRole("button", { name: /Permitir contagem para Joana Castro/ }).click();
+      for (const width of [360, 412]) {
+        await page.setViewportSize({ width, height: 900 });
+        await model.getByRole("combobox", { name: "Visualização", exact: true }).selectOption(String(width));
+        await expect(model.getByRole("heading", { name: "Conferir proposta", exact: true })).toBeVisible();
+        await info.attach("L4-proposta-" + width, { body: await model.locator("#device-frame").screenshot(), contentType: "image/png" });
+        await info.attach("proposta-" + width, { body: await page.screenshot(), contentType: "image/png" });
+      }
+    } finally { await reference.close(); }
+  }
+  await review.getByRole("button", { name: "Aprovar proposta", exact: true }).click();
+  await expect(confirm).toBeVisible();
+  expect(packets).toHaveLength(0);
+  expect(sql(`select status from public.access_change_requests where id=${sqlLiteral(approved.id)};`)).toBe("pending");
+  await confirm.getByRole("button", { name: "Aprovar proposta", exact: true }).click();
+  const failure = page.getByRole("dialog", { name: "A resposta da decisão não chegou", exact: true });
+  const retry = failure.getByRole("button", { name: "Conferir resultado", exact: true });
+  await expect(failure).toBeVisible();
+  await retry.click();
+  await expect(failure.getByText(/Tentativas de recuperação/)).toBeAttached();
+  await expect.poll(() => lookups).toBe(1);
+  // Reopening the workspace keeps the receipt reference and the spent consultation.
+  await page.reload();
+  await list.getByRole("button", { name: "Conferir resultado", exact: true }).click();
+  await retry.click();
+  const result = page.getByRole("dialog", { name: "Proposta aplicada", exact: true });
+  await result.getByRole("button", { name: "Concluir", exact: true }).click();
+  const { careRecipientId, proposalId, attemptKey } = packets[0];
+  expect(packets).toHaveLength(3);
+  expect(packets.slice(1)).toEqual(Array.from({ length: 2 }, () => ({ careRecipientId, proposalId, attemptKey, intent: null })));
+  expect(sql(`select version from public.patient_settings where care_recipient_id=${sqlLiteral(f.patient)};`)).toBe(String(Number(before || "1") + 1));
+  await row(obsolete.id).click();
+  await expect(review.getByRole("button", { name: "Aprovar proposta", exact: true })).toHaveCount(0);
+  await review.getByRole("button", { name: "Preparar nova proposta", exact: true }).click();
+  await page.getByRole("dialog", { name: "Rever a configuração atual", exact: true }).getByRole("button", { name: "Ver configuração atual", exact: true }).click();
+  await expect(page.getByRole("dialog", { name: "Configuração atual", exact: true })).toContainText("43");
+  expect(sql(`select status from public.access_change_requests where id=${sqlLiteral(obsolete.id)};`)).toBe("pending");
+});
+
+test("E10-05 vincula a reemissão ao convite da proposta que aguarda aceite", async ({ page }) => {
+  const f = await setup(), author = await actor("global"), reviewer = await shiftWorker(f.patient, "admin");
+  const proposal = await rpc(author, "configure_patient_access", {
+    p_patient: f.patient, p_kind: "membership", p_change: { userId: fixtures.adminB.id, role: "professional" },
+    p_key: randomUUID(), p_version: 1,
+  });
+  await page.goto("/login");
+  await page.getByLabel("E-mail", { exact: true }).fill(reviewer.email);
+  await page.getByLabel("Senha", { exact: true }).fill(fixturePassword);
+  await page.getByRole("button", { name: "Entrar", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Visão geral", exact: true })).toBeVisible();
+  await selectContext(page, f.patient);
+  await page.goto("/configuracoes?area=people&careRecipientId=" + f.patient);
+  const row = page.getByRole("article", { name: "Proposta " + proposal.id.slice(0, 8), exact: true }).getByRole("button");
+  await row.click();
+  await page.getByRole("dialog", { name: "Conferir proposta", exact: true }).getByRole("button", { name: "Aprovar proposta", exact: true }).click();
+  await page.getByRole("dialog", { name: "Aprovar esta proposta?", exact: true }).getByRole("button", { name: "Aprovar proposta", exact: true }).click();
+  const done = page.getByRole("dialog", { name: "Proposta aprovada", exact: true });
+  const originalLink = await done.getByRole("textbox", { name: "Convite aprovado", exact: true }).inputValue();
+  await done.getByRole("button", { name: "Concluir", exact: true }).click();
+  await expect(row).toContainText("Aguardando aceite do destinatário");
+  await row.click();
+  const approved = page.getByRole("dialog", { name: "Proposta aprovada", exact: true });
+  await expect(approved).toContainText("O destinatário ainda precisa aceitar");
+  await approved.getByRole("link", { name: "Reemitir convite", exact: true }).click();
+  const invitation = page.getByRole("dialog", { name: "Convite da residência", exact: true });
+  await expect(invitation).toContainText(fixtures.adminB.email);
+  await invitation.getByRole("button", { name: "Reemitir link", exact: true }).click();
+  await page.getByRole("dialog", { name: "Reemitir convite?", exact: true }).getByRole("button", { name: "Reemitir convite", exact: true }).click();
+  const reissued = await page.getByRole("textbox", { name: "Link", exact: true }).inputValue();
+  expect(reissued).not.toBe(originalLink);
+  expect(sql(`select count(*) from public.care_recipient_memberships where care_recipient_id=${sqlLiteral(f.patient)} and user_id=${sqlLiteral(fixtures.adminB.id)};`)).toBe("0");
+});
 
 test("L4 confirma a exceção crítica além da função e registra a mudança efetiva", async ({ page }) => {
   const f = await setup();
@@ -181,7 +300,7 @@ test("D3 regra preserva a tentativa incerta e distingue confirmação de falha n
 });
 
 test("D3 lista encontra proposta antiga e compara cinco tipos sem decidir por leitura ou vazar outro paciente", async ({ page }, info) => {
-  const f = await setup(), global = await actor("global");
+  const f = await setup(), global = await actor("global"), reviewer = await shiftWorker(f.patient, "admin");
   const ledger = sql(`select coalesce(jsonb_agg(to_jsonb(m) order by id),'[]') from public.stock_movements m where care_recipient_id=${sqlLiteral(f.patient)};`);
   const proposals: { id: string }[] = [];
   const changes = [
@@ -201,16 +320,24 @@ test("D3 lista encontra proposta antiga e compara cinco tipos sem decidir por le
   await login(page, "global", null);
   await page.goto(`/configuracoes?careRecipientId=${f.patient}&area=people`);
   const region = page.getByRole("region", { name: "Propostas de configuração", exact: true });
+  const review = page.getByRole("dialog", { name: "Conferir proposta", exact: true });
   await expect(region.getByText("5 propostas encontradas · página 1 de 1", { exact: true })).toBeVisible();
   await expect(region.getByRole("article")).toHaveCount(5);
-  for (const proposal of proposals) await region.getByRole("article", { name: "Proposta " + proposal.id.slice(0, 8), exact: true }).locator("summary").click();
+  for (const proposal of proposals) {
+    await region.getByRole("article", { name: "Proposta " + proposal.id.slice(0, 8), exact: true }).getByRole("button").click();
+    await expect(review.getByRole("region", { name: "Compare a alteração", exact: true })).toBeVisible();
+    await expect(review.getByRole("button", { name: "Aprovar proposta", exact: true })).toHaveCount(0);
+    await review.getByRole("button", { name: "Voltar", exact: true }).click();
+  }
   await expect(region.locator("pre,textarea,input[readonly]")).toHaveCount(0);
   await expect(region.getByRole("button", { name: "Aprovar proposta", exact: true })).toHaveCount(0);
+  const administration = region.getByRole("article", { name: "Proposta " + proposals[4].id.slice(0, 8), exact: true }).getByRole("button");
+  await administration.click();
   await widths(page, "D3 five proposal comparisons");
   await page.setViewportSize({ width: 390, height: 900 });
-  await page.evaluate(() => window.scrollTo(0, 0)); await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0);
-  await page.screenshot({ path: `output/playwright/phase-d/d3-proposal-comparisons-${info.project.name}.png`, fullPage: true });
-  await region.getByRole("article", { name: "Proposta " + proposals[4].id.slice(0, 8), exact: true }).screenshot({ path: `output/playwright/phase-d/d3-proposal-card-${info.project.name}.png` });
+  await review.screenshot({ path: `output/playwright/phase-d/d3-proposal-comparisons-${info.project.name}.png` });
+  await review.getByRole("button", { name: "Voltar", exact: true }).click();
+  await administration.screenshot({ path: `output/playwright/phase-d/d3-proposal-card-${info.project.name}.png` });
   await region.getByLabel("Situação da proposta", { exact: true }).selectOption("all"); await region.getByRole("button", { name: "Consultar propostas", exact: true }).click();
   await expect(region.getByText("55 propostas encontradas · página 1 de 3", { exact: true })).toBeVisible();
   await region.getByRole("button", { name: "Próxima página de propostas", exact: true }).click();
@@ -221,9 +348,12 @@ test("D3 lista encontra proposta antiga e compara cinco tipos sem decidir por le
   await expect(region.getByText("1 proposta encontrada · página 1 de 1", { exact: true })).toBeVisible();
   await page.reload(); await expect(region.getByLabel("Buscar proposta por referência ou conteúdo", { exact: true })).toHaveValue(proposals[0].id);
   expect(count(f.patient)).toBe(55);
-  await login(page, "adminA", f.patient); await page.goto(`/configuracoes?area=people&proposalStatus=all&proposalQuery=${proposals[0].id}`);
+  await login(page, reviewer, f.patient); await page.goto(`/configuracoes?area=people&proposalStatus=all&proposalQuery=${proposals[0].id}`);
   await expect(region.getByText("1 proposta encontrada · página 1 de 1", { exact: true })).toBeVisible();
-  await expect(region.getByRole("button", { name: "Aprovar proposta", exact: true })).toBeEnabled();
+  const proposal = region.getByRole("article", { name: "Proposta " + proposals[0].id.slice(0, 8), exact: true });
+  await proposal.getByRole("button").click();
+  await expect(review.getByRole("button", { name: "Aprovar proposta", exact: true })).toBeEnabled();
+  await review.getByRole("button", { name: "Voltar", exact: true }).click();
   const frozen = sql(`select proposed::text from public.access_change_requests where id=${sqlLiteral(proposals[0].id)};`);
   let future: Record<string, unknown> | null = null;
   await page.route("**/api/patient-settings?**", async route => {
@@ -232,7 +362,6 @@ test("D3 lista encontra proposta antiga e compara cinco tipos sem decidir por le
     if (!future || !Array.isArray(body.changes)) return route.fulfill({ response });
     return route.fulfill({ response, json: { ...body, changes: body.changes.map((change: { id: string }) => change.id === proposals[0].id ? { ...change, ...future } : change) } });
   });
-  const proposal = region.getByRole("article", { name: "Proposta " + proposals[0].id.slice(0, 8), exact: true });
   for (const unsupported of [
     { kind: "constructor", proposed: { archiveDays: 9 } },
     { kind: "administration", proposed: { operation: "constructor", args: { displayName: "Nome preservado" } } },
@@ -240,32 +369,38 @@ test("D3 lista encontra proposta antiga e compara cinco tipos sem decidir por le
     { kind: "notification_rule", proposed: { event: "req.issued", role: "family", channels: ["future_channel"] } },
   ]) {
     future = unsupported; await page.reload();
-    await expect(proposal.getByText("Esta proposta contém um tipo ou campo que esta versão não reconhece. Consulte a origem antes de aprovar.", { exact: true })).toBeVisible();
-    await proposal.locator("summary").click();
-    await expect(proposal.locator("textarea,input,select,pre")).toHaveCount(0);
-    await expect(proposal.getByRole("button", { name: "Aprovar proposta", exact: true })).toBeDisabled();
+    await proposal.getByRole("button").click();
+    await expect(review.getByText("Esta proposta contém um tipo ou campo que esta versão não reconhece. Consulte a origem antes de aprovar.", { exact: true })).toBeVisible();
+    await expect(review.locator("textarea,input,select,pre")).toHaveCount(0);
+    await expect(review.getByRole("button", { name: "Aprovar proposta", exact: true })).toBeDisabled();
     expect(sql(`select proposed::text from public.access_change_requests where id=${sqlLiteral(proposals[0].id)};`)).toBe(frozen);
   }
   future = { status: "constructor" }; await page.reload();
   await expect(proposal.getByText("Situação não reconhecida", { exact: false })).toBeVisible();
-  await expect(proposal.getByRole("button", { name: "Aprovar proposta", exact: true })).toHaveCount(0);
+  await proposal.getByRole("button").click();
+  await expect(page.getByRole("dialog", { name: "Decisão da proposta", exact: true }).getByRole("button", { name: "Aprovar proposta", exact: true })).toHaveCount(0);
   future = null; await page.unrouteAll({ behavior: "wait" }); await page.reload();
-  await expect(proposal.getByRole("button", { name: "Aprovar proposta", exact: true })).toBeEnabled();
   const denied = await page.request.get(`/api/patient-settings?careRecipientId=${otherPatient.id}&changesOnly=true&status=all&query=${otherProposal.id}`);
   expect(denied.status()).toBe(404); expect((await denied.json()).code).toBe("NOT_FOUND");
   expect(await denied.text()).not.toContain("Conteúdo exclusivo fictício de outro paciente");
   expect(count(f.patient)).toBe(55);
-  const posted = page.waitForRequest(request => request.method() === "POST" && new URL(request.url()).pathname === "/api/patient-settings");
-  await region.getByRole("button", { name: "Aprovar proposta", exact: true }).click();
+  await proposal.getByRole("button").click();
+  await review.getByRole("button", { name: "Aprovar proposta", exact: true }).click();
+  const posted = page.waitForRequest(request => request.method() === "POST" && new URL(request.url()).pathname === "/api/patient-settings/proposals");
+  await page.getByRole("dialog", { name: "Aprovar esta proposta?", exact: true }).getByRole("button", { name: "Aprovar proposta", exact: true }).click();
   const approval = (await posted).postDataJSON();
-  expect(approval.requestId).toBe(proposals[0].id); expect(approval.expectedVersion).toBe(1);
-  expect(approval.kind).toBe("settings"); expect(approval.change).toEqual({ archiveDays: 9 });
+  expect(approval.proposalId).toBe(proposals[0].id);
+  expect(approval.intent).toEqual({ decision: "approve", reference: expect.stringMatching(/^[0-9a-f]{64}$/) });
   await expect.poll(() => sql(`select status from public.access_change_requests where id=${sqlLiteral(proposals[0].id)};`)).toBe("applied");
   expect(sql(`select settings->>'archiveDays' from public.patient_settings where care_recipient_id=${sqlLiteral(f.patient)};`)).toBe("9");
   expect(count(f.patient)).toBe(55);
+  await page.getByRole("dialog", { name: "Proposta aplicada", exact: true }).getByRole("button", { name: "Concluir", exact: true }).click();
   await region.getByRole("button", { name: "Limpar filtros de propostas", exact: true }).click();
   await expect(region.getByText("4 propostas encontradas · página 1 de 1", { exact: true })).toBeVisible();
-  for (const button of await region.getByRole("button", { name: "Aprovar proposta", exact: true }).all()) await expect(button).toBeDisabled();
+  await region.getByRole("article", { name: "Proposta " + proposals[1].id.slice(0, 8), exact: true }).getByRole("button").click();
+  await expect(review.getByRole("button", { name: "Aprovar proposta", exact: true })).toHaveCount(0);
+  await expect(review.getByRole("button", { name: "Preparar nova proposta", exact: true })).toBeVisible();
+  await review.getByRole("button", { name: "Voltar", exact: true }).click();
   expect(count(otherPatient.id)).toBe(1);
   await page.goto("/configuracoes?area=permissions");
   const matrix = page.getByRole("region", { name: "Matriz de permissões", exact: true });

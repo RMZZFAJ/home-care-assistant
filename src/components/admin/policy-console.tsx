@@ -30,6 +30,7 @@ import { shortNameChange } from "@/lib/validation/governance";
 import { useCommandIntent } from "@/lib/client/use-command-intent";
 import { GovernanceProposals } from "./governance-proposals";
 import { governanceCommandConfirmed } from "@/lib/validation/governance";
+import { residencePolicyDefaults } from "@/lib/governance-presentation";
 type ConfigurationPacket = { careRecipientId: string; kind: string; change: Record<string, unknown>; idempotencyKey: string; expectedVersion: number; requestId?: string; decision?: string };
 type ConfigurationResult = { data: { id: string; status: string }; invitationUrl?: string; invitationRecovery?: { invitationId: string; notice: string } };
 type PolicyData = {
@@ -50,23 +51,6 @@ type PolicyData = {
     status: string;
     resolution?: { invitationId?: string };
   }[];
-};
-const defaults: Record<string, unknown> = {
-  balDay: null,
-  balReview: "optional",
-  balApprovers: ["family", "supervisor"],
-  balRequirement: "any",
-  whatsappSimpleAcceptance: false,
-  scienceRequired: true,
-  scienceRoles: ["admin", "family"],
-  scienceRequirement: "any",
-  scienceByDispatch: true,
-  scienceAutomatic: false,
-  archiveDays: 7,
-  reminderHours: 2,
-  reminderRepeatHours: 24,
-  shareWaitSeconds: 10,
-  patientShortName: "",
 };
 export function PolicyConsole() {
   const params = useSearchParams();
@@ -299,7 +283,7 @@ function Policies({ context }: { context: WorkspaceContext }) {
         {error ? <ActionButton onClick={() => { setError(""); setReadAttempt(value => value + 1); }}>Consultar configuração novamente</ActionButton> : null}
       </Notice>
     );
-  const settings = { ...defaults, ...data.data.settings };
+  const settings = { ...residencePolicyDefaults, ...data.data.settings };
   const recovery = command.uncertain ? <Notice error>O resultado da alteração ainda não foi confirmado. O conteúdo e a chave da tentativa estão preservados. <ActionButton disabled={busy} onClick={async () => { setError(""); try { await confirmed(await command.recover()); } catch (reason) { failed(reason); } }}>Recuperar mesma alteração</ActionButton></Notice>
     : conflict ? <Notice error>Revise a configuração vigente antes de preparar outra intenção. <ActionButton disabled={busy} onClick={() => void reviewCurrent()}>Revisar configuração vigente</ActionButton></Notice> : null;
   return (
@@ -400,7 +384,9 @@ function Policies({ context }: { context: WorkspaceContext }) {
               </button>
             </form>
           </section>
-          <GovernanceProposals context={context} directory={data.directory} version={data.data.version} revision={attempt + liveRevision} busy={locked} configure={configure} reissue={reissueInvitation} />
+          <GovernanceProposals key={context.userId + ":" + patientId} context={context} directory={data.directory}
+            version={data.data.version} revision={attempt + liveRevision} busy={locked}
+            refreshConfiguration={() => { setReadAttempt(value => value + 1); void context.refresh(); }} />
         </>
       ) : null}
     </div>

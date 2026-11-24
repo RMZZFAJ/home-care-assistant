@@ -242,3 +242,61 @@ test("the default open page retains invitations awaiting acceptance without mixi
   assert.equal((await rpc(f.admin, "patient_governance_changes", { p_patient: f.patient, p_status: "awaiting_acceptance" })).total, 1);
   assert.equal(sql(`select count(*) from public.care_recipient_memberships where care_recipient_id=${sqlLiteral(f.patient)} and user_id=${sqlLiteral(fixtures.adminB.id)};`), "0");
 });
+
+test("reviewed proposal decisions use the reviewed facts and recover the same receipt without redoing the decision", async () => {
+  const f = await setup(), global = await actor("global");
+  const proposal = await rpc(global, "configure_patient_access", packet(f.patient, { archiveDays: 43 }));
+  const review = async id => (await rpc(f.admin, "patient_governance_changes", {
+    p_patient: f.patient, p_query: id, p_status: "all",
+  })).changes[0];
+  const send = (client, payload) => client.rpc("review_governance_proposal", payload);
+  const reference = { p_patient: f.patient, p_proposal: proposal.id, p_key: randomUUID() };
+  const approval = { ...reference, p_decision: "approve", p_reference: (await review(proposal.id)).reviewReference, p_invitation_hash: null };
+  const lookup = { ...reference, p_decision: null, p_reference: null, p_invitation_hash: null };
+  assert.equal((await send(global, approval)).error?.code, "42501");
+  assert.equal((await send(f.admin, { ...approval, p_reference: "0".repeat(64) })).error?.code, "PT409");
+  const [first, second] = await Promise.all([send(f.admin, approval), send(f.admin, approval)]);
+  assert.ifError(first.error);
+  assert.ifError(second.error);
+  assert.deepEqual(first.data, second.data);
+  assert.equal(first.data.status, "applied");
+  const recovered = await send(f.admin, lookup);
+  assert.ifError(recovered.error);
+  assert.deepEqual(recovered.data, first.data);
+  assert.equal((await send(f.admin, { ...approval, p_decision: "reject" })).error?.code, "PT409");
+  const after = await review(proposal.id);
+  assert.equal(after.currentVersion, 2);
+  assert.equal(after.approved_by, fixtures.adminA.id);
+  assert.ok(after.reviewerName);
+  assert.equal(after.current.archiveDays, 43);
+
+  const another = await rpc(global, "configure_patient_access", { ...packet(f.patient), p_version: 2 });
+  const closed = { ...lookup, p_key: randomUUID(), p_proposal: another.id };
+  const absent = await send(f.admin, closed);
+  assert.ifError(absent.error);
+  assert.equal(absent.data.state, "closed");
+  const rejection = { ...closed, p_decision: "reject", p_reference: (await review(another.id)).reviewReference };
+  assert.equal((await send(f.admin, rejection)).error?.code, "PT410");
+  assert.equal((await review(another.id)).status, "pending");
+  const rejected = await send(f.admin, { ...rejection, p_key: randomUUID() });
+  assert.ifError(rejected.error);
+  assert.equal(rejected.data.status, "rejected");
+});
+
+test("a reviewed membership proposal records approval separately from the recipient's acceptance", async () => {
+  const f = await setup(), global = await actor("global");
+  const proposal = await rpc(global, "configure_patient_access", { ...packet(f.patient), p_kind: "membership",
+    p_change: { userId: fixtures.adminB.id, role: "professional" } });
+  const { reviewReference } = (await rpc(f.admin, "patient_governance_changes", { p_patient: f.patient })).changes[0];
+  const intent = { p_patient: f.patient, p_proposal: proposal.id, p_key: randomUUID(),
+    p_decision: "approve", p_reference: reviewReference, p_invitation_hash: createHash("sha256").update(randomUUID()).digest("hex") };
+  const approved = await rpc(f.admin, "review_governance_proposal", intent);
+  assert.equal(approved.status, "awaiting_acceptance");
+  assert.ok(approved.invitationId);
+  assert.equal(approved.issuedLink, true);
+  const recovered = await rpc(f.admin, "review_governance_proposal", {
+    ...intent, p_decision: null, p_reference: null, p_invitation_hash: null,
+  });
+  assert.deepEqual(recovered, { ...approved, issuedLink: false });
+  assert.equal(sql(`select count(*) from public.care_recipient_memberships where care_recipient_id=${sqlLiteral(f.patient)} and user_id=${sqlLiteral(fixtures.adminB.id)};`), "0");
+});

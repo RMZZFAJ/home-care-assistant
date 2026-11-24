@@ -345,12 +345,14 @@ test("C031 comparação anuncia remoção proposta e mantém o nome vigente até
   await login(page, f.patient);
   await page.goto(`/configuracoes?careRecipientId=${f.patient}&area=people`);
   const row = page.getByRole("article", { name: "Proposta " + proposal.id.slice(0, 8), exact: true });
-  await row.getByText("Comparar configuração vigente e proposta", { exact: true }).click();
-  const comparison = row.getByRole("row").filter({ hasText: "Nome curto" });
+  await row.getByRole("button").click();
+  const review = page.getByRole("dialog", { name: "Conferir proposta", exact: true });
+  const comparison = review.getByRole("region", { name: "Compare a alteração", exact: true });
   await expect(comparison).toContainText("Nome vigente");
   await expect(comparison).toContainText("Sem nome curto · usar o nome do cadastro");
   expect(state(f.patient).settings.patientShortName).toBe("Nome vigente");
-  await row.getByRole("button", { name: "Aprovar proposta", exact: true }).click();
-  await expect(page.getByRole("status").filter({ hasText: "Configuração aplicada no paciente." })).toBeVisible();
+  await review.getByRole("button", { name: "Aprovar proposta", exact: true }).click();
+  await page.getByRole("dialog", { name: "Aprovar esta proposta?", exact: true }).getByRole("button", { name: "Aprovar proposta", exact: true }).click();
+  await expect(page.getByRole("dialog", { name: "Proposta aplicada", exact: true })).toBeVisible();
   expect(state(f.patient).settings.patientShortName).toBeNull();
 });

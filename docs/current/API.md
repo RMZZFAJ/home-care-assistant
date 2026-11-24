@@ -1123,6 +1123,19 @@ pendente e aceite pendente. kind filtra os cinco tipos de governança; query
 busca referência/conteúdo no paciente autorizado. page inicia em1 e tem teto
 1000000; pageSize usa20 e aceita1–50. NULL explícito é inválido nas RPCs.
 Filtros precedem contagem/paginação, com ordem created_at/id determinística.
+Cada proposta inclui versão vigente, nome do decisor quando disponível e
+`reviewReference` enquanto estiver pendente. A referência vincula a proposta
+e os valores exibidos à configuração vigente no momento da leitura.
+
+`POST /api/patient-settings/proposals` recebe `careRecipientId`,
+`proposalId`, `attemptKey` e a intenção `{ decision, reference }`.
+A decisão usa os dados do registro oficial e exige administrador local
+distinto do autor. Mudança da referência devolve HTTP 409. A consulta
+da mesma tentativa envia `intent: null` e confirma `recorded` ou encerra
+com `closed`, impedindo o envio atrasado com a mesma chave. A resposta é
+privada, sem cache, e distingue aprovação com aceite pendente. O link
+é devolvido na gravação que criou o convite. Uma recuperação confirmada
+leva à reemissão explícita quando for preciso recuperar o link.
 
 Com `permissionPerson`, `GET /api/patient-settings` exige um único
 `careRecipientId` e um único `permissionPerson`. A resposta privada e sem cache

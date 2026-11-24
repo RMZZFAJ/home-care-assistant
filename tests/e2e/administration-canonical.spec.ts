@@ -4,10 +4,11 @@ import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { mkdirSync } from "node:fs";
 import { actor, fixtures, rpc, setup } from "../integration/v4-fixtures.mjs";
+import { shiftWorker } from "../integration/shift-fixtures.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { sql, sqlLiteral as q } from "../../scripts/test-environment.mjs";
 import { selectContext } from "./auth-context";
-import { auditFromTop } from "./accessibility-audit";
+import { audit, auditFromTop } from "./accessibility-audit";
 
 test.setTimeout(180_000);
 const widths = [320, 390, 768, 1024, 1440];
@@ -18,9 +19,9 @@ const facts = (patient: string) => sql(`select jsonb_build_object(
   'changes',(select jsonb_agg(to_jsonb(c) order by id) from public.access_change_requests c where care_recipient_id=${q(patient)}),
   'members',(select jsonb_agg(to_jsonb(m) order by user_id) from public.care_recipient_memberships m where care_recipient_id=${q(patient)}),
   'stock',(select jsonb_agg(to_jsonb(s) order by id) from public.stock_movements s where care_recipient_id=${q(patient)}));`);
-async function login(page: Page, patient: string | null, name = "adminA") {
+async function login(page: Page, patient: string | null, account: string | { email: string } = "adminA") {
   await page.goto("/login");
-  await page.getByLabel("E-mail", { exact: true }).fill(fixtures[name].email);
+  await page.getByLabel("E-mail", { exact: true }).fill(typeof account === "string" ? fixtures[account].email : account.email);
   await page.getByLabel("Senha", { exact: true }).fill(fixturePassword);
   await page.getByRole("button", { name: "Entrar", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Visão geral", exact: true })).toBeVisible();
@@ -301,9 +302,9 @@ test("E10-01 global identification remains a proposal and a reader receives no a
 });
 
 test("15 ADM04 NOT03 proposals retain comparison and notice rules recover a failed read without a write", async ({ page, browser }, info) => {
-  const f = await setup(), global = await actor("global");
+  const f = await setup(), global = await actor("global"), reviewer = await shiftWorker(f.patient, "admin");
   const proposal = await rpc(global, "configure_patient_access", { p_patient: f.patient, p_kind: "settings", p_change: { patientShortName: "Residência proposta de conferência" }, p_key: randomUUID(), p_version: 1 });
-  await login(page, f.patient); await page.goto(`/configuracoes?careRecipientId=${f.patient}&area=people`);
+  await login(page, f.patient, reviewer); await page.goto(`/configuracoes?careRecipientId=${f.patient}&area=people`);
   const card = page.locator(`article[data-proposal-id="${proposal.id}"]`); await expect(card).toBeVisible();
   const before = facts(f.patient), writes: string[] = [];
   page.on("request", request => { if (new URL(request.url()).pathname.startsWith("/api/") && request.method() !== "GET") writes.push(request.url()); });
@@ -311,13 +312,16 @@ test("15 ADM04 NOT03 proposals retain comparison and notice rules recover a fail
   try {
     const model = await reference.newPage(); await model.route(/^https?:/, route => route.abort());
     await model.goto(referenceUrl + "#administracao/residencia");
-    await card.getByText("Comparar configuração vigente e proposta", { exact: true }).click();
-    await expect(card.getByRole("table", { name: "Configuração vigente e proposta", exact: true })).toContainText("Residência proposta de conferência");
+    await card.getByRole("button").click();
+    const proposalReview = page.getByRole("dialog", { name: "Conferir proposta", exact: true });
+    await expect(proposalReview.getByRole("region", { name: "Compare a alteração", exact: true })).toContainText("Residência proposta de conferência");
     for (const width of widths) {
       await page.setViewportSize({ width, height: 900 }); await model.setViewportSize({ width, height: 900 }); await model.screenshot();
-      await compare(card, model.locator(".card.pad").first(), cardProperties);
-      await auditFromTop(page, "administration proposal " + width);
+      await expect(proposalReview.getByText("Proposta registrada", { exact: true })).toBeVisible();
+      await audit(page, "administration proposal " + width);
     }
+    await proposalReview.getByRole("button", { name: "Voltar", exact: true }).click();
+    await expect(card.getByRole("button")).toBeFocused();
     let fail = true;
     const endpoint = (url: URL) => url.pathname === "/api/notification-rules" && url.searchParams.get("careRecipientId") === f.patient;
     await page.route(endpoint, route => fail ? route.fulfill({ status: 503, json: { error: "Consulta indisponível no teste de recuperação." } }) : route.continue());

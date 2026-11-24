@@ -2,6 +2,24 @@ import { capabilityLabels } from "./capability-labels";
 import { roleLabels } from "./role-labels";
 import { documentEventLabel, isKnownDocumentEvent } from "./notifications/event-labels";
 
+export const residencePolicyDefaults: Record<string, unknown> = {
+  balDay: null,
+  balReview: "optional",
+  balApprovers: ["family", "supervisor"],
+  balRequirement: "any",
+  whatsappSimpleAcceptance: false,
+  scienceRequired: true,
+  scienceRoles: ["admin", "family"],
+  scienceRequirement: "any",
+  scienceByDispatch: true,
+  scienceAutomatic: false,
+  archiveDays: 7,
+  reminderHours: 2,
+  reminderRepeatHours: 24,
+  shareWaitSeconds: 10,
+  patientShortName: "",
+};
+
 export type GovernanceChange = {
   id: string; kind: string; proposed: Record<string, unknown>; current: Record<string, unknown> | null;
   proposed_by: string; proposerName: string; subjectName: string | null; status: string;
@@ -71,9 +89,10 @@ export function governanceComparison(change: GovernanceChange, directory: { id: 
   const allowed = change.kind === "administration" && typeof operation === "string" ? own(operationFields, operation) : own(kindFields, change.kind);
   const supported = Boolean(allowed) && entries.length > 0 && entries.every(([key, value]) => allowed?.includes(key) && finiteValueKnown(key, value))
     && (!entries.some(([key]) => key === "productId") || typeof change.current?._productName === "string");
+  const current = change.kind === "settings" ? { ...residencePolicyDefaults, ...change.current } : change.current;
   return {
     supported,
     title: change.kind === "administration" && typeof operation === "string" ? own(operations, operation) ?? "Operação não reconhecida" : own(governanceKindLabels, change.kind) ?? "Tipo de proposta não reconhecido",
-    rows: entries.map(([key, value]) => ({ key, label: own(labels, key) ?? "Campo não reconhecido", current: valueLabel(key, change.current?.[key], change, directory), proposed: valueLabel(key, value, change, directory) })),
+    rows: entries.map(([key, value]) => ({ key, label: own(labels, key) ?? "Campo não reconhecido", current: valueLabel(key, current?.[key], change, directory), proposed: valueLabel(key, value, change, directory) })),
   };
 }

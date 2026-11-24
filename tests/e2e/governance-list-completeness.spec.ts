@@ -1,7 +1,8 @@
 import { expect, test, type Page } from "@playwright/test";
 import { randomUUID } from "node:crypto";
 import { mkdirSync } from "node:fs";
-import { setup, fixtures, actor, rpc } from "../integration/v4-fixtures.mjs";
+import { setup, actor, rpc } from "../integration/v4-fixtures.mjs";
+import { shiftWorker } from "../integration/shift-fixtures.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { sql, sqlLiteral as q } from "../../scripts/test-environment.mjs";
 import { selectContext } from "./auth-context";
@@ -25,7 +26,8 @@ async function populated() {
   return { ...f, original, oracle };
 }
 async function login(page: Page, patient: string) {
-  await page.goto("/login"); await page.getByLabel("E-mail", { exact: true }).fill(fixtures.adminA.email);
+  const reviewer = await shiftWorker(patient, "admin");
+  await page.goto("/login"); await page.getByLabel("E-mail", { exact: true }).fill(reviewer.email);
   await page.getByLabel("Senha", { exact: true }).fill(fixturePassword); await page.getByRole("button", { name: "Entrar", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Visão geral", exact: true })).toBeVisible(); await selectContext(page, patient);
 }
@@ -38,8 +40,9 @@ const facts = (patient: string) => sql(`select encode(sha256(convert_to(jsonb_bu
 
 test("proposal history reaches101 pending requests behind resolved history and preserves filters,focus,Back and official facts", async ({ page }, info) => {
   const f = await populated(), open = f.oracle(), all = f.oracle(true); expect(open).toHaveLength(101); expect(all).toHaveLength(202); expect(open.at(-1)).toBe(f.original.id);
-  const before = facts(f.patient); await login(page, f.patient);
-  const writes: string[] = []; page.on("request", request => { if (new URL(request.url()).pathname === "/api/patient-settings" && request.method() === "POST") writes.push(request.url()); });
+  await login(page, f.patient);
+  const before = facts(f.patient);
+  const writes: string[] = []; page.on("request", request => { if (new URL(request.url()).pathname.startsWith("/api/patient-settings") && request.method() === "POST") writes.push(request.url()); });
   await page.goto(`/configuracoes?careRecipientId=${f.patient}&area=people`);
   await expect.poll(() => ids(page)).toEqual(open.slice(0, 20));
   const refreshed = page.waitForResponse(response => new URL(response.url()).pathname === "/api/patient-settings" && new URL(response.url()).searchParams.get("changesOnly") === "true");
@@ -69,7 +72,9 @@ test("proposal history reaches101 pending requests behind resolved history and p
 });
 
 test("proposal history refuses wrong reads,retains only the current selection and suspends stale decisions", async ({ page }) => {
-  const f = await populated(), open = f.oracle(), before = facts(f.patient); await login(page, f.patient);
+  const f = await populated(), open = f.oracle();
+  await login(page, f.patient);
+  const before = facts(f.patient);
   let mode = "live", release = () => {}, entered = () => {};
   const gate = new Promise<void>(resolve => { release = resolve; }), held = new Promise<void>(resolve => { entered = resolve; });
   await page.route("**/api/patient-settings?*", async route => {
@@ -94,7 +99,11 @@ test("proposal history refuses wrong reads,retains only the current selection an
       mode = invalid; await region(page).getByRole("button", { name: "Atualizar propostas", exact: true }).click();
       await expect(region(page).getByRole("alert")).toBeVisible(); await expect.poll(() => ids(page)).toEqual(open.slice(20, 40));
       await expect(region(page).getByRole("button", { name: "Próxima página de propostas", exact: true })).toBeDisabled();
-      for (const button of await region(page).getByRole("button", { name: /^(Aprovar|Rejeitar) proposta$/ }).all()) await expect(button).toBeDisabled();
+      await region(page).getByRole("article").first().getByRole("button").click();
+      const review = page.getByRole("dialog", { name: "Conferir proposta", exact: true });
+      await expect(review.getByRole("button", { name: "Aprovar proposta", exact: true })).toBeDisabled();
+      await expect(review.getByRole("button", { name: "Rejeitar proposta", exact: true })).toBeDisabled();
+      await review.getByRole("button", { name: "Voltar", exact: true }).click();
       mode = "live"; await region(page).getByRole("button", { name: "Atualizar propostas", exact: true }).click(); await expect(region(page).getByRole("alert")).toHaveCount(0);
     }
     const search = region(page).getByRole("searchbox", { name: "Buscar proposta por referência ou conteúdo", exact: true });

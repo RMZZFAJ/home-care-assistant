@@ -54,13 +54,13 @@ function InvitationLink({ url, label }: { url: string; label: string }) {
   </div>;
 }
 
-export function InvitationManagement({ patientId, userId }: { patientId: string; userId: string }) {
+export function InvitationManagement({ patientId, userId, initialInvitationId = null }: { patientId: string; userId: string; initialInvitationId?: string | null }) {
   const storage = `hca:invitation-admin:${userId}:${patientId}`;
   const [list, setList] = useState<AdministrativeInvitation[] | null>(null);
   const [readError, setReadError] = useState("");
   const [revision, setRevision] = useState(0);
   const [creating, setCreating] = useState(false);
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(initialInvitationId);
   const [review, setReview] = useState<{ invitation: AdministrativeInvitation; action: DetailAction } | null>(null);
   const [pending, setPending] = useState<Pending | null>(null);
   const [failure, setFailure] = useState<Failure | null>(null);
@@ -171,7 +171,7 @@ export function InvitationManagement({ patientId, userId }: { patientId: string;
       </form>
     </Dialog> : null}
 
-    {chosen && !review ? <Drawer open title="Convite da residência" subtitle={chosen.email} headingIcon="users" finalFocus={openerRef} onClose={() => setSelectedId(null)}
+    {chosen && !review && !pending ? <Drawer open title="Convite da residência" subtitle={chosen.email} headingIcon="users" finalFocus={openerRef} onClose={() => setSelectedId(null)}
       footer={<>
         <ActionButton onClick={() => setSelectedId(null)}>Voltar</ActionButton>
         {chosen.status !== "accepted" ? <ActionButton disabled={locked} onClick={() => setReview({ invitation: chosen, action: "reissue" })}>Reemitir link</ActionButton> : null}
