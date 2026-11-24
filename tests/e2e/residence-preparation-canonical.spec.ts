@@ -1,5 +1,4 @@
-import { expect, test, type Locator } from "@playwright/test";
-import { randomUUID } from "node:crypto";
+import { expect, test } from "@playwright/test";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { mkdirSync } from "node:fs";
@@ -10,76 +9,64 @@ import { selectContext } from "./auth-context";
 import { auditFromTop } from "./accessibility-audit";
 
 test.setTimeout(180_000);
-const widths = [320, 390, 768, 1024, 1440];
-async function compare(actual: Locator, model: Locator, properties: string[]) {
-  const expected = await model.evaluate((node, keys) => Object.fromEntries(keys.map(key => [key, getComputedStyle(node).getPropertyValue(key)])), properties);
-  for (const [property, value] of Object.entries(expected)) await expect(actual).toHaveCSS(property, value);
-}
-const facts = () => sql("select jsonb_build_object('patients',(select count(*) from public.care_recipients),'members',(select count(*) from public.care_recipient_memberships),'stock',(select count(*) from public.stock_movements),'documents',(select count(*) from public.operational_documents));");
+const facts = () => sql(`select jsonb_build_object(
+  'residences',(select count(*) from public.care_recipients),
+  'preparations',(select count(*) from private.residence_preparations),
+  'commands',(select count(*) from private.phase_d3_commands),
+  'members',(select count(*) from public.care_recipient_memberships));`);
 
-test("15 GUI02 residence preparation follows canonical fields and numbered navigation without saving or approving tasks by navigation", async ({ page, browser }, info) => {
-  await page.goto("/login"); await page.getByLabel("E-mail", { exact: true }).fill(fixtures.global.email);
-  await page.getByLabel("Senha", { exact: true }).fill(fixturePassword); await page.getByRole("button", { name: "Entrar", exact: true }).click();
-  await expect(page.getByRole("heading", { name: "Visão geral", exact: true })).toBeVisible(); await selectContext(page, null);
-  await page.goto("/preparar-residencia"); await page.getByRole("button", { name: "Nova preparação", exact: true }).click();
-  const panel = page.getByRole("region", { name: "Preparação da residência", exact: true }); await expect(panel).toBeVisible();
-  const before = facts(), posts: string[] = [], name = "Residência de conferência visual " + randomUUID();
-  page.on("request", request => { if (new URL(request.url()).pathname === "/api/residence-preparations" && request.method() !== "GET") posts.push(request.method()); });
-  await panel.getByLabel("Nome da residência", { exact: true }).fill(name);
-  await panel.getByRole("combobox", { name: "Estado inicial", exact: true }).selectOption("false");
-  await panel.getByRole("button", { name: "2. Pessoas e responsabilidades", exact: true }).click();
-  await panel.getByLabel("E-mail da conta administradora inicial", { exact: true }).fill(fixtures.family.email);
-  // The retained local directory has thousands of accounts. Wait for its real
-  // complete read; the form must keep this choice blocked until then.
+test("E12-03 uses the approved mobile sections and leaves abandoned fields in memory only", async ({ page, browser }, info) => {
+  await page.goto("/login");
+  await page.getByLabel("E-mail", { exact: true }).fill(fixtures.global.email);
+  await page.getByLabel("Senha", { exact: true }).fill(fixturePassword);
+  await page.getByRole("button", { name: "Entrar", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Visão geral", exact: true })).toBeVisible();
+  await selectContext(page, null);
+  await page.goto("/preparar-residencia");
+  const panel = page.getByRole("form", { name: "Preparação da residência", exact: true });
+  const name = "Residência de Helena Almeida";
+  const before = facts(), writes: string[] = [];
+  page.on("request", request => {
+    if (new URL(request.url()).pathname === "/api/residence-preparations" && request.method() === "POST")
+      writes.push(request.postDataJSON().action);
+  });
+  const residenceName = panel.getByRole("textbox", { name: "Nome da residência", exact: true });
+  await residenceName.fill(name);
+  await panel.getByRole("textbox", { name: "E-mail da conta administradora inicial", exact: true }).fill(fixtures.family.email);
   await expect(panel.getByRole("combobox", { name: "Titular da continuidade", exact: true })).toBeEnabled({ timeout: 90_000 });
-  const reference = await browser.newContext();
+  const reference = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+  mkdirSync("output/playwright/l4/reference", { recursive: true });
   try {
-    const model = await reference.newPage(); await model.route(/^https?:/, route => route.abort());
-    await model.goto(pathToFileURL(resolve("Home_Care_Assistant_Modelo_Integral.html")).href + "#nova/REQ");
-    await model.locator(".productoption input[type=checkbox]").first().check(); await model.locator('[data-action="wizardNext"]').click();
-    for (const width of widths) {
-      await page.setViewportSize({ width, height: 900 }); await model.setViewportSize({ width, height: 900 }); await model.screenshot();
-      await compare(panel, model.locator(".card.pad").first(), ["padding-top", "padding-left", "border-radius", "border-top-color"]);
-      await compare(panel.locator(".hca-preparation-field").first(), model.locator(".field").first(), ["display", "font-size", "font-weight", "row-gap"]);
-      await compare(panel.getByLabel("E-mail da conta administradora inicial", { exact: true }), model.locator(".field input").first(), ["font-size", "border-radius", "padding-left"]);
-      await compare(panel.locator(".wizard-steps"), model.locator(".wizard-progress"), ["column-gap", "margin-top", "margin-bottom"]);
-      await compare(panel.locator('[aria-current="step"] > span'), model.locator(".wizard-progress .active b"), ["width", "height", "background-color", "border-radius", "font-size"]);
-      // Fieldset can serialize an unresolved minmax(0px, 1fr). Spaces inside
-      // that expression do not count columns; verify the rendered fields.
-      const [first, second] = await panel.locator("fieldset > .hca-preparation-field").evaluateAll(nodes => nodes.slice(0, 2).map(node => {
-        const r = node.getBoundingClientRect(); return { left: r.left, top: r.top, right: r.right, bottom: r.bottom };
-      }));
-      if (width <= 500) {
-        expect(Math.abs(first.left - second.left)).toBeLessThan(1);
-        expect(second.top - first.bottom).toBeGreaterThanOrEqual(15);
-      } else {
-        expect(Math.abs(first.top - second.top)).toBeLessThan(1);
-        expect(second.left - first.right).toBeGreaterThanOrEqual(15);
-      }
-      await auditFromTop(page, "canonical residence preparation " + width);
+    const model = await reference.newPage();
+    await model.route(/^https?:/, route => route.abort());
+    await model.goto(pathToFileURL(resolve("hca-laboratorio-04-v2-aprovado.html")).href + "#E12-03/draft");
+    for (const title of ["Identificação da residência", "Administração e continuidade", "Primeiro acesso"]) {
+      await expect(panel.getByRole("heading", { name: title, exact: true })).toBeVisible();
+      await expect(model.locator("#product-app").getByRole("heading", { name: title, exact: true })).toBeVisible();
     }
-    const navigation = panel.getByRole("navigation", { name: "Etapas da preparação", exact: true });
-    await expect(navigation.getByRole("button")).toHaveCount(7);
-    for (const label of ["3. Catálogo", "4. Estoque inicial", "5. Escalas e BAL", "6. Comunicação e contingência", "7. Conferência da preparação"]) {
-      await navigation.getByRole("button", { name: label, exact: true }).click();
-      await expect(navigation.getByRole("button", { name: label, exact: true })).toHaveAttribute("aria-current", "step");
+    const frame = model.locator("#device-frame");
+    for (const width of [360, 412]) {
+      await model.getByRole("combobox", { name: "Visualização", exact: true }).selectOption(String(width));
+      const size = await frame.boundingBox();
+      expect(size).not.toBeNull();
+      await page.setViewportSize({ width, height: Math.round(size!.height) });
+      await auditFromTop(page, "E12-03 residence creation " + width);
+      await expect(panel.getByRole("button", { name: "Revisar criação", exact: true })).toBeInViewport({ ratio: 1 });
+      await frame.screenshot({ path: "output/playwright/l4/reference/residence-create-" + width + ".png" });
+      await page.screenshot({ path: "output/playwright/l4/residence-create-" + info.project.name + "-" + width + ".png" });
     }
-    await expect(panel).toContainText("Conferência física e aceite humano continuam pendentes.");
-    await navigation.getByRole("button", { name: "1. Residência e fuso", exact: true }).click();
-    await expect(panel.getByLabel("Nome da residência", { exact: true })).toHaveValue(name);
-    await expect(panel.getByRole("combobox", { name: "Estado inicial", exact: true })).toHaveValue("false");
-    await navigation.getByRole("button", { name: "2. Pessoas e responsabilidades", exact: true }).click();
-    await expect(panel.getByLabel("E-mail da conta administradora inicial", { exact: true })).toHaveValue(fixtures.family.email);
-    expect(posts).toEqual([]); expect(facts()).toBe(before);
-    await page.setViewportSize({ width: 320, height: 900 });
-    const beforePaint = await page.locator(".hca-profile-identity").evaluate(node => ({ display: getComputedStyle(node).display, width: node.getBoundingClientRect().width }));
-    mkdirSync("output/playwright/phase-d", { recursive: true });
-    // A native capture flushes WebKit's pending responsive paint, as for the
-    // reference page above. Do not weaken contrast rules or alter app styles.
-    await page.screenshot({ path: `output/playwright/phase-d/residence-preparation-${info.project.name}.png`, fullPage: true, animations: "disabled" });
-    const afterPaint = await page.locator(".hca-profile-identity").evaluate(node => ({ display: getComputedStyle(node).display, width: node.getBoundingClientRect().width }));
-    await info.attach("residence-responsive-paint", { body: JSON.stringify({ beforePaint, afterPaint }), contentType: "application/json" });
-    await expect(page.locator(".hca-profile-identity")).toHaveCSS("display", "none");
-    await auditFromTop(page, "canonical residence preparation final320");
   } finally { await reference.close(); }
+  await expect(panel.getByRole("switch", { name: "Mostrar guia no primeiro acesso" })).toBeChecked();
+  await expect(panel.getByRole("switch", { name: "Cadastro de desenvolvimento" })).toBeChecked();
+  await panel.getByRole("button", { name: "Cancelar", exact: true }).click();
+  const leave = page.getByRole("dialog", { name: "Sair deste preenchimento?", exact: true });
+  await leave.getByRole("button", { name: "Continuar", exact: true }).click();
+  await expect(residenceName).toHaveValue(name);
+  await panel.getByRole("button", { name: "Cancelar", exact: true }).click();
+  await leave.getByRole("button", { name: "Sair", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Guias e ajuda", exact: true })).toBeVisible();
+  await page.goto("/preparar-residencia");
+  await expect(residenceName).toHaveValue("");
+  expect(writes).toEqual([]);
+  expect(facts()).toBe(before);
 });

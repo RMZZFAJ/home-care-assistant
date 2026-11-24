@@ -1,117 +1,485 @@
 "use client";
-import { readProfileDirectory } from "@/lib/client/profile-directory";
-import { CheckboxField, DefinitionGrid } from "@/components/ui/controls";
-import { SearchSelect } from "@/components/ui/search-select";
+
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
-
-import { api, ApiError, buttonClass, inputClass, Notice, primaryClass, Workspace, type WorkspaceContext } from "@/components/workspace";
-import { Dialog } from "@/components/ui/primitives";
-import { useCommandIntent } from "@/lib/client/use-command-intent";
-import { parsePreparation, parsePreparationPage, preparationCreateContent, preparationStatus, preparationConfirmed, type Preparation, type PreparationCommand, type PreparationContent } from "@/lib/validation/residence-preparation";
-
+import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState, type FormEvent, type RefObject } from "react";
+import { z } from "zod";
+import { api, ApiError, Notice, primaryClass, Workspace, type WorkspaceContext } from "@/components/workspace";
+import { ActionButton, CheckboxField, DefinitionGrid, FormField, Pill, SelectField, TextInput } from "@/components/ui/controls";
+import { Icon } from "@/components/ui/icon";
+import { Dialog } from "@/components/ui/overlays";
+import { SearchSelect } from "@/components/ui/search-select";
+import { useOperationActivity } from "@/components/ui/operation-activity";
+import { DocumentOperationFailureDialog, operationRecoveryLimit } from "@/components/documents/document-operation-failure-dialog";
+import { readProfileDirectory } from "@/lib/client/profile-directory";
+import {
+  preparationConfirmed, preparationCreateContent, residenceCreationReceipt, residenceCreationResult, reviewedAdministrator,
+  type PreparationContent, type ResidenceCreationPacket, type ResidenceCreationReceipt, type ReviewedAdministrator,
+} from "@/lib/validation/residence-preparation";
 import "./residence-preparation.css";
 
-type Person={id:string;full_name:string;status:string};
-type Status={patientCreated:boolean;activeMemberships:number;activeProducts:number;stockRecordsExist:boolean;scheduleRecordsExist:boolean;balanceEnabled:boolean;guideConfigured:boolean;productionApproved:false};
-const stages=["Residência e fuso","Pessoas e responsabilidades","Catálogo","Estoque inicial","Escalas e BAL","Comunicação e contingência","Conferência da preparação"];
-const defaults:PreparationContent={isDevelopment:false,showGuide:true,teamIds:[]};
-const withPatient=(path:string,id:string)=>path+(path.includes("?")?"&":"?")+"careRecipientId="+id;
-export function ResidencePreparationPage(){return <Workspace title="Preparar residência">{context=>context.activeContext?.mode==="global"&&context.globalAdministrationAllowed?<PreparationEditor context={context}/>:<Notice>Somente a administração global inicia uma preparação. As tarefas locais continuam no seu paciente autorizado. <Link href="/admin">Abrir administração local</Link></Notice>}</Workspace>;}
-function PreparationEditor({context}:{context:WorkspaceContext}) {
-  const [cachedList,setCachedList]=useState<{key:string;attempt:number;data:Preparation[];total:number}|null>(null),[page,setPage]=useState(1),[query,setQuery]=useState(""),[attempt,setAttempt]=useState(0);
-  const listKey=JSON.stringify([page,query]),list=cachedList?.key===listKey?cachedList:null;
-  const [directoryRevision,setDirectoryRevision]=useState(-1),[directoryAttempt,setDirectoryAttempt]=useState(0);
-  const [people,setPeople]=useState<Person[]>([]),[directoryError,setDirectoryError]=useState(""),[listFailure,setListFailure]=useState<{key:string;message:string}|null>(null);
-  const listError=listFailure?.key===listKey?listFailure.message:"";
-  const listFresh=list?.attempt===attempt,readSequenceRef=useRef(0);
-  const [editing,setEditing]=useState(false),[record,setRecord]=useState<Preparation|null>(null),[content,setContent]=useState<PreparationContent>(defaults),[step,setStep]=useState(0);
-  const [status,setStatus]=useState<Status|null>(null),[statusError,setStatusError]=useState(""),[error,setError]=useState(""),[message,setMessage]=useState(""),[review,setReview]=useState(false),[latest,setLatest]=useState<Preparation|null>(null);
-  const intentRef=useRef<PreparationCommand|null>(null);
-  const command=useCommandIntent<PreparationCommand,{data:unknown}>(value=>Boolean(intentRef.current&&preparationConfirmed(value,intentRef.current))),locked=command.busy||command.uncertain;
-  const [invalidField,setInvalidField]=useState<string|null>(null);
-  useEffect(()=>{if(invalidField){const field=document.getElementById("preparation-"+invalidField);(field?.matches("input,select")?field:field?.querySelector<HTMLElement>("input,select"))?.focus();}},[invalidField,step]);
-  const patient=record?.patientId,created=Boolean(patient);
-  const directoryReady=directoryRevision===directoryAttempt&&!directoryError;
-  useEffect(()=>{const c=new AbortController();void api<unknown>(`/api/residence-preparations?page=${page}&query=${encodeURIComponent(query)}`,undefined,c.signal).then(parsePreparationPage).then(r=>{if(!c.signal.aborted){setCachedList({key:listKey,attempt,data:r.data,total:r.total});setListFailure(null);}}).catch(r=>{if(!c.signal.aborted)setListFailure({key:listKey,message:r.message});});return()=>c.abort();},[page,query,listKey,attempt]);
-  useEffect(()=>{const c=new AbortController();void readProfileDirectory(page=>api<unknown>("/api/admin?section=profiles&profilePage="+page,undefined,c.signal),c.signal).then(r=>{if(!c.signal.aborted){setPeople(r.filter(p=>p.status==="active"));setDirectoryRevision(directoryAttempt);setDirectoryError("");}}).catch(r=>{if(!c.signal.aborted)setDirectoryError(r.message);});return()=>c.abort();},[directoryAttempt]);
-  function patch(value:Partial<PreparationContent>){setContent(old=>({...old,...value}));if(invalidField&&invalidField in value){setInvalidField(null);setError("");}}
-  async function consult(id:string){
-    const sequence=++readSequenceRef.current;setStatusError("");setStatus(null);try{const r=await api<{data:unknown;status:unknown}>("/api/residence-preparations?id="+id),row=parsePreparation(r.data),read=preparationStatus.safeParse(r.status);if(!read.success)throw new Error("Não foi possível ler a situação da preparação. Consulte novamente.");if(sequence!==readSequenceRef.current)return null;setStatus(read.data);return row;}catch(reason){if(sequence===readSequenceRef.current)setStatusError(reason instanceof Error?reason.message:"Não foi possível consultar a situação.");return null;}
+const endpoint = "/api/residence-preparations";
+const creationSteps = [
+  { label: "Conferindo os dados e a administração inicial", icon: "users" },
+  { label: "Registrando a residência", icon: "home" },
+  { label: "Preparando as tarefas de organização", icon: "check" },
+] as const;
+const pendingSchema = z.object({
+  key: z.uuid(),
+  retries: z.number().int().min(0).max(operationRecoveryLimit),
+}).strict();
+type PendingCreation = z.infer<typeof pendingSchema>;
+type Person = Awaited<ReturnType<typeof readProfileDirectory>>[number];
+type Fields = Omit<PreparationContent, "responseMinutes" | "ownerId" | "substituteId"> & {
+  responseMinutes: string; ownerId?: string; substituteId?: string;
+};
+type FieldErrors = Partial<Record<keyof Fields, string>>;
+type Review = { content: PreparationContent; administrator: ReviewedAdministrator };
+type Failure = { cause: unknown; review: boolean };
+
+const initial: Fields = {
+  displayName: "", isActive: false, timeZone: "America/Sao_Paulo", administratorEmail: "",
+  responseMinutes: "60", showGuide: true, isDevelopment: true,
+};
+
+export function ResidencePreparationPage() {
+  return <Workspace title="Nova residência" eyebrow="Administração global">{context =>
+    context.activeContext?.mode === "global" && context.globalAdministrationAllowed ?
+      <ResidenceRegistration key={context.userId} context={context} /> :
+      <Notice>Somente a administração global inicia uma residência. <Link href="/guias">Voltar aos guias</Link></Notice>
+  }</Workspace>;
+}
+
+function ResidenceRegistration({ context }: { context: WorkspaceContext }) {
+  const router = useRouter();
+  const storage = "hca:residence-creation:" + context.userId;
+  const [fields, setFields] = useState<Fields>(initial);
+  const [errors, setErrors] = useState<FieldErrors>({});
+  const [names, setNames] = useState<Record<string, string>>({});
+  const [review, setReview] = useState<Review | null>(null);
+  const [cancel, setCancel] = useState(false);
+  const [failure, setFailure] = useState<Failure | null>(null);
+  const [pending, setPending] = useState<PendingCreation | null>(null);
+  const [checking, setChecking] = useState(true);
+  const [phase, setPhase] = useState<"review" | "create" | "recover" | null>(null);
+  const [receipt, setReceipt] = useState<ResidenceCreationReceipt | null>(null);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [closed, setClosed] = useState(false);
+  const formRef = useRef<HTMLFormElement>(null);
+  const reviewTriggerRef = useRef<HTMLButtonElement>(null);
+  const receiptHeadingRef = useRef<HTMLHeadingElement>(null);
+  const packetRef = useRef<ResidenceCreationPacket | null>(null);
+  const runningRef = useRef(false);
+  const submitting = phase !== null;
+  const unresolved = pending !== null;
+  const locked = checking || submitting || unresolved;
+
+  useOperationActivity(phase === "create", { title: "Criando a residência", steps: creationSteps, stage: 1 });
+  useOperationActivity(phase === "review" || phase === "recover" || checking, {
+    title: phase === "review" ? "Conferindo a administração inicial" : "Consultando o resultado da criação",
+  });
+
+  useEffect(() => {
+    const controller = new AbortController();
+    async function restore() {
+      const ref = readPending(storage);
+      if (!ref) return;
+      const result = await lookup(ref.key, controller.signal);
+      if (controller.signal.aborted) return;
+      if (result?.state === "preparing") {
+        writePending(storage, null);
+        setReceipt(result);
+      } else if (result?.state === "closed_without_creation") {
+        writePending(storage, null);
+        setClosed(true);
+      } else {
+        setPending(ref);
+        setFailure({ cause: new Error("A criação ainda aguarda confirmação."), review: false });
+      }
+    }
+    void restore().catch(reason => {
+      if (controller.signal.aborted) return;
+      setPending(readPending(storage));
+      setFailure({ cause: reason, review: false });
+    }).finally(() => { if (!controller.signal.aborted) setChecking(false); });
+    return () => controller.abort();
+  }, [storage]);
+
+  function patch(value: Partial<Fields>) {
+    setFields(fields => ({ ...fields, ...value }));
+    setErrors(errors => Object.fromEntries(Object.entries(errors).filter(([key]) => !(key in value))));
   }
-  async function open(id:string){if(locked)return;const row=await consult(id);if(row){setRecord(row);setContent(row.content??defaults);setStep(row.step);setEditing(true);setMessage("");setError("");setLatest(null);}}
-  function adopt(row:Preparation){setRecord(row);setContent(row.content??defaults);setStep(row.step);setLatest(null);}
-  async function confirmed(value:{data:unknown}) {
-    const row=parsePreparation(value.data);adopt(row);setReview(false);setError("");setMessage(row.state==="discarded"?"Rascunho próprio descartado.":"Etapa de preparação salva. As tarefas locais e a conferência física continuam separadas.");
-    intentRef.current=null;
-    if(row.state==="discarded")setEditing(false);
-    setAttempt(v=>v+1);
-    // Subsequent reads are outside the already confirmed command boundary.
-    if(row.patientId){await consult(row.id);await context.refresh();}
+
+  function rememberNames(people: Person[]) {
+    setNames(previous => ({ ...previous, ...Object.fromEntries(people.map(person => [person.id, person.full_name])) }));
   }
-  async function send(action:PreparationCommand["action"],next=step) {
-    if(locked||intentRef.current)return;setError("");setMessage("");
-    try{const packet:PreparationCommand={id:record?.id??null,expectedRevision:record?.revision??null,action,content,step:next,idempotencyKey:crypto.randomUUID()};intentRef.current=packet;const r=await command.send("/api/residence-preparations",packet);await confirmed(r);}
-    catch(reason){if(reason instanceof ApiError&&reason.status>0&&reason.status<500)intentRef.current=null;setError(reason instanceof Error?reason.message:"Não foi possível guardar a preparação.");if(reason instanceof ApiError&&reason.status===409&&record){const current=await consult(record.id);if(current)setLatest(current);}}
+
+  async function prepareReview(event: FormEvent) {
+    event.preventDefault();
+    if (locked || runningRef.current) return;
+    const parsed = preparationCreateContent.safeParse({ ...fields, responseMinutes: Number(fields.responseMinutes) });
+    if (!parsed.success) {
+      setErrors(Object.fromEntries(parsed.error.issues.map(issue => [issue.path[0], issue.message])));
+      requestAnimationFrame(() => formRef.current?.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus());
+      return;
+    }
+    const content = parsed.data;
+    runningRef.current = true;
+    setPhase("review");
+    setErrors({});
+    try {
+      const result = await api<{ data: unknown }>(endpoint, { action: "review", administratorEmail: content.administratorEmail });
+      setReview({ content, administrator: reviewedAdministrator.parse(result.data) });
+    } catch (cause) {
+      setFailure({ cause, review: true });
+    } finally {
+      runningRef.current = false;
+      setPhase(null);
+    }
   }
-  function validateCreation(){
-    if (!directoryReady) { setStep(1);setError("Consulte as pessoas antes de revisar a criação. Seus dados foram preservados.");return; }
-    const parsed=preparationCreateContent.safeParse(content);
-    if(!parsed.success){const issue=parsed.error.issues[0],field=String(issue.path[0]);setInvalidField(field);setStep(["displayName","isActive","timeZone"].includes(field)?0:1);setError(issue.message+" Os demais valores foram preservados.");return;}
-    setInvalidField(null);setContent(parsed.data);setError("");setReview(true);
+
+  function remember(value: PendingCreation | null) {
+    writePending(storage, value);
+    setPending(value);
   }
-  const personName=(id?:string)=>people.find(p=>p.id===id)?.full_name??"Identidade não disponível no diretório atual";
-  const describe=(c:PreparationContent|null)=>({"Nome":c?.displayName||"Não informado","Estado inicial":c?.isActive===undefined?"Não escolhido":c.isActive?"Ativo":"Inativo","Fuso":c?.timeZone||"Não escolhido","Conta inicial":c?.administratorEmail||"Não informada","Titular":c?.ownerId?personName(c.ownerId):"Não escolhido","Substituto":c?.substituteId?personName(c.substituteId):"Não escolhido","Prazo":c?.responseMinutes===undefined?"Não informado":c.responseMinutes+" minutos","Guia inicial":c?.showGuide===undefined?"Não escolhido":c.showGuide?"Habilitado":"Desabilitado","Desenvolvimento":c?.isDevelopment?"Cadastro fictício":"Cadastro operacional","Equipe planejada":c?.teamIds?.length?c.teamIds.map(personName).join(", "):"Nenhuma pessoa selecionada"});
-  const taskLink=(path:string,label:string)=>patient?<Link className={buttonClass} href={withPatient(path,patient)}>{label}</Link>:<p>Crie a residência após revisar seus dados para abrir esta tarefa no paciente correto.</p>;
+
+  function adopt(result: ResidenceCreationReceipt) {
+    remember(null);
+    packetRef.current = null;
+    setReceipt(result);
+    setShowSuccess(true);
+    void context.refresh();
+  }
+
+  async function confirm() {
+    if (!review || runningRef.current || pending) return;
+    const packet: ResidenceCreationPacket = {
+      action: "create", content: review.content, reviewedAdministratorId: review.administrator.id,
+      idempotencyKey: crypto.randomUUID(),
+    };
+    packetRef.current = packet;
+    runningRef.current = true;
+    remember({ key: packet.idempotencyKey, retries: 0 });
+    setReview(null);
+    setPhase("create");
+    try { adopt(await transmit(packet)); }
+    catch (cause) {
+      if (cause instanceof ApiError && cause.status > 0 && cause.status < 500) {
+        remember(null);
+        packetRef.current = null;
+      }
+      setFailure({ cause, review: false });
+    } finally {
+      runningRef.current = false;
+      setPhase(null);
+    }
+  }
+
+  async function recover() {
+    if (!pending || runningRef.current || pending.retries >= operationRecoveryLimit) return;
+    runningRef.current = true;
+    remember({ ...pending, retries: pending.retries + 1 });
+    setFailure(null);
+    setPhase("recover");
+    try {
+      const found = await lookup(pending.key);
+      const packet = packetRef.current;
+      if (found?.state === "preparing") {
+        if (packet && !preparationConfirmed({ data: found }, packet)) throw new Error("O resultado não corresponde à revisão enviada.");
+        adopt(found);
+        return;
+      }
+      if (!found && packet) {
+        adopt(await transmit(packet));
+        return;
+      }
+      const response = found ?? readResult(
+        await api(endpoint, { action: "resolve", idempotencyKey: pending.key }), pending.key,
+      );
+      if (response?.state === "preparing") adopt(response);
+      else if (response?.state === "closed_without_creation") {
+        remember(null);
+        packetRef.current = null;
+        setClosed(true);
+      } else throw new Error("A criação ainda aguarda confirmação.");
+    } catch (cause) {
+      setFailure({ cause, review: false });
+    } finally {
+      runningRef.current = false;
+      setPhase(null);
+    }
+  }
+
+  function beginAgain() {
+    setReceipt(null);
+    setFields(initial);
+    setErrors({});
+    setNames({});
+  }
+
+  const nameOf = (id: string) => receipt?.people?.[id] ?? names[id] ?? "Identidade registrada";
+  return <>
+    {receipt ? <CreatedResidence receipt={receipt} context={context} headingRef={receiptHeadingRef} nameOf={nameOf} onNew={beginAgain} /> :
+      <form className="hca-residence-preparation" ref={formRef} aria-label="Preparação da residência" noValidate onSubmit={event => void prepareReview(event)}>
+        <section className="ui-card hca-residence-intro">
+          <span><Icon name="home" /></span>
+          <div><h2>Comece pelos dados essenciais</h2><p>Identifique a residência e as pessoas responsáveis. A criação só acontece após sua revisão.</p></div>
+        </section>
+        <fieldset disabled={locked} className="ui-card hca-residence-section" aria-labelledby="residence-identification">
+          <h2 id="residence-identification">Identificação da residência</h2>
+          <div className="hca-residence-fields">
+            <FormField label="Nome da residência" error={errors.displayName} required>
+              <TextInput value={fields.displayName} maxLength={160} onChange={event => patch({ displayName: event.target.value })} />
+            </FormField>
+            <FormField label="Estado inicial" required>
+              <SelectField value={String(fields.isActive)} onChange={event => patch({ isActive: event.target.value === "true" })}>
+                <option value="false">Inativo</option><option value="true">Ativo</option>
+              </SelectField>
+            </FormField>
+            <ZoneChoice value={fields.timeZone} error={errors.timeZone} onChange={timeZone => patch({ timeZone })} />
+          </div>
+        </fieldset>
+        <fieldset disabled={locked} className="ui-card hca-residence-section" aria-labelledby="residence-people">
+          <h2 id="residence-people">Administração e continuidade</h2>
+          <div className="hca-residence-fields">
+            <FormField label="E-mail da conta administradora inicial" error={errors.administratorEmail} required
+              helpText="Use uma conta ativa e já confirmada pela própria pessoa.">
+              <TextInput type="email" value={fields.administratorEmail} maxLength={254} onChange={event => patch({ administratorEmail: event.target.value })} />
+            </FormField>
+            <PersonChoice label="Titular da continuidade" names={names} selected={fields.ownerId ? [fields.ownerId] : []}
+              onChange={ids => patch({ ownerId: ids[0] })} rememberNames={rememberNames} disabled={locked} error={errors.ownerId} />
+            <PersonChoice label="Substituto da continuidade" names={names} selected={fields.substituteId ? [fields.substituteId] : []}
+              onChange={ids => patch({ substituteId: ids[0] })} rememberNames={rememberNames} disabled={locked} error={errors.substituteId} />
+            <FormField label="Prazo de resposta, em minutos" helpText="De 15 minutos a 7 dias." error={errors.responseMinutes} required>
+              <TextInput type="number" min={15} max={10080} step={1} value={fields.responseMinutes} onChange={event => patch({ responseMinutes: event.target.value })} />
+            </FormField>
+            <details className="hca-residence-plan">
+              <summary>Planejar participantes</summary>
+              <p>As pessoas planejadas recebem acesso pelos convites e aceites próprios.</p>
+              <PersonChoice label="Equipe planejada" names={names} selected={fields.teamIds ?? []}
+                onChange={teamIds => patch({ teamIds })} rememberNames={rememberNames} disabled={locked} multiple />
+            </details>
+          </div>
+        </fieldset>
+        <fieldset disabled={locked} className="ui-card hca-residence-section" aria-labelledby="residence-first-access">
+          <h2 id="residence-first-access">Primeiro acesso</h2>
+          <div className="hca-residence-options">
+            <CheckboxField className="hca-setting-switch" role="switch" aria-label="Mostrar guia no primeiro acesso" checked={fields.showGuide}
+              onChange={event => patch({ showGuide: event.target.checked })}
+              label={<><strong>Mostrar guia no primeiro acesso</strong><small>A apresentação é opcional e pode ser consultada depois.</small></>} />
+            <CheckboxField className="hca-setting-switch" role="switch" aria-label="Cadastro de desenvolvimento" checked={fields.isDevelopment}
+              onChange={event => patch({ isDevelopment: event.target.checked })}
+              label={<><strong>Cadastro de desenvolvimento</strong><small>Destinado exclusivamente a dados fictícios.</small></>} />
+          </div>
+        </fieldset>
+        <div className="hca-residence-actions">
+          <ActionButton disabled={checking || submitting} onClick={() => setCancel(true)}><Icon name="back" />Cancelar</ActionButton>
+          {unresolved ? <ActionButton variant="primary" disabled={checking || submitting} onClick={() => setFailure({
+            cause: new Error("A criação ainda aguarda confirmação."), review: false,
+          })}><Icon name="search" />Conferir resultado</ActionButton> :
+            <ActionButton ref={reviewTriggerRef} variant="primary" type="submit" disabled={locked}>
+              <Icon name="arrow" />Revisar criação
+            </ActionButton>}
+        </div>
+      </form>}
+    {review ? <Dialog open title="Confira antes de criar" kicker="Criação da residência" headingIcon="home"
+      finalFocus={reviewTriggerRef} onClose={() => setReview(null)} footer={<>
+        <ActionButton onClick={() => setReview(null)}>Voltar ao preenchimento</ActionButton>
+        <ActionButton variant="primary" onClick={() => void confirm()}><Icon name="check" />Criar residência</ActionButton>
+      </>}>
+      <DefinitionGrid items={summary(review.content, nameOf, review.administrator.name)} />
+      <Notice>O cadastro confirma a administração inicial. Convites, estoque e organização da rotina continuam nos fluxos próprios.</Notice>
+    </Dialog> : null}
+    {cancel ? <Dialog open title={unresolved ? "Fechar a consulta da criação?" : "Sair deste preenchimento?"}
+      onClose={() => setCancel(false)} footer={<>
+        <ActionButton onClick={() => setCancel(false)}>Continuar</ActionButton>
+        <ActionButton variant="primary" onClick={() => router.push("/guias")}>Sair</ActionButton>
+      </>}>
+      <p>{unresolved ? "A solicitação já foi enviada. Confira o resultado da mesma tentativa ao retornar." : "Os dados desta tela serão descartados. Nenhuma residência foi criada."}</p>
+    </Dialog> : null}
+    {failure ? <DocumentOperationFailureDialog
+      title={unresolved ? "Criação ainda sem confirmação" : failure.review ? "Conta administradora a conferir" : "Não foi possível criar a residência"}
+      outcome={unresolved ? "uncertain" : "rejected"} cause={failure.cause}
+      description={unresolved ? "Consulte o resultado da mesma tentativa antes de criar outra residência." : message(failure.cause)}
+      operation="Criar residência" fallbackCode="RESIDENCIA_CRIACAO_NAO_CONFIRMADA" attempts={pending?.retries ?? 0} attemptReference={pending?.key}
+      guidance={unresolved ? "A referência identifica o cadastro que você confirmou." : "Confira os dados e faça uma nova revisão."}
+      exhaustedMessage={pending?.retries === operationRecoveryLimit ? "Copie os detalhes e avise o responsável pelo sistema." : undefined}
+      action={pending && pending.retries < operationRecoveryLimit ? { label: "Conferir resultado", onClick: () => void recover() } : undefined}
+      onClose={() => setFailure(null)} closeLabel={unresolved ? "Voltar" : "Voltar ao preenchimento"}
+      finalFocus={unresolved ? undefined : reviewTriggerRef} /> : null}
+    {closed ? <Dialog open title="Criação encerrada sem cadastro" headingIcon="info" onClose={() => setClosed(false)}
+      footer={<ActionButton variant="primary" onClick={() => setClosed(false)}>Voltar ao preenchimento</ActionButton>}>
+      <p>O servidor confirmou que nenhuma residência foi criada por esta tentativa.</p>
+    </Dialog> : null}
+    {receipt && showSuccess ? <Dialog open success title="Residência criada"
+      subtitle="O cadastro está confirmado. As tarefas locais continuam com as pessoas autorizadas."
+      finalFocus={receiptHeadingRef} onClose={() => setShowSuccess(false)}
+      footer={<ActionButton variant="primary" onClick={() => setShowSuccess(false)}>Acompanhar tarefas locais</ActionButton>}>
+      <DefinitionGrid items={[
+        { label: "Residência", value: receipt.content.displayName },
+        { label: "Administração inicial", value: receipt.content.administratorEmail },
+        { label: "Estado inicial", value: receipt.content.isActive ? "Ativo" : "Inativo" },
+      ]} />
+    </Dialog> : null}
+  </>;
+}
+
+const tasks = [
+  { title: "Pessoas e vínculos", icon: "users", text: "Confira os vínculos e os aceites no cadastro local." },
+  { title: "Materiais e apresentações", icon: "box", text: "Confira unidades e apresentações no catálogo." },
+  { title: "Estoque e custódias", icon: "home", text: "Organize a conferência física da família e da equipe." },
+  { title: "Escalas e responsabilidades", icon: "calendar", text: "Organize os plantões e as responsabilidades locais." },
+  { title: "Regime de balanços", icon: "note", text: "Configure horários e pessoas responsáveis." },
+  { title: "Comunicação e orientação", icon: "bell", text: "Confira os canais e a orientação inicial da residência." },
+] as const;
+
+function CreatedResidence({ receipt, context, headingRef, nameOf, onNew }: {
+  receipt: ResidenceCreationReceipt; context: WorkspaceContext; headingRef: RefObject<HTMLHeadingElement | null>;
+  nameOf: (id: string) => string; onNew: () => void;
+}) {
+  const [task, setTask] = useState<string | null>(null);
+  const local = context.patients.some(patient => patient.id === receipt.patientId && patient.hasMembership);
   return <div className="hca-residence-preparation">
-    <Notice>Preparação administrativa em sete etapas. Criar residência não concede vínculo operacional à conta global. Tarefas locais, conferência física e homologação permanecem separadas.</Notice>
-    {!editing?<section className="ui-card" aria-label="Minhas preparações"><h2 className="font-semibold">Minhas preparações</h2><div className="hca-toolbar"><button type="button" className={primaryClass} onClick={()=>{readSequenceRef.current++;setRecord(null);setContent(defaults);setStatus(null);setStep(0);setEditing(true);setError("");setMessage("");}}>Nova preparação</button><form onSubmit={e=>{e.preventDefault();setQuery(String(new FormData(e.currentTarget).get("query")??""));setPage(1);}}><label>Buscar preparação pelo nome<input name="query" className={inputClass} maxLength={160} defaultValue={query}/></label><button className={buttonClass} type="submit">Buscar preparações</button></form></div>{listError?<Notice error>{listError}<button type="button" className={buttonClass} onClick={()=>setAttempt(v=>v+1)}>Consultar preparações novamente</button></Notice>:null}{!listFresh&&!listError?<p role="status">Consultando preparações…</p>:null}<ul>{list?.data.map(row=><li key={row.id} className="hca-record"><div className="hca-record-main"><strong className="wrap-break-word">{row.content?.displayName||"Preparação sem nome"}</strong><p>Revisão {row.revision} · etapa {row.step+1} · {row.state==="draft"?"Rascunho privado":"Residência criada; preparação em andamento"}</p></div><button type="button" className={buttonClass} onClick={()=>void open(row.id)}>Retomar preparação <span className="sr-only">{row.content?.displayName||"sem nome"}</span></button></li>)}</ul>{list&&listFresh&&!listError&&list.total===0?<p>Nenhuma preparação corresponde à consulta.</p>:null}{list&&list.total>20?<nav aria-label="Páginas de preparações" className="hca-toolbar"><button type="button" className={buttonClass} disabled={page===1} onClick={()=>setPage(v=>v-1)}>Página anterior</button><span>Página {page} de {Math.ceil(list.total/20)}</span><button type="button" className={buttonClass} disabled={page*20>=list.total} onClick={()=>setPage(v=>v+1)}>Próxima página</button></nav>:null}</section>:null}
-    {editing?<section className="ui-card hca-preparation-editor" aria-label="Preparação da residência"><nav className="hca-preparation-navigation" aria-label="Etapas da preparação"><p>Etapa {step+1} de 7. Navegação não significa conclusão das tarefas.</p><ol className="wizard-steps" aria-label="Etapas da preparação">{stages.map((title,i)=><li key={title}><button type="button" className="hca-step-control" aria-label={`${i+1}. ${title}`} aria-current={step===i?"step":undefined} disabled={locked} onClick={()=>setStep(i)}><span aria-hidden="true">{i+1}</span>{title}</button></li>)}</ol></nav>
-      {error?<div id="preparation-validation-error"><Notice error>{error}</Notice></div>:null}{message?<Notice>{message}</Notice>:null}{!directoryReady&&!directoryError?<p role="status">Consultando pessoas para a preparação…</p>:null}{directoryError?<Notice error>{directoryError}<button type="button" className={buttonClass} onClick={()=>setDirectoryAttempt(v=>v+1)}>Consultar pessoas novamente</button></Notice>:null}
-      {latest?<section aria-label="Comparação de revisões" className="ui-notice"><h3>Outra revisão foi salva</h3><p>Revisão vigente {latest.revision}. Compare os valores antes de decidir.</p><dl>{Object.entries(describe(content)).map(([label,value])=><div key={label}><dt>{label}</dt><dd>Seus valores: {value}</dd><dd>Servidor: {describe(latest.content)[label as keyof ReturnType<typeof describe>]}</dd></div>)}</dl><button type="button" className={buttonClass} onClick={()=>adopt(latest)}>Carregar revisão do servidor</button>{latest.patientId===record?.patientId?<button type="button" className={buttonClass} onClick={()=>{setRecord(latest);setLatest(null);setMessage("Revisão vigente carregada; seus valores locais foram preservados para nova revisão.");}}>Manter meus valores para nova revisão</button>:null}</section>:null}
-      <h2 className="hca-preparation-current-title">{stages[step]}</h2><fieldset disabled={locked} className="hca-preparation-fields">
-        {step===0?created?<DefinitionGrid items={[{label:"Nome registrado na preparação",value:record?.content?.displayName},{label:"Estado inicial escolhido",value:record?.content?.isActive?"Ativo":"Inativo"},{label:"Fuso de referência escolhido",value:record?.content?.timeZone}]}/>:<><label className="hca-preparation-field">Nome da residência<input id="preparation-displayName" aria-invalid={invalidField==="displayName"} aria-describedby={invalidField==="displayName"?"preparation-validation-error":undefined} className={inputClass} value={content.displayName??""} minLength={2} maxLength={160} onChange={e=>patch({displayName:e.target.value})}/></label><label className="hca-preparation-field">Estado inicial<select id="preparation-isActive" aria-invalid={invalidField==="isActive"} aria-describedby={invalidField==="isActive"?"preparation-validation-error":undefined} className={inputClass} value={content.isActive===undefined?"":String(content.isActive)} onChange={e=>patch({isActive:e.target.value==="true"})}><option value="" disabled>Escolha o estado</option><option value="true">Ativo</option><option value="false">Inativo</option></select></label><ZoneChoice invalid={invalidField==="timeZone"} value={content.timeZone} change={timeZone=>patch({timeZone})}/><CheckboxField label="Cadastro de desenvolvimento com dados fictícios" checked={content.isDevelopment===true} onChange={e=>patch({isDevelopment:e.target.checked})}/></>:null}
-        {step===1?<>{created?<p>Administrador inicial indicado: {record?.content?.administratorEmail}. Outros vínculos dependem dos fluxos de convite e aceite pessoal.</p>:<label className="hca-preparation-field">E-mail da conta administradora inicial<input id="preparation-administratorEmail" aria-invalid={invalidField==="administratorEmail"} aria-describedby={invalidField==="administratorEmail"?"preparation-validation-error":undefined} type="email" autoCapitalize="none" autoCorrect="off" autoComplete="email" className={inputClass} value={content.administratorEmail??""} onChange={e=>patch({administratorEmail:e.target.value})}/></label>}<PersonChoice field="ownerId" invalid={invalidField==="ownerId"} label="Titular da continuidade" people={people} disabled={!directoryReady} value={content.ownerId} change={ownerId=>patch({ownerId})}/><PersonChoice field="substituteId" invalid={invalidField==="substituteId"} label="Substituto da continuidade" people={people} disabled={!directoryReady} value={content.substituteId} change={substituteId=>patch({substituteId})}/><label className="hca-preparation-field">Prazo de resposta em minutos<input id="preparation-responseMinutes" aria-invalid={invalidField==="responseMinutes"} aria-describedby={invalidField==="responseMinutes"?"preparation-validation-error":undefined} type="number" className={inputClass} min={15} max={10080} value={content.responseMinutes??""} onChange={e=>patch({responseMinutes:e.target.value?Number(e.target.value):undefined})}/></label><PersonChoice label="Equipe a encaminhar para vínculo" people={people} disabled={!directoryReady} multiple values={content.teamIds??[]} changeMany={teamIds=>patch({teamIds})}/><p className="text-sm">Seleção de planejamento não cria nem aceita vínculos. O titular usa sua conta confirmada; convites posteriores exigem aceite pessoal.</p>{created?taskLink("/admin?section=memberships","Abrir pessoas e vínculos"):null}</>:null}
-        {step===2?<><p>O catálogo começa vazio. Adote modelos por escolha explícita, confira unidades/apresentações e obtenha a aprovação local exigida. Nenhum saldo de outro paciente é copiado.</p>{status?<p>{status.activeProducts} produtos marcados ativos no catálogo. Isso não verifica quantidades físicas.</p>:null}{taskLink("/admin?section=catalog","Preparar catálogo e apresentações")}</>:null}
-        {step===3?<><p>O administrador local registra origem, quantidade física e motivo em cada custódia. Não preencha BAL passado para criar histórico.</p><p>{!status?"Situação ainda não consultada. Atualize antes de avaliar esta tarefa.":status.stockRecordsExist?"Há movimentação registrada; conferência física e de custódia continua com o responsável local.":"Nenhuma movimentação confirmada nesta consulta."}</p>{taskLink("/estoque?custody=FAMILY","Abrir estoque no vínculo local autorizado")}</>:null}
-        {step===4?<><p>Escala não comprova presença. Prepare tipos, pessoas, recorrências e exceções no fluxo próprio; ative BAL apenas após a configuração legítima.</p>{status?<DefinitionGrid items={[{label:"Registros de escala",value:status.scheduleRecordsExist?"Existem registros; confira vigência no fluxo próprio":"Não encontrados"},{label:"Regime BAL",value:status.balanceEnabled?"Habilitado; responsabilidades exigem conferência":"Não habilitado"}]}/>:null}{taskLink("/escalas","Preparar escalas")}{taskLink("/balancos","Preparar regime BAL")}</>:null}
-        {step===5?<><p>Defina canal de apoio e guarda física com os responsáveis. Ciência, vista no aplicativo e leitura de provedor são diferentes; SCI da expedição familiar permanece obrigatória.</p>{created?<p>Apresentação inicial escolhida na criação: {record?.content?.showGuide?"Habilitada":"Desabilitada"}. Administração local pode alterar em Guias e ajuda.</p>:<CheckboxField label="Mostrar guia opcional no primeiro acesso" checked={content.showGuide!==false} onChange={e=>patch({showGuide:e.target.checked})}/>}{taskLink("/configuracoes","Abrir regras e comunicação")}<Link className={buttonClass} href="/guias">Consultar orientação de contingência</Link></>:null}
-        {step===6?<><p>Conferência física e aceite humano continuam pendentes. Registro de configuração não comprova execução do ciclo REQ, COM, ENT, BAL ou consumo.</p>{status?<DefinitionGrid items={[{label:"Residência",value:status.patientCreated?"Criada":"Ainda não criada"},{label:"Vínculos marcados ativos",value:status.activeMemberships},{label:"Apresentação do guia",value:status.guideConfigured?"Configuração registrada":"Não configurada"}]}/>:null}{created?taskLink("/preparacao-local","Abrir acompanhamento das tarefas locais"):null}<Notice>Confira com as pessoas responsáveis o estoque físico, os documentos, os aparelhos e o procedimento de contingência antes do início do atendimento. Salvar esta preparação não confirma essas tarefas.</Notice></>:null}
-      </fieldset>
-      {statusError?<Notice error>{statusError}<button type="button" className={buttonClass} onClick={()=>record&&void consult(record.id)}>Consultar situação novamente</button></Notice>:null}
-      <div className="hca-toolbar mt-5"><button type="button" className={buttonClass} disabled={locked} onClick={()=>void send("save")}>Salvar e retomar</button><button type="button" className={primaryClass} disabled={locked} onClick={()=>void send("save",Math.min(step+1,6))}>{step===6?"Guardar resultado da preparação":"Continuar preparação"}</button>{record&&!created?<button type="button" className={primaryClass} disabled={locked||!directoryReady} onClick={event=>{event.currentTarget.focus();validateCreation();}}>Revisar criação da residência</button>:null}{record?.state==="draft"?<button type="button" className={buttonClass} disabled={locked} onClick={()=>{if(window.confirm("Descartar somente este rascunho privado?"))void send("discard");}}>Descartar preparação própria</button>:null}<button type="button" className={buttonClass} disabled={locked} onClick={()=>setEditing(false)}>Voltar às preparações</button>{record?<button type="button" className={buttonClass} disabled={command.busy} onClick={()=>void consult(record.id)}>Atualizar situação registrada</button>:null}</div>
-      {command.uncertain?<button type="button" className={primaryClass} disabled={command.busy} onClick={()=>void command.recover().then(confirmed).catch(reason=>setError(reason.message))}>Recuperar a mesma preparação</button>:null}
-    </section>:null}
-    <Dialog open={review} title="Revisar criação da residência" closeDisabled={locked} onClose={()=>setReview(false)}><DefinitionGrid items={Object.entries(describe(content)).map(([label,value])=>({label,value}))} /><p className="my-3">A pessoa da administração inicial deve ter confirmado sua própria conta. Criar a residência não confirma as tarefas físicas nem aceita convites de outras pessoas.</p>{error?<Notice error>{error}</Notice>:null}<div className="hca-toolbar"><button type="button" className={buttonClass} disabled={locked} onClick={()=>setReview(false)}>Voltar à preparação</button><button type="button" className={primaryClass} disabled={locked} onClick={()=>void send("create")}>Confirmar criação da residência</button></div>{command.uncertain?<button type="button" className={primaryClass} disabled={command.busy} onClick={()=>void command.recover().then(confirmed).catch(reason=>setError(reason.message))}>Recuperar a mesma preparação</button>:null}</Dialog>
+    <section className="ui-card hca-residence-section" aria-label="Cadastro confirmado">
+      <h2 ref={headingRef} tabIndex={-1}>Residência criada</h2>
+      <div className="hca-toolbar"><Pill tone="success">Criada</Pill><span>Organização local em andamento</span></div>
+      <DefinitionGrid items={summary(receipt.content, nameOf, nameOf(receipt.administratorId))} />
+    </section>
+    <section className="ui-card hca-residence-section" aria-label="Próximos passos">
+      <h2>Próximos passos</h2>
+      <p>Organize a rotina com a equipe. Materiais, vínculos, estoque e escalas são preparados nos fluxos próprios.</p>
+      {tasks.map(({ title, icon, text }) => <button type="button" className="hca-residence-task" key={title} onClick={() => setTask(title)}>
+        <span><Icon name={icon} /></span><div><strong>{title}</strong><small>{text}</small></div><Icon name="chevron" />
+      </button>)}
+    </section>
+    <Notice>Para consultar dados da residência, selecione um vínculo local autorizado.</Notice>
+    <div className="hca-residence-actions">
+      <Link className="hca-control hca-control--secondary" href="/guias">Voltar aos guias</Link>
+      <ActionButton variant="primary" onClick={onNew}><Icon name="plus" />Nova residência</ActionButton>
+    </div>
+    {task ? <Dialog open title="Continue no vínculo local" headingIcon="lock" onClose={() => setTask(null)}
+      footer={<>
+        <ActionButton onClick={() => setTask(null)}>Voltar</ActionButton>
+        {local ? <Link className={primaryClass} href={"/preparacao-local?careRecipientId=" + receipt.patientId}>Abrir preparação local</Link> : null}
+      </>}>
+      <p>As tarefas são consultadas com o vínculo ativo e as permissões da residência.</p>
+      <DefinitionGrid items={[{ label: "Residência", value: receipt.content.displayName }, { label: "Tarefa", value: task }]} />
+    </Dialog> : null}
   </div>;
 }
-function PersonChoice({label,field,invalid=false,people,value,change,multiple=false,values=[],changeMany,disabled=false}:{label:string;disabled?:boolean;field?:string;invalid?:boolean;people:Person[];value?:string;change?:(id:string|undefined)=>void;multiple?:boolean;values?:string[];changeMany?:(ids:string[])=>void}) {
-  const [query,setQuery]=useState<string|null>(null),name=people.find(p=>p.id===value)?.full_name??"";
-  return <div className="hca-preparation-field" data-multiple={multiple||undefined}><label id={label.replaceAll(" ","-")}>{label}</label><SearchSelect
-    id={field?"preparation-"+field:undefined}
-    aria-invalid={invalid}
-    aria-describedby={invalid?"preparation-validation-error":undefined}
-    aria-labelledby={label.replaceAll(" ","-")}
-    multiple={multiple}
-    disabled={disabled}
-    query={query??(multiple?"":name)}
-    selectedIds={multiple?values:value?[value]:[]}
-    onQueryChange={queryValue => {setQuery(queryValue);if(!multiple)change?.(undefined);}}
-    onSelectionChange={nextIds => {if(multiple)changeMany?.(nextIds);else change?.(nextIds[0]);setQuery(null);}}
-    options={(people.filter(p=>!query||p.full_name.toLocaleLowerCase("pt-BR").includes(query.toLocaleLowerCase("pt-BR"))).map(p=>({ value: p.id, label: p.full_name, content: <>{p.full_name}</> }))) ?? []}
-  />{multiple?<ul className="hca-toolbar">{values.map(id=><li key={id}><span>{people.find(p=>p.id===id)?.full_name??"Identidade não disponível"}</span><button type="button" className={buttonClass} disabled={disabled} aria-label={"Remover "+(people.find(p=>p.id===id)?.full_name??"identidade")} onClick={()=>changeMany?.(values.filter(v=>v!==id))}>Remover</button></li>)}</ul>:null}</div>;
+
+function PersonChoice({ label, names, selected, onChange, rememberNames, disabled, multiple, error }: {
+  label: string; names: Record<string, string>; selected: string[]; disabled: boolean; multiple?: boolean; error?: string;
+  onChange: (ids: string[]) => void; rememberNames: (people: Person[]) => void;
+}) {
+  const [query, setQuery] = useState<string | null>(null);
+  const [attempt, setAttempt] = useState(0);
+  const [result, setResult] = useState<{ key: string; data: Person[]; error: string } | null>(null);
+  const search = query?.trim() ?? "";
+  const key = JSON.stringify([search, attempt]);
+  const current = search && result?.key === key ? result : null;
+
+  useEffect(() => {
+    if (!search || disabled) return;
+    const controller = new AbortController();
+    const timer = setTimeout(() => {
+      void readProfileDirectory(page => api("/api/admin?" + new URLSearchParams({
+        section: "profiles", profilePage: String(page), query: search,
+      }), undefined, controller.signal), controller.signal, search).then(people => {
+        if (!controller.signal.aborted) setResult({ key, data: people.filter(person => person.status === "active"), error: "" });
+      }).catch(reason => {
+        if (!controller.signal.aborted) setResult({ key, data: [], error: message(reason) });
+      });
+    }, 200);
+    return () => { clearTimeout(timer); controller.abort(); };
+  }, [search, key, disabled]);
+
+  const id = "residence-" + label.toLowerCase().replaceAll(" ", "-");
+  const caption = names[selected[0]] ?? "";
+  return <FormField label={label} htmlFor={id} error={error} required={!multiple}>
+    <SearchSelect id={id} multiple={multiple} disabled={disabled} aria-label={label}
+      aria-invalid={Boolean(error)} aria-describedby={error ? id + "-error" : undefined}
+      placeholder="Busque pelo nome" maxLength={160} query={query ?? (multiple ? "" : caption)} selectedIds={selected}
+      onQueryChange={value => { setQuery(value); if (!multiple) onChange([]); }}
+      onSelectionChange={ids => {
+        rememberNames(current?.data.filter(person => ids.includes(person.id)) ?? []);
+        onChange(ids);
+        setQuery(null);
+      }}
+      options={(current?.data ?? []).map(person => ({ value: person.id, label: person.full_name }))} />
+    {search && !current && !disabled ? <p role="status">Consultando pessoas…</p> : null}
+    {current?.error ? <Notice error>{current.error} <ActionButton disabled={disabled}
+      onClick={() => setAttempt(value => value + 1)}>Consultar pessoas novamente</ActionButton></Notice> : null}
+    {multiple && selected.length ? <ul className="hca-residence-planned">
+      {selected.map(id => <li key={id}>
+        <span>{names[id] ?? "Identidade registrada"}</span>
+        <ActionButton variant="quiet" compact disabled={disabled} onClick={() => onChange(selected.filter(value => value !== id))}>Remover</ActionButton>
+      </li>)}
+    </ul> : null}
+  </FormField>;
 }
-function ZoneChoice({value,change,invalid=false}:{value?:string;change:(zone:string|undefined)=>void;invalid?:boolean}) {
-  const [query,setQuery]=useState<string|null>(null),zones=[...Intl.supportedValuesOf("timeZone"),"UTC"];
-  return <div className="hca-preparation-field"><label id="preparation-zone" htmlFor="preparation-timeZone">Fuso de referência da residência</label><SearchSelect
-    id="preparation-timeZone"
-    aria-invalid={invalid}
-    aria-describedby={invalid?"preparation-validation-error":undefined}
-    aria-labelledby="preparation-zone"
-    query={query??value??""}
-    selectedIds={value?[value]:[]}
-    onQueryChange={queryValue => {setQuery(queryValue);change(undefined);}}
-    onSelectionChange={nextIds => {change(nextIds[0]);setQuery(null);}}
-    options={(zones.filter(z=>!query||z.toLowerCase().includes(query.toLowerCase())).slice(0,40).map(z=>({ value: z, label: z, content: <>{z}</> }))) ?? []}
-  /><p className="text-sm">Escolha explicitamente uma zona IANA; o fuso do aparelho não será herdado. Cada plantão conserva seu próprio fuso.</p></div>;
+
+const timeZones = [...Intl.supportedValuesOf("timeZone"), "UTC"];
+const suggestedZones = ["America/Sao_Paulo", "America/Manaus", "America/Rio_Branco", "UTC"];
+function ZoneChoice({ value, error, onChange }: { value: string; error?: string; onChange: (value: string) => void }) {
+  const [query, setQuery] = useState<string | null>(null);
+  const options = query ? timeZones.filter(zone => zone.toLowerCase().includes(query.toLowerCase())).slice(0, 40) : suggestedZones;
+  return <FormField label="Fuso da residência" htmlFor="residence-timezone" error={error} required>
+    <SearchSelect id="residence-timezone" aria-label="Fuso da residência" aria-invalid={Boolean(error)}
+      aria-describedby={error ? "residence-timezone-error" : undefined}
+      query={query ?? value} selectedIds={value ? [value] : []}
+      onQueryChange={value => { setQuery(value); onChange(""); }}
+      onSelectionChange={ids => { onChange(ids[0] ?? ""); setQuery(null); }}
+      options={options.map(zone => ({ value: zone, label: zone }))} />
+  </FormField>;
+}
+
+function summary(content: PreparationContent, person: (id: string) => string, administrator: string) {
+  return [
+    { label: "Residência", value: content.displayName },
+    { label: "Estado inicial", value: content.isActive ? "Ativo" : "Inativo" },
+    { label: "Fuso", value: content.timeZone },
+    { label: "Administração inicial", value: administrator },
+    { label: "E-mail da conta", value: content.administratorEmail },
+    { label: "Titular", value: person(content.ownerId) },
+    { label: "Substituto", value: person(content.substituteId) },
+    { label: "Prazo", value: content.responseMinutes + " minutos" },
+    { label: "Guia inicial", value: content.showGuide ? "Habilitado" : "Desabilitado" },
+    { label: "Cadastro", value: content.isDevelopment ? "Desenvolvimento · dados fictícios" : "Operacional" },
+    ...(content.teamIds?.length ? [{ label: "Equipe planejada", value: content.teamIds.map(person).join(", ") }] : []),
+  ];
+}
+
+function readPending(storage: string) {
+  try {
+    const result = pendingSchema.safeParse(JSON.parse(sessionStorage.getItem(storage) ?? "null"));
+    return result.success ? result.data : null;
+  } catch { return null; }
+}
+
+function writePending(storage: string, value: PendingCreation | null) {
+  try {
+    if (value) sessionStorage.setItem(storage, JSON.stringify(value));
+    else sessionStorage.removeItem(storage);
+  } catch { /* The open operation retains its reference in memory. */ }
+}
+
+function readResult(value: unknown, key: string) {
+  const result = z.object({ data: residenceCreationResult.nullable() }).parse(value).data;
+  if (result && result.creationKey !== key) throw new Error("A resposta não corresponde à tentativa original.");
+  return result;
+}
+
+async function lookup(key: string, signal?: AbortSignal) {
+  return readResult(await api(endpoint + "?attempt=" + key, undefined, signal), key);
+}
+
+async function transmit(packet: ResidenceCreationPacket) {
+  const result = await api<{ data: unknown }>(endpoint, packet);
+  if (!preparationConfirmed(result, packet)) throw new Error("A resposta não confirmou a residência revisada.");
+  return residenceCreationReceipt.parse(result.data);
+}
+
+function message(reason: unknown) {
+  return reason instanceof ApiError ? reason.message : "Não foi possível confirmar a operação. Confira os dados e consulte o responsável pelo sistema.";
 }

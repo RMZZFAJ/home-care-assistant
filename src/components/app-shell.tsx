@@ -20,6 +20,7 @@ import {
 
 export function AppWorkspace({
   title,
+  eyebrow,
   heading,
   children,
   administration = false,
@@ -30,6 +31,7 @@ export function AppWorkspace({
   documentPage = false,
 }: {
   title: string;
+  eyebrow?: string;
   heading?: (context: WorkspaceContext) => ReactNode;
   children: (context: WorkspaceContext) => ReactNode;
   administration?: boolean;
@@ -89,6 +91,7 @@ export function AppWorkspace({
   if (!loading && !selecting && value && !initialized) setInitialized(true);
   if ((loading || selecting) && !initialized) return <main id="workspace-content" className="workspace-content" tabIndex={-1} aria-busy="true" />;
   const customHeading = heading && value?.patient && !choose && !error ? heading(value) : null;
+  const contextLabel = value?.activeContext?.mode === "global" ? "Administração global" : roleLabel(value?.patient?.role);
   return (
     <main
       id="workspace-content"
@@ -102,20 +105,16 @@ export function AppWorkspace({
         <div className="page-heading">
           <div>
             <p className="eyebrow">
-              {account
+              {eyebrow ?? (account
                 ? "Conta pessoal"
-                : (value?.patient?.display_name ?? "Home Care Assistant")}
+                : (value?.patient?.display_name ?? "Home Care Assistant"))}
             </p>
             <h1>{title}</h1>
           </div>
           {account ? (
             <span className="context-tag">Sua conta</span>
-          ) : value?.activeContext ? (
-            <span className="context-tag">
-              {value.activeContext.mode === "global"
-                ? "Administração global"
-                : roleLabel(value.patient?.role)}
-            </span>
+          ) : value?.activeContext && contextLabel !== eyebrow ? (
+            <span className="context-tag">{contextLabel}</span>
           ) : null}
         </div>
       ) : null}

@@ -30,6 +30,8 @@ export function databaseError(
   error: { code?: string; message?: string; } | null,
 ): never {
   const message = error?.message ?? "";
+  if (error?.code === "PT409" && message === "reviewed residence administrator changed")
+    throw new ApiError("VERSION_CONFLICT", "A conta administradora mudou durante a revisão. Confira o e-mail antes de revisar novamente.", 409);
   if (error?.code === "PT409" && message === "requisition stock reference changed")
     throw new ApiError("REQUEST_STOCK_CHANGED", "O estoque mudou durante o preenchimento. Sua contagem foi preservada para conferência.", 409);
   if (error?.code === "PT409" && message === "stock reference changed; confirm the reviewed materials again")

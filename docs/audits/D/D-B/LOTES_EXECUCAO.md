@@ -3892,7 +3892,8 @@ comparações das superfícies com os dados e contratos reais.
 - Os bundles públicos de Preview e Produção apontam para o mesmo projeto
   Supabase. A produção está em `fab595c7` e o Supabase remoto registrava
   362 migrations. Antes de aplicar mudanças de contrato, conferir os dois
-  consumidores. O registro de L4 ainda não contém migrations próprias.
+  consumidores. Na conferência inicial, L4 ainda aguardava sua primeira
+  migration.
 - O commit `b95c3872` publicou as referências de L4 no PR em rascunho.
   O [Preview](https://home-care-assistant-kq38wexfx-rmzzfajs-projects.vercel.app)
   respondeu HTTP 200 no login, na verificação pública e em `/api/runtime`,
@@ -3931,3 +3932,54 @@ comparações das superfícies com os dados e contratos reais.
   o campo estava focado. O acesso passou para a faixa acima da região
   rolável. Os três testes dirigidos da ENT passaram após esse ajuste
   em Chromium, Android e iOS emulados.
+- O commit `49c0763b` publicou os guias na branch do PR em rascunho.
+  O [Preview da Vercel](https://home-care-assistant-f8abwrmth-rmzzfajs-projects.vercel.app)
+  respondeu HTTP 200 em `/login`, `/guias`, `/verificar` e `/api/runtime`.
+  O ambiente tem as variáveis de Supabase, aplicação, assinatura de PDF,
+  worker e Web Push. O runtime retornou `ready`, com protocolo 1 e
+  esquema 2. O SonarCloud aprovou o commit. O CodeRabbit pulou a revisão
+  com 273 arquivos para o limite de 100.
+- A regressão de preparação local voltou a localizar o link pelo rótulo
+  aprovado. O caminho dos Guias à adoção do material e à movimentação
+  familiar passou no Chromium. O ajuste de teste foi publicado em `a08742dc`.
+
+### E12-03 — Criação de residência
+
+- O formulário reúne identificação, administração e continuidade em
+  cartões da v2. A revisão confere a conta inicial antes de oferecer a
+  confirmação. A busca de responsáveis consulta as páginas do nome
+  pesquisado e só oferece opções quando a leitura está completa.
+- A confirmação grava a residência, o vínculo administrativo explícito,
+  a configuração do guia, a preparação vinculada e o comprovante em uma
+  transação. A conta global criadora e a equipe planejada mantêm seus
+  próprios fluxos de acesso. A página de resultado encaminha a preparação
+  para os vínculos locais autorizados.
+- A preparação privada por etapas saiu da interface e da API do candidato.
+  Os registros vinculados e os comprovantes da implantação anterior
+  continuam disponíveis a seus consumidores autorizados. A
+  [API de residência](../../../current/API.md#preparação-de-residência-e-guias)
+  descreve os comandos da revisão e da confirmação.
+- Após a perda da resposta, a aba conserva apenas a chave da tentativa
+  e o contador de recuperação. O servidor consulta pelo autor e pela
+  chave. Quando o formulário já foi fechado, a resolução pode encerrar
+  uma chave sem cadastro sob o bloqueio da confirmação. Uma chegada
+  tardia desse mesmo comando é recusada.
+- As capturas da referência e da aplicação em 360 e 412 px registram os
+  cartões com cabeçalhos separados e as ações fixadas na base. O cabeçalho
+  e a navegação seguem o espaço global da aplicação. Os testes também
+  conferem o estado inicial dos interruptores.
+
+| Migration | Supabase local | Supabase remoto |
+| --- | --- | --- |
+| `20261124042309_l4_create_residence_from_review` | Aplicada | Pendente |
+
+O histórico remoto consultado nesta etapa contém 362 versões até
+`20261123165105`. A integração local da criação confirmou a identidade
+revisada, a recusa de outra conta, a reconsulta do mesmo comprovante,
+a confirmação concorrente com um único cadastro e o encerramento seguro
+de uma tentativa ausente. Os nove casos de preparação e guia passaram,
+incluindo os contratos usados pela implantação anterior.
+Na rodada final de navegador, os nove casos passaram em Chromium, Android
+e iOS emulados. A cobertura incluiu a perda da resposta após a gravação,
+a retomada da mesma tentativa depois de recarregar a aba, a busca parcial
+indisponível e a saída voluntária sem gravar o formulário.

@@ -5,13 +5,14 @@ import { ActionButton } from "@/components/ui/controls";
 import { Icon } from "@/components/ui/icon";
 import { ApiError } from "@/lib/client/api";
 
-export function useOperationSupport({ cause, operation, result, fallbackCode, attempts, attemptLabel, label = "Detalhes para suporte" }: {
+export function useOperationSupport({ cause, operation, result, fallbackCode, attempts, attemptLabel, attemptReference, label = "Detalhes para suporte" }: {
   cause: unknown;
   operation: string;
   result: string;
   fallbackCode: string;
   attempts: number;
   attemptLabel: string;
+  attemptReference?: string;
   label?: string;
 }) {
   const supportRef = useRef<HTMLDetailsElement>(null);
@@ -20,12 +21,14 @@ export function useOperationSupport({ cause, operation, result, fallbackCode, at
   const error = cause instanceof ApiError ? cause : null;
   const code = error?.code && /^[A-Z][A-Z0-9_]{0,63}$/.test(error.code) ? error.code : fallbackCode;
   const reference = error?.correlationId;
+  const uuid = /^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i;
   const detail = [
     "Home Care Assistant",
     "Operação: " + operation,
     "Resultado: " + result,
     "Código: " + code,
-    ...(reference && /^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i.test(reference) ? ["Referência: " + reference] : []),
+    ...(reference && uuid.test(reference) ? ["Referência: " + reference] : []),
+    ...(attemptReference && uuid.test(attemptReference) ? ["Tentativa: " + attemptReference] : []),
     attemptLabel + ": " + attempts,
   ].join("\n");
 

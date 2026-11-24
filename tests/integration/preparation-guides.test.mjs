@@ -6,6 +6,69 @@ import { sql, sqlLiteral } from "../../scripts/test-environment.mjs";
 import { whileRowWaits } from "./lock-barrier.mjs";
 const body = () => ({ displayName: "Residência fictícia de preparação " + randomUUID().slice(0,8), isActive: false, isDevelopment: true, timeZone: "America/Sao_Paulo", administratorEmail: fixtures.family.email, ownerId: fixtures.global.id, substituteId: fixtures.adminA.id, responseMinutes: 60, showGuide: true, teamIds: [] });
 const save = content => ({ p_id: null, p_expected: null, p_action: "save", p_content: content, p_step: 0, p_key: randomUUID() });
+test("review creates directly with one official receipt under concurrency and preserves local custody", async () => {
+  const global = await actor("global"), f = await setup();
+  const content = { ...body(), teamIds: [fixtures.professional.id] };
+  const target = { p_email: content.administratorEmail };
+  assert.equal(await rpc(global, "review_residence_administrator", { p_email: "unknown-" + randomUUID() + "@example.test" }), null);
+  const reviewed = await rpc(global, "review_residence_administrator", target);
+  assert.equal(reviewed.id, fixtures.family.id);
+  const command = { p_content: { ...content, reviewedAdministratorId: reviewed.id }, p_key: randomUUID() };
+  assert.equal((await f.admin.rpc("review_residence_administrator", target)).error?.code, "42501");
+  assert.equal((await f.admin.rpc("create_reviewed_residence", command)).error?.code, "42501");
+  assert.equal((await global.rpc("create_reviewed_residence", {
+    ...command, p_content: { ...command.p_content, reviewedAdministratorId: fixtures.adminA.id },
+  })).error?.code, "PT409");
+  assert.equal(await rpc(global, "residence_creation_result", { p_key: command.p_key }), null);
+  const [receipt, replay] = await Promise.all([
+    rpc(global, "create_reviewed_residence", command),
+    rpc(global, "create_reviewed_residence", command),
+  ]);
+  assert.equal(receipt.patientId, replay.patientId);
+  assert.equal(receipt.id, replay.id);
+  assert.equal(receipt.revision, 1);
+  assert.equal(receipt.creationKey, command.p_key);
+  assert.equal(receipt.administratorId, reviewed.id);
+  assert.equal(receipt.people[reviewed.id], reviewed.name);
+  assert.deepEqual(Object.keys(receipt.people).sort(),
+    [fixtures.family.id, fixtures.global.id, fixtures.adminA.id, fixtures.professional.id].sort());
+  assert.deepEqual(receipt.content, content);
+  assert.equal([receipt, replay].filter(result => result.replayed).length, 1);
+  assert.equal((await rpc(global, "residence_creation_result", {
+    p_key: command.p_key, p_close_absent: true,
+  })).patientId, receipt.patientId);
+  assert.equal((await f.admin.rpc("residence_creation_result", { p_key: command.p_key })).error?.code, "42501");
+  assert.equal((await global.rpc("create_reviewed_residence", {
+    ...command, p_content: { ...command.p_content, isActive: true },
+  })).error?.code, "23505");
+  const patient = sqlLiteral(receipt.patientId), name = sqlLiteral(content.displayName);
+  const rows = JSON.parse(sql(`select jsonb_build_object(
+    'residences',(select count(*) from public.care_recipients where display_name=${name}),
+    'preparation',(select jsonb_agg(jsonb_build_object('state',state,'revision',revision)) from private.residence_preparations where content->>'displayName'=${name}),
+    'members',(select jsonb_agg(jsonb_build_object('id',user_id,'role',role)) from public.care_recipient_memberships where care_recipient_id=${patient}),
+    'events',(select count(*) from public.audit_events where entity_id=${patient} and action='patient.preparation.created'),
+    'stock',(select count(*) from public.stock_movements where care_recipient_id=${patient}),
+    'guides',(select count(*) from private.patient_guide_settings where care_recipient_id=${patient})
+  );`));
+  assert.deepEqual(rows, {
+    residences: 1, preparation: [{ state: "preparing", revision: 1 }], members: [{ id: reviewed.id, role: "admin" }],
+    events: 1, stock: 0, guides: 1,
+  });
+});
+
+test("a resolved absent creation stays closed even if the original request arrives later", async () => {
+  const global = await actor("global"), content = body();
+  const key = randomUUID();
+  assert.equal(await rpc(global, "residence_creation_result", { p_key: key }), null);
+  const resolved = await rpc(global, "residence_creation_result", { p_key: key, p_close_absent: true });
+  assert.deepEqual(resolved, { creationKey: key, state: "closed_without_creation" });
+  assert.equal((await global.rpc("create_reviewed_residence", {
+    p_content: { ...content, reviewedAdministratorId: fixtures.family.id }, p_key: key,
+  })).error?.code, "23505");
+  assert.equal(sql(`select count(*) from public.care_recipients where display_name=${sqlLiteral(content.displayName)};`), "0");
+  assert.deepEqual(await rpc(global, "residence_creation_result", { p_key: key }), resolved);
+});
+
 test("residence preparation saves privately, creates inactive atomically and recovers one intention without granting its global creator clinical membership", async () => {
   const global = await actor("global"), content = body(), args = save(content);
   const before = sql("select count(*) from public.care_recipients;");

@@ -32,43 +32,109 @@ function flow(patient:string,user:string,text:string){
 }
 async function widths(page:Page,label:string){for(const width of [320,390,768,1440]){await page.setViewportSize({width,height:900});await page.evaluate(()=>window.scrollTo({top:0,left:0,behavior:"instant"}));await audit(page,label+" "+width);}}
 
-test("D3 preparação global salva antes do cadastro e recupera criação inativa sem duplicar ou conceder vínculo ao criador",async({page,browser})=>{
-  await login(page,"global",null);const before=Number(sql("select count(*) from public.care_recipients;"));
-  const denied=await page.request.post("/api/admin",{data:{action:"recipient",id:null,displayName:"Cadastro inativo fictício rejeitado no legado",isActive:false,isDevelopment:true,initialAdministratorEmail:fixtures.family.email}});
-  expect(denied.status()).toBe(400);expect(Number(sql("select count(*) from public.care_recipients;"))).toBe(before);
-  await page.goto("/preparar-residencia");await page.getByRole("button",{name:"Nova preparação",exact:true}).click();
-  const panel=page.getByRole("region",{name:"Preparação da residência",exact:true}),name="Residência fictícia navegador "+randomUUID().slice(0,8);
-  await panel.getByLabel("Nome da residência",{exact:true}).fill(name);await panel.getByRole("combobox",{name:"Estado inicial",exact:true}).selectOption("false");await choose(page,"Fuso de referência da residência","America/Sao_Paulo");
-  await panel.getByLabel("Cadastro de desenvolvimento com dados fictícios",{exact:true}).check();
-  await panel.getByRole("button",{name:"Continuar preparação",exact:true}).click();await expect(panel.getByLabel("E-mail da conta administradora inicial",{exact:true})).toBeVisible();
-  expect(Number(sql("select count(*) from public.care_recipients;"))).toBe(before);
-  await panel.getByLabel("E-mail da conta administradora inicial",{exact:true}).fill(fixtures.family.email);await choose(page,"Titular da continuidade",nameOf("global"));await choose(page,"Substituto da continuidade",nameOf("adminA"));
-  await panel.getByLabel("Prazo de resposta em minutos",{exact:true}).fill("60");await panel.getByRole("button",{name:"Salvar e retomar",exact:true}).click();
-  await expect(panel.getByText("Etapa de preparação salva.",{exact:false})).toBeVisible();await expect(panel.getByRole("button",{name:"Salvar e retomar",exact:true})).toBeEnabled();
-  const another=await browser.newContext();try{const peer=await another.newPage();await login(peer,"global",null);await peer.goto("/preparar-residencia");await peer.getByLabel("Buscar preparação pelo nome",{exact:true}).fill(name);await peer.getByRole("button",{name:"Buscar preparações",exact:true}).click();await peer.getByRole("button",{name:"Retomar preparação "+name,exact:true}).click();const editor=peer.getByRole("region",{name:"Preparação da residência",exact:true});await expect(editor.getByLabel("E-mail da conta administradora inicial",{exact:true})).toHaveValue(fixtures.family.email);await editor.getByLabel("Prazo de resposta em minutos",{exact:true}).fill("90");await editor.getByRole("button",{name:"Salvar e retomar",exact:true}).click();await expect(editor.getByRole("button",{name:"Salvar e retomar",exact:true})).toBeEnabled();
-    await panel.getByLabel("Prazo de resposta em minutos",{exact:true}).fill("75");await panel.getByRole("button",{name:"Salvar e retomar",exact:true}).click();const comparison=panel.getByRole("region",{name:"Comparação de revisões",exact:true});await expect(comparison.getByText("Servidor: 90 minutos",{exact:true})).toBeVisible();await expect(panel.getByLabel("Prazo de resposta em minutos",{exact:true})).toHaveValue("75");await comparison.getByRole("button",{name:"Manter meus valores para nova revisão",exact:true}).click();await panel.getByRole("button",{name:"Salvar e retomar",exact:true}).click();await expect(panel.getByRole("button",{name:"Salvar e retomar",exact:true})).toBeEnabled();
-  }finally{await another.close();}
-  const packets:Record<string,unknown>[]=[];
-  await page.route("**/api/residence-preparations",async route=>{
-    if(route.request().method()!=="POST"||route.request().postDataJSON().action!=="create")return route.continue();
-    packets.push(route.request().postDataJSON());if(packets.length===1){const response=await route.fetch();expect(response.ok()).toBe(true);return route.abort("failed");}return route.continue();
+test("E12-03 cria direto da revisão e recupera a mesma residência sem vínculo implícito", async ({ page, browser }) => {
+  await login(page, "global", null);
+  const before = Number(sql("select count(*) from public.care_recipients;"));
+  const denied = await page.request.post("/api/admin", {
+    data: { action: "recipient", id: null, displayName: "Cadastro inativo fictício rejeitado no legado",
+      isActive: false, isDevelopment: true, initialAdministratorEmail: fixtures.family.email },
   });
-  await panel.getByRole("button",{name:"Revisar criação da residência",exact:true}).click();const review=page.getByRole("dialog",{name:"Revisar criação da residência",exact:true});
-  await expect(review.locator("input,textarea,select")).toHaveCount(0);await expect(review.getByText("Inativo",{exact:true})).toBeVisible();await review.getByRole("button",{name:"Confirmar criação da residência",exact:true}).click();
-  await expect(review.getByRole("button",{name:"Recuperar a mesma preparação",exact:true})).toBeEnabled();await expect(review.getByRole("button",{name:"Voltar à preparação",exact:true})).toBeDisabled();
-  await review.getByRole("button",{name:"Recuperar a mesma preparação",exact:true}).click();await expect(review).toHaveCount(0);expect(packets).toHaveLength(2);expect(packets[0]).toEqual(packets[1]);await expect(panel.getByRole("alert")).toHaveCount(0);
-  const patient=sql(`select id from public.care_recipients where display_name=${sqlLiteral(name)};`);expect(Number(sql("select count(*) from public.care_recipients;"))).toBe(before+1);
-  expect(sql(`select is_active from public.care_recipients where id=${sqlLiteral(patient)};`)).toBe("f");expect(sql(`select count(*) from public.care_recipient_memberships where care_recipient_id=${sqlLiteral(patient)} and user_id=${sqlLiteral(fixtures.global.id)};`)).toBe("0");
-  await panel.getByRole("button",{name:"5. Escalas e BAL",exact:true}).click();
-  await expect(panel.locator("input,textarea,select")).toHaveCount(0);
-  await expect(panel.getByRole("link",{name:"Preparar escalas",exact:true})).toHaveAttribute("href","/escalas?careRecipientId="+patient);
-  await expect(panel.getByRole("link",{name:"Preparar regime BAL",exact:true})).toHaveAttribute("href","/balancos?careRecipientId="+patient);
-  await panel.getByRole("button",{name:"6. Comunicação e contingência",exact:true}).click();
-  await expect(panel.locator("input,textarea,select")).toHaveCount(0);
-  await expect(panel.getByRole("link",{name:"Abrir regras e comunicação",exact:true})).toHaveAttribute("href","/configuracoes?careRecipientId="+patient);
-  await expect(panel.getByRole("link",{name:"Consultar orientação de contingência",exact:true})).toHaveAttribute("href","/guias");
-  await widths(page,"D3 residence preparation");
-  const second=await browser.newContext();try{const family=await second.newPage();await login(family,"family",patient);expect((await family.request.get("/api/residence-preparations")).status()).toBe(403);const inactive=await family.request.post("/api/documents",{data:{careRecipientId:patient,type:"COM",payload:{origin:"purchase",lines:[{productId:"inactive-fixture-product",quantity:"1"}]},idempotencyKey:randomUUID(),draft:false}});expect(inactive.status()).toBe(409);expect(await inactive.json()).toMatchObject({code:"PATIENT_INACTIVE"});expect(sql(`select count(*) from public.operational_documents where care_recipient_id=${sqlLiteral(patient)};`)).toBe("0");await family.goto("/preparar-residencia");await expect(family.getByText("Somente a administração global inicia uma preparação.",{exact:false})).toBeVisible();await expect(family.getByRole("button",{name:"Nova preparação",exact:true})).toHaveCount(0);}finally{await second.close();}
+  expect(denied.status()).toBe(400);
+  const name = "Residência fictícia de criação direta " + randomUUID().slice(0, 8);
+  const drafts = () => sql(`select count(*) from private.residence_preparations where content->>'displayName'=${sqlLiteral(name)} and state='draft';`);
+  await page.goto("/preparar-residencia");
+  const panel = page.getByRole("form", { name: "Preparação da residência", exact: true });
+  const residenceName = panel.getByRole("textbox", { name: "Nome da residência", exact: true });
+  await residenceName.fill(name);
+  await panel.getByRole("combobox", { name: "Estado inicial", exact: true }).selectOption("false");
+  await choose(page, "Fuso da residência", "America/Manaus");
+  const email = panel.getByRole("textbox", { name: "E-mail da conta administradora inicial", exact: true });
+  await email.fill("sem-conta-" + randomUUID() + "@example.test");
+  await expect(panel.getByRole("combobox", { name: "Titular da continuidade", exact: true })).toBeEnabled({ timeout: 90_000 });
+  await choose(page, "Titular da continuidade", nameOf("global"));
+  await choose(page, "Substituto da continuidade", nameOf("adminA"));
+  await panel.getByRole("spinbutton", { name: "Prazo de resposta, em minutos", exact: true }).fill("75");
+  const reviewButton = panel.getByRole("button", { name: "Revisar criação", exact: true });
+  await reviewButton.click();
+  const conflict = page.getByRole("dialog", { name: "Conta administradora a conferir", exact: true });
+  await expect(conflict).toContainText("ativa e confirmada");
+  await conflict.getByRole("button", { name: "Voltar ao preenchimento", exact: true }).click();
+  await expect(residenceName).toHaveValue(name);
+  await email.fill(fixtures.family.email);
+  await reviewButton.click();
+  const review = page.getByRole("dialog", { name: "Confira antes de criar", exact: true });
+  await expect(review.locator("input,textarea,select")).toHaveCount(0);
+  await expect(review.getByText("Inativo", { exact: true })).toBeVisible();
+  await expect(review.getByText("America/Manaus", { exact: true })).toBeVisible();
+  await expect(review.getByText(nameOf("family"), { exact: true })).toBeVisible();
+  expect(Number(sql("select count(*) from public.care_recipients;"))).toBe(before);
+  expect(drafts()).toBe("0");
+
+  const packets: Array<{ idempotencyKey: string }> = [];
+  const consulted: string[] = [];
+  await page.route("**/api/residence-preparations**", async route => {
+    const req = route.request();
+    if (req.method() === "GET") {
+      consulted.push(new URL(req.url()).searchParams.get("attempt") ?? "");
+      if (consulted.length <= 2) return route.fulfill({ status: 503, json: { error: "Consulta temporariamente indisponível" } });
+      return route.continue();
+    }
+    if (req.postDataJSON().action !== "create") return route.continue();
+    packets.push(req.postDataJSON());
+    const recorded = await route.fetch();
+    expect(recorded.ok(), await recorded.text()).toBe(true);
+    return route.abort("failed");
+  });
+  await review.getByRole("button", { name: "Criar residência", exact: true }).click();
+  const pending = page.getByRole("dialog", { name: "Criação ainda sem confirmação", exact: true });
+  await expect(pending).toBeVisible();
+  const hint = await page.evaluate(() => {
+    const key = Object.keys(sessionStorage).find(item => item.startsWith("hca:residence-creation:"));
+    return key ? JSON.parse(sessionStorage.getItem(key) ?? "null") : null;
+  });
+  expect(hint).toEqual({ key: packets[0].idempotencyKey, retries: 0 });
+  await page.reload();
+  await expect(pending).toBeVisible();
+  await pending.getByText("Ajuda para resolver", { exact: true }).click();
+  await expect(pending).toContainText(packets[0].idempotencyKey);
+  await pending.getByRole("button", { name: "Conferir resultado", exact: true }).click();
+  await expect(pending).toBeVisible();
+  await pending.getByRole("button", { name: "Conferir resultado", exact: true }).click();
+  const success = page.getByRole("dialog", { name: "Residência criada", exact: true });
+  await expect(success).toBeVisible();
+  await success.getByRole("button", { name: "Acompanhar tarefas locais", exact: true }).click();
+  await expect(page.getByRole("region", { name: "Cadastro confirmado", exact: true })).toContainText(nameOf("global"));
+  expect(consulted).toEqual(Array(3).fill(packets[0].idempotencyKey));
+  expect(packets).toHaveLength(1);
+  const patient = sql(`select id from public.care_recipients where display_name=${sqlLiteral(name)};`);
+  expect(Number(sql("select count(*) from public.care_recipients;"))).toBe(before + 1);
+  expect(drafts()).toBe("0");
+  expect(sql(`select count(*) from public.care_recipient_memberships where care_recipient_id=${sqlLiteral(patient)} and user_id=${sqlLiteral(fixtures.global.id)};`)).toBe("0");
+
+  const tasks = page.getByRole("region", { name: "Próximos passos", exact: true });
+  await expect(tasks.getByRole("button")).toHaveCount(6);
+  await tasks.getByRole("button", { name: "Escalas e responsabilidades" }).click();
+  const local = page.getByRole("dialog", { name: "Continue no vínculo local", exact: true });
+  await expect(local).toContainText(name);
+  await expect(local.getByRole("link")).toHaveCount(0);
+  await local.getByRole("button", { name: "Voltar", exact: true }).click();
+
+  const second = await browser.newContext();
+  try {
+    const family = await second.newPage();
+    await login(family, "family", patient);
+    expect((await family.request.get("/api/residence-preparations?attempt=" + packets[0].idempotencyKey)).status()).toBe(403);
+    const inactive = await family.request.post("/api/documents", {
+      data: { careRecipientId: patient, type: "COM", payload: { origin: "purchase", lines: [{ productId: "inactive-fixture-product", quantity: "1" }] },
+        idempotencyKey: randomUUID(), draft: false },
+    });
+    expect(inactive.status()).toBe(409);
+    expect(await inactive.json()).toMatchObject({ code: "PATIENT_INACTIVE" });
+    expect(sql(`select count(*) from public.operational_documents where care_recipient_id=${sqlLiteral(patient)};`)).toBe("0");
+    await family.goto("/preparar-residencia");
+    await expect(family.getByText("Somente a administração global inicia uma residência.", { exact: false })).toBeVisible();
+    await expect(family.getByRole("form", { name: "Preparação da residência" })).toHaveCount(0);
+  } finally { await second.close(); }
 });
 
 test("C-FINAL023 guia não mantém tarefa recusada nem pede editar resultado e recupera foco na consulta", async ({ page }) => {

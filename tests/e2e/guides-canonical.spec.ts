@@ -118,23 +118,27 @@ test("guide rejects a valid response from another role without exposing its task
 
 test("preparation does not offer a partial directory after a failed later page and retains filled fields",async({page})=>{
   await login(page,"global",null);
+  const name=sql("select full_name from public.profiles where id="+q(fixtures.global.id));
   let failure=true;
-  await page.route("**/api/admin?section=profiles&profilePage=*",async route=>{
+  await page.route("**/api/admin?section=profiles&profilePage=*&query=*",async route=>{
     if(!failure)return route.continue();
-    const pageNumber=Number(new URL(route.request().url()).searchParams.get("profilePage"));
+    const params = new URL(route.request().url()).searchParams;
+    const pageNumber=Number(params.get("profilePage"));
     if(pageNumber===2)return route.fulfill({status:503,contentType:"application/json",body:JSON.stringify({error:"Segunda página indisponível."})});
     // Controlled transport data tests completeness; these identities are never submitted.
-    return route.fulfill({status:200,contentType:"application/json",body:JSON.stringify({data:Array.from({length:30},(_,i)=>({id:randomUUID(),full_name:"Pessoa de resposta controlada "+i,role:"reader",status:"active",global_scope:false,created_at:"2026-11-12T10:00:00Z"})),total:31,profilePage:1,pageSize:30,query:""})});
+    return route.fulfill({status:200,contentType:"application/json",body:JSON.stringify({data:Array.from({length:30},(_,i)=>({id:randomUUID(),full_name:i===0?name:"Pessoa de resposta controlada "+i,role:"reader",status:"active",global_scope:false,created_at:"2026-11-12T10:00:00Z"})),total:31,profilePage:1,pageSize:30,query:params.get("query")})});
   });
-  await page.goto("/preparar-residencia");await page.getByRole("button",{name:"Nova preparação",exact:true}).click();
-  const panel=page.getByRole("region",{name:"Preparação da residência",exact:true});
-  await panel.getByLabel("Nome da residência",{exact:true}).fill("Preenchimento preservado após falha de consulta");
-  await panel.getByRole("button",{name:"2. Pessoas e responsabilidades",exact:true}).click();
-  await expect(panel.getByRole("alert")).toContainText("Segunda página indisponível");
-  await expect(panel.getByRole("combobox",{name:"Titular da continuidade",exact:true})).toBeDisabled();
+  await page.goto("/preparar-residencia");
+  const panel=page.getByRole("form",{name:"Preparação da residência",exact:true});
+  const residenceName = panel.getByRole("textbox",{name:"Nome da residência",exact:true});
+  await residenceName.fill("Preenchimento preservado após falha de consulta");
+  const person=panel.getByRole("combobox",{name:"Titular da continuidade",exact:true});
+  await person.fill(name);
+  await expect(panel.getByText("Segunda página indisponível", {exact:false})).toBeVisible();
+  await expect(page.getByRole("option",{name,exact:true})).toHaveCount(0);
   failure=false;await panel.getByRole("button",{name:"Consultar pessoas novamente",exact:true}).click();
-  const person=panel.getByRole("combobox",{name:"Titular da continuidade",exact:true});await expect(person).toBeEnabled();
-  const name=sql("select full_name from public.profiles where id="+q(fixtures.global.id));await person.fill(name);await person.press("ArrowDown");await page.getByRole("option",{name,exact:true}).click();
-  await panel.getByRole("button",{name:"1. Residência e fuso",exact:true}).click();
-  await expect(panel.getByLabel("Nome da residência",{exact:true})).toHaveValue("Preenchimento preservado após falha de consulta");
+  await person.press("ArrowDown");
+  await page.getByRole("option",{name,exact:true}).click();
+  await expect(person).toHaveValue(name);
+  await expect(residenceName).toHaveValue("Preenchimento preservado após falha de consulta");
 });

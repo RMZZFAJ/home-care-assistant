@@ -10,12 +10,13 @@ export const operationRecoveryLimit = 2;
 export type DocumentOperationFailure = { outcome: "rejected" | "uncertain"; description: string; cause?: unknown };
 
 export function DocumentOperationFailureDialog({
-  title, description, outcome, cause, operation, fallbackCode, attempts, guidance, exhaustedMessage, onClose, closeLabel, action, finalFocus,
+  title, description, outcome, cause, operation, fallbackCode, attempts, attemptReference, guidance, exhaustedMessage, onClose, closeLabel, action, finalFocus,
 }: DocumentOperationFailure & {
   title: string;
   operation: string;
   fallbackCode: string;
   attempts: number;
+  attemptReference?: string;
   guidance?: string;
   exhaustedMessage?: string;
   onClose: () => void;
@@ -24,7 +25,7 @@ export function DocumentOperationFailureDialog({
   finalFocus?: ComponentProps<typeof Dialog>["finalFocus"];
 }) {
   const { copy, details } = useOperationSupport({
-    cause, operation, result: title, fallbackCode, attempts, attemptLabel: "Tentativas de recuperação",
+    cause, operation, result: title, fallbackCode, attempts, attemptReference, attemptLabel: "Tentativas de recuperação",
     label: guidance ? "Ajuda para resolver" : undefined,
   });
 

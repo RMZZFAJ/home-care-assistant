@@ -4,6 +4,13 @@ O [fechamento A–D da PR 7](docs/audits/FECHAMENTO_PR7.md) reúne os critérios
 e as pendências para a próxima etapa. Este acompanhamento conserva o
 histórico dos incrementos de D-B.
 
+**24/11 — Criação de residência.** A revisão confere a conta administradora.
+A confirmação registra o cadastro, o vínculo inicial, a configuração do
+guia e o comprovante juntos. Após perda da resposta, a consulta recupera
+a mesma tentativa. Os próximos passos dependem de vínculo local. A migration
+está aplicada no Supabase local e pendente no remoto.
+[Registro de L4](docs/audits/D/D-B/LOTES_EXECUCAO.md#e12-03--criação-de-residência).
+
 **24/11 — Guias e ajuda na tarefa.** A lista por perfil abre os assuntos em
 painéis da v2. Na conferência de entrega, a ajuda mantém o formulário e
 devolve o foco ao controle de origem. O progresso e a configuração da

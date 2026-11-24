@@ -1420,13 +1420,28 @@ as anteriores e exigem motivo ao alterar a suficiência.
 
 ## Preparação de residência e guias
 
-GET /api/residence-preparations é exclusivo do modo global autorizado. Lista
-preparações próprias em páginas de20, com page/query; id consulta a preparação
-e seu resumo de metadados. POST aceita save/create/discard com revisão esperada
-e chave da mesma intenção. Salvar não cria paciente. Criar exige identidade,
-fuso explícito, administração inicial confirmada e responsáveis distintos;
-isActive=false é preservado. Não concede vínculo ao criador global. Resumo,
-contagens e progresso não aprovam estoque físico nem liberação operacional.
+O fluxo de residência exige o modo global autorizado. Em
+`POST /api/residence-preparations`, a ação `review` confere o e-mail
+da conta inicial ativa e confirmada, sem gravar o preenchimento. A ação
+`create` recebe os campos revisados, a identidade da conta conferida e a
+chave da tentativa. O banco revalida conta e autorização e grava, na mesma
+transação, a residência, o vínculo inicial explícito, a configuração do
+guia, a preparação oficial e o comprovante. O estado inativo e o fuso
+escolhidos são preservados. Os responsáveis pela continuidade são distintos.
+
+`GET /api/residence-preparations?attempt=<uuid>` consulta o resultado da
+própria tentativa. A ausência de comprovante ainda pode indicar uma
+requisição em andamento. Ao recuperar sem o formulário, a ação `resolve`
+consulta sob o mesmo bloqueio da criação e encerra uma chave ausente, de
+modo que uma requisição atrasada dessa tentativa seja recusada.
+O identificador e o número de tentativas de recuperação são suficientes
+para reabrir a consulta na mesma aba.
+
+A criação só concede o vínculo selecionado para a administração inicial.
+Pessoas planejadas seguem os fluxos de convite e aceite. As tarefas locais
+dependem do vínculo e das capacidades do paciente. Resumo, contagens e
+progresso descrevem registros e deixam as conferências físicas em seus
+fluxos próprios.
 
 GET /api/guides deriva papel/contexto vigentes no banco. POST progress recebe
 expectedScope, revisão, etapa, escolha e chave; troca de contexto rejeita o
@@ -1434,11 +1449,10 @@ comando sem gravar no paciente seguinte. Recuperação conserva a mesma intenç�
 POST configure exige administração local do paciente e revisão da configuração.
 Progresso próprio e apresentação opcional não alteram SCI ou permissões.
 O cliente confere paciente, papel e escopo da resposta antes de exibir tarefas;
-os links preservam o paciente consultado. A preparação usa o diretório global
-paginado de contas, com trinta pessoas por página e contagem conferida, sem
-tratar uma coleção parcial como lista completa. Alterar uma preparação não
-reconsulta esse diretório; falha de consulta tem recuperação própria e não
-apaga os campos já preenchidos.
+os links preservam o paciente consultado. A criação pesquisa responsáveis
+por nome no diretório global, com trinta pessoas por página e contagem
+conferida. Cada pesquisa só oferece opções após ler todas as suas páginas.
+A falha de uma página preserva os campos preenchidos e permite nova consulta.
 
 GET /api/guides/preparation exige careRecipientId único, UUID válido, sessão
 Auth, paciente selecionado e competência local de preparação. A RPC
