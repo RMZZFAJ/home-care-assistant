@@ -21,11 +21,11 @@ function guideScope(context: WorkspaceContext | null | undefined) {
   return JSON.stringify([context?.userId, context?.activeContext?.mode, context?.patient?.id, context?.patient?.role]);
 }
 
-function useGuide(context: WorkspaceContext | null | undefined) {
+function useGuide(context: WorkspaceContext | null | undefined, active: boolean) {
   const [attempt, setAttempt] = useState(0);
   const [result, setResult] = useState<{ key: number; data: GuideContext } | null>(null);
   const [failure, setFailure] = useState<{ key: number; reason: unknown } | null>(null);
-  const ready = Boolean(context);
+  const ready = active && Boolean(context);
   const role = context?.activeContext?.mode === "global" ? "global" : context?.patient?.role ?? "general";
   const patientId = context?.activeContext?.mode === "global" ? null : context?.patient?.id ?? null;
 
@@ -46,7 +46,7 @@ function useGuide(context: WorkspaceContext | null | undefined) {
   const error = failure?.key === attempt ? failure.reason : null;
   const data = result?.key === attempt && !error ? result.data : null;
   return {
-    context, key: attempt, data, error, loading: !data && !error,
+    context, key: attempt, data, error, loading: ready && !data && !error,
     refresh: () => setAttempt(value => value + 1),
     adopt: (next: GuideContext) => { setResult({ key: attempt, data: next }); setFailure(null); },
   };
@@ -57,11 +57,11 @@ export function GuideOnboarding() {
   return <GuideReader key={guideScope(value)} context={value} onboarding />;
 }
 
-function GuideReader({ context, onboarding, standalone }: {
-  context: WorkspaceContext | null | undefined; onboarding?: boolean; standalone?: boolean;
+function GuideReader({ context, onboarding, standalone, active = true }: {
+  context: WorkspaceContext | null | undefined; onboarding?: boolean; standalone?: boolean; active?: boolean;
 }) {
-  const guide = useGuide(context);
-  if (!onboarding) return <GuideHome guide={guide} standalone={standalone} />;
+  const guide = useGuide(context, active);
+  if (!onboarding) return <GuideHome guide={guide} standalone={standalone} active={active} />;
   if (!guide.data || !guide.data.showOnFirstAccess || guide.data.progress.status !== null) return null;
   return <OnboardingOffer data={guide.data} patientName={context?.patient?.display_name} />;
 }
@@ -125,15 +125,15 @@ export function GuidesPage() {
   </div>}>{() => <UserGuide standalone />}</Workspace>;
 }
 
-export function UserGuide({ standalone }: { standalone?: boolean }) {
+export function UserGuide({ standalone, active = true }: { standalone?: boolean; active?: boolean }) {
   const { value } = useWorkspaceState();
-  return <GuideReader key={guideScope(value)} context={value} standalone={standalone} />;
+  return <GuideReader key={guideScope(value)} context={value} standalone={standalone} active={active} />;
 }
 
 type Task = ReturnType<typeof guideTopicsFor>[number];
 type Progress = Extract<GuideCommand, { action: "progress" }>;
 
-function GuideHome({ guide, standalone }: { guide: ReturnType<typeof useGuide>; standalone?: boolean }) {
+function GuideHome({ guide, standalone, active }: { guide: ReturnType<typeof useGuide>; standalone?: boolean; active: boolean }) {
   const { data, context } = guide;
   const queryTriggerRef = useRef<HTMLButtonElement>(null);
   const topicTriggerRef = useRef<HTMLButtonElement>(null);
@@ -150,13 +150,13 @@ function GuideHome({ guide, standalone }: { guide: ReturnType<typeof useGuide>; 
   const [dismissedRead, setDismissedRead] = useState<number>();
   const command = useCommandIntent<GuideCommand, { data: unknown }>((result, intent) =>
     intent.action === "progress" ? confirmedGuideProgress(result, intent, data) : guideConfigurationConfirmed(result, intent));
-  useOperationActivity(command.busy || guide.loading, { title: command.busy ? "Confirmando a orientação" : "Consultando seu guia" });
+  useOperationActivity(active && (command.busy || guide.loading), { title: command.busy ? "Confirmando a orientação" : "Consultando seu guia" });
   useEffect(() => {
-    if (data && focusAfterReadRef.current) {
+    if (active && data && focusAfterReadRef.current) {
       focusAfterReadRef.current = false;
       summaryRef.current?.focus();
     }
-  }, [data]);
+  }, [active, data]);
 
   async function change(intent?: GuideCommand) {
     if (!data) return;
@@ -225,6 +225,7 @@ function GuideHome({ guide, standalone }: { guide: ReturnType<typeof useGuide>; 
     context && taskDestination.anyCapability.some(capability => can(context, capability)))
     ? guideTaskHref(taskDestination.href, data?.patientId ?? null) : undefined;
 
+  if (!active) return null;
   return <section aria-label="Guia do seu perfil" className={standalone ? "hca-guide-home hca-guide-page" : "hca-guide-home"}>
     {!data ? <section className="ui-card">
       <h2>{guide.error ? "Guia indisponível" : "Guia por tarefa"}</h2>

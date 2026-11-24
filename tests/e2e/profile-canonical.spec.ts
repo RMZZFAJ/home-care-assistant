@@ -56,7 +56,12 @@ test("15 ID02 NOT02 NOT04 profile tabs follow the model and retain unsaved field
   await page.getByLabel("Senha", { exact: true }).fill(fixturePassword);
   await page.getByRole("button", { name: "Entrar", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Visão geral", exact: true })).toBeVisible();
-  await selectContext(page, f.patient); await page.goto("/perfil?careRecipientId=" + f.patient);
+  await selectContext(page, f.patient);
+  const guideReads: string[] = [];
+  page.on("request", request => {
+    if (request.method() === "GET" && new URL(request.url()).pathname === "/api/guides") guideReads.push(request.url());
+  });
+  await page.goto("/perfil?careRecipientId=" + f.patient);
   await selectProfileSection(page, "identity");
   const marker = "Nome em edição sem confirmação " + randomUUID().slice(0, 8);
   const name = page.getByRole("textbox", { name: "Nome", exact: true }); await name.fill(marker);
@@ -85,8 +90,11 @@ test("15 ID02 NOT02 NOT04 profile tabs follow the model and retain unsaved field
   await selectProfileSection(page, "devices");
   await expect(page.getByRole("region", { name: "Aparelhos com avisos", exact: true })).toBeVisible();
   await expect(page.getByRole("button", { name: "Consultar aparelhos novamente", exact: true })).toBeVisible();
+  expect(guideReads).toEqual([]);
   await selectProfileSection(page, "help");
   await expect(page.getByRole("region", { name: "Guias e ajuda", exact: true })).toBeVisible();
+  await expect(page.getByRole("region", { name: "Guia do seu perfil", exact: true })).toBeVisible();
+  expect(guideReads.length).toBeGreaterThan(0);
   const selected = page.getByRole("tab", { name: "Ajuda", exact: true });
   await selected.focus(); await page.keyboard.press("Home");
   await expect(page.getByRole("tab", { name: "Meu perfil", exact: true })).toBeFocused();

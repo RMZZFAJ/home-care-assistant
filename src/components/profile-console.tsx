@@ -354,9 +354,9 @@ function ProfileContent() {
             </>) : null,
             notices: <><PwaSettings />{push.consent}{profile ? <SciencePreferenceSettings /> : null}</>,
             devices: push.devices,
-            help: profile ? (<>
-              <SettingsSection title="Guias e ajuda" summary="Reabrir orientações e guardar seu progresso"><UserGuide /></SettingsSection>
-            </>) : null,
+            help: profile ? active => <SettingsSection title="Guias e ajuda" summary="Reabrir orientações e guardar seu progresso">
+              <UserGuide active={active} />
+            </SettingsSection> : null,
           }}
         </ProfileTabs>
       )} />

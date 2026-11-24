@@ -4044,3 +4044,24 @@ O `chromium-1` da [CI de `a08742dc`](https://github.com/RMZZFAJ/home-care-assist
 falhou nas duas tentativas ao localizar o rótulo anterior de contingência
 em Guias. A regressão usa o rótulo aprovado nesta etapa e passou nos três
 navegadores emulados.
+
+### Pendências da CI publicada em `a08742dc`
+
+- No `chromium-1`, o teste da aprovação, compra e chegada da COM passou
+  na repetição. O artefato da primeira tentativa mostra **Materiais** com
+  foco, **Visão geral** selecionada e URL sem `documentTab`. Cinco
+  execuções locais sem retentativa passaram. A causa da intermitência
+  permanece em aberto. [Job Chromium 1](https://github.com/RMZZFAJ/home-care-assistant/actions/runs/45330314424/job/138238031341)
+- O `ios-1` registrou o mesmo seletor antigo de contingência do
+  `chromium-1` nas duas tentativas. O teste do checkout atual passou
+  em ambos os navegadores. [Job iOS 1](https://github.com/RMZZFAJ/home-care-assistant/actions/runs/45330314424/job/138238031343)
+- No `mobile-2`, os casos de PWA e Web Push falharam nas duas tentativas.
+  Os alertas de sessão e consentimento já estavam na página. Os artefatos
+  mostram diálogos de Guia sobrepostos, iniciados pela aba oculta de
+  Ajuda. A consulta e os diálogos passaram a depender da aba ativa. Os dois
+  casos e o teste de navegação do Perfil passaram no Android emulado sem
+  retentativa. O teste do Perfil confere que a Ajuda consulta o Guia ao
+  abrir e preserva o preenchimento das outras abas.
+- Também no `mobile-2`, o teste de chegada da COM passou na repetição.
+  A primeira tentativa perdeu a aba **Materiais** durante a seleção.
+  [Job Mobile 2](https://github.com/RMZZFAJ/home-care-assistant/actions/runs/45330314424/job/138238031133)

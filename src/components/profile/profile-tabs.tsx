@@ -16,7 +16,7 @@ const sections: { id: string; label: string; icon: IconName }[] = [
 ];
 
 /** Keep every form and official recovery mounted while navigating the account. */
-export function ProfileTabs({ children }: { children: Record<string, ReactNode> }) {
+export function ProfileTabs({ children }: { children: Record<string, ReactNode | ((active: boolean) => ReactNode)> }) {
   const params = useSearchParams();
   const requested = params.get("profileTab");
   const value = requested && sections.some(section => section.id === requested)
@@ -37,11 +37,12 @@ export function ProfileTabs({ children }: { children: Record<string, ReactNode> 
             </Tabs.Tab>
           ))}
         </Tabs.List>
-        {sections.map(section => (
-          <Tabs.Panel key={section.id} value={section.id} keepMounted className="hca-profile-panel">
-            {children[section.id]}
-          </Tabs.Panel>
-        ))}
+        {sections.map(section => {
+          const content = children[section.id];
+          return <Tabs.Panel key={section.id} value={section.id} keepMounted className="hca-profile-panel">
+            {typeof content === "function" ? content(section.id === value) : content}
+          </Tabs.Panel>;
+        })}
       </Tabs.Root>
     </SettingsSectionCards>
   );
