@@ -48,7 +48,9 @@ test("audit delegation grants read only in the selected patient and revocation i
   assert.equal((await professional.rpc("patient_audit_page", { p_patient: f.patient })).error?.code, "42501");
   for (const enabled of [true, false]) {
     const version = (await rpc(f.admin, "patient_governance", { p_patient: f.patient })).data.version;
-    await rpc(f.admin, "configure_patient_access", { p_patient: f.patient, p_kind: "capability", p_change: { capability: "audit.read", subjectUser: fixtures.professional.id, enabled }, p_key: randomUUID(), p_version: version });
+    await rpc(f.admin, "configure_patient_access", { p_patient: f.patient, p_kind: "capability",
+      p_change: { capability: "audit.read", subjectUser: fixtures.professional.id, enabled, ...(enabled ? { reviewedRole: "professional", confirmIndividual: true } : {}) },
+      p_key: randomUUID(), p_version: version });
     const result = await professional.rpc("patient_audit_page", { p_patient: f.patient, p_action: "invitation.created" });
     if (enabled) { assert.ifError(result.error); assert.equal(result.data.total, 201); }
     else assert.equal(result.error?.code, "42501");

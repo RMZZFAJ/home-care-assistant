@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
 import test from "node:test";
-import { actor, rpc, setup } from "./v4-fixtures.mjs";
+import { actor, fixtures, rpc, setup } from "./v4-fixtures.mjs";
 import { sql, sqlLiteral as q } from "../../scripts/test-environment.mjs";
 
 async function stockFixture(t) {
@@ -23,6 +23,39 @@ async function stockFixture(t) {
   };
   return { ...f, admin, reference, command, stock };
 }
+
+test("personal family stock permissions control read and write independently", async t => {
+  const f = await stockFixture(t);
+  const professional = await actor("professional", f.patient);
+  const balances = async () => {
+    const result = await professional.from("current_stock_balances").select("product_id")
+      .eq("care_recipient_id", f.patient).eq("location", "FAMILY");
+    assert.ifError(result.error);
+    return result.data.map(row => row.product_id).sort((left, right) => left.localeCompare(right));
+  };
+  const adjust = async (capability, enabled) => {
+    const policy = await rpc(f.admin, "patient_governance", { p_patient: f.patient });
+    return rpc(f.admin, "configure_patient_access", {
+      p_patient: f.patient, p_kind: "capability", p_key: randomUUID(), p_version: policy.data.version,
+      p_change: { capability, subjectUser: fixtures.professional.id, reviewedRole: "professional",
+        enabled, ...(enabled ? { confirmIndividual: true } : {}) },
+    });
+  };
+  const before = await f.stock();
+  assert.deepEqual(await balances(), []);
+  await adjust("stock.family.read", true);
+  assert.deepEqual(await balances(), [...f.products].sort((left, right) => left.localeCompare(right)));
+  const inbound = await f.command("inbound", [1, 1]);
+  assert.equal((await professional.rpc("commit_family_stock_operation", inbound)).error?.code, "42501");
+  await adjust("stock.family.manage", true);
+  const receipt = await rpc(professional, "commit_family_stock_operation", await f.command("inbound", [1, 1], professional));
+  assert.equal(receipt.movementIds.length, 2);
+  await adjust("stock.family.manage", null);
+  const next = await f.command("inbound", [1, 1]);
+  assert.equal((await professional.rpc("commit_family_stock_operation", next)).error?.code, "42501");
+  assert.equal((await balances()).length, f.products.length);
+  assert.deepEqual(await f.stock(), before.map(amount => amount + 1));
+});
 
 test("one family operation groups its ledger rows, replays in another order and protects recovery by actor", async t => {
   const f = await stockFixture(t);

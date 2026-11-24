@@ -734,7 +734,7 @@ export function SupplyDocumentContent({
   const pendingArrivalIds = data?.type === "COM" && activeContext && !archived && canReviewPurchaseArrivals(context)
     ? data.receipts.filter(receipt => receipt.state === "pending" && receipt.submitted_by !== context.userId).map(receipt => receipt.id)
     : [];
-  const patientAdmin = Boolean(activeContext && context.patient?.role === "admin" && can(context, "access.manage"));
+  const patientAdmin = Boolean(activeContext && can(context, "access.manage"));
   const canReviewCompletion = Boolean(activeContext && !archived && data?.protocol && data.type !== "BAL"
     && !purchaseIdentificationPending
     && !followUpTerminal && data.status !== "rejected" && data.status !== "administratively_closed"

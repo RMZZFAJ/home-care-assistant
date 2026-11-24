@@ -1,12 +1,17 @@
 import { z } from "zod";
 
+const appliedPermission = z.object({
+  actorId: z.uuid(), actorName: z.string().optional(), personId: z.uuid().nullable(),
+  role: z.string(), capability: z.string(), before: z.boolean(), after: z.boolean(),
+});
+
 const changeSchema = z.object({
   id: z.string().uuid(), care_recipient_id: z.string().uuid(), kind: z.string().min(1),
   proposed: z.record(z.string(), z.unknown()), current: z.record(z.string(), z.unknown()).nullable(),
   proposed_by: z.string().uuid(), proposerName: z.string(), subjectName: z.string().nullable(), status: z.string().min(1),
   base_version: z.number().int().positive(), created_at: z.string().datetime({ offset: true }),
   decided_at: z.string().datetime({ offset: true }).nullable(),
-  resolution: z.object({ invitationId: z.string().uuid().optional() }).passthrough().nullish().transform(value => value ?? undefined),
+  resolution: z.object({ invitationId: z.string().uuid().optional(), permission: appliedPermission.optional() }).passthrough().nullish().transform(value => value ?? undefined),
 }).passthrough();
 const pageSchema = z.object({
   changes: z.array(changeSchema).max(50), total: z.number().int().nonnegative(),

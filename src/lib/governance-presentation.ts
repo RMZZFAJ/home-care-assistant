@@ -16,6 +16,7 @@ const labels: Record<string, string> = {
   scienceRequirement: "Critério da ciência", scienceByDispatch: "Ciência pela expedição", scienceAutomatic: "Ciência automática", scienceWhatsApp: "Ciência por WhatsApp", scienceDialog: "Ciência mediante diálogo", scienceTacit: "Preferência de ciência tácita",
   archiveDays: "Dias até arquivamento", reminderHours: "Primeiro lembrete (horas)", reminderRepeatHours: "Repetição do lembrete (horas)", shareWaitSeconds: "Acompanhamento inicial (segundos)", patientShortName: "Nome curto nas mensagens", whatsappSimpleAcceptance: "Aceite simplificado por WhatsApp",
   balReminderUsers: "Destinatários de lembrete do balanço", shiftReminder: "Lembrete de plantão", role: "Função", status: "Situação do vínculo", enabled: "Permissão", capability: "Capacidade", subjectRole: "Função destinatária", subjectUser: "Pessoa destinatária", userId: "Pessoa",
+  reviewedRole: "Função conferida", confirmIndividual: "Confirmação individual",
   event: "Evento", channels: "Canais", includePdf: "Incluir PDF", cooldownMinutes: "Intervalo mínimo (minutos)", quietStart: "Início do silêncio", quietEnd: "Fim do silêncio", mode: "Modo de notificação",
   displayName: "Nome do paciente", isActive: "Ativo", isDevelopment: "Ambiente de desenvolvimento", name: "Nome do material", category: "Categoria", unit: "Unidade", aliases: "Nomes alternativos", description: "Descrição", sortOrder: "Ordem na lista", productId: "Material", location: "Custódia", lowThreshold: "Limite de atenção", criticalThreshold: "Limite crítico", isEnabled: "Habilitado", recipientUserId: "Destinatário", recipientGroup: "Grupo destinatário", channel: "Canal", destination: "Destino", includeTeamAlerts: "Incluir alertas da equipe",
 };
@@ -23,7 +24,7 @@ const translations: Record<string, string> = { admin: "Administrador do paciente
 const operations: Record<string, string> = { recipient: "Cadastro do paciente", product: "Material do paciente", adoptProduct: "Adicionar material do catálogo", membershipStatus: "Situação do vínculo", alertRule: "Alerta de estoque", notificationRecipient: "Destinatário de notificação" };
 const kindFields: Record<string, string[]> = {
   settings: ["balDay", "balReview", "balApprovers", "balRequirement", "scienceRequired", "scienceRoles", "scienceUsers", "scienceRequirement", "scienceByDispatch", "scienceAutomatic", "scienceWhatsApp", "scienceDialog", "scienceTacit", "archiveDays", "reminderHours", "reminderRepeatHours", "shareWaitSeconds", "patientShortName", "whatsappSimpleAcceptance", "balReminderUsers", "shiftReminder"],
-  capability: ["capability", "subjectRole", "subjectUser", "enabled"], membership: ["userId", "role"],
+  capability: ["capability", "subjectRole", "subjectUser", "enabled", "reviewedRole", "confirmIndividual"], membership: ["userId", "role"],
   notification_rule: ["event", "role", "channels", "includePdf", "cooldownMinutes", "quietStart", "quietEnd", "mode"],
 };
 const operationFields: Record<string, string[]> = {
@@ -37,7 +38,8 @@ const own = <T,>(record: Record<string, T>, key: string): T | undefined => Objec
 function finiteValueKnown(key: string, value: unknown) {
   if (key === "capability") return typeof value === "string" && Object.hasOwn(capabilityLabels, value);
   if (key === "event") return typeof value === "string" && isKnownDocumentEvent(value);
-  if (key === "role" || key === "subjectRole") return typeof value === "string" && Object.hasOwn(roleLabels, value);
+  if (key === "role" || key === "subjectRole" || key === "reviewedRole") return typeof value === "string" && Object.hasOwn(roleLabels, value);
+  if (key === "confirmIndividual") return value === true;
   if (key === "scienceRoles") return Array.isArray(value) && value.every(role => typeof role === "string" && Object.hasOwn(roleLabels, role));
   if (key === "channels") return Array.isArray(value) && value.every(channel => ["internal", "email", "whatsapp"].includes(channel));
   if (key === "balApprovers") return Array.isArray(value) && value.every(group => ["family", "supervisor"].includes(group));

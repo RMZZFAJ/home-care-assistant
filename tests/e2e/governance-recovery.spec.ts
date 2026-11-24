@@ -20,6 +20,36 @@ async function login(page: Page, role: "global" | "adminA", patient: string | nu
 }
 test.afterEach(async ({ page }) => { await page.unrouteAll({ behavior: "wait" }); });
 const count = (patient: string) => Number(sql(`select count(*) from public.access_change_requests where care_recipient_id=${sqlLiteral(patient)};`));
+
+test("L4 confirma a exceção crítica além da função e registra a mudança efetiva", async ({ page }) => {
+  const f = await setup();
+  await login(page, "adminA", f.patient);
+  await page.goto("/configuracoes?area=permissions&careRecipientId=" + f.patient);
+  const matrix = page.getByRole("region", { name: "Matriz de permissões", exact: true });
+  await matrix.getByLabel("Visualizar permissões", { exact: true }).selectOption(fixtures.professional.id);
+  const open = () => matrix.getByRole("button", { name: /^Administrar acessos do paciente/ }).click();
+  const title = "Administrar acessos do paciente";
+  await expect(matrix.getByRole("button", { name: /^Administrar acessos do paciente/ })).toContainText("Restrito");
+  await open();
+  await page.getByRole("dialog", { name: title, exact: true }).getByLabel("Exceção pessoal", { exact: true }).selectOption("true");
+  await page.getByRole("button", { name: "Revisar alteração", exact: true }).click();
+  const review = page.getByRole("dialog", { name: "Permitir além da função?", exact: true });
+  await expect(review).toContainText("Acesso fora do padrão");
+  await expect(review).toContainText("Com este acesso, a pessoa pode gerir permissões e participantes");
+  const confirm = review.getByRole("button", { name: "Confirmar ampliação", exact: true });
+  await expect(confirm).toBeDisabled();
+  expect(count(f.patient)).toBe(0);
+  await review.getByRole("checkbox", { name: "Confirmo a ampliação deste acesso", exact: true }).check();
+  const completion = page.waitForResponse(response =>
+    response.request().method() === "POST" && new URL(response.url()).pathname === "/api/patient-settings");
+  await confirm.click();
+  expect((await completion).status()).toBe(200);
+  await expect(review).toHaveCount(0);
+  await expect(matrix.getByRole("button", { name: /^Administrar acessos do paciente/ })).toContainText("Exceção pessoal");
+  await matrix.getByRole("link", { name: /^Histórico de permissões/ }).click();
+  await expect(page.getByText(/Permissão efetiva restrita → permitida/)).toBeVisible();
+});
+
 async function widths(page: Page, label: string) {
   for (const width of [320, 390, 768, 1440]) {
     await page.setViewportSize({ width, height: 900 });

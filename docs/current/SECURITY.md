@@ -102,6 +102,14 @@ Helpers internos não são executáveis livremente. Funções privilegiadas têm
 search_path controlado. Serviço não possui DML público geral: usa a allowlist
 de RPCs de worker, evidências e webhook. Toda nova função exige grant próprio.
 
+Exceções de permissão são vinculadas à pessoa na residência. O banco revalida
+vínculo, versão e confirmação individual antes de ampliar o acesso. O perfil
+inteiro só pode receber permissões dentro da elegibilidade da função.
+`access.manage` exige sessão com a garantia de autenticação administrativa
+e contexto local. A aplicação impede autoelevação, preserva um administrador
+local com poderes efetivos e registra a mudança anterior e posterior.
+Decisões independentes e atribuições físicas preservam seus próprios requisitos.
+
 Ledger e eventos confirmados são imutáveis para clientes. Saldo vem de
 movimentos transacionais não negativos. SHA-256 compara conteúdo canônico;
 não é assinatura assimétrica nem proteção contra administradores do banco.

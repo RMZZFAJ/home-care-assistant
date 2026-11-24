@@ -43,7 +43,7 @@ function ArrivalStatus({ state }: { state: UnlinkedArrival["state"] }) {
 }
 
 function ableToRead(context: WorkspaceContext) {
-  return (context.patient?.role === "family" || context.patient?.role === "admin") && can(context, "com.read");
+  return can(context, "com.read");
 }
 
 function pendingAttempt(storage: string) {

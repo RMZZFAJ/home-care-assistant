@@ -34,7 +34,7 @@ test("the scoped permission snapshot enumerates actual capabilities and distingu
     const configured = await snapshot(admin);
     assert.equal(req(configured).origin, "profile");
     assert.equal(req(configured).effective, false);
-    await set({ subjectUser: fixtures.professional.id }, true, configured.policyVersion);
+    await set({ subjectUser: fixtures.professional.id, reviewedRole: "professional", confirmIndividual: true }, true, configured.policyVersion);
     const personal = await snapshot(admin);
     assert.deepEqual(req(personal), { code: "req.create", critical: false, roleEligible: true, inherited: false, effective: true, exception: true, origin: "personal" });
     const effective = await rpc(professional, "patient_capabilities", { p_patient: f.patient });
@@ -48,6 +48,78 @@ test("the scoped permission snapshot enumerates actual capabilities and distingu
   } finally {
     sql(`update public.care_recipients set is_active=false where id in (${sqlLiteral(f.patient)},${sqlLiteral(other.patient)});`);
   }
+});
+
+test("confirmed individual administration uses a real local session, prevents self elevation and preserves the last administrator", async () => {
+  const f = await setup();
+  const other = await setup();
+  const admin = await actor("adminA", f.patient);
+  const person = await actor("professional", f.patient);
+  const subjectUser = fixtures.professional.id;
+  const subject = { subjectUser, reviewedRole: "professional", confirmIndividual: true };
+  const query = { p_patient: f.patient, p_subject: subjectUser };
+  const read = client => client.rpc("patient_permission_snapshot", query);
+  const version = async () => (await rpc(admin, "patient_governance", { p_patient: f.patient })).data.version;
+  const change = (fields, p_version) => ({ ...packet(f.patient, fields), p_kind: "capability", p_version });
+  const manage = (fields, p_version) => change({ capability: "access.manage", ...fields }, p_version);
+
+  assert.equal((await read(person)).error?.code, "42501");
+  const initial = await version();
+  assert.equal((await admin.rpc("configure_patient_access", manage({ subjectUser, enabled: true }, initial))).error?.code, "23514");
+  assert.equal((await admin.rpc("configure_patient_access", manage({ subjectRole: "professional", enabled: true }, initial))).error?.code, "23514");
+  assert.equal((await admin.rpc("configure_patient_access", manage({ ...subject, reviewedRole: "family", enabled: true }, initial))).error?.code, "PT409");
+  const grant = manage({ ...subject, enabled: true }, initial);
+  const intents = [grant, manage({ ...subject, enabled: true }, initial)];
+  const outcomes = await Promise.all(intents.map(intent => admin.rpc("configure_patient_access", intent)));
+  assert.equal(outcomes.filter(outcome => !outcome.error).length, 1);
+  assert.equal(outcomes.find(outcome => outcome.error).error.code, "PT409");
+  const winner = outcomes.findIndex(outcome => !outcome.error);
+  const result = outcomes[winner].data;
+  assert.equal((await rpc(admin, "configure_patient_access", intents[winner])).id, result.id);
+  assert.equal(result.resolution.permission.actorId, fixtures.adminA.id);
+  assert.deepEqual([result.resolution.permission.personId, result.resolution.permission.before, result.resolution.permission.after], [subjectUser, false, true]);
+  const snapshot = await rpc(person, "patient_permission_snapshot", query);
+  assert.deepEqual(snapshot.permissions.find(row => row.code === "access.manage"), {
+    code: "access.manage", critical: true, roleEligible: false, inherited: false, effective: true, exception: true, origin: "personal",
+  });
+  assert.equal((await person.rpc("patient_permission_snapshot", { ...query, p_patient: other.patient })).error?.code, "42501");
+  assert.equal((await person.rpc("configure_patient_access", change({ ...subject, capability: "audit.read", enabled: true }, await version()))).error?.code, "42501");
+  assert.equal((await person.rpc("configure_patient_access", change({ subjectRole: "professional", capability: "audit.read", enabled: true }, await version()))).error?.code, "42501");
+  assert.equal((await person.rpc("admin_upsert_membership", {
+    p_care_recipient_id: f.patient, p_user_id: subjectUser, p_role: "admin", p_can_manage_stock: false, p_can_count_stock: false,
+  })).error?.code, "42501");
+  const update = await rpc(person, "configure_patient_access", { ...packet(f.patient), p_version: await version() });
+  assert.equal(update.status, "applied");
+  const historical = await rpc(admin, "patient_governance_changes", { p_patient: f.patient, p_status: "all", p_kind: "capability" });
+  assert.deepEqual(historical.changes[0].resolution.permission, result.resolution.permission);
+
+  await rpc(admin, "configure_patient_access", manage({ subjectUser: fixtures.global.id, reviewedRole: "admin", confirmIndividual: true, enabled: false }, await version()));
+  assert.equal((await person.rpc("configure_patient_access", manage({
+    subjectUser: fixtures.adminA.id, reviewedRole: "admin", confirmIndividual: true, enabled: false,
+  }, await version()))).error?.code, "23514");
+  const withdrawn = await rpc(person, "configure_patient_access", manage({ ...subject, enabled: null }, await version()));
+  assert.equal(withdrawn.resolution.permission.after, false);
+  assert.equal((await read(person)).error?.code, "42501");
+  assert.equal((await rpc(admin, "patient_permission_snapshot", query)).permissions.find(row => row.code === "access.manage").origin, "limited");
+});
+
+test("a global individual permission proposal takes effect only after a separate local approval", async () => {
+  const f = await setup();
+  const global = await actor("global");
+  const person = await actor("professional", f.patient);
+  const p_change = { capability: "access.manage", subjectUser: fixtures.professional.id,
+    enabled: true, reviewedRole: "professional", confirmIndividual: true };
+  const proposal = await rpc(global, "configure_patient_access", { ...packet(f.patient, p_change), p_kind: "capability" });
+  assert.equal(proposal.status, "pending");
+  const read = () => rpc(person, "patient_capabilities", { p_patient: f.patient });
+  assert.equal((await read())["access.manage"], false);
+  const decision = { ...packet(f.patient, p_change), p_kind: "capability", p_request_id: proposal.id, p_decision: "approve" };
+  await actor("global", f.patient);
+  assert.equal((await global.rpc("configure_patient_access", decision)).error?.code, "42501");
+  const approved = await rpc(f.admin, "configure_patient_access", decision);
+  assert.equal(approved.resolution.permission.actorId, fixtures.adminA.id);
+  assert.equal(approved.resolution.permission.after, true);
+  assert.equal((await read())["access.manage"], true);
 });
 
 test("51 governance changes retain the oldest pending proposal, reference search, both administrators and bounded scoped pages", async () => {

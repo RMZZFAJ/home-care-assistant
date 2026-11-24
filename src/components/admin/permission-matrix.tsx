@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { useCallback, useState } from "react";
-import { ActionButton, DataTable, DefinitionGrid, FormField, Pill, SelectField, TextInput } from "@/components/ui/controls";
+import { ActionButton, CheckboxField, DataTable, DefinitionGrid, FormField, Pill, SelectField, TextInput } from "@/components/ui/controls";
+import { FeedbackBanner } from "@/components/ui/feedback";
 import { Icon } from "@/components/ui/icon";
 import { Dialog } from "@/components/ui/overlays";
 import { useOperationActivity } from "@/components/ui/operation-activity";
@@ -20,7 +21,7 @@ type Override = { capability: string; subject_role: string | null; subject_user:
 type Member = { id: string; name: string; role: string };
 type Edit = {
   code: string; scope: "person" | "role"; id: string; name: string; critical: boolean;
-  editable: boolean; inherited: boolean; current: boolean | null; version: number; opener: HTMLElement;
+  editable: boolean; inherited: boolean; current: boolean | null; version: number; opener: HTMLElement; personRole?: string;
 };
 const groups: Record<string, string> = {
   req: "Requisições", com: "Compras", ent: "Entregas", bal: "Balanços", stock: "Estoques", schedule: "Escalas",
@@ -69,8 +70,8 @@ export function PermissionMatrix({ patientId, patientName, version, revision, gl
 
   function openPerson(row: PersonalPermission, opener: HTMLElement) {
     if (!person || !snapshot) return;
-    setEdit({ code: row.code, scope: "person", id: person.id, name: person.name, critical: row.critical,
-      editable: row.roleEligible && row.code !== "access.manage", inherited: row.inherited, current: row.exception, version: snapshot.policyVersion, opener });
+    setEdit({ code: row.code, scope: "person", id: person.id, name: person.name, critical: row.critical || row.code === "access.manage",
+      editable: true, inherited: row.inherited, current: row.exception, version: snapshot.policyVersion, opener, personRole: snapshot.role });
   }
 
   return <section aria-label="Matriz de permissões" className="hca-permission-page hca-form">
@@ -158,25 +159,33 @@ function PermissionEditor({ edit, patientName, version, globalMode, busy, config
   const [review, setReview] = useState(false);
   const [selected, setSelected] = useState(people[0]?.id ?? "");
   const [saving, setSaving] = useState(false);
+  const [acknowledged, setAcknowledged] = useState(false);
   const next = value === "inherit" ? null : value === "true";
   const person = edit.scope === "person";
+  const beyond = person && next === true && !edit.inherited;
+  const managesAccess = person && edit.code === "access.manage";
+  const requiresAcknowledgment = beyond || managesAccess;
   const stale = version > edit.version;
-  const title = !edit.editable ? (person ? "Consultar permissão" : "Conferir permissões por pessoa") :
-    review ? (edit.critical ? "Confirmar permissão crítica" : "Confirmar alteração de permissão") : label(edit.code);
+  const title = !edit.editable ? "Definir uma exceção individual" :
+    review ? (beyond ? "Permitir além da função?" : edit.critical ? "Confirmar permissão crítica" : "Confirmar alteração de permissão") : label(edit.code);
 
   async function confirm() {
-    if (saving || busy || stale) return;
+    if (saving || busy || stale || requiresAcknowledgment && !acknowledged) return;
     setSaving(true);
     try {
-      await configure({ capability: edit.code, [person ? "subjectUser" : "subjectRole"]: edit.id, enabled: next }, edit.version);
+      await configure({
+        capability: edit.code, [person ? "subjectUser" : "subjectRole"]: edit.id, enabled: next,
+        ...(person ? { reviewedRole: edit.personRole } : {}),
+        ...(requiresAcknowledgment ? { confirmIndividual: true } : {}),
+      }, edit.version);
     } finally { close(); }
   }
 
   return <Dialog open title={title} headingIcon="shield" keyboardScrollable onClose={close} closeDisabled={saving} finalFocus={() => edit.opener.isConnected ? edit.opener : false}
-    footer={<><ActionButton disabled={saving} onClick={review && !stale ? () => setReview(false) : close}>{review && !stale ? "Voltar à alteração" : "Voltar"}</ActionButton>
-      {edit.editable ? <ActionButton variant="primary" disabled={busy || saving || stale || next === edit.current}
-        onClick={review ? () => void confirm() : () => setReview(true)}>{review ? (globalMode ? "Registrar proposta" : "Confirmar permissão") : "Revisar alteração"}</ActionButton> :
-        !person && selected && <ActionButton variant="primary" onClick={() => viewPerson(selected)}>Conferir permissão individual</ActionButton>}
+    footer={<><ActionButton disabled={saving} onClick={review && !stale ? () => { setReview(false); setAcknowledged(false); } : close}>{review && !stale ? "Voltar à alteração" : "Voltar"}</ActionButton>
+      {edit.editable ? <ActionButton variant="primary" disabled={busy || saving || stale || next === edit.current || review && requiresAcknowledgment && !acknowledged}
+        onClick={review ? () => void confirm() : () => setReview(true)}>{review ? (globalMode ? "Registrar proposta" : beyond ? "Confirmar ampliação" : "Confirmar permissão") : "Revisar alteração"}</ActionButton> :
+        !person && selected && <ActionButton variant="primary" onClick={() => viewPerson(selected)}>Conferir exceção pessoal</ActionButton>}
     </>}>
     <div className="hca-form">
       <DefinitionGrid items={[
@@ -190,7 +199,17 @@ function PermissionEditor({ edit, patientName, version, globalMode, busy, config
             <option value="inherit">{caption(null, edit.inherited)}</option><option value="true">Permitir</option><option value="false">Restringir</option>
           </SelectField>
         </FormField> : null}
-      {!edit.editable && <p className="hca-field-hint">{person ? "Esta capacidade segue a regra de autorização vigente para o vínculo." : "A configuração coletiva desta capacidade é restrita. Consulte as permissões da pessoa vinculada."}</p>}
+      {review && !stale && requiresAcknowledgment && <>
+        {beyond && <FeedbackBanner tone="warning" heading="Acesso fora do padrão">
+          <p>{edit.name} poderá exercer esta permissão além da configuração da função {roleLabel(edit.personRole).toLocaleLowerCase("pt-BR")}. A exceção se limita a esta pessoa nesta residência.</p>
+        </FeedbackBanner>}
+        {managesAccess && <p>{(next ?? edit.inherited)
+          ? "Com este acesso, a pessoa pode gerir permissões e participantes e decidir propostas da residência."
+          : "Esta alteração retira a gestão de permissões e participantes e a decisão de propostas desta pessoa."}</p>}
+        <CheckboxField label={beyond ? "Confirmo a ampliação deste acesso" : "Confirmo a alteração deste acesso crítico"} checked={acknowledged} disabled={saving}
+          onChange={event => setAcknowledged(event.currentTarget.checked)} />
+      </>}
+      {!edit.editable && <p className="hca-field-hint">A configuração coletiva desta capacidade é restrita. Consulte as permissões da pessoa vinculada.</p>}
       {!edit.editable && people.length > 0 && <FormField label="Pessoa vinculada">
         <SelectField value={selected} onChange={event => setSelected(event.target.value)}>{people.map(row => <option key={row.id} value={row.id}>{row.name}</option>)}</SelectField>
       </FormField>}

@@ -1031,7 +1031,8 @@ identidade com administração local. Trocar o perfil ativo não permite aprovar
 a própria proposta. A proposta conserva a versão da política. Cadastro de
 paciente usa initialAdministratorEmail confirmado e atribuição inicial
 explícita.
-Administração de acesso de um administrador ativo não é removida por override.
+Administração de acesso por perfil continua reservada à função de administrador.
+Uma exceção individual pode conceder ou restringir esse acesso na residência.
 
 GET /api/patient-settings exige careRecipientId e retorna configuração,
 diretório e propostas autorizadas. changesOnly=true retorna somente changes,
@@ -1053,6 +1054,12 @@ executa a operação.
 
 POST /api/patient-settings recebe careRecipientId, kind, change,
 idempotencyKey e expectedVersion; decisões incluem requestId e decision.
+Em `kind=capability`, `change.enabled` aceita `true`, `false` ou `null`
+para permitir, restringir ou herdar. A exceção usa `subjectUser`. Quando
+amplia o acesso herdado, ou altera `access.manage`, precisa de
+`confirmIndividual: true` e `reviewedRole` com a função conferida. A aplicação
+revalida versão, vínculo e função. O histórico guarda autor, alvo, capacidade
+e resultados efetivos anterior e posterior em `resolution.permission`.
 Propostas globais pelo alias /api/admin também exigem idempotencyKey e
 expectedVersion do cliente, preservados em cada reenvio. A rota não gera
 automaticamente outra chave nem busca uma versão nova para reaplicar o comando.

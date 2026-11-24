@@ -3914,13 +3914,25 @@ comparações das superfícies com os dados e contratos reais.
 - As configurações admitidas pelo contrato atual abrem edição e revisão
   antes do envio. O comando guarda a versão examinada. A consulta de
   alterações leva à lista de propostas de governança filtrada por capacidade.
-- A próxima parte de E10-04 ainda precisa aplicar e auditar a ampliação
-  individual aprovada. A interface usa os limites atuais até a mudança
-  chegar ao cálculo, aos comandos e aos consumidores de autorização.
+- A revisão individual informa quando o acesso ultrapassa a função e
+  pede confirmação antes do envio. Concessão, restrição e herança de
+  `access.manage` mostram o alcance crítico. A alteração vale para a pessoa
+  no contexto da residência e a configuração coletiva mantém sua elegibilidade.
+- O mesmo cálculo sustenta a matriz, a autorização da sessão, a API e a
+  leitura das fichas por RLS. A retirada revoga a capacidade. A alteração
+  e seu registro de auditoria são transacionais, com autor, alvo, capacidade
+  e antes/depois efetivos. Administração preserva a sessão exigida, a
+  decisão local independente e a proteção contra autoelevação.
+- A conferência explícita de chegadas COM, o acesso a chegadas sem vínculo,
+  o acompanhamento administrativo das fichas e as verificações de
+  regularização ENT passaram a respeitar as capacidades individuais.
+  A confirmação de outra pessoa e a atribuição física preservam suas regras.
 
 | Migration | Supabase local | Supabase remoto |
 | --- | --- | --- |
 | `20261124083708_l4_person_permission_snapshot` | Aplicada | Pendente |
+| `20261124091649_l4_personal_permission_exceptions` | Aplicada | Pendente |
+| `20261124092143` — consumidores operacionais | Aplicada | Pendente |
 
 Os nove casos de integração de governança passaram no Supabase local. O
 caso novo comparou todas as capacidades da pessoa às usadas pelo banco e
@@ -3936,6 +3948,17 @@ revelaram sobreposição no ícone de pesquisa e diferença na ordem das áreas.
 Os dois ajustes passaram em Chromium, Android e iOS. As 48 definições
 atuais também foram conferidas contra os rótulos da v2, com nova execução
 dirigida no Chromium após completar os nove rótulos ausentes.
+
+A rodada de exceções validou concessão e retirada, acesso entre residências,
+autoelevação, concorrência e aprovação local distinta da proposta global.
+Com Auth real, a pessoa delegada conferiu uma chegada COM e outra revisou
+uma regularização ENT sem substituir o recebedor original. A leitura do
+estoque familiar passou por RLS. A escrita usou a operação oficial e voltou
+a ser negada após herdar a regra da função. O teste Android emulado passou
+sem retentativa e verificou a marcação explícita e o histórico exibido.
+O build, o lint dos arquivos alterados e o contrato das 84 migrations
+históricas passaram. O Advisor local apontou somente a extensão
+`unaccent` no esquema público, já existente antes desta rodada.
 
 ### E12-01 — Guias e ajuda na tarefa
 
@@ -4287,11 +4310,12 @@ passaram no Chromium após esse ajuste, sem retentativa.
 
 ### Pendências para o aceite de L4
 
-As alterações pessoais de `access.manage` e as concessões individuais fora
-de `allowed_roles` ainda estão bloqueadas, em conflito com E10-04.
-O banco ainda reserva `access.manage` ao papel de administrador e impede
-a alteração dessa capacidade. A entrega dessa decisão exige validar o
-cálculo de autorização e os consumidores de UI, API, RPC e RLS juntos.
+E10-04 ainda exige a conferência de balanço e consumo com concessão,
+revogação e condições específicas de cada operação. A conferência de
+chegadas COM, a regularização ENT, o estoque familiar e a administração de
+acesso pessoal já têm exercícios dirigidos com Auth real. As migrations
+locais continuam pendentes no banco compartilhado e o Preview publicado
+ainda serve o commit anterior.
 Os demais cenários de E10 e E11 ainda precisam de conferência de paridade
 com a v2. Os testes de E12 não comprovam esse aceite.
 

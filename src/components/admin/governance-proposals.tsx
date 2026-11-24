@@ -4,7 +4,7 @@ import { ActionButton, DataTable, DataTableBody, DataTableCell, DataTableHead, D
 import { useCallback, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-import { Notice, type WorkspaceContext } from "@/components/workspace";
+import { can, Notice, type WorkspaceContext } from "@/components/workspace";
 import { governanceComparison, governanceFilterLabels, governanceKindLabels, governanceStatusLabels } from "@/lib/governance-presentation";
 import { formatBrazilDate } from "@/lib/receipt";
 import { parseGovernanceListRead } from "@/lib/validation/governance-list";
@@ -36,7 +36,7 @@ export function GovernanceProposals({ context, directory, version, revision, bus
     if (sameSelection) read.refresh();
     if (next.toString() !== params.toString()) router.push("/configuracoes?" + next, { scroll: false });
   }
-  const local = context.activeContext?.mode === "patient" && patient.role === "admin";
+  const local = context.activeContext?.mode === "patient" && can(context, "access.manage");
   return <section className="ui-card hca-governance-proposals space-y-4" aria-label="Propostas de configuração" aria-busy={loading}>
     <h2 className="font-semibold">Propostas de configuração</h2>
     <p>Paciente: {patient.display_name}. Compare a configuração vigente e a proposta antes de decidir. Consultar não altera permissões.</p>
@@ -59,10 +59,16 @@ export function GovernanceProposals({ context, directory, version, revision, bus
       {fresh && !data.changes.length ? <p>Nenhuma proposta corresponde aos filtros consultados.</p> : null}
       {data.changes.map(change => {
         const comparison = governanceComparison(change, directory);
+        const applied = change.resolution?.permission;
         return <article key={change.id} data-proposal-id={change.id} className="ui-card hca-admin-card hca-governance-proposal space-y-3" aria-label={"Proposta " + change.id.slice(0, 8)}>
           <h3 className="font-semibold">{comparison.title}</h3>
           <p>Referência: <span className="break-all">{change.id}</span></p>
           <p className="hca-proposal-state"><Pill tone={change.status === "applied" ? "success" : change.status === "rejected" ? "danger" : ["pending", "awaiting_acceptance"].includes(change.status) ? "warning" : "neutral"}>{Object.hasOwn(governanceStatusLabels, change.status) ? governanceStatusLabels[change.status] : "Situação não reconhecida"}</Pill><span>por {change.proposerName}</span><time dateTime={change.created_at}>{formatBrazilDate(change.created_at)}</time></p>
+          {applied && change.decided_at && <p>
+            Permissão efetiva {applied.before ? "permitida" : "restrita"} → {applied.after ? "permitida" : "restrita"}.
+            {" "}Aplicada por {applied.actorName ?? directory.find(person => person.id === applied.actorId)?.name ?? (applied.actorId === change.proposed_by ? change.proposerName : "identidade histórica")}
+            {" "}em <time dateTime={change.decided_at}>{formatBrazilDate(change.decided_at)}</time>.
+          </p>}
           <p>Versão de origem: {change.base_version}. Configuração vigente: {version}.</p>
           {change.base_version !== version && change.status === "pending" ? <Notice error>A configuração mudou após esta proposta. Preserve a proposta original e prepare outra após revisar a configuração vigente.</Notice> : null}
           <details><summary className="cursor-pointer font-semibold">Comparar configuração vigente e proposta</summary>
