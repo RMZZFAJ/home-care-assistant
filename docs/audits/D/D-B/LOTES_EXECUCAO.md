@@ -3893,3 +3893,41 @@ comparações das superfícies com os dados e contratos reais.
   Supabase. A produção está em `fab595c7` e o Supabase remoto registrava
   362 migrations. Antes de aplicar mudanças de contrato, conferir os dois
   consumidores. O registro de L4 ainda não contém migrations próprias.
+- O commit `b95c3872` publicou as referências de L4 no PR em rascunho.
+  O [Preview](https://home-care-assistant-kq38wexfx-rmzzfajs-projects.vercel.app)
+  respondeu HTTP 200 no login, na verificação pública e em `/api/runtime`,
+  com contrato `ready`, protocolo 1 e esquema 2. O SonarCloud aprovou
+  esse commit. O CodeRabbit pulou a revisão com 265 arquivos para o
+  limite de 100. A [CI do commit](https://github.com/RMZZFAJ/home-care-assistant/actions/runs/45320276465)
+  estava em execução na conferência do Preview.
+
+### E12-01 — Guias e ajuda na tarefa
+
+- Os assuntos são apresentados por função e abrem o painel de orientação
+  da v2. Os destinos levam aos fluxos reais no vínculo consultado. O
+  atalho da família abre o histórico filtrado em compra e doação.
+- A conferência de uma ENT da equipe abre a orientação sobre a própria
+  tarefa. Fechar o painel devolve o foco e preserva os campos preenchidos.
+  A consulta contextual deixa o progresso pessoal e a ficha intactos.
+- O guia explica estoque atual, atualização na emissão da REQ e baixa por
+  consumo da equipe. O aviso de falta preserva o saldo. A conferência de
+  quantidades recebidas e a avaliação familiar conservam registros próprios.
+- A apresentação inicial continua opcional. A oferta na Visão geral abre
+  o diálogo da v2 mediante ação da pessoa. Os assuntos adicionais e a
+  configuração por paciente seguem disponíveis no guia e no perfil.
+- O progresso pessoal e a configuração usam os contratos vigentes, com
+  modal após confirmação, reconsulta da mesma tentativa e limite de duas
+  novas tentativas. Falhas de leitura retiram as opções dependentes da
+  resposta. O incremento dispensa migrations.
+- As capturas em `output/playwright/l4/` comparam a lista e o painel em
+  360 e 412 px. A lista mantém os controles de orientação acima da
+  navegação móvel. O painel sobe pela base da tela no celular e mantém
+  as duas ações no rodapé. O cabeçalho e a navegação são os da aplicação.
+- Os testes com Auth local verificaram os seis perfis, a recusa de
+  resposta de outro perfil, o progresso persistido, a recuperação da
+  apresentação e a configuração pelo administrador local. A rodada em
+  três navegadores aprovou 14 de 15 casos. No iOS emulado, o acionamento
+  da ajuda da ENT após editar a justificativa excedeu o tempo enquanto
+  o campo estava focado. O acesso passou para a faixa acima da região
+  rolável. Os três testes dirigidos da ENT passaram após esse ajuste
+  em Chromium, Android e iOS emulados.

@@ -4,6 +4,12 @@ O [fechamento A–D da PR 7](docs/audits/FECHAMENTO_PR7.md) reúne os critérios
 e as pendências para a próxima etapa. Este acompanhamento conserva o
 histórico dos incrementos de D-B.
 
+**24/11 — Guias e ajuda na tarefa.** A lista por perfil abre os assuntos em
+painéis da v2. Na conferência de entrega, a ajuda mantém o formulário e
+devolve o foco ao controle de origem. O progresso e a configuração da
+apresentação usam o contrato de guia por vínculo.
+[Registro de L4](docs/audits/D/D-B/LOTES_EXECUCAO.md#e12-01--guias-e-ajuda-na-tarefa).
+
 **24/11 — início de L4.** E10–E12 seguem o laboratório v2 aprovado.
 O Preview do commit `1ba95e4c` está pronto, com contrato do Supabase
 compatível. A branch continua no PR 8 em rascunho.

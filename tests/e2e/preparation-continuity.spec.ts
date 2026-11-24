@@ -73,7 +73,8 @@ test("D3 preparação global salva antes do cadastro e recupera criação inativ
 
 test("C-FINAL023 guia não mantém tarefa recusada nem pede editar resultado e recupera foco na consulta", async ({ page }) => {
   const f = await setup(); await login(page, "adminA", f.patient); await page.goto("/guias");
-  const panel = guide(page), forward = panel.getByRole("button", { name: "Próxima etapa do guia", exact: true });
+  const panel = guide(page), forward = panel.getByRole("button", { name: "Concluir orientação", exact: true });
+  const readFailure = page.getByRole("dialog", { name: "Não foi possível consultar o guia", exact: true });
   await expect(forward).toBeVisible();
   const initial = (await (await page.request.get("/api/guides")).json()).data;
   const official = sql(`select jsonb_build_object('members',(select jsonb_agg(to_jsonb(m) order by user_id) from public.care_recipient_memberships m where care_recipient_id=${sqlLiteral(f.patient)}),'documents',(select count(*) from public.operational_documents where care_recipient_id=${sqlLiteral(f.patient)}),'ledger',(select count(*) from public.stock_movements where care_recipient_id=${sqlLiteral(f.patient)}));`);
@@ -81,17 +82,35 @@ test("C-FINAL023 guia não mantém tarefa recusada nem pede editar resultado e r
   page.on("request", request => { if (new URL(request.url()).pathname === "/api/guides" && request.method() !== "GET") writes++; });
   await page.route("**/api/guides", route => route.request().method() === "GET" ? route.fulfill({ status: 403, contentType: "application/json", body: JSON.stringify({ error: "Consulta fictícia de guia indisponível", code: "READ_UNAVAILABLE" }) }) : route.continue(), { times: 2 });
   await panel.getByRole("button", { name: /^(Desabilitar|Habilitar) apresentação inicial$/ }).click();
-  await expect(panel.getByRole("alert")).toContainText("Consulta fictícia de guia indisponível");
-  await expect(forward).toHaveCount(0); await expect(panel.locator('[aria-invalid="true"]')).toHaveCount(0);
+  await page.getByRole("dialog", {name:"Apresentação atualizada"}).getByRole("button", {name:"Concluir",exact:true}).click();
+  await expect(readFailure).toContainText("Consulta fictícia de guia indisponível");
+  await expect(panel.locator("nav")).toHaveCount(0); await expect(panel.locator('[aria-invalid="true"]')).toHaveCount(0);
+  await expect(readFailure.getByRole("button", { name: "Consultar guia novamente", exact: true })).toHaveCount(0);
   await page.unroute("**/api/guides");
   const refresh = panel.getByRole("button", { name: "Consultar guia novamente", exact: true });
-  await refresh.focus(); await refresh.press("Enter"); await expect(forward).toBeVisible(); await expect(refresh).toBeFocused();
-  for (const fault of [503, 200]) {
-    await page.route("**/api/guides", route => route.fulfill({ status: fault, contentType: "application/json", body: JSON.stringify(fault === 200 ? { data: null } : { error: "Consulta fictícia de guia indisponível", code: "READ_UNAVAILABLE" }) }), { times: 1 });
-    await refresh.press("Enter"); await expect(panel.getByRole("alert")).toBeVisible();
-    await expect(forward).toHaveCount(0); await expect(panel.locator('[aria-invalid="true"]')).toHaveCount(0);
-    await expect(refresh).toBeFocused(); await refresh.press("Enter"); await expect(forward).toBeVisible(); await expect(refresh).toBeFocused();
-  }
+  await readFailure.getByRole("button",{name:"Voltar ao guia",exact:true}).click();
+  await expect(refresh).toBeFocused();
+  await expect(refresh).toHaveAttribute("aria-disabled","true");
+  await page.reload(); await expect(forward).toBeVisible();
+  let reads = 0;
+  await page.route("**/api/guides", route => {
+    reads++;
+    return route.fulfill({
+      status: reads === 2 ? 200 : 503,
+      json: reads === 2 ? { data: null } : { error: "Consulta fictícia de guia indisponível", code: "READ_UNAVAILABLE" },
+    });
+  });
+  await page.reload();
+  const queryAgain = readFailure.getByRole("button", {name:"Consultar guia novamente",exact:true});
+  await queryAgain.click();
+  await queryAgain.click();
+  await expect(readFailure.getByRole("button", {name:"Copiar detalhes",exact:true})).toBeVisible();
+  await expect(queryAgain).toHaveCount(0);
+  expect(reads).toBe(3);
+  await expect(panel.locator("nav")).toHaveCount(0);
+  await page.unroute("**/api/guides");
+  await page.reload();
+  await expect(forward).toBeVisible();
   const current = (await (await page.request.get("/api/guides")).json()).data;
   expect(current.progress).toEqual(initial.progress); expect(current.showOnFirstAccess).toBe(!initial.showOnFirstAccess);
   expect(writes).toBe(1);
@@ -105,11 +124,22 @@ test("D3 guia pode ser pulado recuperado reaberto e configurado sem ciência ou 
   const before=sql(`select jsonb_build_object('events',(select count(*) from public.document_events where document_id in(select id from public.operational_documents where care_recipient_id=${sqlLiteral(f.patient)})),'members',(select jsonb_agg(to_jsonb(m) order by user_id) from public.care_recipient_memberships m where care_recipient_id=${sqlLiteral(f.patient)}));`);
   let corrupted=false;const packets:unknown[]=[];
   await page.route("**/api/guides",async route=>{if(route.request().method()!=="POST")return route.continue();packets.push(route.request().postDataJSON());if(!corrupted){corrupted=true;const response=await route.fetch();expect(response.ok()).toBe(true);const actual=await response.json();return route.fulfill({response,json:{data:{...actual.data,scope:randomUUID()}}});}return route.continue();});
-  const banner=page.getByRole("region",{name:"Apresentação opcional",exact:true});await banner.getByRole("button",{name:"Pular apresentação",exact:true}).click();await banner.getByRole("button",{name:"Recuperar minha escolha",exact:true}).click();await expect(banner).toHaveCount(0);expect(packets[0]).toEqual(packets[1]);
-  await page.goto("/perfil?careRecipientId="+f.patient);await selectProfileSection(page, "help");await expect(guide(page).getByRole("heading",{name:"Administrador do paciente",exact:true})).toBeVisible();
-  await guide(page).getByRole("button",{name:"Próxima etapa do guia",exact:true}).click();await expect(guide(page).getByText("Etapa 2 de 6",{exact:true})).toBeVisible();
-  await guide(page).getByRole("button",{name:"Desabilitar apresentação inicial",exact:true}).click();await expect(guide(page).getByRole("button",{name:"Habilitar apresentação inicial",exact:true})).toBeVisible();
-  const second=await browser.newContext();try{const pro=await second.newPage();await login(pro,"professional",f.patient);const data=(await(await pro.request.get("/api/guides")).json()).data;expect(data.role).toBe("professional");expect(data.showOnFirstAccess).toBe(false);expect(data.progress.revision).toBe(0);await pro.goto("/guias");await expect(guide(pro).getByRole("heading",{name:"Profissional",exact:true})).toBeVisible();expect((await pro.request.post("/api/guides",{data:{action:"configure",careRecipientId:f.patient,expectedRevision:1,showOnFirstAccess:true,idempotencyKey:randomUUID()}})).status()).toBe(403);}finally{await second.close();}
+  const banner=page.getByRole("region",{name:"Apresentação opcional",exact:true});
+  await banner.getByRole("button",{name:"Conhecer o guia",exact:true}).click();
+  await page.getByRole("dialog",{name:"Conheça sua rotina no sistema"}).getByRole("button",{name:"Pular apresentação",exact:true}).click();
+  await page.getByRole("dialog",{name:"Orientação ainda sem confirmação"}).getByRole("button",{name:"Consultar resultado",exact:true}).click();
+  await expect(banner).toHaveCount(0);expect(packets[0]).toEqual(packets[1]);
+  expect((await(await page.request.get("/api/guides")).json()).data.progress).toMatchObject({revision:1,status:"skipped"});
+  await page.goto("/perfil?careRecipientId="+f.patient);await selectProfileSection(page, "help");await expect(guide(page).getByText("Administrador do paciente",{exact:true})).toBeVisible();
+  await guide(page).getByRole("button",{name:"Contexto e responsabilidades"}).click();
+  const topic = page.getByRole("dialog",{name:"Contexto e responsabilidades"});
+  await expect(topic).toBeVisible();
+  await topic.getByRole("button",{name:"Voltar aos guias",exact:true}).click();
+  expect((await(await page.request.get("/api/guides")).json()).data.progress).toMatchObject({revision:2,status:"started"});
+  await guide(page).getByRole("button",{name:"Desabilitar apresentação inicial",exact:true}).click();
+  await page.getByRole("dialog", {name:"Apresentação atualizada"}).getByRole("button", {name:"Concluir",exact:true}).click();
+  await expect(guide(page).getByRole("button",{name:"Habilitar apresentação inicial",exact:true})).toBeVisible();
+  const second=await browser.newContext();try{const pro=await second.newPage();await login(pro,"professional",f.patient);const data=(await(await pro.request.get("/api/guides")).json()).data;expect(data.role).toBe("professional");expect(data.showOnFirstAccess).toBe(false);expect(data.progress.revision).toBe(0);await pro.goto("/guias");await expect(guide(pro).getByText("Profissional",{exact:true})).toBeVisible();expect((await pro.request.post("/api/guides",{data:{action:"configure",careRecipientId:f.patient,expectedRevision:1,showOnFirstAccess:true,idempotencyKey:randomUUID()}})).status()).toBe(403);}finally{await second.close();}
   await widths(page,"D3 personal guide");expect(sql(`select jsonb_build_object('events',(select count(*) from public.document_events where document_id in(select id from public.operational_documents where care_recipient_id=${sqlLiteral(f.patient)})),'members',(select jsonb_agg(to_jsonb(m) order by user_id) from public.care_recipient_memberships m where care_recipient_id=${sqlLiteral(f.patient)}));`)).toBe(before);
 });
 
