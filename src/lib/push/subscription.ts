@@ -80,11 +80,13 @@ export const pushTestRequest = z.object({
   idempotencyKey: z.uuid(),
   contextReference: pushContextReference,
 }).strict();
+export const pushTestLookup = pushTestRequest.omit({ contextReference: true });
 export const pushTestReceipt = z.object({
   id: z.uuid(),
   state: z.enum(["pending", "processing", "accepted", "expired", "failed", "uncertain"]),
   requestedAt: z.iso.datetime({ offset: true }),
   code: z.string().nullable(),
+  retryAt: z.iso.datetime({ offset: true }).optional(),
 }).strict();
 
 export function pushDestination(value: unknown): string {

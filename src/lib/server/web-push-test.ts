@@ -4,22 +4,31 @@ import { rpc, ApiError } from "./api";
 import { pushSubscription, pushTestReceipt } from "@/lib/push/subscription";
 import type { PushTransport } from "./web-push";
 
+type PushTestAttempt = { deviceId: string; idempotencyKey: string };
+
+export async function readPersonalPushTest(client: SupabaseClient, input: PushTestAttempt) {
+  return pushTestReceipt.nullable().parse(await rpc(client, "my_web_push_test", {
+    p_device: input.deviceId, p_key: input.idempotencyKey,
+  }));
+}
+
 /** The authenticated reservation owns the target; only the server receives transport keys. */
 export async function sendPersonalPushTest(
   client: SupabaseClient,
   service: SupabaseClient,
   userId: string,
-  input: { deviceId: string; idempotencyKey: string },
+  input: PushTestAttempt,
   provider: PushTransport,
 ) {
   const args = { p_device: input.deviceId, p_key: input.idempotencyKey, p_key_version: provider.keyVersion };
   const receipt = pushTestReceipt.parse(await rpc(client, "request_my_web_push_test", args));
-  if (receipt.state !== "pending") return receipt;
+  const readReceipt = async () => await readPersonalPushTest(client, input) ?? receipt;
+  if (receipt.state !== "pending") return readReceipt();
   const token = crypto.randomUUID();
   const payload = await rpc(service, "prepare_web_push_test", {
     p_id: receipt.id, p_user: userId, p_token: token, p_key_version: provider.keyVersion,
   });
-  if (!payload) return pushTestReceipt.parse(await rpc(client, "request_my_web_push_test", args));
+  if (!payload) return readReceipt();
   const prepared = z.object({ id: z.literal(receipt.id), subscription: pushSubscription }).strict().parse(payload);
   let result;
   try { result = await provider.send(prepared.subscription, prepared.id, "test"); }
@@ -27,9 +36,10 @@ export async function sendPersonalPushTest(
   try {
     await rpc(service, "complete_web_push_test", {
       p_id: receipt.id, p_token: token, p_result: result.state, p_error: result.code ?? null,
+      p_retry_at: result.retryAt ?? null,
     });
   } catch {
     throw new ApiError("PUSH_RESULT_UNCONFIRMED", "O resultado do teste ainda não foi confirmado. Consulte a mesma tentativa; ela não será reenviada automaticamente.", 503, true);
   }
-  return pushTestReceipt.parse(await rpc(client, "request_my_web_push_test", args));
+  return readReceipt();
 }

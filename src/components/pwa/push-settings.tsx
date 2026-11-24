@@ -2,11 +2,12 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { z } from "zod";
 import { api, ApiError } from "@/lib/client/api";
-import { pushContextReference, pushDevice, pushDevices, pushTestReceipt } from "@/lib/push/subscription";
+import { pushContextReference, pushDevice, pushDevices } from "@/lib/push/subscription";
 import { useWorkspaceState } from "@/components/layout/workspace-context";
 import { SettingsSection } from "@/components/forms/settings-section";
 import { Icon } from "@/components/ui/primitives";
 import { usePwa } from "./pwa-provider";
+import { PersonalPushTest } from "./personal-push-test";
 
 const receipt = z
   .object({
@@ -42,7 +43,7 @@ async function fingerprintOf(endpoint: string) {
     byte.toString(16).padStart(2, "0"),
   ).join("");
 }
-export type PushSettingsSections = { consent: ReactNode; devices: ReactNode };
+export type PushSettingsSections = { consent: (visible: boolean) => ReactNode; devices: ReactNode };
 export function PushSettings({ renderSections }: { renderSections?: (sections: PushSettingsSections) => ReactNode } = {}) {
   const userId = useWorkspaceState().data?.userId;
   const [ownerId, setOwnerId] = useState<string | null>(userId ?? null);
@@ -62,13 +63,11 @@ function PersonalPushSettings({ userId, active, renderSections }: { userId: stri
   const [busy, setBusy] = useState(false),
     [reading, setReading] = useState(true);
   const [checkedAt, setCheckedAt] = useState(0);
-  const [testPending, setTestPending] = useState(false);
   const [error, setError] = useState(""),
     [message, setMessage] = useState("");
   const generationRef = useRef(0),
     abortRef = useRef<AbortController | null>(null);
   const lifecycleRef = useRef<AbortController | null>(null);
-  const testIntentRef = useRef<{ deviceId: string; idempotencyKey: string } | null>(null);
   const load = useCallback(async (signal?: AbortSignal) => {
     const generation = ++generationRef.current;
     abortRef.current?.abort();
@@ -140,36 +139,6 @@ function PersonalPushSettings({ userId, active, renderSections }: { userId: stri
   const enrolled =
     current?.state === "active" && current.currentSession && current.enabled;
   const paused = !!current?.mutedUntil && Date.parse(current.mutedUntil) > checkedAt;
-  async function testPush() {
-    const lifecycle = lifecycleRef.current?.signal;
-    if (!active || busy || reading || !enrolled || !current || !data || !data.deliveryEnabled || paused || permission !== "granted" || !pwa.pushTestReady || !pwa.readyRegistration() || !lifecycle || lifecycle.aborted) return;
-    if (testIntentRef.current?.deviceId !== current.id)
-      testIntentRef.current = { deviceId: current.id, idempotencyKey: crypto.randomUUID() };
-    const intent = testIntentRef.current!;
-    setTestPending(true);
-    setBusy(true); setError(""); setMessage("");
-    try {
-      const result = await api<{ data: unknown }>("/api/push/test", { ...intent, contextReference: data.contextReference }, lifecycle);
-      if (lifecycle.aborted) return;
-      const test = pushTestReceipt.parse(result.data);
-      setMessage(test.state === "accepted"
-        ? "O serviço aceitou o teste para este aparelho. Confira a notificação de teste no sistema do celular; esta resposta ainda não comprova que ela apareceu."
-        : test.state === "pending" || test.state === "processing"
-          ? "O teste ainda está em andamento. Você pode consultar a mesma tentativa sem reenviar."
-          : test.state === "expired"
-            ? "A inscrição ou sessão deste aparelho não está mais disponível. Consulte os aparelhos e confirme a ativação novamente."
-            : test.state === "uncertain"
-              ? "Não foi possível confirmar o resultado do envio. Nenhum teste será reenviado automaticamente."
-              : "O serviço não aceitou este teste. Confira a conexão e tente um novo teste após um minuto.");
-      if (test.state !== "pending" && test.state !== "processing") { testIntentRef.current = null; setTestPending(false); }
-      await load();
-    } catch (reason) {
-      if (!lifecycle.aborted) {
-        if (reason instanceof ApiError && reason.status === 429) { testIntentRef.current = null; setTestPending(false); }
-        setError(reason instanceof Error ? reason.message : "Não foi possível confirmar o teste. Consulte a mesma tentativa antes de iniciar outro.");
-      }
-    } finally { if (!lifecycle.aborted) setBusy(false); }
-  }
   async function enroll() {
     const registration = pwa.readyRegistration(), lifecycle = lifecycleRef.current?.signal;
     if (!active || busy || reading || !data?.publicKey || !capable || permission === "denied" || !registration || !lifecycle || lifecycle.aborted) return;
@@ -245,7 +214,7 @@ function PersonalPushSettings({ userId, active, renderSections }: { userId: stri
       {message ? <p role="status">{message}</p> : null}
       {reading ? <p role="status">Consultando aparelhos…</p> : null}
   </>;
-  const consent = (
+  const consent = (visible: boolean) => active && (
     <SettingsSection
       title="Avisos neste aparelho"
       summary="Permissão, privacidade e aparelhos da sua conta"
@@ -264,10 +233,12 @@ function PersonalPushSettings({ userId, active, renderSections }: { userId: stri
       {!reading && enrolled ? <div className="ui-notice" role="status">
         <p>{paused ? "Avisos registrados, mas pausados neste aparelho." : permission !== "granted" ? "Inscrição registrada, mas falta permitir os avisos nas configurações do navegador." : "Avisos ativados nesta conta e sessão, neste aparelho."}</p>
         <p>O cadastro foi confirmado no sistema. Use o teste abaixo para conferir o recebimento no celular.</p>
-        <button type="button" className="ui-button ui-button-primary" disabled={busy || pwa.offline || !data?.deliveryEnabled || permission !== "granted" || paused || !pwa.pushTestReady || pwa.worker !== "ready" || pwa.runtime !== "ready"} onClick={() => void testPush()}>{busy ? "Conferindo teste…" : testPending ? "Consultar teste de aviso" : "Enviar aviso de teste neste aparelho"}</button>
         {!pwa.pushTestReady ? <p>Atualize o aplicativo neste aparelho antes de enviar o teste de avisos.</p> : null}
         {paused ? <p>Remova a pausa em Aparelhos com avisos antes de testar.</p> : null}
       </div> : null}
+      <PersonalPushTest deviceId={current?.id} shown={Boolean(enrolled)} contextReference={data?.contextReference}
+        eligible={Boolean(!reading && !busy && enrolled && data?.deliveryEnabled && permission === "granted" && !paused && pwa.pushTestReady && pwa.worker === "ready" && pwa.runtime === "ready")}
+        active={visible} offline={pwa.offline} readyRegistration={pwa.readyRegistration} refreshDevice={() => { void load(); }} />
       {capable === false ? (
         <p>
           Este navegador não oferece avisos neste modo. Continue usando a
@@ -395,6 +366,6 @@ function PersonalPushSettings({ userId, active, renderSections }: { userId: stri
       </ul>
     </SettingsSection>
   );
-  const sections = { consent: active ? consent : null, devices: active ? devices : null };
-  return renderSections ? renderSections(sections) : <>{sections.consent}{sections.devices}</>;
+  const sections = { consent, devices: active ? devices : null };
+  return renderSections ? renderSections(sections) : <>{sections.consent(true)}{sections.devices}</>;
 }

@@ -7,9 +7,12 @@ import type { PushResult, PushTransport } from "@/lib/server/web-push";
 function fixture() {
   const id = randomUUID(), userId = randomUUID();
   let state = "pending", completionFails = false, unavailable = false;
-  const value = () => ({ id, state, requestedAt: "2026-11-12T20:00:00+00:00", code: null });
+  let code: unknown = null, retryAt: unknown;
+  const value = () => ({ id, state, requestedAt: "2026-11-12T20:00:00+00:00", code });
   const subscription = { endpoint: "https://fcm.googleapis.com/wp/synthetic-test", expirationTime: null, keys: { p256dh: "B" + "A".repeat(86), auth: "A".repeat(22) } };
-  const client = { rpc: vi.fn(async () => ({ data: value(), error: null })) };
+  const client = { rpc: vi.fn(async (name: string) => ({
+    data: name === "my_web_push_test" ? { ...value(), retryAt } : value(), error: null,
+  })) };
   const service = { rpc: vi.fn(async (name: string, args: Record<string, unknown>) => {
     if (name === "prepare_web_push_test") {
       if (unavailable) { state = "expired"; return { data: null, error: null }; }
@@ -19,6 +22,8 @@ function fixture() {
     }
     if (completionFails) return { data: null, error: { code: "08006", message: "Controlled database disconnect" } };
     state = args.p_result === "pending" ? "failed" : String(args.p_result);
+    retryAt = args.p_retry_at ?? undefined;
+    code = args.p_error;
     return { data: state, error: null };
   }) };
   const send = vi.fn(async (): Promise<PushResult> => ({ state: "accepted" }));
@@ -47,6 +52,12 @@ it("persists an uncertain provider result and never automatically replays it", a
   const f = fixture(); f.send.mockRejectedValue(new TypeError("Network unavailable"));
   expect((await f.run()).state).toBe("uncertain");
   expect((await f.run()).state).toBe("uncertain"); expect(f.send).toHaveBeenCalledTimes(1);
+});
+it("returns the persisted date when the provider defers a new test", async () => {
+  const f = fixture(), retryAt = "2026-11-12T20:03:00.000Z";
+  f.send.mockResolvedValue({ state: "failed", code: "PUSH_PROVIDER_RATE_LIMITED", retryAt });
+  expect(await f.run()).toMatchObject({ state: "failed", code: "PUSH_PROVIDER_RATE_LIMITED", retryAt });
+  expect(f.send).toHaveBeenCalledTimes(1);
 });
 it("reports an unconfirmed database completion without inventing acceptance or replaying the send", async () => {
   const f = fixture(); f.failCompletion();

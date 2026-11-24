@@ -4081,6 +4081,44 @@ indicador de foco compartilhados da aplicação.
 
 A apresentação final do sino e os estados de aparelhos continuam em execução.
 
+### E11 — Teste pessoal de avisos (§10.2)
+
+- O teste só inicia por ação explícita em aparelho elegível. A espera mostra
+  o limite de 30 segundos. Se o resultado continuar incerto, o diálogo
+  oferece até duas consultas da mesma chave e depois detalhes para suporte.
+- A aba guarda somente a referência e o número de consultas. O GET fica
+  restrito à sessão responsável, inclusive quando o envio está indisponível.
+  Ele deixa a tentativa e os registros de operação intactos. A saída da
+  conta limpa a referência local com o restante do estado privado da aba.
+- O banco conserva o resultado tardio e observa o intervalo informado pelo
+  serviço. A expiração só atinge a inscrição usada pela tentativa, quando
+  o consentimento permanece vigente. O aceite descreve a resposta do
+  serviço e orienta conferir se o aviso apareceu no aparelho.
+- A espera e o resultado usam o diálogo compartilhado. O acesso ainda fica
+  na seção Avisos neste aparelho. O painel completo de aparelhos e a
+  apresentação das demais condições de Push seguem em §10.1.
+
+| Migration | Local | Remoto |
+| --- | --- | --- |
+| `20261124112554_l4_push_test_receipt` | Aplicada | Pendente |
+
+O Supabase local registrou 374 migrations. Passaram 20 testes unitários de
+Push e 11 testes de integração com Auth real. A integração comprovou a
+leitura sem reserva, o isolamento por conta e sessão, a resposta tardia
+após 31 segundos, a limitação do provedor após o minuto local e a
+preservação de um consentimento renovado. O Advisor manteve apenas o aviso
+anterior para a extensão `unaccent`.
+
+A rodada final passou nos quatro cenários dirigidos em Android e iOS
+emulados, sem retentativas. Verificou o prazo, as duas consultas, a recarga
+da aba e um intervalo de 95 segundos. A regressão de consentimento também
+passou nos dois navegadores e a leitura por HTTP funcionou com envio
+desabilitado. A simulação do teste no navegador mantém o transporte externo
+desligado. As capturas e a comparação de 360 e 412 px ficam em
+`output/playwright/l4-push-test/`. O prazo usa a estrutura de erro da v2
+com o ícone compartilhado de resultado incerto. A espera ainda está em
+diálogo. Na v2, ela aparece dentro do painel deste aparelho.
+
 ### E12-01 — Guias e ajuda na tarefa
 
 - Os assuntos são apresentados por função e abrem o painel de orientação

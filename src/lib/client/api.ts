@@ -20,6 +20,7 @@ export class ApiError extends Error {
     public status: number,
     public code?: string,
     public correlationId?: string,
+    public retryAfter?: string,
   ) {
     super(message);
     this.name = "ApiError";
@@ -105,6 +106,7 @@ export async function api<T>(
         body && typeof body === "object" && "correlationId" in body && typeof body.correlationId === "string"
           ? body.correlationId
           : undefined,
+        response.headers.get("retry-after") ?? undefined,
       );
     return body as T;
   } catch (error) {

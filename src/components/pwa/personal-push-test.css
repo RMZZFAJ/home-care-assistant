@@ -1,0 +1,37 @@
+.hca-personal-push-test {
+  display: grid;
+  justify-items: start;
+  gap: .5rem;
+}
+
+.hca-push-test-wait .hca-modal-content {
+  display: grid;
+  gap: .75rem;
+}
+
+.hca-push-test-track {
+  height: .375rem;
+  border-radius: 999px;
+  background: #dce9e3;
+  overflow: hidden;
+}
+
+.hca-push-test-track span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: #146c62;
+  animation: hca-push-time-limit 30s linear both;
+}
+
+@keyframes hca-push-time-limit {
+  from { width: 0; }
+  to { width: 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hca-push-test-track span {
+    width: 100%;
+    animation: none;
+  }
+}

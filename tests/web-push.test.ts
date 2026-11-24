@@ -177,6 +177,19 @@ describe("Web Push protected configuration and provider protocol", () => {
     expect(await webPushTransport(f.config, send).send(f.subscription, id, "test")).toEqual({ state: "accepted" });
     expect(decrypt(Buffer.from(body!), f.recipient, f.auth)).toEqual({ v: 1, id, kind: "test" });
   });
+  it.each(["120", "Thu, 31 Dec 2099 00:00:00 GMT"])("keeps Retry-After %s in a personal test result", async (header) => {
+    const { config, subscription } = fixture();
+    const send = vi.fn<typeof fetch>(async () => new Response(null, { status: 429, headers: { "Retry-After": header } }));
+    const before = Date.now();
+    const result = await webPushTransport(config, send).send(subscription, randomUUID(), "test");
+    expect(result).toMatchObject({ state: "failed", code: "PUSH_PROVIDER_RATE_LIMITED" });
+    const retryAt = Date.parse(result.retryAt!);
+    if (header === "120") {
+      expect(retryAt).toBeGreaterThanOrEqual(before + 120_000);
+      expect(retryAt).toBeLessThanOrEqual(Date.now() + 120_000);
+    } else expect(retryAt).toBe(Date.parse(header));
+    expect(send).toHaveBeenCalledOnce();
+  });
   it.each([
     [410, "expired"],
     [404, "expired"],

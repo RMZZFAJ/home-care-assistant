@@ -1,12 +1,22 @@
 import { NextResponse } from "next/server";
-import { api, ApiError, authenticate, readJson } from "@/lib/server/api";
-import { pushTestRequest } from "@/lib/push/subscription";
+import { api, ApiError, authenticate, parseQuery, readJson } from "@/lib/server/api";
+import { pushTestLookup, pushTestRequest } from "@/lib/push/subscription";
 import { webPushConfiguration, webPushTransport } from "@/lib/server/web-push";
 import { requirePushRequestContext } from "@/lib/server/push-request-context";
 import { createWorkerClient } from "@/lib/server/service-client";
-import { sendPersonalPushTest } from "@/lib/server/web-push-test";
+import { readPersonalPushTest, sendPersonalPushTest } from "@/lib/server/web-push-test";
 
 export const runtime = "nodejs";
+
+export async function GET(request: Request) {
+  return api("push.test.read", async () => {
+    const params = new URL(request.url).searchParams;
+    const input = parseQuery(pushTestLookup, Object.fromEntries(params));
+    const auth = await authenticate();
+    return NextResponse.json({ data: await readPersonalPushTest(auth.client, input) });
+  });
+}
+
 export async function POST(request: Request) {
   return api("push.test", async () => {
     const input = await readJson(request, pushTestRequest, 2048);

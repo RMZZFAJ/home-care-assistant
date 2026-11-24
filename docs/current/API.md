@@ -1663,13 +1663,21 @@ Auth e autorização nativos continuam obrigatórios. O GET original não muda
 sua forma. POST /api/push/session revoga somente as
 inscrições vinculadas à sessão corrente. Todos os comandos conferem origem/CSRF.
 
-`POST /api/push/test` recebe deviceId, idempotencyKey e contextReference. Exige
-conta/sessão atuais, inscrição do próprio aparelho e envio habilitado. O banco
-limita um novo teste por minuto/aparelho; repetição da mesma chave consulta o
-recibo sem duplicar transporte. Apenas RPCs de serviço obtêm a inscrição e
-concluem o resultado, após revalidar sessão, conta, pausa, revogação e chave.
-O teste é genérico e separado dos avisos operacionais. Aceite do serviço não
-comprova exibição no celular. Resultado incerto não causa reenvio automático.
+`POST /api/push/test` recebe `deviceId`, `idempotencyKey` e `contextReference`.
+Exige conta/sessão atuais, inscrição própria e envio habilitado. Apenas as
+RPCs de serviço obtêm a inscrição e concluem o resultado, após revalidar
+sessão, conta, pausa, revogação e chave. O banco impõe um minuto entre testes
+do aparelho e estende o intervalo conforme o `Retry-After` do provedor.
+Quando recusa um novo envio pelo intervalo, responde 429 e `Retry-After`.
+
+`GET /api/push/test?deviceId=…&idempotencyKey=…` consulta o comprovante da mesma
+sessão, inclusive com envio desabilitado. Retorna `data: null` para referência
+sem comprovante visível. O resultado inclui estado, horário, código seguro e
+próximo horário permitido, sem endpoint ou chaves de inscrição. Esta consulta
+dispensa a reserva e o envio. O limite de 30 segundos é da interface. O
+usuário pode fazer duas consultas de recuperação da mesma tentativa.
+Aceite do serviço confirma apenas a resposta do provedor. O teste é genérico
+e fica separado dos avisos operacionais.
 
 GET /api/push/open?id recebe UUID opaco, exige Auth e revalida destinatário,
 vínculo e recurso antes de construir um caminho interno. Não marca visto ou

@@ -21,13 +21,14 @@ export class ApiError extends Error {
       idempotencyKey: string;
       version: number;
     },
+    public retryAt?: number,
   ) {
     super(message);
   }
 }
 
 export function databaseError(
-  error: { code?: string; message?: string; } | null,
+  error: { code?: string; message?: string; details?: string; } | null,
 ): never {
   const message = error?.message ?? "";
   if (error?.code === "PT409" && message === "stale preference version")
@@ -73,8 +74,11 @@ export function databaseError(
     throw new ApiError("VALIDATION_ERROR", "Com @todos, escolha Todos com acesso à ficha antes de publicar.", 400);
   if (error?.code === "PT409" && message === "a reminder is already pending for this communication and channel")
     throw new ApiError("VERSION_CONFLICT", "Já existe um pedido em andamento para esta comunicação e canal. Consulte as tentativas antes de enviar outro.", 409);
-  if (error?.code === "PT429" && message === "push test rate limited")
-    throw new ApiError("RATE_LIMITED", "Aguarde um minuto entre testes neste aparelho.", 429);
+  if (error?.code === "PT429" && message === "push test rate limited") {
+    const retryAt = Date.parse(error.details ?? "");
+    throw new ApiError("RATE_LIMITED", "Ainda é preciso aguardar antes de enviar outro teste neste aparelho.", 429, true, undefined,
+      Number.isFinite(retryAt) ? retryAt : Date.now() + 60_000);
+  }
   if (error?.code === "PT409" && message === "contingency material reference changed")
     throw new ApiError("CONTINGENCY_MATERIAL_CHANGED", "A unidade ou a precisão do material mudou. Confira a referência atual do catálogo.", 409);
   if (error?.code === "PT409" && message === "contingency revision changed")
@@ -611,6 +615,7 @@ export async function api(
         headers: {
           "cache-control": "no-store",
           "x-correlation-id": correlationId,
+          ...(known.retryAt !== undefined ? { "retry-after": new Date(known.retryAt).toUTCString() } : {}),
         },
       },
     );

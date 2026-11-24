@@ -5,6 +5,7 @@ import { generateRequestDetails } from "web-push";
 import { z } from "zod";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { ApiError, rpc } from "@/lib/server/api";
+import { retryAfterTime } from "@/lib/push/retry-after";
 import {
   allowedPushEndpoint,
   pushSubscription,
@@ -87,6 +88,7 @@ export function validatePushPublicKey(subscription: WebPushSubscription): void {
 export type PushResult = {
   state: "accepted" | "pending" | "expired" | "failed" | "uncertain";
   code?: string;
+  retryAt?: string;
 };
 export type PushTransport = {
   keyVersion: string;
@@ -153,6 +155,12 @@ export function webPushTransport(
         if (response.ok) return { state: "accepted" };
         if ([404, 410].includes(response.status))
           return { state: "expired", code: "PUSH_SUBSCRIPTION_EXPIRED" };
+        if (kind === "test" && (response.status === 429 || response.status === 503)) {
+          const now = Date.now();
+          const retryAt = retryAfterTime(response.headers.get("retry-after"), now);
+          if (response.status === 429 || retryAt)
+            return { state: "failed", code: "PUSH_PROVIDER_RATE_LIMITED", retryAt: new Date(retryAt ?? now + 60_000).toISOString() };
+        }
         if (response.status === 429 || response.status >= 500)
           return { state: "pending", code: "PUSH_PROVIDER_RETRYABLE" };
         return { state: "failed", code: "PUSH_PROVIDER_REJECTED" };

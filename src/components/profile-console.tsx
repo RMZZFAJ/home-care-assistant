@@ -326,7 +326,7 @@ function ProfileContent({ patientSelected }: { patientSelected: boolean }) {
               <ChannelPreferences active={active} email={profile?.email} phone={profile?.phone} />
               <SciencePreferenceSettings active={active} patientSelected={patientSelected} />
               <PresentationPreference active={active} />
-              <PwaSettings />{push.consent}
+              <PwaSettings />{push.consent(active)}
             </>,
             devices: push.devices,
             help: profile ? active => <SettingsSection title="Guias e ajuda" summary="Reabrir orientações e guardar seu progresso">

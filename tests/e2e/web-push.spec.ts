@@ -132,7 +132,7 @@ async function adapter(
     { value, outcome },
   );
 }
-async function openProfile(page: Page, patient: string) {
+async function openProfile(page: Page, patient: string, openNoticesDirectly = false) {
   await page.goto("/login");
   await page.getByLabel("E-mail", { exact: true }).fill(fixtures.family.email);
   await page.getByLabel("Senha", { exact: true }).fill(fixturePassword);
@@ -141,8 +141,8 @@ async function openProfile(page: Page, patient: string) {
     page.getByRole("heading", { name: "Visão geral", exact: true }),
   ).toBeVisible();
   await selectContext(page, patient);
-  await page.goto("/perfil");
-  await selectProfileSection(page, "notices");
+  await page.goto(openNoticesDirectly ? "/perfil?profileTab=notices" : "/perfil");
+  if (!openNoticesDirectly) await selectProfileSection(page, "notices");
   await expect(
     panel(page).getByRole("button", {
       name: "Ativar avisos neste aparelho",
@@ -150,6 +150,127 @@ async function openProfile(page: Page, patient: string) {
     }),
   ).toBeVisible();
 }
+
+type DiagnosticRequest = { method: string; search: string; body: string | null };
+type DiagnosticResponse = { waitForAbort: true } | { json: unknown; status?: number; headers?: Record<string, string> };
+
+async function openControlledPersonalTest(page: Page, reply: (request: DiagnosticRequest) => DiagnosticResponse) {
+  const fixture = await setup();
+  await adapter(page, subscription(), "granted");
+  // The browser simulates the provider response and its availability flag.
+  // The local app still enrolls the real Auth session with external sending off.
+  await page.exposeFunction("hcaFixturePushTest", reply);
+  await page.addInitScript(() => {
+    const fetchFromApp = window.fetch.bind(window);
+    window.fetch = async (input, init) => {
+      const url = new URL(input instanceof Request ? input.url : input, location.origin);
+      if (url.origin === location.origin && url.pathname === "/api/push/test") {
+        const fixture = (window as typeof window & {
+          hcaFixturePushTest: (request: DiagnosticRequest) => Promise<DiagnosticResponse>;
+        }).hcaFixturePushTest;
+        const plan = await fixture({
+          method: init?.method ?? "GET", search: url.search,
+          body: typeof init?.body === "string" ? init.body : null,
+        });
+        if ("waitForAbort" in plan) return new Promise<Response>((_resolve, reject) => {
+          const signal = init?.signal;
+          const abort = () => reject(signal?.reason ?? new DOMException("Aborted", "AbortError"));
+          if (signal?.aborted) abort();
+          else signal?.addEventListener("abort", abort, { once: true });
+        });
+        return Response.json(plan.json, { status: plan.status, headers: plan.headers });
+      }
+      const response = await fetchFromApp(input, init);
+      if (!response.ok || url.pathname !== "/api/push/devices" || url.searchParams.get("context") !== "consent")
+        return response;
+      return Response.json({ ...await response.json(), deliveryEnabled: true });
+    };
+  });
+  await openProfile(page, fixture.patient, true);
+  await panel(page).getByRole("button", { name: "Ativar avisos neste aparelho", exact: true }).click();
+  const start = panel(page).getByRole("button", { name: "Enviar aviso de teste neste aparelho", exact: true });
+  await expect(start).toBeEnabled();
+  return start;
+}
+
+test("L4 teste pessoal limita a espera a 30 segundos e consulta a mesma chave duas vezes", async ({ page }, info) => {
+  const posted: { deviceId: string; idempotencyKey: string }[] = [];
+  const checked: URLSearchParams[] = [];
+  const start = await openControlledPersonalTest(page, request => {
+    if (request.method === "POST") {
+      posted.push(JSON.parse(request.body ?? "{}"));
+      return { waitForAbort: true };
+    }
+    checked.push(new URLSearchParams(request.search));
+    return { json: { data: checked.length === 1
+      ? { id: randomUUID(), state: "processing", requestedAt: new Date().toISOString(), code: null }
+      : null } };
+  });
+
+  await page.clock.install();
+  await start.click();
+  const waiting = page.getByRole("dialog", { name: "Aguardando o serviço" });
+  await expect(waiting).toBeVisible();
+  await expect.poll(() => posted.length).toBe(1);
+  await page.clock.fastForward(27_000);
+  await expect(waiting).toBeVisible();
+  await info.attach("teste-pessoal-em-espera", { body: await page.screenshot(), contentType: "image/png" });
+  await page.clock.fastForward(3_100);
+  const timeout = page.getByRole("dialog", { name: "O teste não respondeu a tempo", exact: true });
+  const unconfirmed = page.getByRole("dialog", { name: "Não foi possível confirmar o teste", exact: true });
+  await expect(timeout).toBeVisible();
+  for (const width of [360, 412]) {
+    await page.setViewportSize({ width, height: 900 });
+    await auditFromTop(page, `E11-07 prazo de teste em ${width} px`);
+    await info.attach(`teste-pessoal-prazo-${width}`, { body: await page.screenshot(), contentType: "image/png" });
+  }
+  for (let index = 0; index < 2; index++) {
+    await (index === 0 ? timeout : unconfirmed).getByRole("button", { name: "Conferir este teste", exact: true }).press("Enter");
+    await expect.poll(() => checked.length).toBe(index + 1);
+    await expect(unconfirmed).toBeVisible();
+  }
+  await expect(unconfirmed.getByRole("button", { name: "Copiar detalhes", exact: true })).toBeVisible();
+  await expect(unconfirmed.getByText("Copie os detalhes e avise o responsável pelo sistema.")).toBeVisible();
+  await unconfirmed.getByRole("button", { name: "Voltar", exact: true }).press("Enter");
+  await expect(unconfirmed).toBeHidden();
+  await page.reload();
+  await expect(page.getByRole("tab", { name: "Avisos e aplicativo", exact: true })).toHaveAttribute("aria-selected", "true");
+  await panel(page).getByRole("button", { name: "Ver detalhes do teste", exact: true }).press("Enter");
+  await expect(unconfirmed).toBeVisible();
+  expect(checked.map(params => [params.get("deviceId"), params.get("idempotencyKey")]))
+    .toEqual(Array.from({ length: 2 }, () => [posted[0].deviceId, posted[0].idempotencyKey]));
+  expect(posted).toHaveLength(1);
+});
+
+test("L4 teste pessoal respeita Retry-After e só confirma aceitação pelo serviço", async ({ page }) => {
+  const keys: string[] = [];
+  const start = await openControlledPersonalTest(page, request => {
+    expect(request.method).toBe("POST");
+    keys.push(JSON.parse(request.body ?? "{}").idempotencyKey);
+    if (keys.length === 1)
+      return { status: 429, headers: { "Retry-After": "95" }, json: { code: "RATE_LIMITED", error: "Aguarde." } };
+    return { json: { data: { id: randomUUID(), state: "accepted", requestedAt: new Date().toISOString(), code: null } } };
+  });
+
+  await page.clock.install();
+  await start.click();
+  const limited = page.getByRole("dialog", { name: "Limite de testes atingido" });
+  await expect(limited).toBeVisible();
+  await limited.getByRole("button", { name: "Voltar", exact: true }).press("Enter");
+  await expect(limited).toBeHidden();
+  await page.clock.fastForward(60_000);
+  await expect(start).toBeDisabled();
+  await page.clock.fastForward(36_000);
+  await expect(start).toBeEnabled();
+  expect(keys).toHaveLength(1);
+  await start.click();
+  const accepted = page.getByRole("dialog", { name: "Teste aceito pelo serviço" });
+  await expect(accepted).toBeVisible();
+  await expect(accepted.getByText(/a aceitação ainda não confirma a exibição/i)).toBeVisible();
+  expect(keys).toHaveLength(2);
+  expect(keys[0]).not.toBe(keys[1]);
+});
+
 test("Web Push liga consentimento real de API, evento interno, worker controlado e destino Auth sem ciência ou cruzamento de aparelhos", async ({
   page,
 }, info) => {
@@ -188,6 +309,10 @@ test("Web Push liga consentimento real de API, evento interno, worker controlado
   const disabledTest = await page.request.post("/api/push/test", { data: { deviceId: thisDevice.id, idempotencyKey: randomUUID(), contextReference: consent.contextReference } });
   expect(disabledTest.status()).toBe(503);
   expect((await disabledTest.json()).code).toBe("PUSH_NOT_CONFIGURED");
+  const lookup = await page.request.get("/api/push/test", { params: { deviceId: thisDevice.id, idempotencyKey: randomUUID() } });
+  expect(lookup.status()).toBe(200);
+  expect(lookup.headers()["cache-control"]).toBe("no-store");
+  expect(await lookup.json()).toEqual({ data: null });
   expect(
     await page.evaluate(
       () =>
