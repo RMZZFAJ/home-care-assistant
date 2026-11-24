@@ -1926,11 +1926,13 @@ entradas próprias.
 
 ## Consulta técnica de tentativas
 
-GET /api/operations/notifications exige sessão e modo global vigentes.
-source aceita notices ou web_push; page é inteiro de 1 a 100000. A página
-tem 20 registros. Parâmetros desconhecidos são recusados. A RPC autenticada
-operations_notification_attempts revalida a autoridade global no banco.
-Anon e service_role não recebem execute dessa consulta.
+`GET /api/operations/notifications` exige sessão e modo global vigentes.
+`source` aceita `notices` ou `web_push`. `page` é inteiro de 1 a 100000.
+A página tem 20 registros. Parâmetros repetidos ou desconhecidos são
+recusados. O servidor confere fonte e página da resposta, que é privada e
+sem cache. A RPC autenticada `operations_notification_attempts` revalida
+a autoridade global no banco. `anon` e `service_role` ficam sem permissão
+de execução.
 
 O envelope identifica environment=shared_database, fonte, página, total e
 instante. Cada registro tem referência técnica, canal, estado, criação,
@@ -1943,7 +1945,9 @@ conclusão, resultado e presença de erro. A fila legada informa
 historyCoverage=last_result_only e não fabrica tentativas anteriores.
 Referência ou instante ausente não comprova ausência de envio. O cliente
 confere fonte, página, cobertura e formato antes de apresentar o resultado.
-Falha de consulta não equivale a lista vazia ou entrega confirmada.
+O painel de detalhe usa o registro confirmado da página atual e expõe a
+referência técnica que o responsável pode usar na conciliação. Falhas de
+consulta bloqueiam a abertura de detalhes até uma nova resposta válida.
 
 A consulta não altera fila, inscrição, incidente, ciência ou estoque. Não há
 POST nessa entrada nem concessão implícita de poderes familiares ao suporte.

@@ -1,7 +1,7 @@
 import { test, expect, type Page, type Locator } from "@playwright/test";
 import { pathToFileURL } from "node:url";
 import { resolve } from "node:path";
-import { randomUUID } from "node:crypto";
+import { createECDH, randomBytes, randomUUID } from "node:crypto";
 import { createClient } from "@supabase/supabase-js";
 import { actor, env, fixtures, rpc, setup } from "../integration/v4-fixtures.mjs";
 import { personalReminderFixture, reminderState } from "../integration/notice-reference-fixtures.mjs";
@@ -59,39 +59,77 @@ async function compare(actual: Locator, model: Locator, properties: string[]) {
 
 test("NOT05 global attempt consultation keeps real source, minimizes data and recovers without granting patient actions",async({page})=>{
   test.setTimeout(240_000);
-  const f=await setup();owned.add(f.patient);await login(page);await openConsole(page,"shared_database");
-  await consoleRegion(page).getByRole("tab",{name:"Eventos e envios",exact:true}).click();
-  const scope=page.getByRole("region",{name:"Tentativas de avisos no banco compartilhado",exact:true});
-  const response=await page.request.get("/api/operations/notifications?source=web_push&page=1");expect(response.status()).toBe(200);
-  const expected=(await response.json()).data;expect(expected.environment).toBe("shared_database");
-  await expect.poll(()=>scope.locator("li[data-technical-notification]").evaluateAll(nodes=>nodes.map(node=>node.getAttribute("data-technical-notification")))).toEqual(expected.data.map((row:{id:string})=>row.id));
-  const before=sql("select jsonb_build_object('stock',(select count(*) from public.stock_movements),'science',(select count(*) from public.requisition_science_events),'notices',(select count(*) from public.requisition_notifications),'attempts',(select count(*) from private.web_push_attempts));");
-  const writes:string[]=[];page.on("request",request=>{if(new URL(request.url()).pathname.startsWith("/api/operations")&&request.method()!=="GET")writes.push(request.method());});
-  await expect(scope).not.toContainText("PRIVATE_");await expect(scope.locator("input,textarea")).toHaveCount(0);
-  await expect(scope.getByRole("button",{name:/Reprocessar|Confirmar|Autorizar|Restaurar/})).toHaveCount(0);
-  for(const width of [320,1440]){await page.setViewportSize({width,height:900});await auditFromTop(page,"technical attempts "+width);}
-  let mode="error";
-  await page.route("**/api/operations/notifications?*",async route=>{
-    if(mode==="error")return route.fulfill({status:503,json:{error:"Consulta de tentativas controlada indisponível."}});
-    // A wrong page remains structurally valid for empty and populated databases.
-    // Changing source alone also invalidates nonempty rows, reaching a different check.
-    if(mode==="mismatch") {const result=await route.fetch();const body=await result.json();body.data.page+=1;return route.fulfill({response:result,json:body});}
-    return route.continue();
-  });
-  const refresh=scope.getByRole("button",{name:"Atualizar tentativas",exact:true});
-  // WebKit does not focus a native button on pointer click on every platform.
-  // Establish keyboard focus before testing its preservation across read failure.
-  await refresh.focus();await expect(refresh).toBeFocused();await refresh.press("Enter");
-  await expect(scope.getByRole("alert")).toContainText("Consulta de tentativas controlada indisponível.");await expect(refresh).toBeFocused();
-  await expect(scope).toContainText("Última consulta confirmada preservada");
-  mode="mismatch";await refresh.click();await expect(scope.getByRole("alert")).toContainText("As tentativas não correspondem à consulta atual. Consulte novamente.");
-  await expect.poll(()=>scope.locator("li[data-technical-notification]").evaluateAll(nodes=>nodes.map(node=>node.getAttribute("data-technical-notification")))).toEqual(expected.data.map((row:{id:string})=>row.id));
-  mode="live";await refresh.click();await expect(scope.getByRole("alert")).toHaveCount(0);
-  await scope.getByRole("combobox",{name:"Fonte das tentativas",exact:true}).selectOption("notices");
-  await expect(scope.locator("li[data-technical-notification]").first()).toBeVisible();await expect(scope).toContainText("sem histórico individual completo");
-  expect(writes).toEqual([]);expect(sql("select jsonb_build_object('stock',(select count(*) from public.stock_movements),'science',(select count(*) from public.requisition_science_events),'notices',(select count(*) from public.requisition_notifications),'attempts',(select count(*) from private.web_push_attempts));")).toBe(before);
-  await selectContext(page,f.patient);expect((await page.request.get("/api/operations/notifications?source=notices")).status()).toBe(403);
-  await expect(scope).toHaveCount(0);
+  const f=await personalReminderFixture();owned.add(f.patient);
+  const curve=createECDH("prime256v1");curve.generateKeys();
+  const device=await rpc(f.pro.client,"subscribe_web_push",{p_subscription:{endpoint:"https://fcm.googleapis.com/wp/technical-e2e-"+randomUUID(),expirationTime:null,keys:{p256dh:curve.getPublicKey().toString("base64url"),auth:randomBytes(16).toString("base64url")}},p_label:"Private technical fixture",p_key_version:"test-v1"});
+  const notice=sql(`select id from public.requisition_notifications where reminder_id=${sqlLiteral(f.reminder)} limit 1;`);
+  try {
+    const push=sql(`insert into private.web_push_deliveries(notice_id,device_id,recipient_user_id,state,attempts,dispatch_started_at,last_error,created_at)
+      values(${sqlLiteral(notice)},${sqlLiteral(device.id)},${sqlLiteral(f.pro.id)},'uncertain',1,now(),'PRIVATE_PUSH_ERROR',now()+interval '200 years')
+      on conflict(notice_id,device_id) do update set state='uncertain',attempts=1,dispatch_started_at=now(),last_error='PRIVATE_PUSH_ERROR',created_at=excluded.created_at returning id;`);
+    sql(`insert into private.web_push_attempts(delivery_id,ordinal,lease_token,worker_id,started_at,completed_at,outcome,error_code)
+      values(${sqlLiteral(push)},1,gen_random_uuid(),gen_random_uuid(),now()-interval '1 minute',now(),'uncertain','PRIVATE_ATTEMPT_ERROR');`);
+    await login(page);await openConsole(page,"preview");
+    await consoleRegion(page).getByRole("tab",{name:"Eventos e envios",exact:true}).click();
+    const scope=page.getByRole("region",{name:"Tentativas de avisos no banco compartilhado",exact:true});
+    await expect(scope).toHaveCount(0);
+    await consoleRegion(page).getByRole("button",{name:"Consultar banco compartilhado",exact:true}).click();
+    await expect(consoleRegion(page).getByRole("combobox",{name:"Ambiente técnico",exact:true})).toHaveValue("shared_database");
+    const response=await page.request.get("/api/operations/notifications?source=web_push&page=1");expect(response.status()).toBe(200);
+    expect(response.headers()["cache-control"]).toContain("no-store");
+    expect((await page.request.get("/api/operations/notifications?source=web_push&source=notices")).status()).toBe(400);
+    const expected=(await response.json()).data;expect(expected.environment).toBe("shared_database");
+    await expect.poll(()=>scope.locator("li[data-technical-notification]").evaluateAll(nodes=>nodes.map(node=>node.getAttribute("data-technical-notification")))).toEqual(expected.data.map((row:{id:string})=>row.id));
+    const before=sql("select jsonb_build_object('stock',(select count(*) from public.stock_movements),'science',(select count(*) from public.requisition_science_events),'notices',(select count(*) from public.requisition_notifications),'attempts',(select count(*) from private.web_push_attempts));");
+    const writes:string[]=[];page.on("request",request=>{if(new URL(request.url()).pathname.startsWith("/api/operations")&&request.method()!=="GET")writes.push(request.method());});
+    await expect(scope).not.toContainText("PRIVATE_");await expect(scope.locator("input,textarea")).toHaveCount(0);
+    await expect(scope.getByRole("button",{name:/Reprocessar|Confirmar|Autorizar|Restaurar/})).toHaveCount(0);
+    for(const width of [320,360,412,1440]){await page.setViewportSize({width,height:900});await auditFromTop(page,"technical attempts "+width);}
+    await page.bringToFront();await page.setViewportSize({width:390,height:844});
+    const opener=scope.locator(`li[data-technical-notification="${push}"]`).getByRole("button");
+    await opener.click();
+    const attempt=page.getByRole("dialog",{name:`Web Push · ${push.slice(0,8)}`,exact:true});
+    await expect(attempt).toContainText("Tentativa 1 · Resultado incerto");
+    await expect(attempt).not.toContainText("PRIVATE_");
+    await attempt.locator("summary").filter({ hasText: "Referência técnica" }).click();
+    await expect(attempt.getByText(push,{exact:true})).toBeVisible();
+    await audit(page,"technical attempt details 390");
+    await attempt.getByRole("button",{name:"Voltar às tentativas",exact:true}).click();
+    await expect(opener).toBeFocused();
+    let mode="error";
+    await page.route("**/api/operations/notifications?*",async route=>{
+      if(mode==="error")return route.fulfill({status:503,json:{error:"Consulta de tentativas controlada indisponível."}});
+      // A wrong page remains structurally valid for empty and populated databases.
+      // Changing source alone also invalidates nonempty rows, reaching a different check.
+      if(mode==="mismatch") {const result=await route.fetch();const body=await result.json();body.data.page+=1;return route.fulfill({response:result,json:body});}
+      return route.continue();
+    });
+    const refresh=scope.getByRole("button",{name:"Atualizar tentativas",exact:true});
+    const readFailure=page.getByRole("dialog",{name:"Não foi possível consultar as tentativas",exact:true});
+    // WebKit does not focus a native button on pointer click on every platform.
+    // Establish keyboard focus before testing its preservation across read failure.
+    await refresh.focus();await expect(refresh).toBeFocused();await refresh.press("Enter");
+    await expect(readFailure).toContainText("Consulta de tentativas controlada indisponível.");
+    await readFailure.getByRole("button",{name:"Voltar",exact:true}).click();await expect(refresh).toBeFocused();
+    await expect(scope).toContainText("Última consulta confirmada preservada");
+    mode="mismatch";await refresh.click();await expect(readFailure).toContainText("As tentativas não correspondem à consulta atual. Consulte novamente.");
+    await readFailure.getByRole("button",{name:"Voltar",exact:true}).click();
+    await expect.poll(()=>scope.locator("li[data-technical-notification]").evaluateAll(nodes=>nodes.map(node=>node.getAttribute("data-technical-notification")))).toEqual(expected.data.map((row:{id:string})=>row.id));
+    await expect(opener).toBeDisabled();
+    await refresh.click();await expect(readFailure).toBeVisible();
+    mode="live";await readFailure.getByRole("button",{name:"Consultar novamente",exact:true}).click();await expect(readFailure).toHaveCount(0);
+    await scope.getByRole("combobox",{name:"Fonte das tentativas",exact:true}).selectOption("notices");
+    const legacy=scope.locator("li[data-technical-notification]").first().getByRole("button");
+    await legacy.click();
+    const legacyDialog=page.getByRole("dialog",{name:/Aviso interno|WhatsApp|E-mail/});
+    await expect(legacyDialog).toContainText("sem histórico individual completo");
+    await legacyDialog.getByRole("button",{name:"Voltar às tentativas",exact:true}).click();
+    expect(writes).toEqual([]);expect(sql("select jsonb_build_object('stock',(select count(*) from public.stock_movements),'science',(select count(*) from public.requisition_science_events),'notices',(select count(*) from public.requisition_notifications),'attempts',(select count(*) from private.web_push_attempts));")).toBe(before);
+    await selectContext(page,f.patient);expect((await page.request.get("/api/operations/notifications?source=notices")).status()).toBe(403);
+    await expect(scope).toHaveCount(0);
+  } finally {
+    await rpc(f.pro.client,"web_push_device_command",{p_id:device.id,p_action:"revoke"});
+  }
 });
 
 test("E12-07 technical overview matches the L4 reference and keeps navigation read-only", async ({ page, browser }, info) => {
@@ -102,6 +140,13 @@ test("E12-07 technical overview matches the L4 reference and keeps navigation re
   page.on("request", request => { if (new URL(request.url()).pathname === "/api/operations" && request.method() !== "GET") writes.push(request.method()); });
   const reference = await browser.newContext({ viewport: { width: 1280, height: 900 } });
   try {
+    await expect(page.getByRole("heading", { level: 1, name: "Central técnica", exact: true })).toHaveCount(1);
+    await expect(page.getByRole("heading", { name: "Administração", exact: true })).toHaveCount(0);
+    const navigation = page.getByRole("button", { name: "Outras áreas", exact: true });
+    await navigation.click();
+    await expect(page.getByRole("menuitem", { name: "Administração", exact: true })).toHaveAttribute("href", "/admin");
+    await page.keyboard.press("Escape");
+    await expect(navigation).toBeFocused();
     const model = await reference.newPage(); await model.route(/^https?:/, route => route.abort());
     await model.goto(pathToFileURL(resolve("hca-laboratorio-04-v2-aprovado.html")).href + "#E12-07/overview");
     const frame = model.locator("#device-frame"), scope = consoleRegion(page);
@@ -191,7 +236,7 @@ test("15 audit and uncertain-notification review retain canonical records and re
   } finally { await reference.close(); }
 });
 
-test("GUI04 roteiro liga cópia e ensaio reais, distingue falha e ambiente e nunca restaura pelo painel", async ({ page }) => {
+test("GUI04 roteiro liga cópia e ensaio reais, distingue falha e ambiente e nunca restaura pelo painel", async ({ page, browser }, info) => {
   const archiveId = randomUUID(), manifestSha256 = "a".repeat(64);
   const metrics = { archiveId, manifestSha256, files: 12, bytes: 3456 };
   let sequence = 0;
@@ -211,14 +256,42 @@ test("GUI04 roteiro liga cópia e ensaio reais, distingue falha e ambiente e nun
   await login(page); await openConsole(page, "local");
   await consoleRegion(page).getByRole("tab", { name: "Continuidade", exact: true }).click();
   const guide = consoleRegion(page).getByRole("region", { name: "Roteiro de recuperação do serviço", exact: true });
-  await expect(guide).toContainText("Registros compatíveis da mesma cópia.");
-  await expect(guide).toContainText(archiveId); await expect(guide).toContainText(manifestSha256);
-  await expect(guide).toContainText("não é um inventário completo"); await expect(guide).toContainText("dependem da validação operacional de recuperação");
-  await expect(guide.locator("input,select,textarea,button")).toHaveCount(0);
-  for (const width of [320, 390, 768, 1024, 1440]) { await page.setViewportSize({ width, height: 900 }); await audit(page, "GUI04 recovery " + width); }
+  await expect(guide).toContainText("Cópia e ensaio compatíveis");
+  await expect(guide).toContainText(archiveId);
+  await expect(guide).not.toContainText(manifestSha256);
+  await expect(guide).toContainText("dependem da validação operacional de recuperação");
+  await expect(guide.locator("input,select,textarea")).toHaveCount(0);
+  await expect(guide.getByRole("button")).toHaveCount(2);
+  const recordsButton = guide.getByRole("button", { name: /^Consultar os registros/ });
+  const evidence = page.getByRole("dialog", { name: "Evidências de continuidade", exact: true });
+  for (const width of [320, 360, 412, 768, 1024, 1440]) {
+    await page.setViewportSize({ width, height: 900 }); await auditFromTop(page, "GUI04 recovery " + width);
+    if (width === 360 || width === 412) await info.attach("continuity-" + width, { body: await page.screenshot(), contentType: "image/png" });
+  }
+  await page.bringToFront(); await page.setViewportSize({ width: 390, height: 844 });
+  const reference = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+  try {
+    const model = await reference.newPage(); await model.route(/^https?:/, route => route.abort());
+    await model.goto(pathToFileURL(resolve("hca-laboratorio-04-v2-aprovado.html")).href + "#E12-08/compatible");
+    const frame = model.locator("#device-frame");
+    for (const width of [360, 412]) {
+      await model.getByRole("combobox", { name: "Visualização", exact: true }).selectOption(String(width));
+      await expect(frame.getByText("Cópia e ensaio compatíveis", { exact: true })).toBeVisible();
+      await info.attach("L4-continuity-" + width, { body: await frame.screenshot(), contentType: "image/png" });
+    }
+  } finally { await reference.close(); }
+  await page.bringToFront(); await recordsButton.click();
+  await expect(evidence).toContainText(manifestSha256); await expect(evidence).toContainText("custódia do operador");
+  await audit(page, "GUI04 evidence 390");
+  await evidence.getByRole("button", { name: "Voltar", exact: true }).click(); await expect(recordsButton).toBeFocused();
+  const policyButton = guide.getByRole("button", { name: /^Política de continuidade/ });
+  await policyButton.click();
+  const policy = page.getByRole("dialog", { name: "Política de continuidade", exact: true });
+  await expect(policy).toContainText("7 cópias diárias e 4 semanais"); await expect(policy).toContainText("Até 8 horas");
+  await policy.getByRole("button", { name: "Voltar", exact: true }).click(); await expect(policyButton).toBeFocused();
   const refresh = consoleRegion(page).getByRole("button", { name: "Atualizar monitoramento", exact: true });
   await record("recovery", "RECOVERY_PROBE_VERIFIED", { ...metrics, manifestSha256: "b".repeat(64) });
-  await refresh.click(); await expect(guide).toContainText("ainda não confirmados neste recorte");
+  await refresh.click(); await expect(guide).toContainText("Cópia e ensaio ainda não conciliados");
   await record("recovery", "RECOVERY_FAILURE", {}); await refresh.click();
   await expect(guide).toContainText("Ensaio de recuperação não confirmado");
   let mode = "error";
@@ -236,8 +309,16 @@ test("GUI04 roteiro liga cópia e ensaio reais, distingue falha e ambiente e nun
   await expect(guide).toHaveCount(0); await expect(consoleRegion(page).getByRole("list", { name: "Componentes observados", exact: true })).toHaveCount(0);
   mode = "live"; await refresh.click(); await expect(guide).toBeVisible();
   await expect(guide).toContainText("Ensaio de recuperação não confirmado");
+  await consoleRegion(page).getByRole("tab", { name: "Eventos e envios", exact: true }).click();
+  const eventButton = consoleRegion(page).getByRole("region", { name: "Eventos recentes", exact: true }).getByRole("button", { name: /^Ensaio de recuperação não confirmado/ }).first();
+  await eventButton.click();
+  const event = page.getByRole("dialog", { name: "Ensaio de recuperação não confirmado", exact: true });
+  await expect(event).toContainText("Desenvolvimento local"); await expect(event).toContainText("Correlação");
+  await event.getByRole("button", { name: "Voltar aos eventos", exact: true }).click(); await expect(eventButton).toBeFocused();
+  await consoleRegion(page).getByRole("tab", { name: "Continuidade", exact: true }).click();
   await consoleRegion(page).getByRole("combobox", { name: "Ambiente técnico", exact: true }).selectOption("preview");
-  await expect(guide).toContainText("Ambiente: Preview"); await expect(guide).not.toContainText(archiveId);
+  await expect(guide).toBeVisible(); await expect(guide).not.toContainText(archiveId);
+  await recordsButton.click(); await expect(evidence).toContainText("Preview"); await expect(evidence).not.toContainText(manifestSha256);
   expect(writes).toEqual([]); expect(business()).toBe(before);
 });
 

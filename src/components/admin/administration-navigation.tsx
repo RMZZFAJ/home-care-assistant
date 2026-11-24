@@ -27,6 +27,22 @@ export function administrationAreas(context: WorkspaceContext) {
 export function AdministrationNavigation({ context, section }: { context: WorkspaceContext; section?: string | null }) {
   const allowed = administrationAreas(context);
   const query = context.patient ? "&careRecipientId=" + context.patient.id : "";
-  if (section) return <div className="hca-toolbar hca-administration-toolbar"><Link href={context.patient ? "/admin?careRecipientId=" + context.patient.id : "/admin"} prefetch={false}>Administração</Link><span aria-hidden="true">/</span><strong>{allowed.find((area) => area.section === section)?.title ?? "Área indisponível"}</strong><Menu.Root><Menu.Trigger render={<ActionButton variant="quiet" />}>{<Icon name="more" />}Outras áreas</Menu.Trigger><MenuPopup>{allowed.map((area) => <Menu.LinkItem className="hca-menu-item" key={area.section} href={"/admin?section=" + area.section + query} >{<Icon name={area.icon} />}{area.title}</Menu.LinkItem>)}</MenuPopup></Menu.Root></div>;
+  const home = context.patient ? "/admin?careRecipientId=" + context.patient.id : "/admin";
+  if (section) {
+    const technical = section === "operations";
+    return <div className={"hca-toolbar hca-administration-toolbar" + (technical ? " hca-technical-navigation" : "")}>
+      {!technical && <><Link href={home} prefetch={false}>Administração</Link><span aria-hidden="true">/</span>
+        <strong>{allowed.find(area => area.section === section)?.title ?? "Área indisponível"}</strong></>}
+      <Menu.Root>
+        <Menu.Trigger render={<ActionButton variant="quiet" />}><Icon name="more" />Outras áreas</Menu.Trigger>
+        <MenuPopup>
+          {technical && <Menu.LinkItem className="hca-menu-item" href={home}><Icon name="back" />Administração</Menu.LinkItem>}
+          {allowed.map(area => <Menu.LinkItem className="hca-menu-item" key={area.section} href={"/admin?section=" + area.section + query}>
+            <Icon name={area.icon} />{area.title}
+          </Menu.LinkItem>)}
+        </MenuPopup>
+      </Menu.Root>
+    </div>;
+  }
   return <nav aria-label="Áreas administrativas" className="hca-administration-center">{[...new Set(allowed.map((area) => area.group))].map((group) => <section key={group}><div className="hca-section-heading"><h2>{group}</h2></div><div className="hca-compact-grid">{allowed.filter((area) => area.group === group).map((area) => <Link className="ui-card hca-admin-destination" key={area.section} href={"/admin?section=" + area.section + query} prefetch={false}><Icon name={area.icon} /><h3>{area.title}</h3><p>{area.description}</p></Link>)}</div></section>)}</nav>;
 }

@@ -4205,6 +4205,60 @@ Os quatro contratos locais ainda aguardam a transição descrita em E12-06.
 O Sonar aprovou o commit publicado. O CodeRabbit pulou a análise por tamanho
 da PR, apesar da configuração de revisão automática para drafts.
 
+A conferência identificou a origem de produção em `NEXT_PUBLIC_APP_URL` no
+escopo geral de Preview. A emissão automática usa essa variável para os
+links de verificação. A configuração específica de `feat/phase-d-continuation`
+agora usa o endereço estável do próprio Preview. O novo deploy do mesmo
+`a08742dc` está `READY`. O login e a verificação pública retornaram 200;
+a consulta técnica sem sessão retornou 401. Assim como a produção, o Preview
+consulta o banco compartilhado, cujo contrato retornou protocolo 1 e esquema
+2. A conferência não emitiu PDF nem disparou notificações. A produção continua
+em `fab595c7`. [Novo deploy de Preview](https://vercel.com/rmzzfajs-projects/home-care-assistant/4b9dWGHYbP8cao7UA2RknY63oizQ)
+
+### E12-08 — Continuidade e tentativas de envio
+
+- **Continuidade** usa o recorte confirmado do ambiente para exibir a última
+  cópia e o último ensaio. O painel dos registros mostra os identificadores,
+  o manifesto, a correlação e as métricas que a fonte realmente informou.
+  A correspondência exige a mesma referência, manifesto, quantidade, bytes
+  e ordem temporal. O inventário permanece na custódia do operador.
+- O roteiro preserva responsáveis, isolamento, quarentena e reconciliação.
+  A política abre separadamente e informa retenção, cópia prévia e metas de
+  recuperação ainda sujeitas a comprovação operacional.
+- **Eventos e envios** abre detalhes de eventos e tentativas sem reprocessar
+  filas. Em outro ambiente, a consulta de envios oferece trocar para o banco
+  compartilhado. Web Push mostra as tentativas preservadas e a fila legada
+  indica a lacuna. O provedor, o destino e o texto de erro ficam restritos.
+  A referência que pode ser copiada é o identificador técnico do registro.
+- A consulta usa os contratos existentes de observações e tentativas. Não
+  houve nova migration para esta etapa. Os detalhes de eventos e as duas
+  fontes permanecem limitados à administração global. As consultas não
+  executam restauração ou reenvio e não registram ciência ou recebimento.
+- Falha ao consultar as tentativas usa o diálogo compartilhado, com nova
+  consulta e detalhes para suporte. A lista anterior, quando disponível,
+  conserva o horário e bloqueia detalhes enquanto aguarda resposta válida.
+
+Os dois fluxos passaram em Chromium, Android e iOS emulados, sem
+retentativas. Chromium concluiu os dois testes antes de o runner travar
+na troca de projeto. A execução separada de Android e iOS passou com quatro
+testes. Os casos checam rolagem pelo teclado, retorno do foco, escopo,
+consulta de histórico e ausência de comandos sobre estoque, ciência e fila.
+Os 18 testes unitários de continuidade e monitoramento passaram. As
+capturas de 360 e 412 px permitiram reduzir a duplicação no cabeçalho
+da Central e ajustar o rodapé ao contexto global. O acesso à Administração
+continua pelo menu **Outras áreas**. A visão técnica e a continuidade
+passaram no Chromium após esse ajuste, sem retentativa.
+
+### Pendências para o aceite de L4
+
+A matriz vigente ainda desabilita `access.manage` na pessoa e bloqueia a
+concessão individual fora de `allowed_roles`, em conflito com E10-04.
+O banco ainda reserva `access.manage` ao papel de administrador e impede
+a alteração dessa capacidade. A entrega dessa decisão exige validar o
+cálculo de autorização e os consumidores de UI, API, RPC e RLS juntos.
+Os demais cenários de E10 e E11 ainda precisam de conferência de paridade
+com a v2. Os testes de E12 não comprovam esse aceite.
+
 ### Pendências da CI publicada em `a08742dc`
 
 - No `chromium-1`, o teste da aprovação, compra e chegada da COM passou

@@ -12,6 +12,7 @@ import { formatBrazilDate } from "@/lib/receipt";
 import { useScopedRead } from "@/lib/use-scoped-read";
 import { RecoveryRunbook } from "./recovery-runbook";
 import { stateLabels } from "./technical-history";
+import { TechnicalEvents } from "./technical-events";
 import { TechnicalIncident } from "./technical-incident";
 import { TechnicalNotifications } from "./technical-notifications";
 import { TechnicalPolicy } from "./technical-policy";
@@ -65,6 +66,11 @@ export function OperationsConsole({ actorId }: { actorId: string }) {
     setReadAttempts(0);
     read.refresh();
   }
+  function selectEnvironment(next: OperationEnvironment) {
+    setEnvironment(next);
+    setPage(1);
+    setReadAttempts(0);
+  }
   function closeEditor() {
     setEditor(null);
     setConflict(null);
@@ -76,17 +82,11 @@ export function OperationsConsole({ actorId }: { actorId: string }) {
   }
 
   return <section aria-label="Central técnica" className="hca-operations hca-form">
-    <header className="hca-operations-heading">
-      <p className="eyebrow">Administração global</p>
-      <h2>Central técnica</h2>
-    </header>
     <section className="ui-card hca-technical-scope hca-form">
-      <FormField label="Ambiente técnico"><SelectField value={environment} disabled={locked || Boolean(editor)} onChange={event => {
-        setEnvironment(event.target.value as OperationEnvironment);
-        setPage(1);
-        setReadAttempts(0);
-      }}>{Object.entries(environmentLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</SelectField></FormField>
-      <p className="hca-field-hint">O painel consulta os metadados do ambiente técnico. O acesso a dados do paciente exige um vínculo local autorizado.</p>
+      <FormField label="Ambiente técnico"><SelectField value={environment} disabled={locked || Boolean(editor)} onChange={event => selectEnvironment(event.target.value as OperationEnvironment)}>
+        {Object.entries(environmentLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+      </SelectField></FormField>
+      <p className="hca-technical-scope-hint hca-field-hint"><Icon name="shield" width={15} />Dados técnicos do ambiente. Dados do paciente exigem vínculo local autorizado.</p>
     </section>
     {pending && !editor && <section className="ui-card hca-technical-scope hca-form">
       <h3>Há uma decisão técnica a conferir</h3>
@@ -156,16 +156,20 @@ export function OperationsConsole({ actorId }: { actorId: string }) {
           </ActionLink>
         </section>
       </>,
-      continuity: !unavailable ? <RecoveryRunbook data={data} /> : <p>Consulte novamente para ver as evidências deste ambiente.</p>,
+      continuity: !unavailable ? <RecoveryRunbook key={environment} data={data} /> : <p>Consulte novamente para ver as evidências deste ambiente.</p>,
       events: <>
-        <details className="ui-card hca-operations-card"><summary>Eventos técnicos recentes</summary>
-          <ul className="hca-form mt-4">{data.events.map(event => <li key={event.id}>
-            <strong>{incidentLabels[event.code]}</strong><p>{operationLabels[event.component]} · {formatBrazilDate(event.at)}</p>
-            <p className="break-all">Correlação: {event.correlationId}</p>
-          </li>)}</ul>
-          {!data.events.length && <p>Nenhum evento registrado neste ambiente.</p>}
-        </details>
-        {environment === "shared_database" ? <TechnicalNotifications /> : <Notice>Consulte as tentativas de avisos no Banco compartilhado, fonte destes registros.</Notice>}
+        {environment === "shared_database" ? <TechnicalNotifications /> :
+          <section className="ui-card hca-operations-card hca-form">
+            <h3>Tentativas de comunicação</h3>
+            <div className="hca-guide-reading"><span><Icon name="bell" /></span><div>
+              <strong>Esta fonte está no banco compartilhado</strong>
+              <p>Os registros de envio pertencem ao banco. A origem na aplicação fica indeterminada quando o registro não a informa.</p>
+            </div></div>
+            <ActionButton variant="primary" disabled={locked || Boolean(editor)} onClick={() => selectEnvironment("shared_database")}>
+              Consultar banco compartilhado<Icon name="arrow" />
+            </ActionButton>
+          </section>}
+        {!unavailable && <TechnicalEvents key={environment} data={data} />}
       </>,
     }}</TechnicalTabs>}
     <footer className="hca-technical-footer">

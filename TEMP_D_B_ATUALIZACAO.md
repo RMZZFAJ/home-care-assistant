@@ -4,6 +4,14 @@ O [fechamento A–D da PR 7](docs/audits/FECHAMENTO_PR7.md) reúne os critérios
 e as pendências para a próxima etapa. Este acompanhamento conserva o
 histórico dos incrementos de D-B.
 
+**24/11 — Central técnica.** Incidentes e política consultam versões reais e
+recuperam a decisão pela mesma chave. Continuidade e envios abrem evidências
+e tentativas por fonte. O Preview publicado responde com as variáveis
+previstas. O avanço depende da transição dos quatro contratos no banco
+compartilhado e da validação do SHA candidato. O L4 ainda tem pendências
+de autorização e paridade em E10/E11.
+[Registro de L4](docs/audits/D/D-B/LOTES_EXECUCAO.md#e12-07--central-técnica-e-decisões).
+
 **24/11 — Dossiê de contingência.** A busca por referência ou descrição
 filtra o conjunto autorizado antes de paginar. Fatos, Materiais e Histórico
 abrem em um painel com autoria, registro digital e evidências confirmadas.

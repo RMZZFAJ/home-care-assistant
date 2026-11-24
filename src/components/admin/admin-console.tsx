@@ -68,9 +68,11 @@ const labels: Record<Section, string> = {
 };
 export function AdminConsole() {
   const params = useSearchParams();
+  const technical = params.get("section") === "operations";
   return (
     <Workspace
-      title="Administração"
+      title={technical ? "Central técnica" : "Administração"}
+      eyebrow={technical ? "Administração global" : undefined}
       administration
       administrationCapabilities={[
         "access.manage",
@@ -296,11 +298,11 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
           permanecer autorizada.
         </Notice>
       ) : null}
-      <p className="text-sm text-(--muted)">
+      {section !== "operations" && <p className="text-sm text-(--muted)">
         {globalMode
           ? "Administração global e por paciente."
           : "Todas as alterações desta área se limitam ao paciente selecionado."}
-      </p>
+      </p>}
       <AdministrationNavigation
         context={context}
         section={section === "overview" ? null : section}
