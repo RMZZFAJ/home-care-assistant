@@ -4090,6 +4090,66 @@ de Supabase, PDF, Push e notificações cadastradas. A publicação dos commits
 locais depende das duas migrations pendentes no Supabase compartilhado com
 produção. Esta etapa não modificou o banco remoto.
 
+### E12-06 — Conferência independente e vínculo
+
+- O painel de conferência segue a v2 com a declaração, a autoria, a revisão
+  e abas para vincular um registro ou pedir esclarecimento. A busca e a
+  consulta mostram referências reais do mesmo paciente e processo. A
+  confirmação exibe a referência e a justificativa na revisão escolhida.
+- O cadastro do ato ausente abre seu fluxo em outra aba para manter a
+  conferência disponível aqui. O dossiê continua acessível pelo endereço
+  original. A navegação oferece somente fluxos permitidos ao vínculo atual.
+- Uma revisão mais recente do dossiê exige consultar os atos acrescentados.
+  A justificativa fica no painel e a referência precisa ser escolhida após
+  adotar a nova revisão. Se mudar a revisão da ficha ou do relato digital,
+  o seletor mostra a versão anteriormente conferida e as referências atuais.
+- A associação bloqueia anexos ainda em quarentena. Os dados de envio ficam
+  sujeitos ao acesso vigente. A interface mostra a pendência sem divulgar
+  arquivo, autor do envio ou chave de outra pessoa. A independência é
+  verificada para a declaração original e para todos os complementos.
+- O comprovante abre o resultado confirmado e permite voltar ao dossiê
+  com histórico atualizado. Após perda de resposta, a recuperação consulta a
+  mesma chave até duas vezes. A aba preserva somente metadados da tentativa
+  oficial. O pedido de esclarecimento não associa uma referência digital.
+- A conferência preserva os atos de estoque, recebimento, ciência e assinatura
+  de L1–L3. A associação acrescenta um evento ao dossiê e aplica a proteção a
+  novos complementos e decisões após o vínculo.
+
+| Migration | Supabase local | Supabase remoto |
+| --- | --- | --- |
+| `20261124063932_l4_contingency_review_reference` | Aplicada | Pendente |
+
+Foram confirmadas 365 versões locais e 362 remotas. A nova migration exige
+a versão da referência em novos vínculos, inclusive por RPC direta.
+Preserva o comprovante de operações antigas pela mesma chave. O novo
+contrato precisa ser publicado junto com a aplicação que informa a versão
+da referência. O Preview em `a08742dc` e a produção em `fab595c7` usam
+o mesmo banco. A API da produção ainda envia vínculos sem `targetVersion`.
+Aplicar esta migration isoladamente impediria novos vínculos nessa versão.
+
+Os 11 testes de integração passaram com Auth real, incluindo recusas de
+versão ausente ou divergente, referência de outro paciente, decisão pelo
+próprio autor, evidência pendente e concorrência entre duas pessoas. A
+consulta de permissões confirmou execução somente pelo papel autenticado
+nas duas RPCs alteradas, com verificação de escopo no banco. A instalação
+limpa e a evolução a partir da base antiga pela suíte de CI aguardam
+publicação do candidato.
+
+Os cenários de atualização do dossiê, mudança da revisão do registro,
+resultado incerto, ausência de referência e independência passaram em
+Chromium, Android e iOS emulados. O teste ponta a ponta com anexo passou
+em Chromium e Android. No iOS esse teste passou duas vezes seguidas sem
+retentativas após voltar à largura original do aparelho ao fim da auditoria
+de cinco larguras. O clique anterior em **Materiais** havia atingido o
+limite do Playwright após o redimensionamento. Em uma rodada inicial,
+uma consulta pós-anexo também recebeu 503 em `/api/context` depois de o
+envio receber 201. O 503 não reapareceu na verificação seguinte.
+
+As capturas em 390 px comparam o painel com o laboratório v2. O aplicativo
+mantém o cabeçalho global, as abas e diálogos compartilhados. O build,
+quatro testes unitários, ESLint dirigido, Markdown e a verificação das
+migrations históricas passaram.
+
 ### Pendências da CI publicada em `a08742dc`
 
 - No `chromium-1`, o teste da aprovação, compra e chegada da COM passou

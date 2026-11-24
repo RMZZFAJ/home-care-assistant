@@ -12,7 +12,9 @@ it('normalizes exact decimal input while preserving zero unknowns and server-own
 });
 it('requires expected actor and a matching explicit decision without arbitrary client fields',()=>{
  const base={careRecipientId:patient,expectedActorId:actor,process:'REQ' as const,idempotencyKey:key};expect(contingencyCommand.parse({...base,action:'record',content:content()}).action).toBe('record');
- for(const invalid of [{...base,expectedActorId:undefined,action:'record',content:content()},{...base,action:'link_existing',id,expectedRevision:1,reason:'Conferido',targetId:null},{...base,action:'needs_clarification',id,expectedRevision:1,reason:'Conferido',targetId:id}])expect(contingencyCommand.safeParse(invalid).success).toBe(false);
+ const reviewed={...base,action:'link_existing',id,expectedRevision:1,reason:'Conferido',targetId:id,targetVersion:2};
+ expect(contingencyCommand.parse(reviewed)).toEqual(reviewed);
+ for(const invalid of [{...base,expectedActorId:undefined,action:'record',content:content()},{...reviewed,targetId:null},{...reviewed,targetVersion:undefined},{...reviewed,targetVersion:0},{...reviewed,targetVersion:'2'},{...base,action:'needs_clarification',id,expectedRevision:1,reason:'Conferido',targetId:id},{...reviewed,action:'needs_clarification',targetId:null}])expect(contingencyCommand.safeParse(invalid).success).toBe(false);
 });
 it('never accepts another scope or an incomplete confirmation as the official result',()=>{
  const scope={patientId:patient,actorId:actor,process:'REQ',key},value={...scope,persistence:'confirmed',caseId:id,revision:1,action:'record',recordedAt:'2026-11-12T12:00:00Z'};

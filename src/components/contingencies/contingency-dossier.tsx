@@ -24,6 +24,8 @@ type Props = {
   patientName: string;
   allowReport: boolean;
   allowReview: boolean;
+  independentBlocked: boolean;
+  reviewing: boolean;
   blocked: boolean;
   returnFocus: RefObject<HTMLElement | null>;
   onClose: () => void;
@@ -33,7 +35,7 @@ type Props = {
   children?: ReactNode;
 };
 
-export function ContingencyDossierPanel({ dossier, patientName, allowReport, allowReview, blocked, returnFocus, onClose, onSupplement, onReview, refresh, children }: Props) {
+export function ContingencyDossierPanel({ dossier, patientName, allowReport, allowReview, independentBlocked, reviewing, blocked, returnFocus, onClose, onSupplement, onReview, refresh, children }: Props) {
   const { occurredOn, occurredTime, timeZone } = dossier.content;
   const factDate = occurredOn ? occurredOn.split("-").reverse().join("/") : "Data desconhecida";
   const linked = dossier.events.findLast(event => event.action === "link_existing");
@@ -45,7 +47,8 @@ export function ContingencyDossierPanel({ dossier, patientName, allowReport, all
     : null;
   return <Tabs.Root defaultValue="facts">
     <Drawer open title={dossier.content.knownReference ?? "Dossiê de contingência"} kicker="Contingência física" headingIcon="note"
-      subtitle={contingencyProcesses[dossier.process] + " · " + patientName} popupClassName="hca-contingency-dossier hca-guide-topic-sheet"
+      subtitle={contingencyProcesses[dossier.process] + " · " + patientName}
+      popupClassName={"hca-contingency-dossier hca-guide-topic-sheet" + (reviewing ? " hca-contingency-dossier-under-review" : "")}
       onClose={onClose} closeLabel="Fechar dossiê" finalFocus={returnFocus}
       navigation={<div className="hca-contingency-dossier-navigation">
         <div className="hca-contingency-state">
@@ -65,6 +68,9 @@ export function ContingencyDossierPanel({ dossier, patientName, allowReport, all
         </ActionButton>}
         {allowReview && <ActionButton variant="primary" disabled={blocked} onClick={event => onReview(event.currentTarget)}>
           <Icon name="check" />Conferir e vincular
+        </ActionButton>}
+        {independentBlocked && <ActionButton disabled={blocked} onClick={event => onReview(event.currentTarget)}>
+          <Icon name="shield" />Conferência independente
         </ActionButton>}
       </>}>
       <section aria-label="Dossiê selecionado" className="hca-contingency-view">

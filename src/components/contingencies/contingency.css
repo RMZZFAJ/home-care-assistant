@@ -18,6 +18,7 @@
 .hca-contingency-empty { display: grid; justify-items: center; text-align: center; padding: 20px 8px; }
 .hca-contingency-pages { justify-content: space-between; }
 .hca-contingency-dossier-navigation { background: var(--hca-paper); border-bottom: 1px solid var(--hca-line); }
+.hca-contingency-dossier-under-review { visibility: hidden; }
 .hca-contingency-state { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; padding: 12px 18px 8px; }
 .hca-contingency-state > span:last-child { color: var(--hca-muted); font-size: 12px; }
 .hca-contingency-dossier .hca-modal-context-head h2 { overflow-wrap: anywhere; }
@@ -37,6 +38,8 @@
 .hca-contingency-editor .hca-contingency-facts { gap: 12px; }
 .hca-contingency-editor .hca-contingency-lead { align-items: center; }
 .hca-contingency-editor .hca-modal-context-head > div { flex: 1; min-width: 0; }
+.hca-contingency-editor .hca-document-tab-list { position: static; padding-inline: 0; margin: 0; }
+.hca-contingency-editor .hca-document-tab-list > button { flex: 1; }
 .hca-contingency-editor .hca-contingency-facts > .hca-contingency-lead { align-items: flex-start; }
 .hca-contingency-editor .hca-contingency-facts > .hca-contingency-lead p { color: var(--hca-muted); }
 .hca-contingency-summary { padding-bottom: 12px; border-bottom: 1px solid var(--hca-line); }

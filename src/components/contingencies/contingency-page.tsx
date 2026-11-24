@@ -3,8 +3,7 @@ import {useCallback,useEffect,useRef,useState} from 'react';
 import {useSearchParams} from 'next/navigation';
 import {z} from 'zod';
 import {Workspace,Notice,type WorkspaceContext} from '@/components/workspace';
-import {ActionButton,DefinitionGrid,FormField,Pill,SelectField,TextAreaField,TextInput} from '@/components/ui/controls';
-import {RecordDrawer} from '@/components/forms/record-drawer';
+import {ActionButton,DefinitionGrid,FormField,Pill,SelectField,TextInput} from '@/components/ui/controls';
 import {Icon} from '@/components/ui/icon';
 import {Dialog} from '@/components/ui/overlays';
 import {useOperationActivity} from '@/components/ui/operation-activity';
@@ -15,7 +14,8 @@ import {can} from '@/lib/client/capabilities';
 import {useScopedRead} from '@/lib/use-scoped-read';
 import {useLiveRevision} from '@/lib/use-live-revision';
 import {parseCatalogueCollectionRead} from '@/lib/validation/catalogue-list';
-import {contingencyDossier,storedContingencyContent,contingencyProcess,contingencyProcesses,parseContingencyCases,parseContingencyReceipt,type ContingencyCase,type ContingencyCommand,type ContingencyContent} from '@/lib/validation/contingency';
+import {contingencyDossier,storedContingencyContent,contingencyProcess,contingencyProcesses,parseContingencyCases,parseContingencyReceipt,type ContingencyDossier,type ContingencyCommand,type ContingencyContent} from '@/lib/validation/contingency';
+import {ContingencyDecision,type DecisionConflict} from './contingency-decision';
 import {ContingencyForm} from './contingency-form';
 import {ContingencyFacts,ContingencyAttribution} from './contingency-facts';
 import {ContingencyDossierPanel,dossierState} from './contingency-dossier';
@@ -25,13 +25,20 @@ type Process=keyof typeof contingencyProcesses;
 const domain:Record<Process,string>={REQ:'req.read',COM:'com.read',ENT:'ent.read',RETURN:'ent.read',BAL:'bal.read',CONSUMPTION_FAMILY:'stock.family.read',CONSUMPTION_TEAM:'stock.team.read'};
 const retained=z.object({patientId:z.uuid(),process:contingencyProcess,key:z.uuid(),actorId:z.uuid(),action:z.enum(['record','supplement','needs_clarification','link_existing']),caseId:z.uuid().optional(),expectedRevision:z.number().int().positive().optional(),recoveryAttempts:z.number().int().min(0).max(operationRecoveryLimit).optional()}).strict();
 type Retained=z.infer<typeof retained>;
-type DeclarationResult={kind:'confirmed';process:Process;caseId:string;title:string;description:string;recordedAt?:string}|{kind:'not_executed'};
+type OperationResult=
+ | {kind:'confirmed';process:Process;caseId:string;title:string;description:string;recordedAt?:string;decision:boolean}
+ | {kind:'not_executed';decision:boolean};
 const declarationSteps=[
  {label:'Conferindo os fatos informados',icon:'checklist'},
  {label:'Preservando a declaração e o responsável',icon:'note'},
  {label:'Confirmando o registro',icon:'shield'},
 ] as const;
 const isDeclaration=(attempt:Retained)=>attempt.action==='record'||attempt.action==='supplement';
+const decisionSteps=[
+ {label:'Conferindo a revisão e a referência',icon:'checklist'},
+ {label:'Preservando a decisão no histórico',icon:'history'},
+ {label:'Confirmando o registro',icon:'shield'},
+] as const;
 const storageKey=(user:string,patient:string)=>'hca:contingency-intent:'+JSON.stringify([user,patient]);
 function readPending(user:string,patient:string){try{const r=retained.safeParse(JSON.parse(sessionStorage.getItem(storageKey(user,patient))??'null'));return r.success&&r.data.patientId===patient&&r.data.actorId===user?r.data:null;}catch{return null;}}
 function checkReceipt(value:unknown,pending:Retained){const r=parseContingencyReceipt(value,pending);if(r.persistence==='confirmed'&&(r.action!==pending.action||pending.caseId&&r.caseId!==pending.caseId||r.revision!==(pending.expectedRevision??0)+1))throw new Error('O resultado não confirma a mesma operação. Consulte a tentativa.');return r;}
@@ -46,8 +53,9 @@ function ScopedContingency({context}:{context:WorkspaceContext}){
  const [searchText,setSearchText]=useState(''),[searchQuery,setSearchQuery]=useState('');
  const [help,setHelp]=useState(false),[dismissed,setDismissed]=useState<unknown>(null),[readAttempts,setReadAttempts]=useState(0);
  const refreshRef=useRef<HTMLButtonElement>(null),dossierFocusRef=useRef<HTMLElement>(null);
- const [editor,setEditor]=useState<{opener:HTMLElement;action:'record'|'supplement';reference:ContingencyCase|null}|null>(null),[decision,setDecision]=useState<{opener:HTMLElement;reference:ContingencyCase}|null>(null),[busy,setBusy]=useState(false),[error,setError]=useState(''),[message,setMessage]=useState('');
- const [declarationResult,setDeclarationResult]=useState<DeclarationResult|null>(null),[declarationFailure,setDeclarationFailure]=useState<DocumentOperationFailure|null>(null);
+ const [editor,setEditor]=useState<{opener:HTMLElement;action:'record'|'supplement';reference:ContingencyDossier|null}|null>(null),[decision,setDecision]=useState<{opener:HTMLElement;reference:ContingencyDossier}|null>(null),[busy,setBusy]=useState(false);
+ const [result,setResult]=useState<OperationResult|null>(null),[failure,setFailure]=useState<(DocumentOperationFailure&{decision:boolean})|null>(null);
+ const [decisionConflict,setDecisionConflict]=useState<DecisionConflict|null>(null);
  const [supplementConflict,setSupplementConflict]=useState(false);
  const [recovering,setRecovering]=useState(false);
  const pendingRef=useRef(pending),sendingRef=useRef(false);
@@ -61,9 +69,11 @@ function ScopedContingency({context}:{context:WorkspaceContext}){
   return c;
  },[selected,patient.id,process]);
  const detail=useScopedRead(canRead&&selected?'/api/contingencies?'+new URLSearchParams({careRecipientId:patient.id,process,id:selected}):null,String(revision),detailDecoder);
- useOperationActivity(!declarationResult&&!declarationFailure&&(list.loading||detail.loading),{title:detail.loading?'Consultando dossiê':'Consultando contingências'});
- useOperationActivity(busy&&Boolean(pending&&isDeclaration(pending)),{
-  title:recovering?'Conferindo o resultado':'Registrando a declaração',steps:declarationSteps,stage:recovering?2:1,
+ useOperationActivity(!result&&!failure&&(list.loading||detail.loading),{title:detail.loading?'Consultando dossiê':'Consultando contingências'});
+ useOperationActivity(busy&&Boolean(pending),{
+  title:recovering?'Conferindo o resultado':pending?.action==='link_existing'?'Vinculando os registros':
+   pending?.action==='needs_clarification'?'Registrando o pedido':'Registrando a declaração',
+  steps:pending&&isDeclaration(pending)?declarationSteps:decisionSteps,stage:recovering?2:1,
  });
  function visitDossier(id:string|null,opener?:HTMLElement,nextProcess=process){
   if(opener)dossierFocusRef.current=opener;
@@ -92,73 +102,72 @@ function ScopedContingency({context}:{context:WorkspaceContext}){
   const receipt=checkReceipt(value,p);
   if(receipt.persistence==='unconfirmed')throw new Error('Ainda não há um comprovante. Preserve a tentativa e consulte novamente.');
   forget(p);
-  setError('');
-  setDeclarationFailure(null);
-  if(isDeclaration(p)){
-   if(receipt.persistence==='confirmed'&&receipt.caseId){
-    setEditor(null);
-    setDeclarationResult({
-     kind:'confirmed',process:p.process,caseId:receipt.caseId,recordedAt:receipt.recordedAt,
-     title:p.action==='supplement'?'Complemento registrado':recovered?'Declaração localizada':'Declaração registrada',
-     description:recovered?'A mesma tentativa foi localizada. Nenhum registro foi repetido.':p.action==='supplement'?
-      'As informações anteriores foram preservadas no histórico.':'O fato foi preservado e aguarda conferência por outra pessoa autorizada.',
-    });
-   }else setDeclarationResult({kind:'not_executed'});
-  }else{
-   setMessage(receipt.persistence==='confirmed'?'Operação registrada com autoria e referências próprias. Não foi produzido aceite em nome de outra pessoa.':'Tentativa encerrada sem execução. Um envio tardio com essa referência será recusado; você pode revisar e preparar outra confirmação.');
-   if(receipt.persistence==='confirmed'){setDecision(null);visitDossier(receipt.caseId!);}
-  }
+  setFailure(null);
+  const decision=!isDeclaration(p);
+  if(receipt.persistence==='confirmed'&&receipt.caseId){
+   setEditor(null);setDecision(null);setDecisionConflict(null);
+   const copy={
+    record:[recovered?'Declaração localizada':'Declaração registrada','O fato foi preservado e aguarda conferência por outra pessoa autorizada.'],
+    supplement:['Complemento registrado','As informações anteriores foram preservadas no histórico.'],
+    link_existing:['Referência vinculada','A conferência foi registrada e o dossiê foi preservado.'],
+    needs_clarification:['Esclarecimento solicitado','O pedido foi incluído no histórico do dossiê.'],
+   }[p.action];
+   setResult({
+    kind:'confirmed',process:p.process,caseId:receipt.caseId,recordedAt:receipt.recordedAt,decision,title:copy[0],
+    description:recovered?'A mesma tentativa foi localizada. Nenhum registro foi repetido.':copy[1],
+   });
+  }else setResult({kind:'not_executed',decision});
   list.refresh();detail.refresh();
  }
  async function recover(){
   const attempt=pendingRef.current;
   if(!attempt||sendingRef.current)return;
-  const declaration=isDeclaration(attempt),attempts=attempt.recoveryAttempts??0;
-  if(declaration&&attempts>=operationRecoveryLimit){
-   setDeclarationFailure(previous=>previous??{outcome:'uncertain',description:'O resultado continua sem confirmação.'});
+  const decision=!isDeclaration(attempt),attempts=attempt.recoveryAttempts??0;
+  if(attempts>=operationRecoveryLimit){
+   setFailure(previous=>previous??{outcome:'uncertain',description:'O resultado continua sem confirmação.',decision});
    return;
   }
-  const updated=declaration?{...attempt,recoveryAttempts:attempts+1}:attempt;
-  sendingRef.current=true;setBusy(true);setRecovering(true);setError('');
-  if(declaration){
-   pendingRef.current=updated;
-   setPending(updated);
-   try{sessionStorage.setItem(storageKey(context.userId,patient.id),JSON.stringify(updated));}catch{/* The original operation reference remains recoverable. */}
-  }
+  const updated={...attempt,recoveryAttempts:attempts+1};
+  sendingRef.current=true;setBusy(true);setRecovering(true);
+  pendingRef.current=updated;
+  setPending(updated);
+  try{sessionStorage.setItem(storageKey(context.userId,patient.id),JSON.stringify(updated));}catch{/* The original operation reference remains recoverable. */}
   try{
    const r=await api<{data:unknown}>('/api/contingencies',{careRecipientId:patient.id,process:updated.process,expectedActorId:context.userId,idempotencyKey:updated.key,action:'resolve'});
    accept(r.data,updated,true);
   }catch(cause){
    const description=cause instanceof Error?cause.message:'Não foi possível conferir a tentativa.';
-   if(declaration)setDeclarationFailure({cause,description,outcome:'uncertain'});
-   else setError(description);
+   setFailure({cause,description,outcome:'uncertain',decision});
   }finally{sendingRef.current=false;setBusy(false);setRecovering(false);}
  }
  async function send(input:Exclude<ContingencyCommand,{action:'resolve'}>){
   if(pendingRef.current||sendingRef.current)return;
-  setError('');setMessage('');setDeclarationFailure(null);
+  setResult(null);setFailure(null);
   const p:Retained={patientId:patient.id,process:input.process,key:input.idempotencyKey,actorId:context.userId,action:input.action,...('id' in input?{caseId:input.id,expectedRevision:input.expectedRevision}:{})};
   try{sessionStorage.setItem(storageKey(context.userId,patient.id),JSON.stringify(p));}catch(cause){
    const description='Não foi possível guardar a referência de recuperação neste aparelho. A operação não foi enviada.';
-   if(isDeclaration(p))setDeclarationFailure({outcome:'rejected',description,cause});else setError(description);
+   setFailure({outcome:'rejected',description,cause,decision:!isDeclaration(p)});
    return;
   }
   pendingRef.current=p;sendingRef.current=true;setPending(p);setBusy(true);
   try{const result=await api<{data:unknown}>('/api/contingencies',input);accept(result.data,p);}
   catch(cause){
    const description=cause instanceof Error?cause.message:'Não foi possível confirmar esta operação. Consulte a tentativa.';
-   if(!isDeclaration(p))setError(description);
-   else if(cause instanceof ApiError&&cause.status===409&&cause.code==='CONTINGENCY_MATERIAL_CHANGED'){
-    forget(p);
+   const rejected=cause instanceof ApiError&&Boolean(cause.code)&&[400,401,403,404,409,413,422,429].includes(cause.status);
+   if(rejected)forget(p);
+   if(cause instanceof ApiError&&cause.status===409&&cause.code==='CONTINGENCY_MATERIAL_CHANGED'){
     products.refresh();
    }else if(cause instanceof ApiError&&cause.status===409&&cause.code==='VERSION_CONFLICT'&&p.action==='supplement'){
-    forget(p);
     setSupplementConflict(true);
     detail.refresh();
+   }else if(!isDeclaration(p)&&cause instanceof ApiError&&rejected&&[
+    'VERSION_CONFLICT','CONTINGENCY_REFERENCE_CHANGED','CONTINGENCY_REFERENCE_UNAVAILABLE','ATTACHMENT_PENDING','CONTINGENCY_ALREADY_LINKED',
+   ].includes(cause.code??'')){
+    setDecisionConflict(cause.code==='CONTINGENCY_REFERENCE_CHANGED'?'reference':
+     cause.code==='CONTINGENCY_REFERENCE_UNAVAILABLE'?'incompatible':cause.code==='ATTACHMENT_PENDING'?'evidence':'dossier');
+    detail.refresh();
    }else{
-    const rejected=cause instanceof ApiError&&Boolean(cause.code)&&[400,401,403,404,409,413,422,429].includes(cause.status);
-    if(rejected)forget(p);
-    setDeclarationFailure({cause,description,outcome:rejected?'rejected':'uncertain'});
+    setFailure({cause,description,outcome:rejected?'rejected':'uncertain',decision:!isDeclaration(p)});
    }
   }finally{sendingRef.current=false;setBusy(false);}
  }
@@ -171,15 +180,18 @@ function ScopedContingency({context}:{context:WorkspaceContext}){
      careRecipientId:patient.id,expectedActorId:context.userId,process:requestedProcess,idempotencyKey:crypto.randomUUID(),
      ...(editor.action==='record'?{action:'record',content}:{action:'supplement',id:editor.reference!.id,expectedRevision:editor.reference!.revision,content}),
    })}/>:null;
- const openDecision=decision&&c?<ContingencyDecision context={context} c={decision.reference} current={c}
-   onAdopt={next=>setDecision(old=>old?{...old,reference:next}:null)} opener={decision.opener}
-   busy={busy} pending={Boolean(pending)} error={error} onRecover={()=>void recover()} onClose={()=>setDecision(null)}
-   onConfirm={(action,reason,targetId)=>send({
+ const openDecision=decision&&c?<ContingencyDecision context={context} dossier={decision.reference} current={c}
+   currentError={detail.error} currentLoading={detail.loading} conflict={decisionConflict} opener={decision.opener}
+   onAdopt={next=>{setDecision({...decision,reference:next});setDecisionConflict(null);}}
+   onReload={()=>{if(decisionConflict==='evidence')setDecisionConflict(null);detail.refresh();}}
+   onResolveConflict={()=>{if(decisionConflict==='reference'||decisionConflict==='incompatible')setDecisionConflict(null);}}
+   busy={busy} pending={Boolean(pending)} onRecover={()=>void recover()} onClose={()=>{setDecision(null);setDecisionConflict(null);}}
+   onConfirm={input=>send({
      careRecipientId:patient.id,expectedActorId:context.userId,process,idempotencyKey:crypto.randomUUID(),
-     action,id:decision.reference.id,expectedRevision:decision.reference.revision,reason,targetId,
+     id:decision.reference.id,expectedRevision:decision.reference.revision,...input,
    })}/>:null;
  const failedRead=detail.error?detail:list.error?list:null;
- const showReadFailure=failedRead&&!failedRead.loading&&failedRead.errorCause!==dismissed&&!declarationResult&&!declarationFailure&&!supplementConflict;
+ const showReadFailure=failedRead&&!failedRead.loading&&failedRead.errorCause!==dismissed&&!result&&!failure&&!supplementConflict&&!(failedRead===detail&&openDecision);
  const canWriteDossier=c&&c.state!=='linked'&&patient.is_active;
 
  return <div className="hca-contingency hca-guide-page hca-docked-page">
@@ -195,15 +207,11 @@ function ScopedContingency({context}:{context:WorkspaceContext}){
       setPage(0);
       setReadAttempts(0);
       visitDossier(null,undefined,next);
-      setError('');
-      setMessage('');
     }}>
       {!canRead&&<option value={process} disabled>{contingencyProcesses[process]}</option>}
       {allowed.map(item=><option key={item} value={item}>{contingencyProcesses[item]}</option>)}
     </SelectField></FormField>
   </section>
-  {error?<Notice error>{error}</Notice>:null}
-  {message?<Notice>{message}</Notice>:null}
   {pending&&!editor&&!decision?<aside className="hca-attention" aria-label="Tentativa oficial a conferir">
    <h2>Há uma operação a conferir</h2>
    <p>Consulte o resultado da mesma tentativa. Se ela ainda não estiver registrada, a consulta encerrará essa referência para impedir execução tardia.</p>
@@ -222,7 +230,7 @@ function ScopedContingency({context}:{context:WorkspaceContext}){
       <ActionButton type="submit" aria-label="Buscar contingências" disabled={!canRead||locked}><Icon name="search"/></ActionButton>
     </form>
     {list.data?.data.map(row=><button key={row.id} type="button" className="hca-guide-row"
-      onClick={event=>{visitDossier(row.id,event.currentTarget);setError('');}}>
+      onClick={event=>visitDossier(row.id,event.currentTarget)}>
       <span className="hca-guide-row-icon"><Icon name="note"/></span>
       <span className="hca-guide-row-label">
         <strong>{row.reference??row.description}</strong>
@@ -260,11 +268,14 @@ function ScopedContingency({context}:{context:WorkspaceContext}){
   </Dialog>:null}
   {c?<ContingencyDossierPanel key={c.id} dossier={c} patientName={patient.display_name}
     allowReport={Boolean(canWriteDossier&&c.canReport)}
-    allowReview={Boolean(canWriteDossier&&c.canReview&&!c.events.some(e=>e.action==='supplement'&&e.actorId===context.userId))}
+    allowReview={Boolean(canWriteDossier&&c.canReview)}
+    independentBlocked={Boolean(canWriteDossier&&can(context,'contingency.review')&&!c.canReview
+      &&(c.actorId===context.userId||c.events.some(e=>e.action==='supplement'&&e.actorId===context.userId)))}
+    reviewing={Boolean(openDecision)}
     blocked={locked||Boolean(detail.error)||detail.loading} returnFocus={dossierFocusRef} refresh={detail.refresh}
     onClose={()=>visitDossier(null)}
     onSupplement={opener=>setEditor({opener,action:'supplement',reference:c})}
-    onReview={opener=>setDecision({opener,reference:c})}>
+    onReview={opener=>{setDecision({opener,reference:c});setDecisionConflict(null);}}>
     {openEditor}{openDecision}
   </ContingencyDossierPanel>:openEditor}
   {supplementConflict&&editor?.reference&&!detail.loading&&<Dialog open title="Confira a versão atual do dossiê" kicker="Contingência atualizada" headingIcon="history"
@@ -281,32 +292,34 @@ function ScopedContingency({context}:{context:WorkspaceContext}){
       {event.action==='supplement'?<ContingencyFacts value={storedContingencyContent.parse(event.body)} scope={event.id}/>:<p>{String(event.body.reason??'')}</p>}
     </article>)}
   </Dialog>}
-  {declarationFailure&&!busy&&<DocumentOperationFailureDialog {...declarationFailure}
-    title={declarationFailure.outcome==='uncertain'?'Resultado da declaração a conferir':'Não foi possível registrar a declaração'}
-    operation="Registrar declaração de contingência" fallbackCode="CONTINGENCIA_DECLARACAO" attempts={pending?.recoveryAttempts??0}
-    attemptReference={pending?.key} closeLabel={editor?'Voltar à declaração':'Fechar'}
-    onClose={()=>setDeclarationFailure(null)}
-    guidance={pending?'Confira a mesma tentativa para saber se a declaração foi registrada.':'A declaração desta tentativa não foi registrada. Confira os dados e a orientação antes de tentar de novo.'}
+  {failure&&!busy&&<DocumentOperationFailureDialog {...failure}
+    title={failure.outcome==='uncertain'?(failure.decision?'Resultado da conferência a conferir':'Resultado da declaração a conferir'):
+      (failure.decision?'Não foi possível registrar a conferência':'Não foi possível registrar a declaração')}
+    operation={failure.decision?'Registrar conferência de contingência':'Registrar declaração de contingência'}
+    fallbackCode={failure.decision?'CONTINGENCIA_CONFERENCIA':'CONTINGENCIA_DECLARACAO'} attempts={pending?.recoveryAttempts??0}
+    attemptReference={pending?.key} closeLabel={decision?'Voltar à conferência':editor?'Voltar à declaração':'Fechar'}
+    onClose={()=>setFailure(null)}
+    guidance={pending?'Confira a mesma tentativa para saber se o ato foi registrado.':'A tentativa foi recusada. Confira os dados e a orientação antes de confirmar novamente.'}
     action={pending&&(pending.recoveryAttempts??0)<operationRecoveryLimit?{label:'Conferir resultado',onClick:()=>void recover()}:undefined}
     exhaustedMessage={pending&&(pending.recoveryAttempts??0)>=operationRecoveryLimit?'Copie os detalhes e avise o responsável pelo sistema.':undefined}/>}
-  {declarationResult?.kind==='confirmed'&&<Dialog open success title={declarationResult.title} subtitle={declarationResult.description}
-    onClose={()=>setDeclarationResult(null)}
-    footer={<><ActionButton onClick={()=>setDeclarationResult(null)}>Fechar</ActionButton>
+  {result?.kind==='confirmed'&&<Dialog open success title={result.title} subtitle={result.description}
+    onClose={()=>setResult(null)}
+    footer={<><ActionButton onClick={()=>setResult(null)}>Fechar</ActionButton>
       <ActionButton variant="primary" onClick={()=>{
-        setProcess(declarationResult.process);setPage(0);
-        visitDossier(declarationResult.caseId,undefined,declarationResult.process);
-        setDeclarationResult(null);
-      }}>Abrir dossiê</ActionButton></>}>
+        setProcess(result.process);setPage(0);
+        visitDossier(result.caseId,undefined,result.process);
+        setResult(null);
+      }}>{result.decision?'Voltar ao dossiê':'Abrir dossiê'}</ActionButton></>}>
     <DefinitionGrid items={[
-      {label:'Registro',value:c?.id===declarationResult.caseId?(c.content.knownReference??c.id):declarationResult.caseId,wide:true},
-      ...(declarationResult.recordedAt?[{label:'Confirmado em',value:formatBrazilDate(declarationResult.recordedAt)}]:[]),
+      {label:'Registro',value:c?.id===result.caseId?(c.content.knownReference??c.id):result.caseId,wide:true},
+      ...(result.recordedAt?[{label:'Confirmado em',value:formatBrazilDate(result.recordedAt)}]:[]),
       {label:'Estoque e recebimento',value:'Nenhum movimento ou aceite criado',wide:true},
     ]}/>
   </Dialog>}
-  {declarationResult?.kind==='not_executed'&&<Dialog open title="Tentativa encerrada sem execução" headingIcon="info"
-    onClose={()=>setDeclarationResult(null)}
-    footer={<ActionButton variant="primary" onClick={()=>setDeclarationResult(null)}>{editor?'Voltar à declaração':'Voltar às contingências'}</ActionButton>}>
-    <p>A declaração não foi registrada. O sistema encerrou esta referência para impedir um envio tardio. Você pode preparar outra confirmação.</p>
+  {result?.kind==='not_executed'&&<Dialog open title="Tentativa encerrada sem execução" headingIcon="info"
+    onClose={()=>setResult(null)}
+    footer={<ActionButton variant="primary" onClick={()=>setResult(null)}>{decision?'Voltar à conferência':editor?'Voltar à declaração':'Voltar às contingências'}</ActionButton>}>
+    <p>{result.decision?'A decisão não foi registrada.':'A declaração não foi registrada.'} O sistema encerrou esta referência para impedir um envio tardio. Você pode preparar outra confirmação.</p>
   </Dialog>}
   {showReadFailure&&<DocumentOperationFailureDialog title="Não foi possível consultar as contingências"
     outcome="rejected" cause={failedRead.errorCause} description={failedRead.error}
@@ -315,12 +328,4 @@ function ScopedContingency({context}:{context:WorkspaceContext}){
     action={readAttempts<operationRecoveryLimit?{label:'Consultar novamente',onClick:()=>{setReadAttempts(count=>count+1);failedRead.refresh();}}:undefined}
     exhaustedMessage={readAttempts>=operationRecoveryLimit?'Copie os detalhes e avise o responsável pelo sistema.':undefined}/>}
  </div>;
-}
-function ContingencyDecision({context,c,current,onAdopt,opener,busy,pending,error,onRecover,onClose,onConfirm}:{context:WorkspaceContext;c:ContingencyCase;current:ContingencyCase|null;onAdopt:(c:ContingencyCase)=>void;opener:HTMLElement;busy:boolean;pending:boolean;error:string;onRecover:()=>void;onClose:()=>void;onConfirm:(action:'link_existing'|'needs_clarification',reason:string,target:string|null)=>Promise<void>}){
- const reviewHeadingRef=useRef<HTMLHeadingElement>(null);
- const [action,setAction]=useState<'needs_clarification'|'link_existing'>('needs_clarification'),[reason,setReason]=useState(''),[target,setTarget]=useState(''),[query,setQuery]=useState(''),[search,setSearch]=useState(''),[page,setPage]=useState(0),[review,setReview]=useState(false);
- useEffect(()=>{if(review)reviewHeadingRef.current?.focus();},[review]);
- const decode=useCallback((v:unknown)=>{const r=z.object({patientId:z.uuid(),process:contingencyProcess,page:z.number().int(),total:z.number().int().nonnegative(),data:z.array(z.object({id:z.uuid(),kind:z.enum(['document','consumption']),label:z.string(),recordedAt:z.iso.datetime({offset:true}),version:z.number().int().positive()}))}).parse((v as{data:unknown}).data);if(r.patientId!==c.patientId||r.process!==c.process||r.page!==page||r.data.length!==Math.min(25,Math.max(0,r.total-page*25))||new Set(r.data.map(x=>x.id)).size!==r.data.length)throw new Error('A referência não corresponde a este processo e paciente.');return r;},[c.patientId,c.process,page]);
- const refs=useScopedRead(action==='link_existing'?'/api/contingencies?view=references&careRecipientId='+c.patientId+'&process='+c.process+'&query='+encodeURIComponent(search)+'&page='+page:null,'',decode),chosen=refs.data?.data.find(r=>r.id===target);
- return <RecordDrawer title={review?'Revisar conciliação':'Conciliar declaração de contingência'} onClose={onClose} restoreFocusTo={opener} busy={busy} preventClose={pending} hasUnsavedChanges={Boolean(reason)}>{error?<Notice error>{error}</Notice>:null}{pending?<Notice>Consulte a mesma tentativa antes de preparar outra decisão.<ActionButton disabled={busy} onClick={onRecover}>Consultar resultado desta tentativa</ActionButton></Notice>:null}<p>Conciliador: {context.fullName}. A decisão será registrada com sua sessão, separada de quem realizou ou recebeu o fato físico.</p>{current&&current.id===c.id&&current.revision!==c.revision?<Notice>Há uma revisão mais recente deste dossiê. Sua decisão e seu motivo foram preservados. Confira as informações acrescentadas antes de usar essa revisão.<section aria-label="Informações da revisão mais recente">{current.events.filter(e=>e.sequence>=c.revision).map(e=><article key={e.id}><ContingencyAttribution name={e.actorName} role={e.actorRole} at={e.recordedAt}/>{e.action==='supplement'?<ContingencyFacts value={storedContingencyContent.parse(e.body)} scope={e.id}/>:<p>{String(e.body.reason??'')}</p>}</article>)}</section><ActionButton disabled={busy||pending||current.state==='linked'} onClick={()=>{setReview(false);onAdopt(current);}}>Usar esta revisão após a conferência</ActionButton></Notice>:null}{review?<><h2 ref={reviewHeadingRef} tabIndex={-1}>Confira a decisão e sua referência</h2><DefinitionGrid items={[{label:'Decisão',value:action==='link_existing'?'Vincular registro existente':'Solicitar esclarecimento'},{label:'Base e motivo',value:reason},{label:'Referência selecionada',value:chosen?.label??'Nenhuma; não haverá vínculo'}]}/><p>Vincular não refaz movimentos nem cria confirmação pessoal. Evidências ainda pendentes impedem concluir o vínculo.</p><ActionButton variant="primary" disabled={busy||pending} onClick={()=>void onConfirm(action,reason,action==='link_existing'?target:null)}>Confirmar conciliação</ActionButton><ActionButton disabled={busy||pending} onClick={()=>setReview(false)}>Voltar à decisão</ActionButton></>:<form className="hca-form" onSubmit={event=>{event.preventDefault();if(busy||pending||reason.trim().length<3||action==='link_existing'&&(!chosen||refs.loading||refs.error))return;setReview(true);}}><FormField label="Decisão de conciliação"><SelectField value={action} onChange={event=>{setAction(event.target.value as typeof action);setTarget('');}}><option value="needs_clarification">Solicitar esclarecimento</option><option value="link_existing">Vincular registro digital existente</option></SelectField></FormField><FormField label="Motivo e base da regularização" required><TextAreaField value={reason} required minLength={3} maxLength={2000} onChange={event=>setReason(event.target.value)}/></FormField>{action==='link_existing'?<section aria-label="Comparar referência existente"><p>Procure primeiro o registro já existente. Se ainda precisar de um ato operacional, use o fluxo próprio e volte para vinculá-lo; esta decisão não cria estoque ou aceite.</p><FormField label="Buscar referência por código ou descrição"><TextInput value={query} maxLength={200} onChange={event=>setQuery(event.target.value)}/></FormField><ActionButton type="button" onClick={()=>{setSearch(query);setPage(0);setTarget('');refs.refresh();}}>Buscar registros existentes</ActionButton>{refs.loading?<p role="status">Consultando referências…</p>:null}{refs.error?<Notice error>{refs.error}</Notice>:null}<FormField label="Registro existente" required><SelectField required value={target} disabled={refs.loading||Boolean(refs.error)||!refs.data} onChange={event=>setTarget(event.target.value)}><option value="">Selecione após comparar</option>{refs.data?.data.map(row=><option value={row.id} key={row.id}>{row.label} · revisão {row.version}</option>)}</SelectField></FormField>{refs.data?<div className="hca-toolbar"><ActionButton type="button" disabled={page===0||refs.loading} onClick={()=>{setPage(n=>n-1);setTarget('');}}>Referências anteriores</ActionButton><span>Página {page+1} de {Math.max(1,Math.ceil(refs.data.total/25))}</span><ActionButton type="button" disabled={refs.loading||(page+1)*25>=refs.data.total} onClick={()=>{setPage(n=>n+1);setTarget('');}}>Próximas referências</ActionButton></div>:null}</section>:null}<ActionButton type="submit" variant="primary" disabled={busy||pending}>Revisar regularização</ActionButton></form>}</RecordDrawer>;
 }

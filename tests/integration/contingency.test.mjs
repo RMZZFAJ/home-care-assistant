@@ -19,10 +19,15 @@ test('contingency preserves explicit unknowns and digital attribution without ch
 });
 test('a second legitimate person links an existing fact once without another document stock entry or personal receipt',async()=>{
  const f=await setup(),req=await issue(f.patient,f.products),pro=await actor('professional',f.patient),created=await recordContingency(pro,f.patient),before=state(f.patient);
- const self=await pro.rpc('contingency_command',decision(f.patient,created.caseId,'link_existing',{reason:'Conferência própria não substitui decisão independente',targetId:req.id}));assert.equal(self.error?.code,'42501');
- const family=await actor('family',f.patient),packet=decision(f.patient,created.caseId,'link_existing',{reason:'Documento existente comparado com o registro físico fictício',targetId:req.id});
+ const self=await pro.rpc('contingency_command',decision(f.patient,created.caseId,'link_existing',{reason:'Conferência própria não substitui decisão independente',targetId:req.id,targetVersion:1}));assert.equal(self.error?.code,'42501');
+ const family=await actor('family',f.patient),packet=decision(f.patient,created.caseId,'link_existing',{reason:'Documento existente comparado com o registro físico fictício',targetId:req.id,targetVersion:1});
+ const {targetVersion,...unreviewed}=packet.p_body;
+ assert.equal((await family.rpc('contingency_command',{...packet,p_body:unreviewed})).error?.code,'22023');
+ const stale=await family.rpc('contingency_command',{...packet,p_body:{...unreviewed,targetVersion:targetVersion+1}});
+ assert.equal(stale.error?.code,'PT409');assert.equal(stale.error?.message,'contingency target revision changed');
+ assert.equal((await detail(family,f.patient,created.caseId)).events.length,0);
  const r=await rpc(family,'contingency_command',packet);await rpc(family,'contingency_command',packet);assert.equal(r.revision,2);
- const d=await detail(family,f.patient,created.caseId);assert.equal(d.state,'linked');assert.equal(d.events.length,1);assert.equal(d.events[0].actorId,fixtures.family.id);assert.equal(d.events[0].body.targetId,req.id);assert.equal(state(f.patient),before);
+ const d=await detail(family,f.patient,created.caseId);assert.equal(d.state,'linked');assert.equal(d.events.length,1);assert.equal(d.events[0].actorId,fixtures.family.id);assert.equal(d.events[0].body.targetId,req.id);assert.equal(d.events[0].body.targetVersion,targetVersion);assert.equal(state(f.patient),before);
  assert.equal((await family.rpc('contingency_command',{...packet,p_key:randomUUID(),p_expected:2})).error?.code,'PT409');
 });
 test('clarification and supplements append history and prohibit reviewing any declaration of your own',async()=>{
@@ -54,7 +59,7 @@ test('references are patient and process scoped and paginated without inferring 
  const f=await setup(),req=await issue(f.patient,f.products),family=await actor('family',f.patient),created=await recordContingency(family,f.patient,'REQ',contingencyBody({knownReference:'Caderno % de intercorrências'})),admin=await actor('adminA',f.patient),refs=await rpc(admin,'contingency_references',{p_patient:f.patient,p_process:'REQ'});
  assert.ok(refs.data.some(x=>x.id===req.id));assert.equal(refs.patientId,f.patient);assert.equal(refs.process,'REQ');
  const another=await setup(),foreign=await issue(another.patient,another.products);await actor('adminA',f.patient);
- assert.equal((await admin.rpc('contingency_command',decision(f.patient,created.caseId,'link_existing',{reason:'Referência de outro paciente deve ser recusada',targetId:foreign.id}))).error?.code,'42501');
+ assert.equal((await admin.rpc('contingency_command',decision(f.patient,created.caseId,'link_existing',{reason:'Referência de outro paciente deve ser recusada',targetId:foreign.id,targetVersion:1}))).error?.code,'42501');
  for(let i=0;i<26;i++)await recordContingency(admin,f.patient);
  const first=await rpc(admin,'contingency_cases',{p_patient:f.patient,p_process:'REQ',p_page:0}),next=await rpc(admin,'contingency_cases',{p_patient:f.patient,p_process:'REQ',p_page:1});
  assert.equal(first.total,27);assert.equal(first.data.length,25);assert.equal(next.data.length,2);assert.equal(new Set([...first.data,...next.data].map(x=>x.id)).size,27);
@@ -72,13 +77,17 @@ test('case-locked evidence reuses actual Storage attestation recovery and immuta
  const args={p_patient:f.patient,p_contingency:created.caseId,p_filename:'registro-fisico-ficticio.jpg',p_mime:'image/jpeg',p_bytes:bytes.length,p_key:key,p_source_hash:hash,p_source_bytes:bytes.length,p_source_mime:'image/jpeg',p_hash:hash,p_transformation:'image-normalized-v1'};
  const a=await rpc(pro,'prepare_contingency_attachment_attempt',args);assert.equal(a.contingency_id,created.caseId);assert.equal((await rpc(pro,'prepare_contingency_attachment_attempt',args)).id,a.id);
  await rpc(worker,'attest_attachment_source',{p_id:a.id,p_actor:fixtures.professional.id,p_source_hash:hash,p_source_bytes:bytes.length,p_source_mime:'image/jpeg',p_hash:hash,p_transformation:'image-normalized-v1'});
- const family=await actor('family',f.patient),packet=decision(f.patient,created.caseId,'link_existing',{reason:'Evidência comparada com a ficha existente',targetId:req.id});
+ const family=await actor('family',f.patient),packet=decision(f.patient,created.caseId,'link_existing',{reason:'Evidência comparada com a ficha existente',targetId:req.id,targetVersion:1});
+ const dossierQuery={p_patient:f.patient,p_process:'REQ',p_id:created.caseId};
+ const pending=await rpc(family,'contingency_case_dossier',dossierQuery);
+ assert.equal(pending.pendingEvidence,true);assert.deepEqual(pending.evidence,[]);
  assert.equal((await family.rpc('contingency_command',packet)).error?.code,'PT409');
  const token=randomUUID();await rpc(pro,'begin_attachment_upload',{p_id:a.id,p_source_hash:hash,p_hash:hash,p_token:token});assert.ifError((await pro.storage.from('patient-evidence').upload(a.object_path,bytes,{contentType:'image/jpeg',upsert:false})).error);
  await rpc(worker,'settle_attachment_upload',{p_id:a.id,p_actor:fixtures.professional.id,p_token:token,p_outcome:'stored'});await rpc(worker,'finalize_attachment',{p_id:a.id,p_actor:fixtures.professional.id,p_hash:hash,p_mime:'image/jpeg',p_bytes:bytes.length,p_valid:true});await rpc(pro,'bind_validated_attachment',{p_id:a.id});
  const files=await rpc(pro,'contingency_attachment_attempts',{p_patient:f.patient,p_contingency:created.caseId,p_key:key});assert.equal(files.length,1);assert.equal(files[0].sourceSha256,hash);assert.equal(files[0].state,'ready');assert.ifError((await pro.storage.from('patient-evidence').download(a.object_path)).error);
  const before=state(f.patient);await rpc(family,'contingency_command',packet);const d=await detail(family,f.patient,created.caseId);assert.deepEqual(d.events[0].body.evidence,[{id:a.id,sha256:hash}]);assert.equal(state(f.patient),before);
- const dossier=await rpc(family,'contingency_case_dossier',{p_patient:f.patient,p_process:'REQ',p_id:created.caseId});
+ const dossier=await rpc(family,'contingency_case_dossier',dossierQuery);
+ assert.equal(dossier.pendingEvidence,false);
  assert.deepEqual(dossier.evidence.map(file=>[file.id,file.filename]),[[a.id,'registro-fisico-ficticio.jpg']]);assert.match(dossier.evidence[0].confirmedAt,/T/);
  await rpc(worker,'finalize_attachment',{p_id:a.id,p_actor:fixtures.professional.id,p_hash:hash,p_mime:'image/jpeg',p_bytes:bytes.length,p_valid:true});await rpc(pro,'bind_validated_attachment',{p_id:a.id});
  assert.equal((await pro.rpc('prepare_contingency_attachment_attempt',{...args,p_key:randomUUID()})).error?.code,'PT409');
@@ -100,7 +109,7 @@ test('material snapshots reject a different reviewed unit or precision before pr
  assert.equal((await f.admin.rpc('contingency_command',contingencyPacket(f.patient,'REQ',{p_body:body}))).error?.code,'PT409');assert.equal(Number(sql('select count(*) from private.contingency_cases where care_recipient_id='+q(f.patient))),0);assert.equal(state(f.patient),before);
 });
 test('two independent real reviewers serialize on the same recorded revision and only one immutable decision remains',async()=>{
- const f=await setup(),req=await issue(f.patient,f.products),pro=await actor('professional',f.patient),created=await recordContingency(pro,f.patient),admin=await actor('adminA',f.patient),family=await actor('family',f.patient),before=state(f.patient),body={reason:'Conferência independente fictícia com referência existente',targetId:req.id};
+ const f=await setup(),req=await issue(f.patient,f.products),pro=await actor('professional',f.patient),created=await recordContingency(pro,f.patient),admin=await actor('adminA',f.patient),family=await actor('family',f.patient),before=state(f.patient),body={reason:'Conferência independente fictícia com referência existente',targetId:req.id,targetVersion:1};
  const r=await Promise.all([admin.rpc('contingency_command',decision(f.patient,created.caseId,'link_existing',body)),family.rpc('contingency_command',decision(f.patient,created.caseId,'link_existing',body))]);assert.equal(r.filter(x=>!x.error).length,1);assert.equal(r.filter(x=>x.error?.code==='PT409').length,1);assert.equal((await detail(admin,f.patient,created.caseId)).events.length,1);assert.equal(state(f.patient),before);
 });
 

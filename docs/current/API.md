@@ -1476,7 +1476,10 @@ de 25 resumos. O filtro `query` pesquisa identificador do dossiê,
 referência física, descrição, complementos e código digital vinculado
 antes de paginar. A resposta identifica o filtro e o escopo consultados.
 Com `id`, a consulta traz os fatos, os atos imutáveis e as evidências
-confirmadas daquele dossiê. `view=references` pesquisa referências
+confirmadas daquele dossiê. `pendingEvidence` indica a existência de
+um envio em quarentena, sem expor dados do arquivo ou da tentativa.
+A projeção de conferência também considera quem complementou o dossiê.
+`view=references` pesquisa referências
 emitidas do mesmo paciente e processo e distingue entrega de devolução.
 As respostas usam `private, no-store`. A leitura depende do vínculo local.
 
@@ -1495,21 +1498,26 @@ separados das pessoas e do instante físico declarados. Comunicações manuais
 registram estado declarado, sem enviar aviso ou produzir ciência.
 
 needs_clarification/link_existing exigem id, expectedRevision, reason e
-targetId (null no esclarecimento). A decisão exige contingency.review e
-outra identidade, que não tenha criado ou complementado a declaração.
+targetId (null no esclarecimento). link_existing exige também
+`targetVersion`, a revisão do registro digital escolhido. A decisão exige
+contingency.review e outra identidade, que não tenha criado ou complementado
+a declaração.
 Vínculo só alcança registro existente do mesmo processo/paciente e congela
 referência e evidências prontas; envio em quarentena impede concluir. Não
 cria documento, débito/crédito, ciência, recebimento ou assinatura pessoal.
-Histórico não é editado ou apagado; concorrência rejeita a revisão obsoleta.
+O banco compara as revisões do dossiê e do registro digital sob bloqueio.
+`CONTINGENCY_REFERENCE_CHANGED` (409) exige nova escolha após comparação.
+`CONTINGENCY_REFERENCE_UNAVAILABLE` (409) preserva o escopo da busca quando
+a referência escolhida está ausente ou é incompatível. O histórico é imutável.
 
 view=recovery e attemptKey consultam o resultado próprio; action=resolve
 confere a mesma intenção. Se ainda não há resultado, encerra aquela chave
 atomicamente, impedindo um comando tardio; resultado confirmado é recuperado.
 Somente a referência oficial, sem conteúdo do formulário, pode ficar em
-sessionStorage por conta/paciente. Na declaração e no complemento, a interface
-oferece até duas consultas de recuperação e fornece os detalhes da tentativa
-para suporte ao atingir esse limite. O preenchimento fica na tela até sair
-ou receber a confirmação.
+sessionStorage por conta/paciente. A interface oferece até duas consultas
+de recuperação na declaração, no complemento e na conferência. Fornece os
+detalhes da tentativa para suporte ao atingir esse limite. O preenchimento
+fica na tela até sair ou receber a confirmação.
 
 /api/attachments também aceita contingencyId como pai exclusivo, em lugar
 de documentId/movementId. Usa a mesma reserva, quarentena, sanitização,

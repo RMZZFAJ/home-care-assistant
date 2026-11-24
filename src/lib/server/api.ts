@@ -77,9 +77,13 @@ export function databaseError(
     throw new ApiError("CONTINGENCY_MATERIAL_CHANGED", "A unidade ou a precisão do material mudou. Confira a referência atual do catálogo.", 409);
   if (error?.code === "PT409" && message === "contingency revision changed")
     throw new ApiError("VERSION_CONFLICT", "A referência da contingência mudou. Compare os registros atuais antes de preparar outra confirmação.", 409);
+  if (error?.code === "PT409" && message === "contingency target revision changed")
+    throw new ApiError("CONTINGENCY_REFERENCE_CHANGED", "A revisão do registro digital mudou. Consulte e escolha a referência atual antes de confirmar.", 409);
   if (error?.code === "PT409" && message === "contingency evidence pending")
     throw new ApiError("ATTACHMENT_PENDING", "Há evidência com envio ainda não confirmado. Consulte a mesma tentativa de anexo antes de vincular o registro.", 409);
-  if (error?.code === "PT409" && /^(contingency already linked|contingency evidence closed)$/.test(message))
+  if (error?.code === "PT409" && message === "contingency already linked")
+    throw new ApiError("CONTINGENCY_ALREADY_LINKED", "O dossiê já foi vinculado. Consulte o resultado e as evidências preservadas.", 409);
+  if (error?.code === "PT409" && message === "contingency evidence closed")
     throw new ApiError("INVALID_OPERATION", "O dossiê já foi vinculado. Consulte o resultado e as evidências preservadas.", 409);
   if (error?.code === "42501" && message === "independent contingency reviewer required")
     throw new ApiError("FORBIDDEN", "A conferência exige outra pessoa com competência local. Quem declarou ou complementou não revisa a própria informação.", 403);

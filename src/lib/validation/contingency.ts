@@ -16,7 +16,8 @@ const target={id:z.uuid(),expectedRevision:z.number().int().positive()};
 export const contingencyCommand=z.discriminatedUnion('action',[
  z.object({...common,action:z.literal('record'),content:contingencyContent}).strict(),
  z.object({...common,...target,action:z.literal('supplement'),content:contingencyContent}).strict(),
- z.object({...common,...target,action:z.enum(['needs_clarification','link_existing']),reason:z.string().trim().min(3).max(2000),targetId:z.uuid().nullable()}).strict().refine(v=>v.action==='link_existing'?v.targetId!==null:v.targetId===null,{path:['targetId'],message:'Selecione a referência existente para vincular; esclarecimento não confirma vínculo.'}),
+ z.object({...common,...target,action:z.literal('needs_clarification'),reason:z.string().trim().min(3).max(2000),targetId:z.null()}).strict(),
+ z.object({...common,...target,action:z.literal('link_existing'),reason:z.string().trim().min(3).max(2000),targetId:z.uuid(),targetVersion:z.number().int().positive()}).strict(),
  z.object({...common,action:z.literal('resolve')}).strict(),
 ]);
 export type ContingencyCommand=z.infer<typeof contingencyCommand>;
@@ -28,6 +29,7 @@ export const contingencyCase=z.object({id:z.uuid(),patientId:z.uuid(),process:co
 export type ContingencyCase=z.infer<typeof contingencyCase>;
 export const contingencyDossier=contingencyCase.extend({
   evidence:z.array(z.object({id:z.uuid(),filename:z.string(),confirmedAt:instant.nullable()}).strict()),
+  pendingEvidence:z.boolean(),
 });
 export type ContingencyDossier=z.infer<typeof contingencyDossier>;
 export const contingencyQuery=z.object({careRecipientId:common.careRecipientId,process:contingencyProcess,view:z.enum(['cases','references','recovery']).default('cases'),id:z.uuid().transform(v=>v.toLowerCase()).optional(),page:z.coerce.number().int().min(0).max(100000).default(0),query:z.string().trim().max(200).default(''),attemptKey:z.uuid().optional()}).strict();
@@ -51,4 +53,24 @@ export function parseContingencyCases(value: unknown, patient: string, process: 
     throw new Error('A consulta não corresponde às contingências deste paciente. Atualize a seção.');
   }
   return data;
+}
+
+const contingencyReference = z.object({
+  id: z.uuid(), kind: z.enum(['document', 'consumption']), label: z.string(),
+  recordedAt: instant, version: z.number().int().positive(),
+}).strict();
+export type ContingencyReference = z.infer<typeof contingencyReference>;
+const referencePage = z.object({
+  patientId: z.uuid(), process: contingencyProcess, page: z.number().int(),
+  total: z.number().int().nonnegative(), data: z.array(contingencyReference),
+}).strict();
+export function parseContingencyReferences(value: unknown, patient: string, process: string, page: number) {
+  const result = referencePage.parse(value);
+  const kind = process.startsWith('CONSUMPTION_') ? 'consumption' : 'document';
+  if (result.patientId !== patient || result.process !== process || result.page !== page
+    || result.data.length !== Math.min(25, Math.max(0, result.total - page * 25))
+    || result.data.some(row => row.kind !== kind) || new Set(result.data.map(row => row.id)).size !== result.data.length) {
+    throw new Error('A referência não corresponde a este processo e paciente.');
+  }
+  return result;
 }
