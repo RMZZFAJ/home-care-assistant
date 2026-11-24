@@ -4,9 +4,11 @@ import { useCallback, useEffect, useRef, useState, type RefObject } from "react"
 import { useRouter } from "next/navigation";
 import { ActionButton, Pill } from "@/components/ui/controls";
 import { Drawer } from "@/components/ui/overlays";
+import { Icon } from "@/components/ui/icon";
 import { api, ApiError } from "@/lib/client/api";
 import { documentEventLabel } from "@/lib/notifications/event-labels";
 import { parseInboxNotice } from "@/lib/notifications/inbox";
+import { inboxNoticeIcon, inboxTaskLabels } from "@/lib/notifications/inbox-presentation";
 import { notificationHref, notificationTargetLabel } from "@/lib/notifications/navigation";
 import { formatBrazilDate } from "@/lib/receipt";
 import { useLiveRevision } from "@/lib/use-live-revision";
@@ -64,8 +66,8 @@ export function InboxNoticeDetails({ patientId, patientName, noticeId, onClose, 
   };
 
   return <Drawer
-    open onClose={onClose} finalFocus={finalFocus} headingIcon="bell"
-    title={denied ? "Aviso indisponível" : row?.operational_documents?.code ?? "Aviso"}
+    open onClose={onClose} finalFocus={finalFocus} headingIcon={row ? inboxNoticeIcon(row) : "bell"}
+    title={denied ? "Aviso indisponível" : row?.reference_code ?? "Aviso"}
     kicker={row && patientName ? `Avisos · ${patientName}` : undefined}
     footer={<>
       <ActionButton onClick={onClose}>{denied ? "Voltar aos avisos" : "Fechar"}</ActionButton>
@@ -82,7 +84,11 @@ export function InboxNoticeDetails({ patientId, patientName, noticeId, onClose, 
         <time dateTime={row.created_at}>{formatBrazilDate(row.created_at)}</time>
       </div>
       <h3 className="font-semibold">{documentEventLabel(row.event_key ?? row.document_events?.action)}</h3>
-      {row.document_events?.actorName ? <p>{row.document_events.actorName}</p> : null}
+      {row.document_events?.actorName ? <p className="flex items-center gap-2"><Icon name="users" width={16} height={16} />{row.document_events.actorName}</p> : null}
+      {row.task ? <section aria-label="Ação na ficha" className="mt-3 grid gap-2 rounded-xl border border-(--hca-line) p-3">
+        <span className="flex flex-wrap items-center justify-between gap-2"><strong>{inboxTaskLabels[row.task]}</strong><Pill tone="warning">Pendente</Pill></span>
+        <p className="text-sm">{row.seen_at ? "Você já viu o aviso. A ação continua pendente na ficha." : "Abra a ficha para registrar a ação."}</p>
+      </section> : null}
     </div> : null}
   </Drawer>;
 }

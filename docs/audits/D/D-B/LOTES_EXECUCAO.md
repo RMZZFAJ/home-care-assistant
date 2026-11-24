@@ -4016,8 +4016,36 @@ após o ajuste que limpa a contagem antiga do sino. As execuções dirigidas
 usaram zero retentativas. O Advisor local retornou o aviso já registrado
 sobre a extensão `unaccent` no esquema público.
 
-A busca e os filtros de tipo e pendência previstos no laboratório v2, os
-modais de falha de leitura e as preferências continuam em execução no E11.
+### E11-02 — Central com busca, filtros e ações da ficha
+
+A central segue a ordem do laboratório v2 com resumo, busca, filtros de
+estado, tipo de ficha em diálogo, hora da consulta e lista de avisos. A busca
+combina referência, autoria e descrição do evento. O filtro “Com ação” usa
+ciência de REQ, conferência de ENT/DEV, aprovação de COM e revisão de BAL
+enquanto a pessoa ainda puder praticar o ato na ficha. Abrir ou marcar um aviso
+como visto mantém essas pendências independentes.
+
+COM e a devolução sob ENT entram no seletor porque são destinos reais do
+produto. Avisos de estoque, escala e outros eventos continuam em “Todos”.
+O diálogo de falha distingue uma consulta anterior da falha atual e oferece
+nova consulta. Os três totais e a página vêm do recorte autorizado no banco.
+A comparação em 360 e 412 px manteve “Avisos” e a identificação do paciente
+no topo. O sino compartilhado continua no cabeçalho do sistema. A consulta
+de atrasos e recuperação foi posicionada depois da lista. O espaçamento da
+lupa foi conferido no campo real.
+
+| Migration | Local | Remoto |
+| --- | --- | --- |
+| `20261124101715_l4_inbox_search_and_tasks` | Aplicada | Pendente |
+
+O banco local tem 372 versões. A integração com Auth real confirmou busca,
+filtro, ciência independente de visto e revisão de balanço por outra pessoa.
+Os seis cenários finais de avisos, ocorrências e recuperação passaram em
+Chromium móvel e WebKit no perfil iPhone. Um timeout de login apareceu em
+rodada anterior e o cenário passou nas reexecuções dirigidas sem retry.
+As capturas de 360 e 412 px estão em `output/playwright/l4-inbox/`.
+As preferências, a apresentação final do sino e os estados de aparelhos
+continuam em execução no E11.
 
 ### E12-01 — Guias e ajuda na tarefa
 

@@ -1,17 +1,21 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { matchingDocumentEvents } from "@/lib/notifications/event-labels";
+import { inboxKind, inboxSearchLimit } from "@/lib/notifications/inbox";
 import {
   api,
   ApiError,
   authenticate,
   pageParameters,
   readJson,
+  parseQuery,
   rpc,
   uuid,
   parseUuid,
 } from "@/lib/server/api";
 
 const privateResponse = { headers: { "Cache-Control": "private, no-store" } };
+const filterQuery = z.object({ kind: inboxKind.nullable(), search: z.string().trim().max(inboxSearchLimit), tasks: z.boolean() });
 
 export async function GET(request: Request) {
   return api("notifications.mine", async () => {
@@ -21,13 +25,17 @@ export async function GET(request: Request) {
     const noticeId = params.has("noticeId") ? parseUuid(params.get("noticeId")) : null;
     const surface = params.get("surface") === "bell" ? "bell" : "center";
     const unreadOnly = params.get("unread") === "true";
+    const filters = parseQuery(filterQuery, {
+      kind: params.get("kind"), search: params.get("q") ?? "", tasks: params.get("tasks") === "true",
+    });
+    const query = { ...filters, page, pageSize, unread: unreadOnly, surface };
     const requested = params.get("careRecipientId")
       ? parseUuid(params.get("careRecipientId"))
       : null;
     const context = await rpc(auth.client, "my_active_context") as { mode?: string; care_recipient_id?: string } | null;
     if (context?.mode !== "patient" || !uuid.safeParse(context.care_recipient_id).success) {
       if (noticeId) throw new ApiError("NOT_FOUND", "Este aviso não está disponível neste vínculo.", 404);
-      return NextResponse.json({ data: [], total: 0, unreadCount: 0, page, pageSize, unread: unreadOnly, surface, availability: "patient_context_required" }, privateResponse);
+      return NextResponse.json({ ...query, data: [], total: 0, unreadCount: 0, actionCount: 0, availability: "patient_context_required" }, privateResponse);
     }
     const patient = context.care_recipient_id!;
     if (requested && requested !== patient) throw new ApiError("CONTEXT_REQUIRED", "Selecione seu vínculo com o paciente destas notificações em Mudar perfil.", 409);
@@ -38,8 +46,12 @@ export async function GET(request: Request) {
       p_surface: noticeId ? "center" : surface,
       p_unread: noticeId ? false : unreadOnly,
       p_id: noticeId,
-    }) as { data?: unknown[]; total?: number; unreadCount?: number } | null;
-    if (!Array.isArray(result?.data) || typeof result.total !== "number" || typeof result.unreadCount !== "number")
+      ...(noticeId ? {} : {
+        p_kind: filters.kind, p_search: filters.search, p_tasks: filters.tasks,
+        p_event_keys: matchingDocumentEvents(filters.search),
+      }),
+    }) as { data?: unknown[]; total?: number; unreadCount?: number; actionCount?: number } | null;
+    if (!Array.isArray(result?.data) || typeof result.total !== "number" || typeof result.unreadCount !== "number" || typeof result.actionCount !== "number")
       throw new ApiError("INTERNAL_ERROR", "Não foi possível ler o resultado da consulta de notificações.", 500);
     const after = await rpc(auth.client, "my_active_context") as { mode?: string; care_recipient_id?: string } | null;
     if (after?.mode !== "patient" || after.care_recipient_id !== patient)
@@ -49,13 +61,11 @@ export async function GET(request: Request) {
       return NextResponse.json({ data: result.data[0] }, privateResponse);
     }
     return NextResponse.json({
+      ...query,
       data: result.data,
       total: result.total,
       unreadCount: result.unreadCount,
-      page,
-      pageSize,
-      unread: unreadOnly,
-      surface,
+      actionCount: result.actionCount,
       availability: "ready",
       careRecipientId: patient,
     }, privateResponse);

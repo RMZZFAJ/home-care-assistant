@@ -52,7 +52,7 @@ test("login, navegação, menus, filtros e quatro wizards são acessíveis e res
     ["/admin", "Administração"],
     ["/configuracoes", "Permissões, comunicação e regras"],
     ["/perfil", "Meu perfil e segurança"],
-    ["/notificacoes", "Central de notificações"],
+    ["/notificacoes", "Avisos"],
     ["/consumo", "Consumo e faltas"],
     ["/unidades", "Unidades e apresentações"],
   ]) {
@@ -95,7 +95,7 @@ test("login, navegação, menus, filtros e quatro wizards são acessíveis e res
   await expect(page.getByLabel("Menu do usuário",{exact:true})).toBeFocused();
   await page.getByLabel("Menu do usuário",{exact:true}).click();
   await page.getByRole("menuitem",{name:"Central de notificações",exact:true}).click();
-  await expect(page.getByRole("heading",{name:"Central de notificações",exact:true})).toBeVisible();
+  await expect(page.getByRole("heading",{name:"Avisos",exact:true})).toBeVisible();
   await expect(page.getByRole("menu",{name:"Ações do usuário",exact:true})).toHaveCount(0);
   await page
     .getByRole("combobox", { name: "Pessoa assistida", exact: true })

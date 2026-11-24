@@ -20,7 +20,7 @@ export function DashboardNotices({ patientId }: { patientId: string }) {
         <span className="notice-icon"><Icon name="bell" width={17} height={17} /></span>
         <span>
           <strong>{documentEventLabel(row.event_key ?? row.document_events?.action)}</strong>
-          <span>{row.operational_documents?.code ?? "Atualização do paciente"}</span>
+          <span>{row.reference_code ?? "Atualização do paciente"}</span>
           <small>{formatBrazilDate(row.created_at)}</small>
         </span>
         <Icon name="chevron" width={16} height={16} />

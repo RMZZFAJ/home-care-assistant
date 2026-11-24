@@ -124,6 +124,12 @@ const labels: Record<string, string> = {
 export function isKnownDocumentEvent(action: string) {
   return Object.hasOwn(labels, action);
 }
+export function matchingDocumentEvents(search: string) {
+  if (!search) return [];
+  const normalize = (value: string) => value.normalize("NFD").replaceAll(/\p{M}/gu, "").toLocaleLowerCase("pt-BR");
+  const term = normalize(search);
+  return Object.entries(labels).filter(([, label]) => normalize(label).includes(term)).map(([action]) => action);
+}
 export function documentEventLabel(action?: string, origin?: "purchase" | "donation") {
   if (!action) return "Atualização disponível";
   if (origin === "donation") {

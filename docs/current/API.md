@@ -476,13 +476,17 @@ O banco aplica a permissão atual de leitura do destino antes de paginar e
 contar. Lista, total e contagem do sino vêm da mesma consulta. O GET com
 `noticeId` consulta novamente a mesma autorização para um único aviso e retorna
 `404` se o aviso estiver fora do alcance da pessoa no vínculo selecionado.
-A resposta paginada inclui availability=ready, careRecipientId, data, total,
-unreadCount, page, pageSize, unread e surface. A central confere a seleção,
-o tamanho esperado da página e identidades únicas; resposta inconsistente
-não substitui a leitura válida. O sino exclui silenciosas antes da paginação;
-na central, o filtro de não vistas se aplica antes da página. Falha de leitura
-ou resultado inválido não vira caixa vazia. POST marca vista no aplicativo;
-não registra ciência, aceite documental ou leitura confirmada por provedor.
+Na central, `kind` seleciona REQ, ENT (entregas e devoluções), COM ou BAL.
+`q` pesquisa referência, autoria e descrição do evento sem exigir acentos.
+`tasks=true` lista avisos que apontam para uma ação ainda elegível da pessoa.
+Os filtros se combinam antes da paginação. A resposta inclui `actionCount`,
+`unreadCount`, os filtros aplicados e o total de avisos que passam pelos
+filtros. A central confere a seleção, o tamanho esperado da página e as
+identidades únicas. Uma resposta inconsistente mantém a última leitura
+confirmada do mesmo recorte. O sino exclui silenciosas antes da paginação.
+Na central, o filtro de não vistas se aplica antes da página. O POST marca
+vista no aplicativo. Ciência, aceite documental e leitura confirmada pelo
+provedor são registros independentes.
 
 Em GET /api/patient-settings, a leitura de propostas mantém a RPC nativa e
 inclui careRecipientId, status, kind e query, além de changes, total, page e

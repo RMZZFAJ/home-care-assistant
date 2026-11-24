@@ -247,8 +247,8 @@ test("ocorrências e notificações preservam saldos e distinguem estados no apl
   await page.getByRole("button", { name: "Descartar alterações", exact: true }).click();
   expect(await balance()).toEqual(before);
   await page.goto("/notificacoes?careRecipientId=" + patientA);
-  await expect(page.getByRole("heading", { name: "Central de notificações", exact: true })).toBeVisible();
-  await page.getByRole("checkbox", { name: "Somente não vistas", exact: true }).check();
+  await expect(page.getByRole("heading", { name: "Avisos", exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Não vistos", exact: true }).click();
   await expect(page.getByText("Consultando notificações…", { exact: true })).toHaveCount(0);
   await noOverflow(page);
   await capture(page, "notificacoes-central", info.project.name);

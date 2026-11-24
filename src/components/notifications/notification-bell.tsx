@@ -68,7 +68,7 @@ export function NotificationBell({ patientId, patientName, disabled = false }: {
                     }}
                   >
                     <strong>
-                      {row.operational_documents?.code ??
+                      {row.reference_code ??
                         "Atualização do paciente"}
                     </strong>
                     <span>

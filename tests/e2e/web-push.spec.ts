@@ -389,7 +389,7 @@ test("Web Push negado não repete pedido, não inscreve e mantém a central e o 
   await auditFromTop(page, "push-unavailable");
   await page.goto("/notificacoes");
   await expect(
-    page.getByRole("heading", { name: "Central de notificações", exact: true }),
+    page.getByRole("heading", { name: "Avisos", exact: true }),
   ).toBeVisible();
 });
 

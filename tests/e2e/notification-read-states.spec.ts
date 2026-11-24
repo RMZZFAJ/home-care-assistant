@@ -73,12 +73,13 @@ test("D3 central distingue demora falha resposta inválida e vazio confirmado e 
     await expect(center(page).getByText("Nenhuma notificação neste filtro.", { exact: true })).toHaveCount(0);
     release(); await expect(center(page).getByText("Nenhuma notificação neste filtro.", { exact: true })).toBeVisible(); mode = "error";
     await center(page).getByRole("button", { name: "Atualizar", exact: true }).click();
-    await expect(center(page).getByRole("alert")).toContainText("Falha controlada na leitura da central");
+    const failure = page.getByRole("dialog", { name: "Não foi possível consultar os avisos", exact: true });
+    await expect(failure.getByRole("alert")).toContainText("Falha controlada na leitura da central");
     await expect(center(page).getByText("Nenhuma notificação neste filtro.", { exact: true })).toHaveCount(0);
-    mode = "invalid"; await center(page).getByRole("button", { name: "Consultar notificações novamente", exact: true }).click();
-    await expect(center(page).getByRole("alert")).toContainText("A resposta da consulta de notificações não pôde ser lida");
+    mode = "invalid"; await failure.getByRole("button", { name: "Consultar notificações novamente", exact: true }).click();
+    await expect(failure.getByRole("alert")).toContainText("A resposta da consulta de notificações não pôde ser lida");
     await expect(center(page).getByText("Nenhuma notificação neste filtro.", { exact: true })).toHaveCount(0);
-    mode = "live"; await center(page).getByRole("button", { name: "Consultar notificações novamente", exact: true }).click();
+    mode = "live"; await failure.getByRole("button", { name: "Consultar notificações novamente", exact: true }).click();
     await expect(center(page).getByText("Nenhuma notificação neste filtro.", { exact: true })).toBeVisible();
     const response = await page.request.get("/api/notifications"); expect(response.ok()).toBeTruthy();
     expect(await response.json()).toMatchObject({ availability: "ready", careRecipientId: f.patient, data: [], total: 0, unreadCount: 0 });

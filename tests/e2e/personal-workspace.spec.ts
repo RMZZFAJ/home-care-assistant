@@ -75,7 +75,7 @@ test("perfil pessoal salva registro e foto privada e notificações distinguem c
   expect(profile.professional_registration).toBe("REG-TESTE");
   expect(profile.professional_state).toBe("SP");
   await page.goto("/notificacoes?careRecipientId=" + patientA);
-  await page.getByLabel("Somente não vistas", { exact: true }).check();
+  await page.getByRole("button", { name: "Não vistos", exact: true }).click();
   const row = page
     .getByRole("listitem")
     .filter({ has: page.getByText(receipt.code, { exact: true }) });
