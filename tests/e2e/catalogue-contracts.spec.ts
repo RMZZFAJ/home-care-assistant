@@ -134,22 +134,23 @@ test("apresentação fracionária pode ser configurada na interface existente po
   await login(page, f.patient);
   await page.goto("/unidades?careRecipientId=" + f.patient);
   await page
-    .getByRole("button", { name: "Configurar unidade e precisão", exact: true })
+    .getByRole("button", { name: /^Precisão de um material/ })
     .click();
   const drawer = page.getByRole("dialog", {
-    name: "Unidade base e precisão",
+    name: "Precisão do material",
     exact: true,
   });
   await drawer
-    .getByRole("combobox", { name: "Produto", exact: true })
+    .getByRole("combobox", { name: "Material", exact: true })
     .selectOption(product.product_id);
-  await drawer.getByLabel("Precisão do produto", { exact: true }).fill("1");
+  await drawer.getByLabel("Casas decimais", { exact: true }).selectOption("1");
   await drawer
-    .getByRole("button", { name: "Salvar unidade / precisão", exact: true })
+    .getByRole("button", { name: "Salvar precisão", exact: true })
     .click();
+  await page.getByRole("dialog", { name: "Precisão registrada", exact: true }).getByRole("button", { name: "Concluir", exact: true }).click();
   await expect(drawer).toHaveCount(0);
   await page
-    .getByRole("button", { name: "Nova apresentação", exact: true })
+    .getByRole("button", { name: "Adicionar apresentação", exact: true })
     .click();
   const presentation = page.getByRole("dialog", {
     name: "Nova apresentação",
@@ -165,20 +166,21 @@ test("apresentação fracionária pode ser configurada na interface existente po
     .getByRole("option", { name: /Líquido fracionário da interface/ })
     .click();
   await presentation
-    .getByLabel("Código da apresentação", { exact: false })
+    .getByLabel("Código de barras", { exact: true })
     .fill("0123456789012");
   await presentation
     .getByLabel("Nome da apresentação", { exact: true })
     .fill("Frasco fracionário fictício");
   await presentation
-    .getByLabel("Fator na unidade base", { exact: false })
+    .getByLabel("Quantidade na unidade base", { exact: true })
     .fill("1.5");
   await presentation
     .getByRole("button", { name: "Revisar apresentação", exact: true })
     .click();
-  await presentation
+  await page.getByRole("dialog", { name: "Confirmar apresentação?", exact: true })
     .getByRole("button", { name: "Confirmar apresentação", exact: true })
     .click();
+  await page.getByRole("dialog", { name: "Apresentação registrada", exact: true }).getByRole("button", { name: "Concluir", exact: true }).click();
   await expect(presentation).toHaveCount(0);
   expect(
     sql(

@@ -227,7 +227,7 @@ test("administração usa listas, painéis de edição e confirmação crítica 
   await expect(page.getByLabel("Arquivar após conclusão ou cancelamento (dias)", { exact: true })).toBeVisible();
   await page.keyboard.press("Escape");
   await page.goto("/unidades?careRecipientId=" + patientA);
-  await expect(page.getByRole("table", { name: "Unidades base", exact: true })).toBeVisible();
+  await expect(page.getByRole("region", { name: "Unidades disponíveis", exact: true })).toBeVisible();
   await capture(page, "unidades-lista", info.project.name);
   await page.getByRole("button", { name: "Nova unidade", exact: true }).click();
   await expect(page.getByLabel("Código", { exact: true })).toBeVisible();

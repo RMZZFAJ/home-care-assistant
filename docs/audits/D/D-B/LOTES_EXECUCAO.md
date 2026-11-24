@@ -5251,6 +5251,41 @@ preservou o PDF byte a byte, comparou a referência concorrente, recuperou
 a decisão após resposta perdida e confirmou a recusa de nova ação depois
 da revogação. O painel foi comparado com o laboratório a 360 e 412 px.
 
-Esta etapa usa a rota e a migration `20261124212833` de E10-07. Unidades,
-apresentações, o histórico de alterações gerais do material e a retirada
-do acesso comum aos comprovantes seguem em E10-09 e E10-10.
+Esta etapa usa a rota e a migration `20261124212833` de E10-07.
+
+### E10-09 — Unidades, apresentações e leitura de código
+
+A tela segue a organização do laboratório em unidades disponíveis,
+apresentações dos materiais e consulta de embalagem. Busca, filtros e
+paginação atendem aos cadastros reais. O detalhe da unidade informa código,
+dimensão, precisão e âmbito. A configuração de precisão apresenta a
+restrição da unidade já usada no histórico. A configuração global cria
+unidades gerais; a configuração de materiais e apresentações usa o vínculo
+local autorizado.
+
+Unidade, precisão e apresentação usam a confirmação revisada e o
+resultado da própria tentativa. O preenchimento fica na edição aberta.
+O fechamento descarta os campos; a consulta de um resultado incerto
+retém a chave da tentativa. A edição de uma versão concorrente conserva
+os campos até o usuário conferir a referência atual e revisar de novo.
+
+A apresentação mantém o código textual, a equivalência positiva, o
+interruptor de disponibilidade e as versões oficiais em painel próprio.
+A consulta da embalagem reutiliza o leitor que atende os wizards.
+Câmera, imagem e digitação consultam as apresentações ativas da residência.
+O resultado encontrado permite abrir a apresentação; a ausência apresenta
+a alternativa de conferir o número ou usar a unidade base. A consulta
+preserva documentos, movimentos e quantidades.
+
+Passaram 12 integrações com Auth local e sete cenários dirigidos em
+Chromium, entre a rodada inicial e os retestes. A validação cobriu
+criação e recuperação sem duplicidade, edição concorrente, foco de
+retorno, código duplicado, acesso em leitura, preservação do fator em
+ficha emitida e leitura por imagem e digitação com zeros à esquerda.
+A câmera negada foi simulada. O teste de layout percorreu cinco
+larguras e cores forçadas, com comparação visual a 360 e 412 px.
+O reteste final mediu a separação da lupa e do texto nos dois campos de
+busca a 360 e 412 px.
+
+E10-09 reutiliza o contrato de `20261124212833`, sem nova migration. O
+histórico geral do material e a retirada da central comum seguem em E10-10.

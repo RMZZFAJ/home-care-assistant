@@ -2320,5 +2320,12 @@ preserva a identidade, as custódias e o histórico. A consulta da tentativa
 própria continua autorizada enquanto houver leitura da residência. Novos
 atos exigem `catalog.manage`.
 
-Os endpoints históricos de preparação permanecem usados pelos editores de
-unidades e apresentações durante a transição do L4.
+Unidade, precisão e apresentação consultam o mesmo endpoint de referência.
+`selection` identifica o material em `unit_configure` e
+`presentation_create`. `presentation_edit` usa o ID da apresentação e a
+referência devolve seu material e a versão atual. O registro da alteração
+usa a intenção revisada, preservando as versões antigas de equivalência.
+Os endpoints de leitura de apresentações continuam recebendo o código
+textual, inclusive seus zeros iniciais, e fornecem as versões oficiais.
+Os endpoints anteriores de preparação continuam disponíveis aos
+consumidores do contrato anterior durante a transição do L4.

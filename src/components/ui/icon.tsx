@@ -55,6 +55,7 @@ const paths = {
   "menu": "M4 6h16 M4 12h16 M4 18h16",
   "close": "M6 6l12 12 M18 6 6 18",
   "camera": "M3 7h5l2-3h4l2 3h5v14H3z M8 13a4 4 0 1 0 8 0a4 4 0 1 0-8 0",
+  "scan": "M3 8V3h5m8 0h5v5M3 16v5h5m8 0h5v-5M7 8v8m3-8v8m4-8v8m3-8v8",
   "user": "M8 7a4 4 0 1 0 8 0a4 4 0 1 0-8 0 M4 21v-2a8 8 0 0 1 16 0v2",
   "forms": "M6 3h8l5 5v13H6z M14 3v5h5 M9 13h7 M9 17h7",
   "stock": "m3 7 9-4 9 4v10l-9 4-9-4z M3 7l9 5 9-5 M12 12v9",

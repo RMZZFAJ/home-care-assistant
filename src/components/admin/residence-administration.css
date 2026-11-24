@@ -55,7 +55,7 @@
 .hca-catalogue-add { justify-self: start; min-height: 36px; }
 .hca-catalogue-search { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px; padding: 6px; border: 1px solid var(--hca-line); border-radius: 15px; background: #fff; }
 .hca-catalogue-search .hca-text-input { border-color: transparent; }
-.hca-l1 .hca-catalogue-search .hca-input-adornment > input.hca-text-input { padding-inline-start: 38px; font-size: 12px; }
+.hca-l1 :is(.hca-catalogue-search, .hca-catalogue-filter-search) .hca-input-adornment > input.hca-text-input { padding-inline-start: 38px; font-size: 12px; }
 .hca-catalogue-search > button { align-self: center; }
 .hca-catalogue-types { display: flex; overflow-x: auto; border-bottom: 1px solid var(--hca-line); }
 .hca-catalogue-types > button { flex: none; border-radius: 0; border-bottom: 2px solid transparent; padding-inline: 10px; font-size: 13px; }
@@ -75,6 +75,11 @@
 .hca-catalogue-balances strong { color: var(--hca-teal); font-size: 24px; font-weight: 600; line-height: 1.25; margin-top: 4px; font-variant-numeric: tabular-nums; }
 .hca-catalogue-balance-hint { display: flex; align-items: flex-start; gap: 8px; }
 .hca-catalogue-balance-hint svg { flex-shrink: 0; margin-top: 2px; color: var(--hca-muted); }
+.hca-catalogue-presentation-filters { display: grid; grid-template-columns: minmax(0, 1fr) minmax(82px, auto); gap: 8px; }
+.hca-catalogue-presentation-switch { justify-content: space-between; padding-block: 12px; border-bottom: 1px solid var(--hca-line); }
+.hca-catalogue-presentation-switch input { order: 1; flex-shrink: 0; }
+.hca-catalogue-scan-guide { display: grid; justify-items: center; gap: 7px; padding: 24px 12px; color: var(--hca-teal); background: var(--hca-bg); border: 1px dashed var(--hca-line); border-radius: 16px; text-align: center; }
+.hca-catalogue-scan-guide small { color: var(--hca-muted); }
 @media (max-width: 600px) { .hca-catalogue-add { width: 100%; } }
 .hca-notice-channel-disabled { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
 .hca-notice-channel-disabled small { display: block; color: var(--hca-muted); }

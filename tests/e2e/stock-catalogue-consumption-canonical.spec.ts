@@ -1,8 +1,9 @@
-import { expect, test, type Browser, type Locator, type Page } from "@playwright/test";
+import { expect, test, type Locator, type Page } from "@playwright/test";
 import { randomUUID } from "node:crypto";
 import { mkdirSync } from "node:fs";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
+import sharp from "sharp";
 import { setup, rpc, fixtures } from "../integration/v4-fixtures.mjs";
 import { autonomousReturnFixture, declaredAutonomousReturn, transferCommand } from "../integration/autonomous-return-fixtures.mjs";
 import { shiftWorker } from "../integration/shift-fixtures.mjs";
@@ -20,20 +21,8 @@ async function login(page: Page, patient: string) {
   await page.getByLabel("Senha", { exact: true }).fill(fixturePassword); await page.getByRole("button", { name: "Entrar", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Visão geral", exact: true })).toBeVisible(); await selectContext(page,patient);
 }
-async function model(browser: Browser, route: string) {
-  const context = await browser.newContext(), page = await context.newPage(); await page.route(/^https?:/, route => route.abort());
-  await page.goto(pathToFileURL(resolve("Home_Care_Assistant_Modelo_Integral.html")).href + "#" + route); await page.locator("#roleSelect").selectOption("admin");
-  return { context,page };
-}
 function writes(page: Page) { const sent: string[] = []; page.on("request", r => { if (new URL(r.url()).pathname.startsWith("/api/") && r.method() !== "GET") sent.push(r.url()); }); return sent; }
 const facts = (patient: string) => sql(`select jsonb_build_object('catalogue',(select jsonb_agg(to_jsonb(p) order by product_id) from public.care_recipient_products p where care_recipient_id=${q(patient)}),'stock',(select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where care_recipient_id=${q(patient)}),'documents',(select jsonb_agg(to_jsonb(d) order by id) from public.operational_documents d where care_recipient_id=${q(patient)}),'reports',(select jsonb_agg(to_jsonb(r) order by id) from public.consumption_reports r where care_recipient_id=${q(patient)}),'presentations',(select jsonb_agg(to_jsonb(p) order by id) from public.product_presentations p where care_recipient_id=${q(patient)}));`);
-async function tableParity(table: Locator, reference: Page, width: number) {
-  const ref = reference.locator(".tablewrap.mobilecards").first(); await expect(ref).toBeVisible();
-  for (const p of ["border-radius","border-color","background-color"] as const) await expect(table.locator("..")).toHaveCSS(p,await ref.evaluate((n,p) => getComputedStyle(n).getPropertyValue(p),p));
-  const row = table.locator("tbody tr").first();
-  for (const p of ["display","padding-left","padding-top","gap"] as const) await expect(row).toHaveCSS(p,await ref.locator("tbody tr").first().evaluate((n,p) => getComputedStyle(n).getPropertyValue(p),p));
-  expect(await row.evaluate(node => node.getBoundingClientRect().width)).toBeLessThanOrEqual(width);
-}
 async function capture(node: Locator, file: string) {
   await node.evaluate(node => node.scrollIntoView({ block: "center",inline: "nearest",behavior: "instant" }));
   expect(await node.evaluate(node => { const r=node.getBoundingClientRect(),x=r.left+r.width/2;return [r.top+12,r.bottom-12].every(y=>y>0&&y<innerHeight&&node.contains(document.elementFromPoint(x,y))); })).toBe(true);
@@ -43,6 +32,16 @@ async function capture(node: Locator, file: string) {
 function transitQuantity(card: Locator, label: string) {
   return card.locator(".hca-transit-quantities > div")
     .filter({ has: card.page().getByText(label, { exact: true }) }).locator("dd strong");
+}
+
+async function ean8Image(code: string) {
+  const left = ["0001101", "0011001", "0010011", "0111101", "0100011", "0110001", "0101111", "0111011", "0110111", "0001011"];
+  const leftSide = Array.from(code.slice(0, 4), digit => left[Number(digit)]).join("");
+  const rightSide = Array.from(code.slice(4), digit => left[Number(digit)].replace(/[01]/g, bit => bit === "1" ? "0" : "1")).join("");
+  const symbol = "0000000000101" + leftSide + "01010" + rightSide + "1010000000000";
+  const stripe = Buffer.from(Array.from(symbol).flatMap(bit => Array<number>(5).fill(bit === "1" ? 0 : 255)));
+  const height = 135;
+  return sharp(Buffer.concat(Array<Buffer>(height).fill(stripe)), { raw: { width: stripe.length, height, channels: 1 } }).png().toBuffer();
 }
 
 test("06.4 stock transit and movement cards retain four factual quantities and distinguish current catalogue from preserved origin", async ({page},info) => {
@@ -146,21 +145,56 @@ test("devolução em trânsito mostra a rota própria, a diferença e a mesma fi
   expect(facts(f.patient)).toBe(before);
 });
 
-test("06.4 catalogue units and presentations retain aliases,precision,leading zero and conversion across canonical table cards", async ({page,browser},info) => {
+test("06.4 catalogue units and presentations retain aliases,precision,leading zero and conversion across canonical records", async ({page},info) => {
+  test.setTimeout(300_000);
   const name="Material de catálogo "+"com nome extenso ".repeat(6)+randomUUID().slice(0,8),f=await setup({catalogue:catalogue(name)});
   const presentation=await rpc(f.admin,"catalogue_presentation_command",{p_patient:f.patient,p_id:null,p_version:null,p_key:randomUUID(),p_body:{productId:f.products[0],barcode:"0012345678905",name:"Pacote preservado com oito unidades",baseQuantity:"8",active:true}});
-  expect(presentation).toBeTruthy();await login(page,f.patient);const before=facts(f.patient),sent=writes(page),ref=await model(browser,"catalogo/materiais");
-  try{
+  const imageCode = "01234565";
+  await rpc(f.admin,"catalogue_presentation_command",{p_patient:f.patient,p_id:null,p_version:null,p_key:randomUUID(),p_body:{productId:f.products[0],barcode:imageCode,name:"Embalagem da imagem",baseQuantity:"4",active:true}});
+  expect(presentation).toBeTruthy();await login(page,f.patient);const before=facts(f.patient),sent=writes(page);
     await page.goto(`/admin?careRecipientId=${f.patient}&section=catalog`);
     const list=page.getByRole("region",{name:"Produtos do catálogo",exact:true}),row=list.locator("[data-product-id]");
     await expect(row).toHaveCount(1);await expect(row).toContainText("Alias preservado para pesquisa");await expect(row).toContainText("Precisão 0 casa(s)");
     for(const width of widths){await page.setViewportSize({width,height:1100});expect(await row.evaluate(node=>node.getBoundingClientRect().width)).toBeLessThanOrEqual(width);await auditFromTop(page,"canonical catalogue "+width);if(width===320)await capture(row,"catalogue-material-"+info.project.name);}
-    await page.goto(`/unidades?careRecipientId=${f.patient}`);const units=page.getByRole("table",{name:"Unidades base",exact:true}),packs=page.getByRole("table",{name:"Apresentações por material",exact:true});
-    await expect(units.locator("tbody tr").first()).toBeVisible();await expect(packs).toContainText("0012345678905");await expect(packs).toContainText("1 embalagem = 8 unidade");
-    for(const width of widths){await page.setViewportSize({width,height:1100});await ref.page.setViewportSize({width,height:1100});await tableParity(units,ref.page,width);await tableParity(packs,ref.page,width);await auditFromTop(page,"canonical units presentations "+width);}
+    await page.goto(`/unidades?careRecipientId=${f.patient}`);const units=page.getByRole("region",{name:"Unidades disponíveis",exact:true}),packs=page.getByRole("region",{name:"Apresentações dos materiais",exact:true});
+    await expect(units.getByRole("button",{name:/Unidade.*Contagem/})).toBeVisible();await expect(packs).toContainText("1 embalagem = 8 unidade");
+    for(const width of widths){await page.setViewportSize({width,height:1100});
+      for(const section of [units,packs])expect(await section.evaluate(node=>node.scrollWidth)).toBeLessThanOrEqual(width);
+      await auditFromTop(page,"canonical units presentations "+width);
+    }
+    if(info.project.name==="chromium")for(const width of [360,412]){await page.setViewportSize({width,height:900});await page.evaluate(()=>window.scrollTo(0,0));await page.screenshot({path:info.outputPath("unidades-"+width+".png")});}
+    await page.evaluate(() => {
+      Object.defineProperty(navigator.mediaDevices,"getUserMedia",{configurable:true,value:async()=>{throw new DOMException("Câmera indisponível","NotAllowedError");}});
+    });
+    await page.getByRole("button",{name:/^Ler código de barras/}).click();
+    const scanner=page.getByRole("dialog",{name:"Consultar código de barras",exact:true});
+    await scanner.getByRole("button",{name:"Usar câmera",exact:true}).click();
+    await expect(scanner.getByText(/Acesso à câmera negado/)).toBeVisible();
+    await scanner.getByLabel("Selecionar imagem").setInputFiles({name:"codigo-ean8.png",mimeType:"image/png",buffer:await ean8Image(imageCode)});
+    await expect(scanner.getByText("Embalagem da imagem",{exact:true})).toBeVisible();
+    await expect(scanner).toContainText(imageCode);
+    const code=scanner.getByLabel("Código manual",{exact:true});
+    await code.fill("00000000987654");
+    await scanner.getByRole("button",{name:"Consultar código",exact:true}).click();
+    await expect(scanner.getByRole("heading",{name:"Código não localizado",exact:true})).toBeVisible();
+    await code.fill("0012345678905");
+    await scanner.getByRole("button",{name:"Consultar código",exact:true}).click();
+    await expect(scanner).toContainText("0012345678905");
+    await scanner.getByRole("button",{name:"Ver apresentação",exact:true}).click();
+    const detail=page.getByRole("dialog",{name:"Apresentação da embalagem",exact:true});
+    await expect(detail.getByLabel("Código de barras",{exact:true})).toHaveValue("0012345678905");
+    await detail.getByRole("button",{name:"Voltar",exact:true}).click();
+    await units.getByRole("button",{name:/^Precisão de um material/}).click();
+    const precision=page.getByRole("dialog",{name:"Precisão do material",exact:true});
+    await precision.getByLabel("Material",{exact:true}).selectOption(f.products[0]);
+    await expect(precision.getByLabel("Unidade base",{exact:true})).toBeDisabled();
+    await precision.getByRole("button",{name:"Unidade preservada pelo histórico",exact:true}).click();
+    const preservation=page.getByRole("dialog",{name:"Unidade preservada pelo histórico",exact:true});
+    await expect(preservation).toContainText("Unidade registrada");
+    await preservation.getByRole("button",{name:"Entendi",exact:true}).click();
+    await precision.getByRole("button",{name:"Voltar",exact:true}).click();
     await page.emulateMedia({forcedColors:"active",reducedMotion:"reduce"});await auditFromTop(page,"catalogue forced colors");
     expect(facts(f.patient)).toBe(before);expect(sent).toEqual([]);
-  }finally{await ref.context.close();}
 });
 
 test("06.4 consumption canonical record preserves original author,complete text and structured declaration without debit", async ({page,browser},info) => {

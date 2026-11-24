@@ -267,10 +267,10 @@ test("C026 REQ anuncia erro no campo e conserva extra e observação de 1001 car
 test("C026 apresentação incompleta aponta material, nome, código e fator sem perder dados nem mover estoque", async ({ page }, info) => {
   const f = await fixture(), ledger = sql(`select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where care_recipient_id=${q(f.patient)}`);
   let commands = 0;
-  page.on("request", request => { if (new URL(request.url()).pathname === "/api/catalog/presentations" && request.method() === "POST") commands++; });
+  page.on("request", request => { if (new URL(request.url()).pathname === "/api/admin/catalogue-actions" && request.method() === "POST") commands++; });
   await login(page, f.patient);
   await page.goto("/unidades?careRecipientId=" + f.patient);
-  await page.getByRole("button", { name: "Nova apresentação", exact: true }).click();
+  await page.getByRole("button", { name: "Adicionar apresentação", exact: true }).click();
   const drawer = page.getByRole("dialog", { name: "Nova apresentação", exact: true });
   const review = drawer.getByRole("button", { name: "Revisar apresentação", exact: true });
   const material = drawer.getByRole("combobox", { name: "Material da apresentação", exact: true });
@@ -284,18 +284,18 @@ test("C026 apresentação incompleta aponta material, nome, código e fator sem 
   await errorAt(name, "Informe um nome de pelo menos dois caracteres.");
   await name.fill("Pacote preservado");
   await review.click();
-  const barcode = drawer.getByLabel("Código da apresentação", { exact: false });
+  const barcode = drawer.getByLabel("Código de barras", { exact: true });
   await errorAt(barcode, "Informe um código de 8 a 14 algarismos, preservando os zeros iniciais.");
   await barcode.fill("0012345678901");
   await review.click();
-  const factor = drawer.getByLabel("Fator na unidade base", { exact: false });
+  const factor = drawer.getByLabel("Quantidade na unidade base", { exact: true });
   await expect(factor).toBeFocused(); await expect(factor).toHaveAttribute("aria-invalid", "true");
   await expect(name).toHaveValue("Pacote preservado"); await expect(barcode).toHaveValue("0012345678901"); expect(commands).toBe(0);
   for (const width of [1440, 768, 390, 320]) { await page.setViewportSize({ width, height: 900 }); await audit(page, "C026-apresentacao-" + width); }
   await capture(page, "C026-apresentacao", info.project.name);
   await factor.fill("10"); await review.click();
-  await expect(drawer.getByRole("heading", { name: "Revisar apresentação", exact: true })).toBeVisible();
-  await drawer.getByRole("button", { name: "Confirmar apresentação", exact: true }).click();
+  await page.getByRole("dialog", { name: "Confirmar apresentação?", exact: true }).getByRole("button", { name: "Confirmar apresentação", exact: true }).click();
+  await page.getByRole("dialog", { name: "Apresentação registrada", exact: true }).getByRole("button", { name: "Concluir", exact: true }).click();
   await expect(drawer).toHaveCount(0); expect(commands).toBe(1);
   expect(sql(`select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where care_recipient_id=${q(f.patient)}`)).toBe(ledger);
 });

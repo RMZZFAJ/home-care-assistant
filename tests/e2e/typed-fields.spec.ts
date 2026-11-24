@@ -23,7 +23,7 @@ async function login(page: Page, role: "adminA" | "family", patient?: string, st
   if (patient) await selectContext(page, patient);
 }
 
-test("CFinal019 catálogo e unidade preservam inteiros, código textual e escopo com persistência real", async ({ page }) => {
+test("CFinal019 catálogo e unidade preservam inteiros, código textual e escopo com persistência real", async ({ page }, info) => {
   const f = await setup(); owned.add(f.patient);
   const ledger = sql(`select coalesce(jsonb_agg(to_jsonb(m) order by id),'[]') from public.stock_movements m where care_recipient_id=${q(f.patient)};`);
   await login(page, "adminA", f.patient);
@@ -38,7 +38,7 @@ test("CFinal019 catálogo e unidade preservam inteiros, código textual e escopo
   await order.fill("12"); expect(await order.evaluate((element: HTMLInputElement) => element.checkValidity())).toBe(true);
   const name = "Nome livre 001234 / água " + randomUUID().slice(0, 6);
   await drawer.getByLabel("Nome do material", { exact: true }).fill(name);
-  await expect(drawer.getByLabel("Nome do material", { exact: true })).toHaveAttribute("type", "text");
+  expect(await drawer.getByLabel("Nome do material", { exact: true }).evaluate(input => (input as HTMLInputElement).type)).toBe("text");
   await drawer.getByLabel("Unidade de controle", { exact: true }).selectOption("unidade");
   const saved = page.waitForResponse(response => new URL(response.url()).pathname === "/api/admin/catalogue-actions" && response.request().method() === "POST");
   await drawer.getByRole("button", { name: "Revisar material", exact: true }).click();
@@ -47,45 +47,62 @@ test("CFinal019 catálogo e unidade preservam inteiros, código textual e escopo
   await page.getByRole("dialog", { name: "Material adicionado", exact: true }).getByRole("button", { name: "Concluir", exact: true }).click();
   expect(sql(`select sort_order from public.care_recipient_products where care_recipient_id=${q(f.patient)} and name=${q(name)};`)).toBe("12");
   await page.goto("/unidades?careRecipientId=" + f.patient);
+  if (info.project.name === "chromium") {
+    const viewport = page.viewportSize();
+    for (const width of [360, 412]) {
+      await page.setViewportSize({ width, height: 910 });
+      for (const label of ["Pesquisar unidades", "Pesquisar apresentações"]) {
+        const spacing = await page.getByRole("searchbox", { name: label, exact: true }).evaluate(input => {
+          const icon = input.parentElement?.querySelector("svg");
+          return icon ? input.getBoundingClientRect().left + Number.parseFloat(getComputedStyle(input).paddingInlineStart) - icon.getBoundingClientRect().right : -1;
+        });
+        expect(spacing).toBeGreaterThanOrEqual(4);
+      }
+      await page.screenshot({ path: info.outputPath("unidades-espacamento-" + width + ".png") });
+    }
+    if (viewport) await page.setViewportSize(viewport);
+  }
   await page.getByRole("button", { name: "Nova unidade", exact: true }).click();
   const unit = page.getByRole("dialog", { name: "Nova unidade", exact: true });
   await unit.getByLabel("Código", { exact: true }).fill("001234");
-  await unit.getByRole("button", { name: "Salvar preenchimento privado", exact: true }).click();
-  await expect(unit.getByText(/Preenchimento privado salvo/)).toBeVisible();
+  await expect(unit.getByRole("button", { name: "Salvar preenchimento privado", exact: true })).toHaveCount(0);
   await unit.getByRole("button", { name: "Fechar edição", exact: true }).click();
   await page.reload();
   await page.getByRole("button", { name: "Nova unidade", exact: true }).click();
-  await expect(unit.getByLabel("Código", { exact: true })).toHaveValue("001234");
+  await expect(unit.getByLabel("Código", { exact: true })).toHaveValue("");
+  await unit.getByLabel("Código", { exact: true }).fill("001234");
   await unit.getByLabel("Nome", { exact: true }).fill("Volume livre / código preservado");
   await unit.getByRole("combobox", { name: "Dimensão", exact: true }).selectOption("volume");
-  await expect(unit.getByRole("combobox", { name: "Âmbito", exact: true })).toHaveValue("patient");
+  await expect(unit.getByText("Esta residência", { exact: true })).toBeVisible();
   const decimals = unit.getByLabel("Casas decimais", { exact: true });
-  for (const value of ["-1", "1.5", "7"]) { await decimals.fill(value); expect(await decimals.evaluate((element: HTMLInputElement) => element.checkValidity())).toBe(false); }
-  for (const value of ["0", "6"]) { await decimals.fill(value); expect(await decimals.evaluate((element: HTMLInputElement) => element.checkValidity())).toBe(true); }
-  const created = page.waitForResponse(response => new URL(response.url()).pathname === "/api/units" && response.request().method() === "POST");
+  expect(await decimals.locator("option").evaluateAll(options => options.map(option => (option as HTMLOptionElement).value))).toEqual(["0", "1", "2", "3", "4", "5", "6"]);
+  await decimals.selectOption("6");
+  const created = page.waitForResponse(response => new URL(response.url()).pathname === "/api/admin/catalogue-actions" && response.request().method() === "POST");
   await unit.getByRole("button", { name: "Criar unidade", exact: true }).click();
-  const response = await created; expect(response.ok()).toBe(true); const id = (await response.json()).id;
+  const response = await created; expect(response.ok()).toBe(true); const id = (await response.json()).outcome.unitId;
+  await page.getByRole("dialog", { name: "Unidade criada", exact: true }).getByRole("button", { name: "Concluir", exact: true }).click();
   expect(JSON.parse(sql(`select jsonb_build_object('code',code,'name',name,'dimension',dimension,'decimals',decimals,'patient',care_recipient_id) from public.measurement_units where id=${q(id)};`))).toEqual({ code: "001234", name: "Volume livre / código preservado", dimension: "volume", decimals: 6, patient: f.patient });
   const payload = { careRecipientId: f.patient, code: "OUTRA", name: "Outra unidade", dimension: "count", decimals: 0 };
   for (const bad of [{ decimals: 1.5 }, { decimals: 7 }, { decimals: "6" }, { code: 1234 }, { dimension: "unknown" }]) expect((await page.request.post("/api/units", { data: { ...payload, ...bad } })).status()).toBe(400);
   expect((await page.request.post("/api/units", { data: { ...payload, careRecipientId: null } })).status()).toBe(403);
   await expect(unit).toHaveCount(0);
-  await page.getByRole("button", { name: "Nova apresentação", exact: true }).click();
+  await page.getByRole("button", { name: "Adicionar apresentação", exact: true }).click();
   const presentation = page.getByRole("dialog", { name: "Nova apresentação", exact: true });
   const material = presentation.getByRole("combobox", { name: "Material da apresentação", exact: true });
   await material.fill("Material fictício V4 0"); await material.press("ArrowDown");
   await page.getByRole("option", { name: /Material fictício V4 0/ }).click();
   await presentation.getByLabel("Nome da apresentação", { exact: true }).fill("Apresentação livre / zeros preservados");
-  const barcode = presentation.getByLabel("Código da apresentação", { exact: true });
+  const barcode = presentation.getByLabel("Código de barras", { exact: true });
   await barcode.fill("001234");
   const sixDigits = await barcode.evaluate((element: HTMLInputElement) => ({ type: element.type, textPreserved: element.value === "001234", valid: element.checkValidity() }));
   expect(sixDigits).toEqual({ type: "text", textPreserved: true, valid: false });
   await barcode.fill("00123456");
-  await presentation.getByLabel("Fator na unidade base", { exact: true }).fill("1");
+  await presentation.getByLabel("Quantidade na unidade base", { exact: true }).fill("1");
   await presentation.getByRole("button", { name: "Revisar apresentação", exact: true }).click();
-  const presentationSaved = page.waitForResponse(response => new URL(response.url()).pathname === "/api/catalog/presentations" && response.request().method() === "POST");
-  await presentation.getByRole("button", { name: "Confirmar apresentação", exact: true }).click();
+  const presentationSaved = page.waitForResponse(response => new URL(response.url()).pathname === "/api/admin/catalogue-actions" && response.request().method() === "POST");
+  await page.getByRole("dialog", { name: "Confirmar apresentação?", exact: true }).getByRole("button", { name: "Confirmar apresentação", exact: true }).click();
   expect((await presentationSaved).ok()).toBe(true);
+  await page.getByRole("dialog", { name: "Apresentação registrada", exact: true }).getByRole("button", { name: "Concluir", exact: true }).click();
   const found = await page.request.get(`/api/catalog/presentations?careRecipientId=${f.patient}&barcode=00123456`);
   expect(found.ok()).toBe(true); expect(JSON.stringify(await found.json())).toContain('"barcode":"00123456"');
   expect(sql(`select coalesce(jsonb_agg(to_jsonb(m) order by id),'[]') from public.stock_movements m where care_recipient_id=${q(f.patient)};`)).toBe(ledger);

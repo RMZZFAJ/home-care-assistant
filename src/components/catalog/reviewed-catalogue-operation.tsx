@@ -105,14 +105,18 @@ export function ReviewedCatalogueFeedback({ operation, onFinish, onReview, ident
   showPending?: boolean;
 }) {
   const { pending, failure, result, busy } = operation;
-  const canCompare = failure?.cause instanceof ApiError && failure.cause.status === 409 && !failure.uncertain;
+  const canCompare = failure?.cause instanceof ApiError && failure.cause.code === "VERSION_CONFLICT" && !failure.uncertain;
   const action = failure?.uncertain && pending && pending.lookups < operationRecoveryLimit
     ? { label: "Conferir resultado", onClick: () => void operation.recover() }
     : canCompare && onReview ? { label: identity ? "Conferir atualização" : "Conferir cadastro atual", onClick: onReview } : undefined;
   const closed = result?.state === "closed";
   const proposed = result?.outcome && "proposalId" in result.outcome;
+  const unit = result?.purpose === "unit_create";
+  const precision = result?.purpose === "unit_configure";
+  const presentation = result?.outcome && "presentationId" in result.outcome ? result.outcome : null;
   const title = closed ? "Tentativa encerrada" : proposed ? "Proposta registrada"
     : identity ? "Situação registrada"
+      : unit ? "Unidade criada" : precision ? "Precisão registrada" : presentation ? "Apresentação registrada"
       : result?.purpose === "adopt" ? "Modelo adotado" : result?.purpose === "create" ? "Material adicionado" : "Cadastro atualizado";
   function finish() {
     if (!result) return;
@@ -137,6 +141,9 @@ export function ReviewedCatalogueFeedback({ operation, onFinish, onReview, ident
       subtitle={closed ? "A consulta confirmou que esta tentativa não alterou o catálogo."
         : proposed ? "Outro administrador da residência decide a proposta em Pessoas e propostas."
           : identity ? "A decisão ficou no histórico. Os saldos e movimentos permanecem associados às identidades originais."
+            : unit ? "A unidade ficou disponível no âmbito informado. Os registros anteriores preservam suas referências."
+              : precision ? "A referência do material foi atualizada após conferir as quantidades existentes."
+                : presentation ? `A versão ${presentation.version} ficou registrada. Os usos anteriores conservam a equivalência da ocasião.`
             : "O material está identificado no catálogo. Os estoques mantêm seus registros."}
       footer={<ActionButton variant="primary" onClick={finish}>Concluir</ActionButton>}>{null}</Dialog> : null}
   </>;
