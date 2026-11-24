@@ -4,6 +4,11 @@ O [fechamento A–D da PR 7](docs/audits/FECHAMENTO_PR7.md) reúne os critérios
 e as pendências para a próxima etapa. Este acompanhamento conserva o
 histórico dos incrementos de D-B.
 
+**24/11 — início de L4.** E10–E12 seguem o laboratório v2 aprovado.
+O Preview do commit `1ba95e4c` está pronto, com contrato do Supabase
+compatível. A branch continua no PR 8 em rascunho.
+[Registro de L4](docs/audits/D/D-B/LOTES_EXECUCAO.md#l4).
+
 **23/11 — emissão e recuperação de PDF.** A emissão manual usa os
 diálogos e o carregamento da v4. A confirmação perdida recupera a mesma
 referência, sem duplicar o exemplar. A confirmação mostra ficha, modalidade

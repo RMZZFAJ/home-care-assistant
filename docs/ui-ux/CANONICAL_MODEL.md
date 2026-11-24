@@ -25,6 +25,12 @@ rege estoque, consumo e faltas, plantões e balanços, arquivos da ficha e
 validação pública. O [comando mestre L3](../../HCA_L3_COMANDO_MESTRE_CODEX_V4.md)
 delimita os impactos nas superfícies de L1/L2 e os contratos preservados.
 
+Em E10–E12, o [laboratório L4 v2](../../hca-laboratorio-04-v2-aprovado.html)
+rege residência, participantes, permissões e catálogo, conta, avisos e
+aplicativo, ajuda e continuidade. O
+[comando mestre L4](../../HCA_L4_COMANDO_MESTRE_CODEX_V2.md) delimita as
+mudanças nos contratos e nas superfícies compartilhadas de L1–L3.
+
 ## Precedência
 
 Esta ordem posterior substitui as orientações visuais conflitantes. Auditorias,

@@ -1,6 +1,6 @@
 # Execução dos lotes L1 a L4
 
-**Atualizado em 22/11/2026.** L3 em execução na branch
+**Atualizado em 24/11/2026.** L4 em execução na branch
 `feat/phase-d-continuation`, avançada a partir de `master` em `fab595c7`.
 A [PR #7](https://github.com/RMZZFAJ/home-care-assistant/pull/7) reúne
 o histórico de L1 e L2.
@@ -14,8 +14,8 @@ e nas [matrizes de execução](ACCEPTANCE_EXECUTION.csv) e
 | --- | --- | --- |
 | L1 | Implementado e revisado, com evidência de cenários específicos | [Ordem E01–E03](../../../../HCA_L1_LOTE_CODEX_E01_E03.md), [laboratório v3](../../../../hca-laboratorio-01-v3-final.html) e [comentários v3](../../../../hca-l01-v3-comentarios.json) |
 | L2 | Escopo aprovado implementado, com verificação local dirigida e CI final pendente | [Comando mestre](../../../../HCA_L2_COMANDO_MESTRE_CODEX_V7.md) e [laboratório v7 aprovado](../../../../hca-laboratorio-02-v7.html) |
-| L3 | Em execução | [Comando mestre v4](../../../../HCA_L3_COMANDO_MESTRE_CODEX_V4.md) e [laboratório v4 aprovado](../../../../hca-laboratorio-03-v4-aprovado.html) |
-| L4 | Futuro | Ordem e laboratório a registrar quando o lote for definido |
+| L3 | Implementação verificada no candidato em rascunho | [Comando mestre v4](../../../../HCA_L3_COMANDO_MESTRE_CODEX_V4.md) e [laboratório v4 aprovado](../../../../hca-laboratorio-03-v4-aprovado.html) |
+| L4 | Em execução | [Comando mestre v2](../../../../HCA_L4_COMANDO_MESTRE_CODEX_V2.md) e [laboratório v2 aprovado](../../../../hca-laboratorio-04-v2-aprovado.html) |
 
 Em cada incremento, registre o commit, os cenários conferidos, o que foi
 criado para o produto real, as diferenças ainda visíveis, os contratos e as
@@ -3867,4 +3867,29 @@ WhatsApp ainda requer homologação do provedor.
 
 ## L4
 
-Aguardando ordem e referência aprovadas.
+O comando mestre v2 e o laboratório v2 são as referências aprovadas
+de E10–E12. O HTML foi preservado na raiz, com SHA-256
+`6db3ae8c3c4f01914d4c80c1227cbe38c72bd2353e380ee87312b412a9efbdb9`,
+e excluído da análise do SonarCloud pelo nome exato, como em L2 e L3.
+Os 180 estados dos 27 cenários renderizaram nas larguras de 360 e
+412 px ao percorrer o laboratório offline. O aceite no produto requer
+comparações das superfícies com os dados e contratos reais.
+
+### Publicação e ambientes no início de L4
+
+- A branch `feat/phase-d-continuation` inicia L4 em `1ba95e4c`, no
+  [PR #8 em rascunho](https://github.com/RMZZFAJ/home-care-assistant/pull/8).
+  A [CI desse commit](https://github.com/RMZZFAJ/home-care-assistant/actions/runs/45300111307)
+  e o SonarCloud passaram. O CodeRabbit encerrou a revisão automática ao
+  identificar 261 arquivos para um limite de 100.
+- O [Preview desse commit](https://vercel.com/rmzzfajs-projects/home-care-assistant/8jqcV7wupPNyoXWugwGrkSo2cixJ)
+  ficou pronto. A Vercel confirmou as variáveis de aplicação, Supabase,
+  assinatura de PDF, worker e Web Push no escopo de Preview, incluindo a
+  política de confiança de PDF da branch. O login e o endpoint
+  `/api/runtime` responderam HTTP 200. O contrato retornou `ready`,
+  protocolo 1 e esquema 2. A conferência de configuração e conectividade
+  dispensou alteração de variáveis ou redeploy.
+- Os bundles públicos de Preview e Produção apontam para o mesmo projeto
+  Supabase. A produção está em `fab595c7` e o Supabase remoto registrava
+  362 migrations. Antes de aplicar mudanças de contrato, conferir os dois
+  consumidores. O registro de L4 ainda não contém migrations próprias.

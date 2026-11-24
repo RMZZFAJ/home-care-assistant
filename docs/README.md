@@ -25,6 +25,10 @@ L3 segue o [comando mestre v4](../HCA_L3_COMANDO_MESTRE_CODEX_V4.md) e o
 [laboratório v4 aprovado](../hca-laboratorio-03-v4-aprovado.html) para
 estoque e consumo, plantões e balanços, arquivos e verificação.
 
+L4 segue o [comando mestre v2](../HCA_L4_COMANDO_MESTRE_CODEX_V2.md) e o
+[laboratório v2 aprovado](../hca-laboratorio-04-v2-aprovado.html) para
+residência, permissões e catálogo, conta e avisos, ajuda e continuidade.
+
 **Andamento da D-B:** [acompanhamento principal](../TEMP_D_B_ATUALIZACAO.md),
 com capacidades entregues, trabalho local, fila e responsabilidades. A
 [matriz](audits/D/D-B/ACCEPTANCE_EXECUTION.csv) detalha os 105 critérios.
