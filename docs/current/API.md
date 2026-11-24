@@ -1486,6 +1486,10 @@ content; supplement também exige id e expectedRevision. Datas, fuso, pessoas,
 referência, quantidade e custódia desconhecidos são null explícito. Materiais
 selecionados levam reviewedUnit/reviewedDecimals; o banco confere e bloqueia
 a referência durante a gravação e preserva nome/unidade/precisão próprios.
+Uma referência de catálogo alterada retorna `CONTINGENCY_MATERIAL_CHANGED`
+(409). A interface consulta o catálogo e exige confirmação explícita da
+unidade e da precisão atuais. Quantidades conhecidas dos materiais afetados
+precisam ser informadas novamente. Quantidades desconhecidas continuam nulas.
 Zero não vira desconhecido. Autor, papel e instante digitais vêm do servidor,
 separados das pessoas e do instante físico declarados. Comunicações manuais
 registram estado declarado, sem enviar aviso ou produzir ciência.
@@ -1502,7 +1506,10 @@ view=recovery e attemptKey consultam o resultado próprio; action=resolve
 confere a mesma intenção. Se ainda não há resultado, encerra aquela chave
 atomicamente, impedindo um comando tardio; resultado confirmado é recuperado.
 Somente a referência oficial, sem conteúdo do formulário, pode ficar em
-sessionStorage por conta/paciente. Esta recuperação não cria rascunho comum.
+sessionStorage por conta/paciente. Na declaração e no complemento, a interface
+oferece até duas consultas de recuperação e fornece os detalhes da tentativa
+para suporte ao atingir esse limite. O preenchimento fica na tela até sair
+ou receber a confirmação.
 
 /api/attachments também aceita contingencyId como pai exclusivo, em lugar
 de documentId/movementId. Usa a mesma reserva, quarentena, sanitização,

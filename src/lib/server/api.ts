@@ -73,7 +73,9 @@ export function databaseError(
     throw new ApiError("VERSION_CONFLICT", "Já existe um pedido em andamento para esta comunicação e canal. Consulte as tentativas antes de enviar outro.", 409);
   if (error?.code === "PT429" && message === "push test rate limited")
     throw new ApiError("RATE_LIMITED", "Aguarde um minuto entre testes neste aparelho.", 429);
-  if (error?.code === "PT409" && /^(contingency revision changed|contingency material reference changed)$/.test(message))
+  if (error?.code === "PT409" && message === "contingency material reference changed")
+    throw new ApiError("CONTINGENCY_MATERIAL_CHANGED", "A unidade ou a precisão do material mudou. Confira a referência atual do catálogo.", 409);
+  if (error?.code === "PT409" && message === "contingency revision changed")
     throw new ApiError("VERSION_CONFLICT", "A referência da contingência mudou. Compare os registros atuais antes de preparar outra confirmação.", 409);
   if (error?.code === "PT409" && message === "contingency evidence pending")
     throw new ApiError("ATTACHMENT_PENDING", "Há evidência com envio ainda não confirmado. Consulte a mesma tentativa de anexo antes de vincular o registro.", 409);

@@ -49,6 +49,7 @@ const reconciliation = {
 export const errorCatalog = {
   PDF_ANNOTATIONS_UNSUPPORTED: { ...validation, recommendedAction: "Exporte uma cópia com as anotações e campos incorporados às páginas; confira o conteúdo e envie a cópia." },
   ATTACHMENT_PENDING: { ...conflict, recommendedAction: "Recupere a mesma tentativa. Resultado pendente impede abandonar o envio." },
+  CONTINGENCY_MATERIAL_CHANGED: { ...conflict, recommendedAction: "Compare a referência atual e reconfirme a quantidade física do material." },
   BALANCE_APPLICATION_REFERENCE_CHANGED: conflict,
   PUSH_NOT_CONFIGURED: configuration,
   PUSH_RESULT_UNCONFIRMED: reconciliation,

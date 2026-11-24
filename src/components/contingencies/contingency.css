@@ -32,7 +32,43 @@
 .hca-contingency > .hca-guide-actions { justify-content: space-between; }
 .hca-contingency > .hca-guide-actions > button { flex: 0 1 auto; }
 
+.hca-contingency-editor :is(h3, p), .hca-contingency-editor .hca-contingency-facts { margin-block: 0; }
+.hca-contingency-editor h3 { font-size: 15px; font-weight: 700; }
+.hca-contingency-editor .hca-contingency-facts { gap: 12px; }
+.hca-contingency-editor .hca-contingency-lead { align-items: center; }
+.hca-contingency-editor .hca-modal-context-head > div { flex: 1; min-width: 0; }
+.hca-contingency-editor .hca-contingency-facts > .hca-contingency-lead { align-items: flex-start; }
+.hca-contingency-editor .hca-contingency-facts > .hca-contingency-lead p { color: var(--hca-muted); }
+.hca-contingency-summary { padding-bottom: 12px; border-bottom: 1px solid var(--hca-line); }
+.hca-contingency-hint { display: flex; align-items: flex-start; gap: 8px; color: var(--hca-muted); font-size: 13px; }
+.hca-contingency-hint > svg { flex: none; margin-top: 3px; }
+.hca-contingency-editor-card, .hca-contingency-disclosure {
+  border: 1px solid var(--hca-line);
+  border-radius: 12px;
+  background: var(--hca-paper);
+}
+.hca-contingency-editor-card { padding: 12px; }
+.hca-contingency-disclosure > summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 12px;
+  color: var(--hca-ink);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 650;
+}
+.hca-contingency-disclosure > summary::-webkit-details-marker { display: none; }
+.hca-l1 .hca-contingency-editor .hca-contingency-disclosure > summary::after { content: none; }
+.hca-contingency-disclosure[open] > summary > svg { transform: rotate(180deg); }
+.hca-contingency-disclosure > .hca-form { padding: 0 12px 12px; }
+.hca-contingency-known { display: grid; gap: 4px; min-width: 0; font-size: 13px; }
+
 @media (max-width: 850px) {
+  .hca-drawer-viewport > .hca-contingency-editor.hca-guide-topic-sheet {
+    max-height: calc(100dvh - var(--app-header-height));
+  }
   .hca-drawer-viewport > .hca-contingency-dossier.hca-guide-topic-sheet { max-height: min(92dvh, 740px); }
   .hca-contingency-dossier .hca-modal-footer:has(> .hca-control--primary:nth-child(3)) {
     display: grid;

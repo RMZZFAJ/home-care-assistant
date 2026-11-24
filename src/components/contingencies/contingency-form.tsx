@@ -1,35 +1,311 @@
 "use client";
-import {useEffect,useId,useRef,useState,type RefObject} from 'react';
-import {RecordDrawer} from '@/components/forms/record-drawer';
-import {ActionButton,CheckboxField,DefinitionGrid,FormField,SelectField,TextAreaField,TextInput} from '@/components/ui/controls';
-import {SearchSelect} from '@/components/ui/search-select';
-import {Notice} from '@/components/workspace';
-import {ContingencyFacts} from './contingency-facts';
-import {contingencyContent,emptyContingency,type ContingencyContent} from '@/lib/validation/contingency';
-export type ContingencyProduct={id:string;name:string;unit:string;quantity_decimals:number;is_active:boolean};
-export function KnownText({label,value,onChange,type='text',maxLength=300}:{label:string;value:string|null;onChange:(value:string|null)=>void;type?:'text'|'date'|'time';maxLength?:number}){return <div className="hca-form"><CheckboxField label={'Não sei informar: '+label} checked={value===null} onChange={event=>onChange(event.target.checked?null:'')}/>{value!==null?<FormField label={label} required><TextInput type={type} value={value} required maxLength={maxLength} onChange={event=>onChange(event.target.value)}/></FormField>:null}</div>;}
-export function ContingencyForm({opener,headingRef,products,productsError,busy,pending,error,onRetry,onClose,onConfirm}:{opener:HTMLElement;headingRef:RefObject<HTMLHeadingElement|null>;products:ContingencyProduct[]|null;productsError:string;busy:boolean;pending:boolean;error:string;onRetry:()=>void;onClose:()=>void;onConfirm:(content:ContingencyContent)=>Promise<void>}){
- const [fields,setFields]=useState(emptyContingency),[materials,setMaterials]=useState<{key:string;value:ContingencyContent['materials'][number]}[]>([]),[communications,setCommunications]=useState<{key:string;value:ContingencyContent['communications'][number]}[]>([]),[review,setReview]=useState<ContingencyContent|null>(null),[validation,setValidation]=useState('');
- function patch<K extends keyof ContingencyContent>(key:K,value:ContingencyContent[K]){setFields(old=>({...old,[key]:value}));}
- const locked=busy||pending,reviewHeadingRef=useRef<HTMLHeadingElement>(null);
- useEffect(()=>{if(review)reviewHeadingRef.current?.focus();},[review]);
- return <RecordDrawer title={review?'Revisar declaração de contingência':'Registrar fato de contingência'} restoreFocusTo={opener} restoreFocusFallbackRef={headingRef} busy={busy} preventClose={pending} hasUnsavedChanges={Boolean(Object.entries(fields).some(([,v])=>Array.isArray(v)?v.length>0:v!==null&&v!=='')||materials.length||communications.length)} onClose={onClose}>
- {error?<Notice error>{error}</Notice>:null}{pending?<Notice>Há uma tentativa oficial a conferir. Os campos estão preservados; consulte o resultado antes de confirmar novamente.<ActionButton disabled={busy} onClick={onRetry}>Consultar resultado desta tentativa</ActionButton></Notice>:null}
- {review?<><h2 ref={reviewHeadingRef} tabIndex={-1}>Confira os fatos conhecidos e os desconhecidos</h2><ContingencyFacts value={{...review,materials:review.materials.map(row=>({...row,productName:products?.find(p=>p.id===row.productId)?.name??null,unit:row.reviewedUnit}))}} scope="review"/><p>Este registro preserva a declaração. Não movimenta estoque, não assina por outra pessoa e não confirma recebimento.</p><div className="hca-toolbar"><ActionButton variant="primary" disabled={locked} onClick={()=>void onConfirm(review)}>Confirmar declaração</ActionButton><ActionButton disabled={locked} onClick={()=>setReview(null)}>Voltar ao preenchimento</ActionButton></div></>:<form className="hca-form" onSubmit={event=>{event.preventDefault();if(locked)return;const parsed=contingencyContent.safeParse({...fields,materials:materials.map(r=>r.value),communications:communications.map(r=>r.value)});if(!parsed.success){setValidation(parsed.error.issues[0]?.message??'Confira o preenchimento.');return;}setValidation('');setReview(parsed.data);}}>
- <p>Preencha o que é conhecido. Campos marcados como desconhecidos permanecem assim. O preenchimento não é salvo como rascunho.</p>
- {validation?<Notice error>{validation}</Notice>:null}<FormField label="Fato físico" required helpText="Descreva o ocorrido e o que ainda precisa de conferência; até 4.000 caracteres."><TextAreaField value={fields.fact} maxLength={4000} required minLength={3} onChange={event=>patch('fact',event.target.value)}/></FormField>
- <KnownText label="Referência física" value={fields.knownReference} onChange={v=>patch('knownReference',v)}/><div className="hca-compact-grid"><KnownText label="Data do fato físico" type="date" value={fields.occurredOn} onChange={v=>patch('occurredOn',v)}/><KnownText label="Hora do fato físico" type="time" value={fields.occurredTime} onChange={v=>patch('occurredTime',v)}/><KnownZone value={fields.timeZone} onChange={v=>patch('timeZone',v)}/><KnownText label="Pessoa que realizou" value={fields.performer} onChange={v=>patch('performer',v)}/><KnownText label="Pessoa que recebeu" value={fields.receiver} onChange={v=>patch('receiver',v)}/></div>
- <h2>Materiais físicos declarados</h2><p>Depois de confirmar a declaração, você poderá anexar o registro físico ao dossiê preservado.</p><ActionButton type="button" disabled={locked} onClick={onRetry}>Atualizar materiais de referência</ActionButton>{productsError?<Notice error>{productsError}<ActionButton type="button" disabled={locked} onClick={onRetry}>Consultar materiais novamente</ActionButton></Notice>:null}
- {materials.map(row=><fieldset key={row.key} className="ui-card hca-form"><legend>Material declarado</legend><FormField label="Material identificado"><SelectField value={row.value.productId??''} disabled={!products||locked} onChange={event=>{const id=event.target.value;setMaterials(old=>old.map(x=>x.key===row.key?{...x,value:{...x.value,productId:id||null,reviewedUnit:products?.find(p=>p.id===id)?.unit??null,reviewedDecimals:products?.find(p=>p.id===id)?.quantity_decimals??null}}:x));}}><option value="">Não identificado</option>{products?.map(p=><option key={p.id} value={p.id}>{p.name} · {p.unit}{p.is_active?'':' · Inativo'}</option>)}</SelectField></FormField><DefinitionGrid items={[{label:'Unidade',value:row.value.reviewedUnit??'Não identificada'}]}/>{row.value.productId&&products&&products.some(p=>p.id===row.value.productId&&(p.unit!==row.value.reviewedUnit||p.quantity_decimals!==row.value.reviewedDecimals))?<Notice>A unidade ou a precisão mudou desde a seleção. Confira o material e a quantidade física antes de usar a referência atual.<ActionButton type="button" disabled={locked} onClick={()=>{const p=products.find(p=>p.id===row.value.productId);if(p)setMaterials(old=>old.map(x=>x.key===row.key?{...x,value:{...x.value,reviewedUnit:p.unit,reviewedDecimals:p.quantity_decimals}}:x));}}>Usar referência atual após conferir</ActionButton></Notice>:null}<KnownText label="Referência histórica do material" value={row.value.description} onChange={v=>setMaterials(old=>old.map(x=>x.key===row.key?{...x,value:{...x.value,description:v}}:x))}/><KnownText label="Quantidade física" value={row.value.quantity} onChange={v=>setMaterials(old=>old.map(x=>x.key===row.key?{...x,value:{...x.value,quantity:v}}:x))}/><FormField label="Custódia física"><SelectField value={row.value.custody??''} onChange={event=>{const value=event.target.value as typeof row.value.custody;setMaterials(old=>old.map(x=>x.key===row.key?{...x,value:{...x.value,custody:value||null}}:x));}}><option value="">Desconhecida</option><option value="FAMILY">Família</option><option value="CARE_TEAM">Equipe</option><option value="TRANSIT">Em trânsito</option></SelectField></FormField><ActionButton type="button" disabled={locked} onClick={()=>setMaterials(old=>old.filter(x=>x.key!==row.key))}>Retirar este material da declaração</ActionButton></fieldset>)}
- <ActionButton type="button" disabled={locked||materials.length>=100} onClick={()=>setMaterials(old=>[...old,{key:crypto.randomUUID(),value:{productId:null,description:null,quantity:null,custody:null,reviewedUnit:null,reviewedDecimals:null}}])}>Acrescentar material físico</ActionButton>
- <KnownText label="Ressalva" maxLength={2000} value={fields.notes} onChange={v=>patch('notes',v)}/><h2>Comunicações legítimas</h2><p>Registre o estado que você pode declarar. Esta lista não envia mensagens nem produz ciência ou recebimento.</p>
- {communications.map(row=><fieldset key={row.key} className="ui-card hca-form"><legend>Comunicação declarada</legend><FormField label="Pessoa ou referência histórica" required><TextInput value={row.value.person} required maxLength={300} onChange={event=>{const value=event.target.value;setCommunications(old=>old.map(x=>x.key===row.key?{...x,value:{...x.value,person:value}}:x));}}/></FormField><FormField label="Canal"><SelectField value={row.value.channel} onChange={event=>{const value=event.target.value as typeof row.value.channel;setCommunications(old=>old.map(x=>x.key===row.key?{...x,value:{...x.value,channel:value}}:x));}}><option value="internal">Aplicativo</option><option value="phone">Telefone</option><option value="paper">Registro físico</option><option value="other">Outro canal</option></SelectField></FormField><FormField label="Estado declarado"><SelectField value={row.value.state} onChange={event=>{const value=event.target.value as typeof row.value.state;setCommunications(old=>old.map(x=>x.key===row.key?{...x,value:{...x.value,state:value}}:x));}}><option value="pending">Pendente</option><option value="attempted">Tentativa declarada</option><option value="reported_sent">Envio declarado</option><option value="reported_read">Leitura declarada</option></SelectField></FormField><FormField label="Base legítima e referência da comunicação" required><TextAreaField value={row.value.basis} minLength={3} required maxLength={1000} onChange={event=>{const value=event.target.value;setCommunications(old=>old.map(x=>x.key===row.key?{...x,value:{...x.value,basis:value}}:x));}}/></FormField><ActionButton type="button" disabled={locked} onClick={()=>setCommunications(old=>old.filter(x=>x.key!==row.key))}>Retirar esta comunicação</ActionButton></fieldset>)}
- <ActionButton type="button" disabled={locked||communications.length>=30} onClick={()=>setCommunications(old=>[...old,{key:crypto.randomUUID(),value:{person:'',channel:'paper',state:'pending',basis:''}}])}>Acrescentar comunicação</ActionButton><ActionButton type="submit" variant="primary" disabled={locked}>Revisar declaração</ActionButton>
- </form>}
- </RecordDrawer>;
+
+import { useEffect, useId, useRef, useState, type ComponentProps, type FormEvent, type ReactNode, type RefObject } from "react";
+import { RecordDrawer } from "@/components/forms/record-drawer";
+import { ActionButton, CheckboxField, DefinitionGrid, FormField, SelectField, TextAreaField, TextInput } from "@/components/ui/controls";
+import { Icon } from "@/components/ui/icon";
+import { Dialog } from "@/components/ui/overlays";
+import { SearchSelect } from "@/components/ui/search-select";
+import { Notice } from "@/components/workspace";
+import { contingencyContent, contingencyProcesses, emptyContingency, type ContingencyContent } from "@/lib/validation/contingency";
+import { ContingencyFacts } from "./contingency-facts";
+
+type Process = keyof typeof contingencyProcesses;
+type ContingencyProduct = { id: string; name: string; unit: string; quantity_decimals: number; is_active: boolean };
+type Material = ContingencyContent["materials"][number];
+type Communication = ContingencyContent["communications"][number];
+type MaterialRow = { key: string; name: string; value: Material };
+type CommunicationRow = { key: string; value: Communication };
+
+const channels = { paper: "Registro físico", phone: "Telefone", internal: "Aplicativo", other: "Outro canal" };
+const communicationStates = { pending: "Pendente", attempted: "Tentativa declarada", reported_sent: "Envio declarado", reported_read: "Leitura declarada" };
+const custodyOptions = { FAMILY: "Família", CARE_TEAM: "Equipe", TRANSIT: "Em trânsito" };
+
+export function ContingencyForm({
+  opener, headingRef, patientName, actorName, process, processes, supplement, catalogue, busy, pending, onRecover, onClose, onConfirm,
+}: {
+  opener: HTMLElement;
+  headingRef: RefObject<HTMLHeadingElement | null>;
+  patientName: string;
+  actorName: string;
+  process: Process;
+  processes: Process[];
+  supplement: boolean;
+  catalogue: { data: ContingencyProduct[] | null; loading: boolean; error: string; refresh: () => void };
+  busy: boolean;
+  pending: boolean;
+  onRecover: () => void;
+  onClose: () => void;
+  onConfirm: (content: ContingencyContent, process: Process) => Promise<void>;
+}) {
+  const [fields, setFields] = useState(emptyContingency);
+  const [selectedProcess, setSelectedProcess] = useState(process);
+  const [materials, setMaterials] = useState<MaterialRow[]>([]);
+  const [communications, setCommunications] = useState<CommunicationRow[]>([]);
+  const [review, setReview] = useState<ContingencyContent | null>(null);
+  const [validation, setValidation] = useState("");
+  const [picker, setPicker] = useState(false);
+  const [compare, setCompare] = useState(false);
+  const formId = useId();
+  const reviewHeadingRef = useRef<HTMLHeadingElement>(null);
+  const locked = busy || pending;
+  const catalogueReady = !catalogue.loading && !catalogue.error && catalogue.data !== null;
+  const changed = catalogueReady ? materials.flatMap(row => {
+    if (!row.value.productId) return [];
+    const product = catalogue.data?.find(item => item.id === row.value.productId);
+    return product?.unit !== row.value.reviewedUnit || product?.quantity_decimals !== row.value.reviewedDecimals ? [{ row, product }] : [];
+  }) : [];
+  const hasCatalogueMaterials = materials.some(row => row.value.productId !== null);
+  const summary = [{ label: "Paciente", value: patientName }, { label: "Quem declara", value: actorName }];
+
+  useEffect(() => {
+    if (!review) return;
+    const heading = reviewHeadingRef.current;
+    heading?.closest(".hca-modal-content")?.scrollTo(0, 0);
+    heading?.focus({ preventScroll: true });
+  }, [review]);
+
+  function patch<K extends keyof ContingencyContent>(key: K, value: ContingencyContent[K]) {
+    setFields(previous => ({ ...previous, [key]: value }));
+  }
+
+  function addMaterial(product?: ContingencyProduct) {
+    setMaterials(previous => [...previous, {
+      key: crypto.randomUUID(),
+      name: product?.name ?? "Material não identificado",
+      value: {
+        productId: product?.id ?? null, description: null, quantity: product ? "" : null,
+        custody: null, reviewedUnit: product?.unit ?? null, reviewedDecimals: product?.quantity_decimals ?? null,
+      },
+    }]);
+    setPicker(false);
+  }
+
+  function updateMaterial(key: string, patch: Partial<Material>) {
+    setMaterials(previous => previous.map(row => row.key === key ? { ...row, value: { ...row.value, ...patch } } : row));
+  }
+
+  function updateCommunication(key: string, patch: Partial<Communication>) {
+    setCommunications(previous => previous.map(row => row.key === key ? { ...row, value: { ...row.value, ...patch } } : row));
+  }
+
+  function adoptCatalogueUnits() {
+    setMaterials(previous => previous.map(row => {
+      const product = changed.find(item => item.row.key === row.key)?.product;
+      if (!product) return row;
+      return { ...row, name: product.name, value: {
+        ...row.value, reviewedUnit: product.unit, reviewedDecimals: product.quantity_decimals,
+        quantity: row.value.quantity === null ? null : "",
+      } };
+    }));
+    setReview(null);
+    setCompare(false);
+  }
+
+  function reviewDeclaration(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (locked) return;
+    if (changed.length) {
+      setCompare(true);
+      return;
+    }
+    if (hasCatalogueMaterials && !catalogueReady) return;
+    const parsed = contingencyContent.safeParse({
+      ...fields, materials: materials.map(row => row.value), communications: communications.map(row => row.value),
+    });
+    if (!parsed.success) {
+      setValidation(parsed.error.issues[0]?.message ?? "Confira o preenchimento.");
+      return;
+    }
+    setValidation("");
+    setReview(parsed.data);
+  }
+
+  return <RecordDrawer
+    title={review ? "Confira a declaração" : supplement ? "Acrescentar informações" : "Declarar um fato"}
+    kicker={supplement ? "Complemento de contingência" : "Contingência física"}
+    headingIcon="note" popupClassName="hca-guide-topic-sheet hca-contingency-editor"
+    restoreFocusTo={opener} restoreFocusFallbackRef={headingRef} busy={busy} uncertainOutcome={pending} exitDialog
+    hasUnsavedChanges={Object.values(fields).some(value => typeof value === "string") || materials.length > 0 || communications.length > 0}
+    onClose={onClose} footer={requestClose => <>
+      <ActionButton disabled={busy} onClick={review && !pending ? () => setReview(null) : requestClose}>
+        {review && !pending ? "Voltar ao preenchimento" : "Fechar"}
+      </ActionButton>
+      {pending ? <ActionButton variant="primary" disabled={busy} onClick={onRecover}>
+        <Icon name="search" />Conferir resultado
+      </ActionButton> : changed.length ? <ActionButton variant="primary" disabled={locked} onClick={() => setCompare(true)}>
+        <Icon name="box" />Conferir unidade
+      </ActionButton> : review ? <ActionButton variant="primary" disabled={locked || hasCatalogueMaterials && !catalogueReady} onClick={() => void onConfirm(review, selectedProcess)}>
+        <Icon name="check" />Confirmar declaração
+      </ActionButton> : <ActionButton variant="primary" type="submit" form={formId} disabled={locked || hasCatalogueMaterials && !catalogueReady}>
+        <Icon name="arrow" />Revisar declaração
+      </ActionButton>}
+    </>}
+  >
+    {hasCatalogueMaterials && !catalogueReady && <CatalogueStatus catalogue={catalogue} />}
+    {review ? <div className="hca-form">
+      <h3 className="sr-only" ref={reviewHeadingRef} tabIndex={-1}>Confira os fatos conhecidos e os desconhecidos</h3>
+      <DefinitionGrid className="hca-contingency-summary" items={[
+        ...summary, { label: "Processo", value: contingencyProcesses[selectedProcess] },
+        { label: "Referência", value: review.knownReference ?? "Desconhecida" },
+      ]} />
+      <ContingencyFacts value={{
+        ...review,
+        materials: review.materials.map((row, index) => ({ ...row, productName: row.productId ? materials[index]?.name : null, unit: row.reviewedUnit })),
+      }} scope="review" layout="review" />
+      <p className="hca-contingency-hint"><Icon name="info" width={16} />Confirmar preserva a declaração. Não movimenta estoque nem registra recebimento ou ciência.</p>
+    </div> : <form id={formId} className="hca-form" onSubmit={reviewDeclaration} onInvalid={event => {
+      const details = (event.target as HTMLElement).closest("details");
+      if (details) details.open = true;
+    }}>
+      <DefinitionGrid className="hca-contingency-summary" items={supplement ? [...summary, { label: "Processo", value: contingencyProcesses[process] }] : summary} />
+      {!supplement && <FormField label="Processo"><SelectField disabled={locked} value={selectedProcess} onChange={event => setSelectedProcess(event.target.value as Process)}>
+        {processes.map(item => <option key={item} value={item}>{contingencyProcesses[item]}</option>)}
+      </SelectField></FormField>}
+      {validation && <Notice error>{validation}</Notice>}
+      <FormField label="O que aconteceu?" required helpText="Descreva o fato físico e o que ainda precisa de conferência.">
+        <TextAreaField value={fields.fact} maxLength={4000} required minLength={3} disabled={locked} onChange={event => patch("fact", event.target.value)} />
+      </FormField>
+      <DeclarationDisclosure title="Referência, data e pessoas">
+        <KnownText label="Referência física" value={fields.knownReference} onChange={value => patch("knownReference", value)} />
+        <KnownText label="Data do fato" type="date" value={fields.occurredOn} onChange={value => patch("occurredOn", value)} />
+        <KnownText label="Hora do fato" type="time" value={fields.occurredTime} onChange={value => patch("occurredTime", value)} />
+        <KnownZone value={fields.timeZone} onChange={value => patch("timeZone", value)} />
+        <KnownText label="Quem realizou" value={fields.performer} onChange={value => patch("performer", value)} />
+        <KnownText label="Quem recebeu" value={fields.receiver} onChange={value => patch("receiver", value)} />
+      </DeclarationDisclosure>
+      <section className="hca-form" aria-label="Materiais declarados">
+        <div className="hca-section-heading">
+          <h3>Materiais declarados</h3>
+          <ActionButton compact disabled={locked || materials.length >= 100} onClick={() => setPicker(true)}>
+            <Icon name="plus" />Adicionar
+          </ActionButton>
+        </div>
+        {materials.map(({ key, name, value }) => <div key={key} className="hca-contingency-editor-card hca-form">
+          <div className="hca-contingency-lead">
+            <span className="hca-guide-row-icon"><Icon name="box" /></span>
+            <span className="hca-guide-row-label"><strong>{name}</strong><small>{value.reviewedUnit ?? "Unidade desconhecida"}</small></span>
+            <ActionButton variant="quiet" compact aria-label={"Retirar " + name} onClick={() => setMaterials(previous => previous.filter(row => row.key !== key))}><Icon name="close" /></ActionButton>
+          </div>
+          {!value.productId && <FormField label="Referência histórica do material">
+            <TextInput value={value.description ?? ""} maxLength={300} onChange={event => updateMaterial(key, { description: event.target.value || null })} />
+          </FormField>}
+          {value.quantity !== null && <FormField label="Quantidade física" required>
+            <TextInput required inputMode="decimal" value={value.quantity} onChange={event => updateMaterial(key, { quantity: event.target.value })} />
+          </FormField>}
+          <CheckboxField label="Não sei informar a quantidade" checked={value.quantity === null} onChange={event => updateMaterial(key, { quantity: event.target.checked ? null : "" })} />
+          <FormField label="Custódia física"><SelectField value={value.custody ?? ""} onChange={event => updateMaterial(key, { custody: (event.target.value || null) as Material["custody"] })}>
+            <option value="">Desconhecida</option>
+            {Object.entries(custodyOptions).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+          </SelectField></FormField>
+        </div>)}
+      </section>
+      <DeclarationDisclosure title="Ressalvas e comunicações">
+        <FormField label="Ressalva — se conhecida">
+          <TextAreaField value={fields.notes ?? ""} maxLength={2000} onChange={event => patch("notes", event.target.value || null)} />
+        </FormField>
+        {communications.map(({ key, value }) => <div key={key} className="hca-contingency-editor-card hca-form">
+          <FormField label="Pessoa ou referência histórica" required>
+            <TextInput value={value.person} required maxLength={300} onChange={event => updateCommunication(key, { person: event.target.value })} />
+          </FormField>
+          <FormField label="Canal"><SelectField value={value.channel} onChange={event => updateCommunication(key, { channel: event.target.value as Communication["channel"] })}>
+            {Object.entries(channels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+          </SelectField></FormField>
+          <FormField label="Estado declarado"><SelectField value={value.state} onChange={event => updateCommunication(key, { state: event.target.value as Communication["state"] })}>
+            {Object.entries(communicationStates).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+          </SelectField></FormField>
+          <FormField label="Base da declaração" required>
+            <TextAreaField value={value.basis} minLength={3} required maxLength={1000} onChange={event => updateCommunication(key, { basis: event.target.value })} />
+          </FormField>
+          <ActionButton compact onClick={() => setCommunications(previous => previous.filter(row => row.key !== key))}><Icon name="trash" />Retirar comunicação</ActionButton>
+        </div>)}
+        <ActionButton compact disabled={locked || communications.length >= 30} onClick={() => setCommunications(previous => [...previous, {
+          key: crypto.randomUUID(), value: { person: "", channel: "paper", state: "pending", basis: "" },
+        }])}><Icon name="plus" />Acrescentar comunicação</ActionButton>
+        <p className="hca-field-hint">A comunicação declarada não envia mensagem nem produz ciência ou recebimento.</p>
+      </DeclarationDisclosure>
+      <p className="hca-field-hint">Após confirmar, você pode anexar a evidência ao dossiê.</p>
+    </form>}
+    {picker && <MaterialPicker catalogue={catalogue} onPick={addMaterial} onClose={() => setPicker(false)} />}
+    {compare && <Dialog open title="Confira a unidade atual" headingIcon="box" kicker="Catálogo atualizado" onClose={() => setCompare(false)}
+      footer={<>
+        <ActionButton onClick={() => { setCompare(false); setReview(null); }}>Voltar ao preenchimento</ActionButton>
+        <ActionButton variant="primary" disabled={!catalogueReady || !changed.length || changed.some(item => !item.product)} onClick={adoptCatalogueUnits}>Usar unidade atual</ActionButton>
+      </>}>
+      <div className="hca-form">
+        {changed.map(({ row, product }) => <section className="hca-contingency-editor-card hca-form" key={row.key}>
+          <h3>{row.name}</h3>
+          <DefinitionGrid items={[
+            { label: "Unidade anterior", value: row.value.reviewedUnit ?? "Desconhecida" },
+            { label: "Unidade atual", value: product?.unit ?? "Referência indisponível" },
+            { label: "Casas decimais anteriores", value: row.value.reviewedDecimals ?? "Desconhecidas" },
+            { label: "Casas decimais atuais", value: product?.quantity_decimals ?? "Indisponíveis" },
+          ]} />
+        </section>)}
+        <p className="hca-field-hint">{changed.some(item => !item.product)
+          ? "Volte ao preenchimento para substituir o material que saiu do catálogo."
+          : "Informe novamente a quantidade física dos materiais alterados. O sistema não faz conversão automática."}</p>
+      </div>
+    </Dialog>}
+  </RecordDrawer>;
 }
 
-function KnownZone({value,onChange}:{value:string|null;onChange:(value:string|null)=>void}){
- const [query,setQuery]=useState<string|null>(null),id=useId(),zones=[...Intl.supportedValuesOf('timeZone'),'UTC'];
- return <div className="hca-form"><CheckboxField label="Não sei informar: Fuso do fato físico" checked={value===null} onChange={event=>onChange(event.target.checked?null:'')}/>{value!==null?<><label id={id} htmlFor={id+"-input"}>Fuso do fato físico</label><SearchSelect id={id+"-input"} aria-labelledby={id} required query={query??value} selectedIds={value?[value]:[]} onQueryChange={text=>{setQuery(text);onChange('');}} onSelectionChange={ids=>{onChange(ids[0]??'');setQuery(null);}} options={zones.filter(z=>!query||z.toLowerCase().includes(query.toLowerCase())).slice(0,40).map(z=>({value:z,label:z}))}/><p className="hca-field-hint">Escolha o fuso do fato; o horário deste aparelho não será presumido.</p></>:null}</div>;
+function DeclarationDisclosure({ title, children }: { title: string; children: ReactNode }) {
+  return <details className="hca-contingency-disclosure">
+    <summary>{title}<Icon name="down" width={16} /></summary>
+    <div className="hca-form">{children}</div>
+  </details>;
+}
+
+function KnownText({ label, value, onChange, type = "text" }: {
+  label: string; value: string | null; onChange: (value: string | null) => void; type?: "text" | "date" | "time";
+}) {
+  return <div className="hca-contingency-known">
+    {value === null ? <strong>{label}</strong> : <FormField label={label} required>
+      <TextInput type={type} value={value} required maxLength={300} onChange={event => onChange(event.target.value)} />
+    </FormField>}
+    <CheckboxField label={"Não sei informar: " + label} checked={value === null} onChange={event => onChange(event.target.checked ? null : "")} />
+  </div>;
+}
+
+function KnownZone({ value, onChange }: { value: string | null; onChange: (value: string | null) => void }) {
+  const [query, setQuery] = useState<string | null>(null);
+  const id = useId();
+  const zones = [...Intl.supportedValuesOf("timeZone"), "UTC"];
+  return <div className="hca-contingency-known">
+    {value === null ? <strong>Fuso do fato</strong> : <>
+      <label id={id} htmlFor={id + "-input"}>Fuso do fato</label>
+      <SearchSelect id={id + "-input"} aria-labelledby={id} required query={query ?? value} selectedIds={value ? [value] : []}
+        onQueryChange={text => { setQuery(text); onChange(""); }}
+        onSelectionChange={ids => { onChange(ids[0] ?? ""); setQuery(null); }}
+        options={zones.filter(zone => !query || zone.toLowerCase().includes(query.toLowerCase())).slice(0, 40).map(zone => ({ value: zone, label: zone }))} />
+    </>}
+    <CheckboxField label="Não sei informar: Fuso do fato" checked={value === null}
+      onChange={event => { setQuery(null); onChange(event.target.checked ? null : ""); }} />
+  </div>;
+}
+
+type Catalogue = ComponentProps<typeof ContingencyForm>["catalogue"];
+
+function CatalogueStatus({ catalogue }: { catalogue: Catalogue }) {
+  if (catalogue.loading) return <p role="status">Consultando materiais de referência…</p>;
+  if (!catalogue.error) return null;
+  return <Notice error>{catalogue.error}<ActionButton compact onClick={catalogue.refresh}>Consultar materiais novamente</ActionButton></Notice>;
+}
+
+function MaterialPicker({ catalogue, onPick, onClose }: {
+  catalogue: Catalogue; onPick: (product?: ContingencyProduct) => void; onClose: () => void;
+}) {
+  const [query, setQuery] = useState("");
+  const filtered = catalogue.data?.filter(product => product.name.toLocaleLowerCase("pt-BR").includes(query.trim().toLocaleLowerCase("pt-BR"))) ?? [];
+  return <Dialog open title="Adicionar material declarado" headingIcon="box" onClose={onClose}
+    footer={<><ActionButton onClick={onClose}>Voltar</ActionButton><ActionButton onClick={() => onPick()}>Material não identificado</ActionButton></>}>
+    <FormField label="Buscar material"><TextInput value={query} onChange={event => setQuery(event.target.value)} /></FormField>
+    <CatalogueStatus catalogue={catalogue} />
+    {!catalogue.loading && !catalogue.error && (filtered.length ? filtered.map(product => <button key={product.id} type="button" className="hca-guide-row" onClick={() => onPick(product)}>
+      <span className="hca-guide-row-icon"><Icon name="box" /></span>
+      <span className="hca-guide-row-label"><strong>{product.name}</strong><small>{product.unit}{product.is_active ? "" : " · Inativo"}</small></span>
+      <Icon name="chevron" width={16} />
+    </button>) : <p>Nenhum material encontrado.</p>)}
+  </Dialog>;
 }

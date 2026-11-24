@@ -16,8 +16,31 @@ async function login(page:Page,role:string,patient:string|null){await page.goto(
 const target=(patient:string,id?:string)=>'/contingencias?careRecipientId='+patient+'&process=REQ'+(id?'&id='+id:'');
 const facts=(patient:string)=>sql("select jsonb_build_object('stock',(select jsonb_agg(to_jsonb(x) order by id) from public.stock_movements x where care_recipient_id="+q(patient)+"),'docs',(select jsonb_agg(to_jsonb(x) order by id) from public.operational_documents x where care_recipient_id="+q(patient)+"),'events',(select count(*) from public.document_events where care_recipient_id="+q(patient)+"),'science',(select count(*) from public.requisition_science_events where requisition_id in(select id from public.operational_documents where care_recipient_id="+q(patient)+")))");
 const count=(patient:string)=>Number(sql('select count(*) from private.contingency_cases where care_recipient_id='+q(patient)));
-async function start(page:Page,text:string){await page.getByRole('button',{name:'Declarar fato',exact:true}).click();await expect(page.getByRole('dialog')).toBeVisible();await test.info().attach('contingency-dialog-accessible-name',{body:JSON.stringify(await page.getByRole('dialog').evaluateAll(nodes=>nodes.map(n=>({attributes:n.getAttributeNames().map(k=>[k,n.getAttribute(k)]),titles:Array.from(n.querySelectorAll('h2')).map(h=>({text:h.textContent,id:h.id})),labelTargets:(n.getAttribute('aria-labelledby')??'').split(' ').map(id=>({id,text:document.getElementById(id)?.textContent}))}))),null,2),contentType:'application/json'});await test.info().attach('contingency-locator-counts',{body:JSON.stringify({dialog:await page.getByRole('dialog',{name:'Registrar fato de contingência',exact:true}).count(),label:await page.getByLabel('Fato físico',{exact:true}).count(),textbox:await page.getByRole('textbox',{name:'Fato físico',exact:true}).count()}),contentType:'application/json'});const drawer=page.getByRole('dialog',{name:'Registrar fato de contingência',exact:true});await drawer.getByRole('textbox',{name:'Fato físico',exact:true}).fill(text);return drawer;}
-async function review(page:Page){await page.getByRole('button',{name:'Revisar declaração',exact:true}).click();const drawer=page.getByRole('dialog',{name:'Revisar declaração de contingência',exact:true});await expect(drawer.getByRole('heading',{name:'Confira os fatos conhecidos e os desconhecidos',exact:true})).toBeFocused();await expect(drawer.locator('input,select,textarea')).toHaveCount(0);return drawer;}
+async function start(page:Page,text:string){
+ await page.getByRole('button',{name:'Declarar fato',exact:true}).click();
+ const drawer=page.getByRole('dialog',{name:'Declarar um fato',exact:true});
+ await drawer.getByRole('textbox',{name:'O que aconteceu?',exact:true}).fill(text);
+ return drawer;
+}
+async function review(page:Page){
+ await page.getByRole('button',{name:'Revisar declaração',exact:true}).click();
+ const drawer=page.getByRole('dialog',{name:'Confira a declaração',exact:true});
+ await expect(drawer.getByRole('heading',{name:'Confira os fatos conhecidos e os desconhecidos',exact:true})).toBeFocused();
+ await expect(drawer.locator('input,select,textarea')).toHaveCount(0);
+ return drawer;
+}
+async function addMaterial(page:Page,drawer:ReturnType<Page["getByRole"]>,name:string){
+ await drawer.getByRole('button',{name:'Adicionar',exact:true}).click();
+ const picker=page.getByRole('dialog',{name:'Adicionar material declarado',exact:true});
+ await picker.getByRole('textbox',{name:'Buscar material',exact:true}).fill(name);
+ await picker.getByRole('button',{name:new RegExp('^'+name+' ')}).click();
+}
+async function openConfirmedDossier(page:Page,title:string){
+ const result=page.getByRole('dialog',{name:title,exact:true});
+ await expect(result).toContainText('Nenhum movimento ou aceite criado');
+ await result.getByRole('button',{name:'Abrir dossiê',exact:true}).click();
+ await expect(page.getByRole('region',{name:'Dossiê selecionado',exact:true}).getByRole('heading',{name:'O que foi declarado',exact:true})).toBeVisible();
+}
 
 test('E12-04 filters the authorized dossiers and opens facts, materials and history without writes',async({page,browser},info)=>{
  const f=await setup(), reference='Caderno %, folha 18';
@@ -73,10 +96,29 @@ test('E12-04 filters the authorized dossiers and opens facts, materials and hist
 test('contingency real declaration evidence and independent link preserve physical facts and all unknowns',async({page,browser},info)=>{
  const f=await setup(),req=await issue(f.patient,f.products),before=facts(f.patient),text='Requisição física fictícia e estoque observado; autoria física e horário desconhecidos. Não presumir ciência pessoal.';
  await login(page,'professional',f.patient);await page.goto('/guias');await page.getByRole('link',{name:/^Contingência física/}).click();await page.getByRole('combobox',{name:'Tipo de processo',exact:true}).selectOption('REQ');
- const editor=await start(page,text);await editor.getByRole('button',{name:'Acrescentar material físico',exact:true}).click();await editor.getByRole('combobox',{name:'Material identificado',exact:true}).selectOption(f.products[0]);await editor.getByRole('checkbox',{name:'Não sei informar: Quantidade física',exact:true}).uncheck();await editor.getByRole('textbox',{name:'Quantidade física',exact:true}).fill('0');
- await editor.getByRole('button',{name:'Acrescentar comunicação',exact:true}).click();await editor.getByRole('textbox',{name:'Pessoa ou referência histórica',exact:true}).fill('Responsável fictício a consultar');await editor.getByRole('textbox',{name:'Base legítima e referência da comunicação',exact:true}).fill('Aguardar conferência pessoal do registro físico sob guarda autorizada');
- for(const width of [320,390,768,1024,1440]){await page.setViewportSize({width,height:1000});await editor.getByRole('textbox',{name:'Fato físico',exact:true}).focus();await audit(page,'contingency declaration '+width);}
- const checked=await review(page);await expect(checked).toContainText('unidade');await page.keyboard.press('Tab');await expect(checked.getByRole('button',{name:'Confirmar declaração',exact:true})).toBeFocused();await checked.getByRole('button',{name:'Confirmar declaração',exact:true}).click();await expect(page.getByRole('dialog',{name:'Dossiê de contingência',exact:true}).getByRole('heading',{name:'O que foi declarado',exact:true})).toBeVisible();
+ const editor=await start(page,text);
+ const material=sql('select name from public.care_recipient_products where care_recipient_id='+q(f.patient)+' and product_id='+q(f.products[0]));
+ await addMaterial(page,editor,material);
+ await editor.getByRole('textbox',{name:'Quantidade física',exact:true}).fill('0');
+ await editor.getByText('Ressalvas e comunicações',{exact:true}).click();
+ await editor.getByRole('button',{name:'Acrescentar comunicação',exact:true}).click();
+ await editor.getByRole('textbox',{name:'Pessoa ou referência histórica',exact:true}).fill('Responsável fictício a consultar');
+ await editor.getByRole('textbox',{name:'Base da declaração',exact:true}).fill('Aguardar conferência pessoal do registro físico sob guarda autorizada');
+ for(const width of [320,390,768,1024,1440]){
+  await page.setViewportSize({width,height:1000});
+  await editor.getByRole('textbox',{name:'O que aconteceu?',exact:true}).focus();
+  await audit(page,'contingency declaration '+width);
+ }
+ const checked=await review(page);
+ await expect(checked).toContainText('0 unidade');
+ await expect(checked).toContainText('Quem declara');
+ await page.keyboard.press('Tab');
+ await expect(checked.getByRole('button',{name:'Voltar ao preenchimento',exact:true})).toBeFocused();
+ await page.keyboard.press('Tab');
+ const confirm=checked.getByRole('button',{name:'Confirmar declaração',exact:true});
+ await expect(confirm).toBeFocused();
+ await confirm.press('Enter');
+ await openConfirmedDossier(page,'Declaração registrada');
  const id=sql('select id from private.contingency_cases where care_recipient_id='+q(f.patient)+' order by created_at desc limit 1'),body=JSON.parse(sql('select content from private.contingency_cases where id='+q(id)));
  expect(body.receiver).toBeNull();expect(body.occurredOn).toBeNull();expect(body.materials[0].quantity).toBe('0');expect(body.materials[0].unit).toBe('unidade');expect(body.communications[0].state).toBe('pending');expect(count(f.patient)).toBe(1);
  await page.getByRole('tab',{name:'Materiais',exact:true}).click();await expect(page.getByRole('tabpanel',{name:'Materiais',exact:true})).toContainText('0 unidade');
@@ -93,9 +135,116 @@ test('contingency real declaration evidence and independent link preserve physic
 test('contingency lost response recovers after reload and a fenced unsent intent rejects its delayed arrival',async({page})=>{
  const f=await setup(),before=facts(f.patient),text='Declaração física fictícia com resposta oficial perdida, sem rascunho comum.';await login(page,'professional',f.patient);await page.goto(target(f.patient));
  await page.route('**/api/contingencies',async route=>{if(route.request().method()!=='POST'||route.request().postDataJSON().action!=='record')return route.continue();const response=await route.fetch();expect(response.status()).toBe(200);await route.abort('failed');},{times:1});
- await start(page,text);const checked=await review(page);await checked.getByRole('button',{name:'Confirmar declaração',exact:true}).click();await expect(checked.getByRole('button',{name:'Consultar resultado desta tentativa',exact:true})).toBeEnabled();expect(count(f.patient)).toBe(1);expect(await page.evaluate(()=>Object.keys(sessionStorage).filter(k=>k.startsWith('hca:contingency-intent:')).map(k=>sessionStorage.getItem(k)).join(''))).not.toContain(text);
- page.on('dialog',d=>void d.accept());await page.reload();await page.getByRole('button',{name:'Conferir resultado e encerrar tentativa pendente',exact:true}).click();await expect(page.getByRole('dialog',{name:'Dossiê de contingência',exact:true}).getByRole('heading',{name:'O que foi declarado',exact:true})).toBeVisible();expect(count(f.patient)).toBe(1);
- await page.getByRole('button',{name:'Fechar dossiê',exact:true}).click();let delayed:Record<string,unknown>|null=null;await page.route('**/api/contingencies',route=>{if(route.request().method()!=='POST'||route.request().postDataJSON().action!=='record')return route.continue();delayed=route.request().postDataJSON();return route.abort('failed');},{times:1});await start(page,'Segunda declaração fictícia, interrompida antes de alcançar o banco.');const second=await review(page);await second.getByRole('button',{name:'Confirmar declaração',exact:true}).click();await expect(second.getByRole('button',{name:'Consultar resultado desta tentativa',exact:true})).toBeEnabled();await second.getByRole('button',{name:'Consultar resultado desta tentativa',exact:true}).click();await expect(page.getByText('Tentativa encerrada sem execução.',{exact:false})).toBeVisible();expect(delayed).not.toBeNull();expect((await page.request.post('/api/contingencies',{data:delayed!})).status()).toBe(409);expect(count(f.patient)).toBe(1);expect(facts(f.patient)).toBe(before);
+ await start(page,text);const checked=await review(page);await checked.getByRole('button',{name:'Confirmar declaração',exact:true}).click();await expect(page.getByRole('dialog',{name:'Resultado da declaração a conferir',exact:true})).toBeVisible();expect(count(f.patient)).toBe(1);expect(await page.evaluate(()=>Object.keys(sessionStorage).filter(k=>k.startsWith('hca:contingency-intent:')).map(k=>sessionStorage.getItem(k)).join(''))).not.toContain(text);
+ page.on('dialog',d=>void d.accept());await page.reload();await page.getByRole('button',{name:'Conferir resultado e encerrar tentativa pendente',exact:true}).click();await openConfirmedDossier(page,'Declaração localizada');expect(count(f.patient)).toBe(1);
+ await page.getByRole('button',{name:'Fechar dossiê',exact:true}).click();let delayed:Record<string,unknown>|null=null;await page.route('**/api/contingencies',route=>{if(route.request().method()!=='POST'||route.request().postDataJSON().action!=='record')return route.continue();delayed=route.request().postDataJSON();return route.abort('failed');},{times:1});await start(page,'Segunda declaração fictícia, interrompida antes de alcançar o banco.');const second=await review(page);await second.getByRole('button',{name:'Confirmar declaração',exact:true}).click();const failure=page.getByRole('dialog',{name:'Resultado da declaração a conferir',exact:true});await failure.getByRole('button',{name:'Conferir resultado',exact:true}).click();await expect(page.getByRole('dialog',{name:'Tentativa encerrada sem execução',exact:true})).toBeVisible();expect(delayed).not.toBeNull();expect((await page.request.post('/api/contingencies',{data:delayed!})).status()).toBe(409);expect(count(f.patient)).toBe(1);expect(facts(f.patient)).toBe(before);
+});
+
+test('E12-05 compares catalogue precision, preserves other facts and appends a confirmed supplement',async({page},info)=>{
+ const f=await setup(),before=facts(f.patient);
+ const {product_id:editableMaterial}=await rpc(f.admin,'admin_upsert_recipient_product',{
+  p_care_recipient_id:f.patient,p_product_id:null,p_name:'Material sem movimentação',p_category:'higiene',
+  p_unit:'unidade',p_aliases:[],p_is_active:true,
+ });
+ await login(page,'professional',f.patient);
+ await page.goto(target(f.patient));
+ const fact='Materiais contados no armário e anotados durante a interrupção.';
+ const editor=await start(page,fact);
+ await addMaterial(page,editor,'Material sem movimentação');
+ await editor.getByRole('textbox',{name:'Quantidade física',exact:true}).fill('3');
+ await addMaterial(page,editor,'Material fictício V4 1');
+ await editor.getByRole('checkbox',{name:'Não sei informar a quantidade',exact:true}).nth(1).check();
+ await editor.getByText('Referência, data e pessoas',{exact:true}).click();
+ await editor.getByRole('checkbox',{name:'Não sei informar: Referência física',exact:true}).uncheck();
+ await editor.getByRole('textbox',{name:'Referência física',exact:true}).fill('Armário · folha 4');
+ await editor.getByText('Referência, data e pessoas',{exact:true}).click();
+ await page.setViewportSize({width:390,height:709});
+ await editor.locator('.hca-modal-content').evaluate(element=>element.scrollTo(0,0));
+ await page.screenshot({path:'output/playwright/l4/contingency-declaration-'+info.project.name+'.png',animations:'disabled'});
+ const checked=await review(page);
+ await page.screenshot({path:'output/playwright/l4/contingency-review-'+info.project.name+'.png',animations:'disabled'});
+ sql('update public.care_recipient_products set quantity_decimals=2 where care_recipient_id='+q(f.patient)+' and product_id='+q(editableMaterial));
+ await checked.getByRole('button',{name:'Confirmar declaração',exact:true}).click();
+ await checked.getByRole('button',{name:'Conferir unidade',exact:true}).click();
+ const comparison=page.getByRole('dialog',{name:'Confira a unidade atual',exact:true});
+ await expect(comparison).toContainText('Casas decimais atuais');
+ await expect(comparison.getByText('2',{exact:true})).toBeVisible();
+ await page.screenshot({path:'output/playwright/l4/contingency-conflict-'+info.project.name+'.png',animations:'disabled'});
+ expect(count(f.patient)).toBe(0);
+ await comparison.getByRole('button',{name:'Usar unidade atual',exact:true}).click();
+ await expect(editor.getByRole('textbox',{name:'O que aconteceu?',exact:true})).toHaveValue(fact);
+ await expect(editor.getByRole('textbox',{name:'Quantidade física',exact:true})).toHaveValue('');
+ await expect(editor.getByRole('checkbox',{name:'Não sei informar a quantidade',exact:true}).nth(1)).toBeChecked();
+ await editor.getByRole('textbox',{name:'Quantidade física',exact:true}).fill('2,5');
+ await editor.getByText('Referência, data e pessoas',{exact:true}).click();
+ await expect(editor.getByRole('textbox',{name:'Referência física',exact:true})).toHaveValue('Armário · folha 4');
+ await (await review(page)).getByRole('button',{name:'Confirmar declaração',exact:true}).click();
+ await openConfirmedDossier(page,'Declaração registrada');
+ const dossier=page.getByRole('dialog',{name:'Armário · folha 4',exact:true});
+ await dossier.getByRole('button',{name:'Complementar',exact:true}).click();
+ const supplement=page.getByRole('dialog',{name:'Acrescentar informações',exact:true});
+ await supplement.getByRole('textbox',{name:'O que aconteceu?',exact:true}).fill('Complemento que não será confirmado.');
+ await supplement.getByRole('button',{name:'Fechar',exact:true}).click();
+ await page.getByRole('dialog',{name:'Sair sem concluir?',exact:true}).getByRole('button',{name:'Sair e descartar',exact:true}).click();
+ await dossier.getByRole('button',{name:'Complementar',exact:true}).click();
+ const added='A folha também indicava que as caixas estavam com a família.';
+ await expect(supplement.getByRole('textbox',{name:'O que aconteceu?',exact:true})).toHaveValue('');
+ await supplement.getByRole('textbox',{name:'O que aconteceu?',exact:true}).fill(added);
+ const supplementReview=await review(page);
+ const caseId=sql('select id from private.contingency_cases where care_recipient_id='+q(f.patient));
+ const concurrent='Foi localizada uma segunda folha na pasta de registros.';
+ await rpc(f.admin,'contingency_command',contingencyPacket(f.patient,'REQ',{
+  p_id:caseId,p_expected:1,p_action:'supplement',p_body:contingencyBody({fact:concurrent}),
+ }));
+ await supplementReview.getByRole('button',{name:'Confirmar declaração',exact:true}).click();
+ const latest=page.getByRole('dialog',{name:'Confira a versão atual do dossiê',exact:true});
+ await expect(latest).toContainText(concurrent);
+ await latest.getByRole('button',{name:'Usar esta versão',exact:true}).click();
+ await expect(supplementReview).toContainText(added);
+ await supplementReview.getByRole('button',{name:'Confirmar declaração',exact:true}).click();
+ await openConfirmedDossier(page,'Complemento registrado');
+ await expect(dossier).toContainText(fact);
+ await dossier.getByRole('tab',{name:'Histórico',exact:true}).click();
+ await expect(dossier).toContainText(added);
+ await expect(dossier).toContainText(concurrent);
+ const body=JSON.parse(sql('select content from private.contingency_cases where care_recipient_id='+q(f.patient)));
+ expect(body.materials.map((row:{quantity:string|null})=>row.quantity)).toEqual(['2.5',null]);
+ expect(body.knownReference).toBe('Armário · folha 4');
+ expect(count(f.patient)).toBe(1);
+ expect(facts(f.patient)).toBe(before);
+});
+
+test('E12-05 stops after two recovery attempts and retains only the official reference',async({page})=>{
+ const f=await setup(),before=facts(f.patient);
+ await login(page,'professional',f.patient);
+ await page.goto(target(f.patient));
+ let writes=0,recoveries=0;
+ await page.route('**/api/contingencies',route=>{
+  if(route.request().method()!=='POST')return route.continue();
+  if(route.request().postDataJSON().action==='resolve')recoveries++;
+  else writes++;
+  return route.abort('failed');
+ });
+ const text='Declaração fictícia interrompida enquanto a confirmação estava sendo enviada.';
+ await start(page,text);
+ await (await review(page)).getByRole('button',{name:'Confirmar declaração',exact:true}).click();
+ const failure=page.getByRole('dialog',{name:'Resultado da declaração a conferir',exact:true});
+ const recover=failure.getByRole('button',{name:'Conferir resultado',exact:true});
+ for(const attempt of [1,2]){
+  await recover.click();
+  await expect.poll(()=>recoveries).toBe(attempt);
+ }
+ await expect(failure.getByRole('button',{name:'Copiar detalhes',exact:true})).toBeVisible();
+ await expect(recover).toHaveCount(0);
+ expect(writes).toBe(1);
+ const metadata=await page.evaluate(()=>{
+  const key=Object.keys(sessionStorage).find(key=>key.startsWith('hca:contingency-intent:'));
+  return key?JSON.parse(sessionStorage.getItem(key)??'null'):null;
+ });
+ expect(Object.keys(metadata).sort()).toEqual(['action','actorId','key','patientId','process','recoveryAttempts']);
+ expect(metadata.recoveryAttempts).toBe(2);
+ expect(count(f.patient)).toBe(0);
+ expect(facts(f.patient)).toBe(before);
 });
 
 test('contingency conflicting review preserves the reason and requires explicit comparison before another confirmation',async({page})=>{

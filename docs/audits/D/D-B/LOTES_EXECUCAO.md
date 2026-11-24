@@ -4045,6 +4045,51 @@ falhou nas duas tentativas ao localizar o rótulo anterior de contingência
 em Guias. A regressão usa o rótulo aprovado nesta etapa e passou nos três
 navegadores emulados.
 
+### E12-05 — Declaração e complemento
+
+- O painel da v2 organiza autoria e paciente, escolha de processo, relato,
+  referência física, materiais e comunicações. A revisão lê os fatos e
+  mantém as ações no rodapé em largura de celular. A sessão autenticada
+  fornece o autor. As pessoas e o horário do fato são informações separadas.
+- O seletor consulta o catálogo do paciente. O produto mantém a opção
+  **Material não identificado** com referência histórica, que não aparece
+  no laboratório. A escolha preserva a possibilidade de declarar um objeto
+  físico sem correspondência no catálogo. A consulta também mantém as
+  referências inativas disponíveis para declarar fatos históricos.
+- Unidade ou precisão alterada abre uma comparação com a referência atual.
+  Após adotá-la, a pessoa informa novamente apenas as quantidades conhecidas
+  que estavam nas referências alteradas. Zero permanece zero. Quantidade
+  desconhecida permanece nula. A decisão de conciliação continua no fluxo
+  independente.
+- Uma alteração concorrente no dossiê durante o complemento exige ler os
+  fatos acrescentados antes de confirmar na revisão atual. A confirmação
+  mostra o resultado oficial e oferece acesso ao dossiê. Os fatos originais
+  e seus autores permanecem no histórico.
+- O fechamento descarta campos transitórios. Em resultado incerto a aba
+  guarda somente a referência oficial da tentativa e o contador. Até duas
+  consultas conferem a mesma referência. Se ela estiver ausente, o banco
+  pode encerrá-la para impedir envio tardio. Ao esgotar as consultas, a
+  interface oferece a cópia de detalhes para suporte.
+- Declaração e complemento usam o RPC existente e não acrescentam migration.
+  Os testes verificam que estoque, fichas emitidas e ciência de L1–L3
+  permanecem com os mesmos registros durante esses atos.
+
+Os sete casos da suíte de contingências passaram no Chromium sem retentativas.
+A primeira rodada teve um timeout no carregamento pós-login. A segunda preservou
+a mesma espera e passou. Após os ajustes de foco, de carregamento e da cobertura
+do complemento concorrente, passaram os 12 casos dirigidos em Chromium,
+Android e iOS emulados, também sem retentativas. Os quatro testes unitários,
+o build, o lint dirigido e a verificação das migrations históricas passaram.
+
+As capturas em 390 px comparam o preenchimento, a revisão e a unidade alterada
+com os três estados da v2. O aplicativo conserva o cabeçalho global e os diálogos
+compartilhados. O teste de revisão verifica o foco por teclado no rodapé.
+
+O Preview da PR #8 continua em `a08742dc`, com estado `READY` e as variáveis
+de Supabase, PDF, Push e notificações cadastradas. A publicação dos commits
+locais depende das duas migrations pendentes no Supabase compartilhado com
+produção. Esta etapa não modificou o banco remoto.
+
 ### Pendências da CI publicada em `a08742dc`
 
 - No `chromium-1`, o teste da aprovação, compra e chegada da COM passou
