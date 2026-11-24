@@ -3,6 +3,7 @@ import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { mkdirSync } from "node:fs";
 import { fixtures, setup } from "../integration/v4-fixtures.mjs";
+import { shiftWorker } from "../integration/shift-fixtures.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { sql, sqlLiteral as q } from "../../scripts/test-environment.mjs";
 import { selectContext } from "./auth-context";
@@ -115,8 +116,9 @@ test("15 ID04 global identity rows share canonical appearance without local auth
 
 test("15 ID04 membership rows preserve canonical presentation, search and credential focus", async ({ page, browser }, info) => {
   const first = await setup();
+  const reviewer = await shiftWorker(first.patient, "admin");
   await page.goto("/login");
-  await page.getByLabel("E-mail", { exact: true }).fill(fixtures.adminA.email);
+  await page.getByLabel("E-mail", { exact: true }).fill(reviewer.email);
   await page.getByLabel("Senha", { exact: true }).fill(fixturePassword);
   await page.getByRole("button", { name: "Entrar", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Visão geral", exact: true })).toBeVisible();
@@ -153,7 +155,7 @@ test("15 ID04 membership rows preserve canonical presentation, search and creden
     await people.getByRole("searchbox", { name: "Pesquisar pessoas", exact: true }).fill("");
     await row.click();
     const opener = page.getByRole("dialog").getByRole("button", { name: /^Credencial profissional/ }); await opener.click();
-    const drawer = page.getByRole("dialog", { name: "Conferência familiar da credencial", exact: true });
+    const drawer = page.getByRole("dialog", { name: "Credencial profissional", exact: true });
     await expect(drawer).toBeVisible(); await drawer.press("Escape"); await expect(drawer).toHaveCount(0); await expect(opener).toBeFocused();
     expect(facts(first.patient)).toBe(before); expect(writes).toEqual([]);
     await page.getByRole("dialog").getByRole("button", { name: "Voltar", exact: true }).click();

@@ -1793,6 +1793,14 @@ POST aceita somente paciente, pessoa, expectedRevision textual bigint,
 outcome checked/not_confirmed, note e idempotencyKey. Auth/CSRF, limite8k e
 schema estrito; autor/instante não são entradas. Revisão/intenção obsoleta409;
 replay conserva registro. Nenhum papel ou validação externa é concedido.
+
+`POST /api/admin/credentials/result` recebe `careRecipientId`, `subjectId`,
+`expectedRevision` textual e `idempotencyKey`. A operação usa a mesma
+autorização da conferência e o mesmo lock por autor e chave. O estado
+`recorded` devolve o comprovante da conferência. O estado `closed` confirma
+que a tentativa foi encerrada sem registro e impede que um envio atrasado
+conclua a gravação com a mesma chave. Uma gravação com chave encerrada recebe
+HTTP 410. A consulta retorna `private, no-store` e usa limite de 2 KB.
 [Contrato e provas](../audits/D/D-B/PROFESSIONAL_CREDENTIALS.md).
 
 ## Preparações de programação e plantões BAL

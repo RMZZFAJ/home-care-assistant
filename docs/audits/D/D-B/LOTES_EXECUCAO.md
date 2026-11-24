@@ -4947,3 +4947,60 @@ A prévia foi comparada com o cartão do laboratório em 360 e 412 px. A rodada
 final do cadastro completo passou nos três navegadores, incluindo e-mail
 confirmado localmente, primeiro aceite e recuperação de senha. Build, tipos,
 lint e guard das 84 migrations históricas passaram.
+
+### E10-03 — Declaração e conferência da credencial profissional
+
+A partir do vínculo da pessoa, a tela apresenta a declaração atual,
+a conferência da família e o acesso ao histórico, conforme L4 v2.
+O histórico mantém autoria, horário, dados da versão conferida e observação.
+Na edição, a confirmação é vinculada à versão exibida. Se a declaração muda
+durante a conferência, a gravação é bloqueada e o modal compara os valores
+anteriores e atuais. Usar a declaração atual exige nova confirmação.
+
+O laboratório apresenta a credencial como cenário de página. No sistema,
+a consulta abre sobre o painel da pessoa e devolve o foco ao vínculo.
+A composição mantém as seções e ações do laboratório e inclui leitura sem
+competência para conferir, erros de consulta e paginação do histórico real.
+O modal apresenta as versões e os dados atuais em formato compacto. Os
+valores completos de ambas as versões ficam acessíveis em **Comparar todos
+os dados**.
+
+Quando a resposta da gravação se perde, a aba conserva somente a referência
+da tentativa e a contagem de recuperação. A consulta da mesma chave confirma
+o registro oficial ou encerra a tentativa sob o lock já usado na gravação.
+Se a consulta encerrar a tentativa antes de a gravação chegar, o servidor
+recusa o envio atrasado. Duas consultas são oferecidas, inclusive após
+recarregar a aba. A declaração e a conferência mantêm seus efeitos limitados
+ao histórico de credenciais.
+
+| Migration | Supabase local | Supabase remoto |
+| --- | --- | --- |
+| `20261124180056` | Aplicada | Pendente |
+
+O Supabase local tem 380 migrations, aplicadas incrementalmente. O remoto
+vinculado tem 362. O Preview publicado em `75ab9d5f` tem 15 migrations do
+candidato pendentes no banco que compartilha com produção. A Vercel confirmou
+as variáveis de Preview e a aplicação respondeu no login, runtime, manifesto,
+service worker e página offline. Credencial sem sessão recebeu HTTP 401.
+
+Na PR 8, o SonarCloud passou para `75ab9d5f`. A revisão automática do
+CodeRabbit está habilitada para rascunhos. O bot pulou essa execução por
+não conseguir retomar a revisão incremental. Na CI desse SHA, cinco shards
+de navegador falharam, um foi cancelado e um passou. Os logs confirmam
+falhas repetidas em autenticação de continuação, avisos, tarefas e outras
+jornadas. As verificações dirigidas deste incremento são locais.
+
+Passaram sete testes unitários e seis integrações com Auth real. A
+integração confirmou leitura da mesma chave após gravação, ausência confirmada
+com bloqueio de envio atrasado, corrida entre gravação e consulta, revogação
+e isolamento de escopo. Nos testes de navegador, Chromium, Android e
+iPhone emulados passaram na perda de resposta após commit, na paginação
+do histórico e no conflito provocado por alteração real do titular.
+
+O cenário de Pessoas passou nos três navegadores, com comparação em sete
+larguras, busca e retorno de foco ao fechar a credencial. Após um timeout
+com mais de 11 mil opções acumuladas no seletor do usuário compartilhado,
+o teste passou a usar uma conta fictícia com o vínculo do cenário.
+Build de produção, tipos, lint e guard das 84 migrations passaram.
+O modal final foi comparado com o cenário de conflito do laboratório em
+360 e 412 px. A comparação e o fundo do modal passaram nos três navegadores.

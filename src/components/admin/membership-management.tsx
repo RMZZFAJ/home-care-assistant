@@ -135,7 +135,9 @@ export function MembershipManagement({ rows, directory, userId, globalMode, onCo
             onClick={() => setPanel({ kind: "impact", id })} /> : null}
         </section>
       </div>
-      {credential ? <CredentialReview patientId={patientId} subjectId={credential.subjectId} opener={credential.opener} onClose={() => setCredential(null)} /> : null}
+      {credential && credentialReviewAllowed ? <CredentialReview patientId={patientId} subjectId={credential.subjectId}
+        subjectRole={member.role === "professional" ? "Profissional da equipe" : role}
+        opener={credential.opener} onClose={() => setCredential(null)} /> : null}
     </Drawer> : null}
     {panel?.kind === "new" || (panel?.kind === "edit" && member) ? <ReviewedMemberEditor
       key={id ?? "new"} scope={{ ...context, purpose: "membership", targetId: id }} people={directory}
