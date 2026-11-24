@@ -39,10 +39,10 @@ async function login(page: Page, name = "global", patient: string | null = null)
   await page.getByLabel("Senha", { exact: true }).fill(fixturePassword); await page.getByRole("button", { name: "Entrar", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Visão geral", exact: true })).toBeVisible(); await selectContext(page, patient);
 }
-const consoleRegion = (page: Page) => page.getByRole("region", { name: "Monitoramento e suporte", exact: true });
+const consoleRegion = (page: Page) => page.getByRole("region", { name: "Central técnica", exact: true });
 async function openConsole(page: Page, environment = "preview") {
   await page.goto("/admin");
-  await page.getByRole("navigation", { name: "Áreas administrativas", exact: true }).getByRole("link", { name: /Monitoramento e suporte/ }).click();
+  await page.getByRole("navigation", { name: "Áreas administrativas", exact: true }).getByRole("link", { name: /Central técnica/ }).click();
   await consoleRegion(page).getByRole("combobox", { name: "Ambiente técnico", exact: true }).selectOption(environment);
   await expect(consoleRegion(page).getByRole("list", { name: "Componentes observados", exact: true })).toBeVisible();
 }
@@ -60,7 +60,7 @@ async function compare(actual: Locator, model: Locator, properties: string[]) {
 test("NOT05 global attempt consultation keeps real source, minimizes data and recovers without granting patient actions",async({page})=>{
   test.setTimeout(240_000);
   const f=await setup();owned.add(f.patient);await login(page);await openConsole(page,"shared_database");
-  await consoleRegion(page).getByRole("tab",{name:"Eventos e política",exact:true}).click();
+  await consoleRegion(page).getByRole("tab",{name:"Eventos e envios",exact:true}).click();
   const scope=page.getByRole("region",{name:"Tentativas de avisos no banco compartilhado",exact:true});
   const response=await page.request.get("/api/operations/notifications?source=web_push&page=1");expect(response.status()).toBe(200);
   const expected=(await response.json()).data;expect(expected.environment).toBe("shared_database");
@@ -94,52 +94,52 @@ test("NOT05 global attempt consultation keeps real source, minimizes data and re
   await expect(scope).toHaveCount(0);
 });
 
-test("15 technical overview and continuity follow the approved model without a command by navigation", async ({ page, browser }, info) => {
-  // Ten whole-page axe scans plus reference rendering and native navigation.
-  // The first WebKit run exhausted the old aggregate budget during scan 3.
+test("E12-07 technical overview matches the L4 reference and keeps navigation read-only", async ({ page, browser }, info) => {
   test.setTimeout(600_000);
   const id = await fault(); await login(page); await openConsole(page);
-  const before = sql("select jsonb_build_object('commands',(select count(*) from private.operations_commands),'stock',(select count(*) from public.stock_movements),'science',(select count(*) from public.requisition_science_events));");
-  const writes: string[] = []; page.on("request", r => { if (new URL(r.url()).pathname === "/api/operations" && r.method() !== "GET") writes.push(r.method()); });
-  const reference = await browser.newContext();
+  const business = () => sql("select jsonb_build_object('commands',(select count(*) from private.operations_commands),'stock',(select count(*) from public.stock_movements),'science',(select count(*) from public.requisition_science_events));");
+  const before = business(), viewport = page.viewportSize(), writes: string[] = [];
+  page.on("request", request => { if (new URL(request.url()).pathname === "/api/operations" && request.method() !== "GET") writes.push(request.method()); });
+  const reference = await browser.newContext({ viewport: { width: 1280, height: 900 } });
   try {
-    const model = await reference.newPage(); await model.route(/^https?:/, route => route.abort()); await model.goto(referenceUrl + "#suporte/overview"); await model.locator("#roleSelect").selectOption("global");
-    const scope = consoleRegion(page), component = scope.locator(".hca-observation-card").first();
+    const model = await reference.newPage(); await model.route(/^https?:/, route => route.abort());
+    await model.goto(pathToFileURL(resolve("hca-laboratorio-04-v2-aprovado.html")).href + "#E12-07/overview");
+    const frame = model.locator("#device-frame"), scope = consoleRegion(page);
+    await model.getByRole("combobox", { name: "Visualização", exact: true }).selectOption("390");
+    await expect(frame.getByRole("heading", { name: "Central técnica", exact: true })).toBeVisible();
+    const expected = ["Aplicação", "Banco", "Fila de avisos", "Emissão e assinatura", "Cópias de segurança", "Ensaios de recuperação"];
+    for (const text of expected) {
+      await expect(frame.getByRole("heading", { name: text, exact: true })).toBeVisible();
+      await expect(scope.getByRole("heading", { name: text, exact: true })).toBeVisible();
+    }
+    await info.attach("L4-central-390", { body: await frame.screenshot(), contentType: "image/png" });
     for (const width of [320, 390, 768, 1024, 1440]) {
-      await page.setViewportSize({ width, height: 900 }); await model.setViewportSize({ width, height: 900 }); await model.screenshot();
-      await compare(component, model.locator(".card.metric").first(), ["border-radius", "border-top-color", "padding-top", "padding-left", "min-height"]);
-      await compare(component.locator(".hca-observation-value"), model.locator(".metric .value").first(), ["font-size", "font-weight", "letter-spacing"]);
-      const expectedColumns = await model.locator(".cards4").evaluate(node => getComputedStyle(node).gridTemplateColumns.split(" ").length);
-      expect(await scope.locator(".hca-observation-grid").evaluate(node => getComputedStyle(node).gridTemplateColumns.split(" ").length)).toBe(expectedColumns);
-      await compare(scope.getByRole("tab", { name: "Visão técnica", exact: true }), model.getByRole("tab", { name: "Visão técnica", exact: true }), ["font-size", "font-weight", "padding-top", "padding-left", "border-bottom-color"]);
+      await page.setViewportSize({ width, height: 900 });
       await auditFromTop(page, "technical overview " + width);
+      if (width === 390) await info.attach("central-390", { body: await page.screenshot(), contentType: "image/png" });
     }
-    await info.attach("technical-overview", { body: await page.screenshot({ fullPage: true }), contentType: "image/png" });
-    const card = scope.getByRole("article", { name: "Integridade documental recusada", exact: true }).filter({ hasText: id });
-    const opener = card.getByRole("button", { name: "Investigar incidente", exact: true }); await opener.click();
-    const dialog = page.getByRole("dialog", { name: "Integridade documental recusada", exact: true }); await expect(dialog).toContainText(id);
-    await dialog.getByRole("combobox", { name: "Motivo do acompanhamento", exact: true }).selectOption("waiting_dependency");
-    await page.keyboard.press("Escape"); await expect(dialog).toHaveCount(0); await expect(opener).toBeFocused();
-    await opener.click(); await expect(dialog.getByRole("combobox", { name: "Motivo do acompanhamento", exact: true })).toHaveValue("waiting_dependency");
-    await dialog.getByRole("button", { name: "Fechar diálogo", exact: true }).click();
-    await scope.getByRole("tab", { name: "Continuidade", exact: true }).click(); await model.goto(referenceUrl + "#suporte/continuidade");
-    const guide = scope.getByRole("region", { name: "Roteiro de recuperação do serviço", exact: true }); await expect(guide).toBeVisible();
-    for (const width of [320, 390, 768, 1024, 1440]) {
-      await page.setViewportSize({ width, height: 900 }); await model.setViewportSize({ width, height: 900 }); await model.screenshot();
-      await compare(guide.locator(".hca-operations-card").first(), model.locator(".card.pad").first(), ["border-radius", "border-top-color", "padding-top", "padding-left"]);
-      await compare(guide.getByRole("heading", { name: "Backup e recuperação", exact: true }), model.locator(".card.pad h2").first(), ["font-size", "font-weight", "line-height"]);
-      expect(await guide.locator(".hca-recovery-grid").evaluate(node => getComputedStyle(node).gridTemplateColumns.split(" ").length)).toBe(width <= 850 ? 1 : 2);
-      await auditFromTop(page, "technical continuity " + width);
-    }
-    await info.attach("technical-continuity", { body: await page.screenshot({ fullPage: true }), contentType: "image/png" });
-    await scope.getByRole("tab", { name: "Eventos e política", exact: true }).click();
-    await scope.getByText("Limites e severidades por ambiente", { exact: true }).click();
-    const input = scope.getByLabel("Fila: aviso (segundos)", { exact: true }); await input.fill("125");
-    await scope.getByRole("tab", { name: "Residências e contas", exact: true }).click();
-    await expect(scope.getByRole("link", { name: "Preparar residência", exact: true })).toHaveAttribute("href", "/admin?section=patient");
-    await expect(scope.getByRole("link", { name: "Consultar contas globais", exact: true })).toHaveAttribute("href", "/admin?section=profiles");
-    await page.goBack(); await expect(input).toHaveValue("125");
-    expect(writes).toEqual([]); expect(sql("select jsonb_build_object('commands',(select count(*) from private.operations_commands),'stock',(select count(*) from public.stock_movements),'science',(select count(*) from public.requisition_science_events));")).toBe(before);
+    await page.bringToFront();
+    if (viewport) await page.setViewportSize(viewport);
+    const opener = scope.locator('[data-technical-incident="' + id + '"]').getByRole("button", { name: /^Investigar incidente/ });
+    await opener.click();
+    const dialog = page.getByRole("dialog", { name: "Integridade documental recusada", exact: true });
+    await expect(dialog).toContainText(id);
+    const reason = dialog.getByRole("combobox", { name: "Motivo do acompanhamento", exact: true });
+    await reason.selectOption("waiting_dependency");
+    await page.getByRole("button", { name: "Fechar edição", exact: true }).click();
+    const exit = page.getByRole("dialog", { name: "Sair sem concluir?", exact: true });
+    await exit.getByRole("button", { name: "Sair e descartar", exact: true }).click();
+    await expect(dialog).toBeHidden(); await expect(opener).toBeFocused();
+    await opener.click(); await expect(reason).toHaveValue("investigating");
+    await page.getByRole("button", { name: "Fechar edição", exact: true }).click();
+    await expect(dialog).toBeHidden();
+    await expect(scope.getByRole("link", { name: /^Criar nova residência/ })).toHaveAttribute("href", "/preparar-residencia");
+    await expect(scope.getByRole("link", { name: /^Consultar contas globais/ })).toHaveAttribute("href", "/admin?section=profiles");
+    await scope.getByRole("tab", { name: "Continuidade", exact: true }).click();
+    const guide = scope.getByRole("region", { name: "Roteiro de recuperação do serviço", exact: true });
+    await expect(guide.getByRole("heading", { name: "Backup e recuperação", exact: true })).toBeVisible();
+    await audit(page, "technical continuity");
+    expect(writes).toEqual([]); expect(business()).toBe(before);
   } finally { await reference.close(); }
 });
 
@@ -227,9 +227,12 @@ test("GUI04 roteiro liga cópia e ensaio reais, distingue falha e ambiente e nun
     if (mode === "wrong-scope") { const response = await route.fetch(); const body = await response.json(); body.data.environment = "preview"; return route.fulfill({ response, json: body }); }
     return route.continue();
   });
-  await refresh.click(); await expect(consoleRegion(page)).toContainText("Consulta técnica GUI04 indisponível");
+  const readFailure = page.getByRole("dialog", { name: "Não foi possível consultar o ambiente técnico", exact: true });
+  await refresh.click(); await expect(readFailure).toContainText("Consulta técnica GUI04 indisponível");
+  await readFailure.getByRole("button", { name: "Voltar", exact: true }).click();
   await expect(guide).toHaveCount(0); await expect(refresh).toBeFocused();
-  mode = "wrong-scope"; await refresh.click(); await expect(consoleRegion(page)).toContainText("Resposta técnica sem confirmação reconhecível.");
+  mode = "wrong-scope"; await refresh.click(); await expect(readFailure).toContainText("Resposta técnica sem confirmação reconhecível");
+  await readFailure.getByRole("button", { name: "Voltar", exact: true }).click();
   await expect(guide).toHaveCount(0); await expect(consoleRegion(page).getByRole("list", { name: "Componentes observados", exact: true })).toHaveCount(0);
   mode = "live"; await refresh.click(); await expect(guide).toBeVisible();
   await expect(guide).toContainText("Ensaio de recuperação não confirmado");
@@ -238,73 +241,114 @@ test("GUI04 roteiro liga cópia e ensaio reais, distingue falha e ambiente e nun
   expect(writes).toEqual([]); expect(business()).toBe(before);
 });
 
-test("OPS3 suporte global recupera a mesma alteração incerta e preserva histórico sem efeito operacional", async ({ page }) => {
+test("E12-07 recupera decisão sem reenviar o comando e exige nova revisão do incidente", async ({ page }) => {
   const id = await fault(); await login(page); await openConsole(page);
-  const card = consoleRegion(page).getByRole("article", { name: "Integridade documental recusada", exact: true });
-  await expect(card).toContainText(id);
+  const scope = consoleRegion(page), card = scope.locator('[data-technical-incident="' + id + '"]');
   const business = () => sql("select jsonb_build_object('docs',(select count(*) from public.operational_documents),'science',(select count(*) from public.requisition_science_events),'stock',(select count(*) from public.stock_movements));");
-  const before = business(), packets: unknown[] = [];
-  let lose = true, failRead = false;
-  await page.route("**/api/operations?*",route=>{if(failRead){failRead=false;return route.fulfill({status:503,json:{error:"Consulta de incidente controlada indisponível."}});}return route.continue();});
+  const before = business(), packets: { action: string; idempotencyKey: string; reason?: string }[] = [];
   await page.route("**/api/operations", async route => {
     if (route.request().method() !== "POST") return route.continue();
-    packets.push(route.request().postDataJSON());
-    if (lose) { lose = false; const response = await route.fetch(); expect(response.ok()).toBeTruthy(); return route.abort("failed"); }
+    const packet = route.request().postDataJSON();
+    packets.push(packet);
+    if (packets.length === 1) {
+      const response = await route.fetch(); expect(response.ok()).toBeTruthy();
+      return route.abort("failed");
+    }
+    if (packets.length === 2) return route.fulfill({ status: 503, json: { code: "DATABASE_UNAVAILABLE", error: "Comprovante temporariamente indisponível" } });
+    if (packet.action === "resolve" && packets.filter(value => value.action === "resolve").length === 1)
+      expect(await fault()).toBe(id);
     return route.continue();
   });
-  await card.getByRole("button", { name: "Investigar incidente", exact: true }).click();
+  const open = card.getByRole("button", { name: /^Investigar incidente/ });
   const decision = page.getByRole("dialog", { name: "Integridade documental recusada", exact: true });
+  const failure = page.getByRole("dialog", { name: "Resultado da decisão técnica a conferir", exact: true });
+  const success = page.getByRole("dialog", { name: "Acompanhamento registrado", exact: true });
+  await open.click();
   await decision.getByRole("button", { name: "Iniciar acompanhamento", exact: true }).click();
-  await expect(decision).toContainText("Resultado incerto");
+  await expect(failure).toBeVisible();
   await expect(page.getByRole("combobox", { name: "Ambiente técnico", exact: true, includeHidden: true })).toBeDisabled();
   expect(sql(`select state from private.operations_incidents where id=${sqlLiteral(id)};`)).toBe("acknowledged");
-  failRead=true;
-  await decision.getByRole("button", { name: "Recuperar alteração técnica", exact: true }).click();
-  await expect(decision).toContainText("Confirmação da mesma alteração recuperada.");
-  await expect(decision).toContainText("Consulta de incidente controlada indisponível.");
-  await expect(decision.getByRole("button",{name:"Encerrar incidente técnico",exact:true})).toBeDisabled();
-  await decision.getByRole("button", { name: "Fechar diálogo", exact: true }).click();
-  await consoleRegion(page).getByRole("button",{name:"Atualizar monitoramento",exact:true}).click();
-  expect(packets).toHaveLength(2); expect(packets[1]).toEqual(packets[0]);
+  await failure.getByRole("button", { name: "Conferir resultado", exact: true }).click();
+  await expect(failure).toContainText("Comprovante temporariamente indisponível");
+  const metadata = await page.evaluate(() => {
+    const key = Object.keys(sessionStorage).find(key => key.startsWith("hca:operations-intent:"));
+    return key ? JSON.parse(sessionStorage.getItem(key) ?? "null") : null;
+  });
+  expect(metadata.attempts).toBe(1);
+  expect(Object.keys(metadata).sort()).toEqual(["action", "attempts", "environment", "expectedActorId", "expectedVersion", "idempotencyKey", "incidentId"]);
+  await page.reload();
+  await scope.getByRole("button", { name: "Conferir decisão", exact: true }).click();
+  await expect(success).toContainText("O comprovante da mesma decisão foi localizado.");
+  await success.getByRole("button", { name: "Voltar à central técnica", exact: true }).click();
   await expect(card).toContainText("Em acompanhamento");
-  await card.getByRole("button", { name: "Histórico completo deste incidente", exact: true }).click();
+  expect(packets.slice(0, 3).map(packet => packet.action)).toEqual(["acknowledge", "recover", "recover"]);
+  expect(packets.slice(0, 3).every(packet => packet.idempotencyKey === packets[0].idempotencyKey)).toBe(true);
+  expect(packets.slice(1, 3).every(packet => packet.reason === undefined)).toBe(true);
+
+  await open.click();
+  await decision.getByRole("button", { name: /^Histórico do incidente/ }).click();
   const history = page.getByRole("region", { name: "Histórico técnico completo", exact: true });
-  await expect(history).toContainText("Acompanhamento iniciado");
-  await history.getByRole("button", { name: "Fechar histórico técnico", exact: true }).click();
-  await card.getByRole("button", { name: "Investigar incidente", exact: true }).click();
+  await expect(history.getByRole("heading", { name: "Acompanhamento iniciado", exact: true })).toHaveCount(1);
+  await page.getByRole("button", { name: "Voltar ao incidente", exact: true }).click();
+  await decision.getByRole("combobox", { name: "Motivo do encerramento", exact: true }).selectOption("reviewed_history");
+  const confirm = page.getByRole("dialog", { name: "Encerrar este incidente?", exact: true });
+  const confirmation = confirm.getByRole("button", { name: "Encerrar incidente", exact: true });
   await decision.getByRole("button", { name: "Encerrar incidente técnico", exact: true }).click();
+  await confirmation.click();
+  await decision.getByRole("button", { name: "Conferir atualização", exact: true }).click();
+  const comparison = page.getByRole("dialog", { name: "Situação atual do incidente", exact: true });
+  await expect(comparison).toContainText("Ocorrências atuais");
+  await comparison.getByRole("button", { name: "Usar situação atual", exact: true }).click();
+  await expect(decision.getByRole("combobox", { name: "Motivo do encerramento", exact: true })).toHaveValue("reviewed_history");
+  await decision.getByRole("button", { name: "Encerrar incidente técnico", exact: true }).click();
+  await confirmation.click();
+  await page.getByRole("dialog", { name: "Incidente encerrado", exact: true }).getByRole("button", { name: "Voltar à central técnica", exact: true }).click();
   await expect(card).toHaveCount(0); expect(business()).toBe(before);
-  await expect(consoleRegion(page).getByRole("button",{name:"Atualizar monitoramento",exact:true})).toBeFocused();
-  await consoleRegion(page).getByRole("combobox", { name: "Incidentes", exact: true }).selectOption("resolved");
-  await expect(consoleRegion(page).getByRole("article", { name: "Integridade documental recusada", exact: true }).filter({ hasText: id })).toBeVisible();
+  await expect(scope.getByRole("button", { name: "Atualizar monitoramento", exact: true })).toBeFocused();
+  await scope.getByRole("combobox", { name: "Incidentes", exact: true }).selectOption("resolved");
+  await expect(card).toBeVisible();
 });
 
-test("OPS3 política usa versão vigente, recusa concorrência e mantém teclado e geometria em quatro larguras", async ({ page }) => {
+test("E12-07 política exige confirmação e compara mudanças concorrentes antes de adotar", async ({ page }) => {
   await login(page); await openConsole(page, "operator");
-  await consoleRegion(page).getByRole("tab", { name: "Eventos e política", exact: true }).click();
   const global = await actor("global"), original = (await rpc(global, "operations_diagnostics", { p_environment: "operator" })).policy;
   try {
-    await consoleRegion(page).locator("summary").filter({ hasText: "Limites e severidades por ambiente" }).click();
-    const input = consoleRegion(page).getByLabel("Fila: aviso (segundos)", { exact: true });
-    await input.fill("122"); await input.press("Tab");
-    await expect(consoleRegion(page).getByLabel("Fila: crítico (segundos)", { exact: true })).toBeFocused();
-    await consoleRegion(page).getByRole("button", { name: "Guardar política técnica", exact: true }).click();
-    await expect(consoleRegion(page)).toContainText("Alteração técnica confirmada.");
-    const current = (await rpc(global, "operations_diagnostics", { p_environment: "operator" })).policy;
-    expect(current.version).toBe(original.version + 1); expect(current.values.jobWarningSeconds).toBe(122);
-    await expect(consoleRegion(page).getByRole("button", { name: "Guardar política técnica", exact: true })).toBeEnabled();
-    await rpc(global, "operations_command", { p_environment: "operator", p_action: "configure", p_id: null, p_expected: current.version, p_payload: { policy: { jobWarningSeconds: 123 } }, p_key: randomUUID() });
-    await input.fill("124");
+    const open = consoleRegion(page).getByRole("button", { name: /^Limites e severidades/ });
+    await open.click();
+    const drawer = page.getByRole("dialog", { name: "Limites e severidades", exact: true });
+    const severity = drawer.getByLabel("Severidade padrão: Aplicação", { exact: true });
+    await expect(severity).toBeHidden();
+    await drawer.getByText("Severidade por componente", { exact: true }).filter({ visible: true }).click();
+    await expect(severity).toBeVisible();
+    const input = drawer.getByLabel("Processamento · atenção", { exact: true });
+    await input.fill("124"); await input.press("Tab");
+    await expect(drawer.getByLabel("Processamento · crítico", { exact: true })).toBeFocused();
+    await drawer.getByRole("button", { name: "Revisar política", exact: true }).click();
+    const confirm = page.getByRole("dialog", { name: "Aplicar esta política técnica?", exact: true });
+    expect((await rpc(global, "operations_diagnostics", { p_environment: "operator" })).policy.version).toBe(original.version);
+    await rpc(global, "operations_command", { p_environment: "operator", p_action: "configure", p_id: null, p_expected: original.version,
+      p_payload: { policy: { jobWarningSeconds: 123, jobCriticalSeconds: original.values.jobCriticalSeconds + 1 } }, p_key: randomUUID() });
     const refusal = page.waitForResponse(response => new URL(response.url()).pathname === "/api/operations" && response.request().method() === "POST");
-    await consoleRegion(page).getByRole("button", { name: "Guardar política técnica", exact: true }).click();
+    await confirm.getByRole("button", { name: "Confirmar política", exact: true }).click();
     expect((await refusal).status()).toBe(409);
-    await expect(consoleRegion(page)).toContainText("O acompanhamento técnico mudou em outra sessão.");
+    await drawer.getByRole("button", { name: "Conferir atualização", exact: true }).click();
+    const compare = page.getByRole("dialog", { name: "Política técnica atualizada", exact: true });
+    await expect(compare).toContainText("Valor vigente");
+    await expect(compare).toContainText("123"); await expect(compare).toContainText("124");
+    await compare.getByRole("button", { name: "Usar versão vigente como referência", exact: true }).click();
     await expect(input).toHaveValue("124");
-    await expect(consoleRegion(page).getByRole("button", { name: "Guardar política técnica", exact: true })).toBeDisabled();
-    await expect(consoleRegion(page).getByRole("button", { name: "Usar versão vigente como referência", exact: true })).toBeVisible();
-    for (const width of [320, 390, 768, 1440]) { await page.setViewportSize({ width, height: 900 }); await audit(page, "OPS3 global policy " + width); }
-    await consoleRegion(page).getByRole("button", { name: "Consultar histórico completo de políticas", exact: true }).click();
-    await expect(page.getByRole("region", { name: "Histórico técnico completo", exact: true })).toContainText("Política configurada");
+    await expect(drawer.getByLabel("Processamento · crítico", { exact: true })).toHaveValue(String(original.values.jobCriticalSeconds + 1));
+    for (const width of [320, 390, 768, 1440]) { await page.setViewportSize({ width, height: 900 }); await audit(page, "L4 technical policy " + width); }
+    await page.bringToFront(); await page.setViewportSize({ width: 390, height: 844 });
+    await drawer.getByRole("button", { name: "Revisar política", exact: true }).click();
+    await confirm.getByRole("button", { name: "Confirmar política", exact: true }).click();
+    await page.getByRole("dialog", { name: "Política técnica atualizada", exact: true }).getByRole("button", { name: "Voltar à central técnica", exact: true }).click();
+    const current = (await rpc(global, "operations_diagnostics", { p_environment: "operator" })).policy;
+    expect(current.version).toBe(original.version + 2); expect(current.values.jobWarningSeconds).toBe(124);
+    expect(current.values.jobCriticalSeconds).toBe(original.values.jobCriticalSeconds + 1);
+    await open.click();
+    await drawer.getByRole("button", { name: /^Histórico das políticas/ }).click();
+    await expect(page.getByRole("region", { name: "Histórico técnico completo", exact: true }).getByRole("heading", { name: "Política configurada", exact: true }).first()).toBeVisible();
   } finally {
     const current = (await rpc(global, "operations_diagnostics", { p_environment: "operator" })).policy;
     await rpc(global, "operations_command", { p_environment: "operator", p_action: "configure", p_id: null, p_expected: current.version, p_payload: { policy: original.values }, p_key: randomUUID() });
@@ -315,11 +359,14 @@ test("OPS3 leitura distingue falha e resposta inválida, conserva referência an
   await login(page); await openConsole(page);
   let mode = "error";
   await page.route("**/api/operations?*", route => mode === "error" ? route.fulfill({ status: 503, json: { code: "DATABASE_UNAVAILABLE", error: "Consulta técnica controlada indisponível" } }) : mode === "invalid" ? route.fulfill({ status: 200, json: { data: {} } }) : route.continue());
+  const failure = page.getByRole("dialog", { name: "Não foi possível consultar o ambiente técnico", exact: true });
   await consoleRegion(page).getByRole("button", { name: "Atualizar monitoramento", exact: true }).click();
-  await expect(consoleRegion(page)).toContainText("Consulta técnica controlada indisponível");
-  await expect(consoleRegion(page)).toContainText("Última consulta confirmada preservada.");
+  await expect(failure).toContainText("Consulta técnica controlada indisponível");
+  await failure.getByRole("button", { name: "Voltar", exact: true }).click();
+  await expect(consoleRegion(page)).toContainText("A última consulta deste ambiente continua disponível.");
   mode = "invalid"; await consoleRegion(page).getByRole("button", { name: "Atualizar monitoramento", exact: true }).click();
-  await expect(consoleRegion(page)).toContainText("Resposta técnica sem confirmação reconhecível.");
+  await expect(failure).toContainText("Resposta técnica sem confirmação reconhecível");
+  await failure.getByRole("button", { name: "Voltar", exact: true }).click();
   await expect(consoleRegion(page).getByRole("list", { name: "Componentes observados", exact: true })).toHaveCount(0);
   mode = "live"; await consoleRegion(page).getByRole("button", { name: "Atualizar monitoramento", exact: true }).click();
   await expect(consoleRegion(page).getByRole("list", { name: "Componentes observados", exact: true })).toBeVisible();
@@ -327,7 +374,7 @@ test("OPS3 leitura distingue falha e resposta inválida, conserva referência an
   await expect(consoleRegion(page)).toHaveCount(0);
   const response = await page.request.get("/api/operations?environment=preview"); expect(response.status()).toBe(403);
   await page.goto("/admin?careRecipientId=" + f.patient);
-  await expect(page.getByRole("navigation", { name: "Áreas administrativas", exact: true }).getByRole("link", { name: /Monitoramento e suporte/ })).toHaveCount(0);
+  await expect(page.getByRole("navigation", { name: "Áreas administrativas", exact: true }).getByRole("link", { name: /Central técnica/ })).toHaveCount(0);
 });
 
 test("OPS3 impacto pessoal conserva a referência, orienta recuperação e ajuda e não cria ciência", async ({ page }) => {

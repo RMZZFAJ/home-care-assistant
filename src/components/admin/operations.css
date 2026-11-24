@@ -1,13 +1,11 @@
-.hca-operations { min-width: 0; }
+.hca-operations { min-width: 0; grid-template-columns: minmax(0, 1fr); }
+.hca-operations > div { min-width: 0; }
 .hca-operations-heading h2 { font-size: 24px; font-weight: 730; line-height: 1.3; }
 .hca-operations-heading > p { color: var(--hca-muted); margin-top: 8px; }
 .hca-technical-panel { display: grid; gap: 18px; min-width: 0; }
 .hca-technical-panel[hidden] { display: none; }
 .hca-observation-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
-.hca-observation-card.ui-card { padding: 18px; min-height: 119px; overflow-wrap: anywhere; }
-.hca-observation-card > strong { display: block; font-size: 12px; font-weight: 400; color: var(--hca-muted); }
-.hca-observation-value { font-size: 20px; font-weight: 730; letter-spacing: -.9px; margin: 7px 0 3px; }
-.hca-observation-card > small { font-size: 11px; color: var(--hca-teal); display: block; }
+.hca-observation-card > small { font-size: 11px; display: block; }
 .hca-technical-list.ui-card { padding: 0; overflow: hidden; }
 .hca-technical-cardhead { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 20px; border-bottom: 1px solid #eaf0ec; }
 .hca-technical-cardhead h3 { font-size: 16px; font-weight: 700; }
@@ -29,8 +27,6 @@
 .hca-recovery-steps p { font-size: 13px; }
 .hca-recovery-evidence { display: grid; gap: 18px; margin-top: 14px; }
 .hca-recovery-evidence h5 { font-size: 13px; font-weight: 670; margin: 0 0 9px; }
-.hca-operations-policy { display: grid; gap: 16px; margin-top: 19px; }
-.hca-operations-policy .hca-field > label { font-size: 12px; font-weight: 650; }
 .hca-audit-event { display: block; }
 .hca-audit-event h3 { font-size: 13px; font-weight: 670; }
 .hca-audit-event p { font-size: 12px; margin-top: 6px; overflow-wrap: anywhere; }
@@ -43,7 +39,6 @@
 }
 @media (max-width: 500px) {
   .hca-observation-grid { gap: 9px; }
-  .hca-observation-card.ui-card { padding: 15px; min-height: 104px; }
   .hca-technical-record { flex-wrap: wrap; padding: 14px; }
   .hca-technical-record-main { flex-basis: calc(100% - 51px); }
   .hca-technical-record-main > small { font-size: 10px; }
@@ -51,5 +46,47 @@
 }
 
 .hca-operations .hca-document-tab { padding: 13px 15px; border-bottom-width: 3px; font-size: 12px; font-weight: 650; line-height: 1.5; min-height: 47px; }
+.hca-technical-scope.ui-card { padding: 15px 16px; }
+.hca-technical-scope p, .hca-technical-scope h3 { margin: 0; }
+.hca-technical-scope p { color: var(--hca-muted); }
+.hca-technical-card-hint { padding: 12px 16px; color: var(--hca-muted); font-size: 12px; }
+.hca-technical-cardhead .hca-field { margin: 0; min-width: 0; max-width: 135px; }
+.hca-operations .hca-observation-grid { padding: 14px; margin: 0; list-style: none; }
+.hca-observation-card {
+  display: grid; align-content: start; gap: 4px; min-width: 0; border: 1px solid var(--hca-line);
+  border-radius: 12px; padding: 12px; background: var(--hca-bg); overflow-wrap: anywhere;
+}
+.hca-observation-card h4 { margin: 4px 0 0; font-size: 13px; font-weight: 700; }
+.hca-observation-card > strong { font-size: 12px; font-weight: 650; color: var(--hca-ink); }
+.hca-observation-card[data-state="observed"] > strong { color: var(--hca-teal); }
+.hca-observation-card[data-state="attention"] > strong { color: var(--hca-amber); }
+.hca-observation-card[data-state="unobserved"] > strong, .hca-observation-card > small { color: var(--hca-muted); }
+.hca-operations .hca-guide-row { min-width: 0; padding-inline: 16px; }
+.hca-operations .hca-technical-route { justify-content: normal; color: inherit; text-align: start; }
+.hca-technical-footer {
+  position: sticky; z-index: 2; bottom: var(--hca-bottom-navigation, 0); display: flex; justify-content: flex-end;
+  padding: 10px 0; border-top: 1px solid var(--hca-line); background: var(--hca-bg);
+}
+.hca-technical-pagination { padding: 12px 16px; justify-content: space-between; }
+.hca-technical-sheet .hca-modal-context-head > div { flex: 1; min-width: 0; }
+.hca-technical-sheet-state { display: flex; align-items: center; justify-content: space-between; gap: 8px; color: var(--hca-muted); }
+.hca-technical-sheet .hca-field-hint { margin: 0; }
+.hca-technical-disclosure { border: 1px solid var(--hca-line); border-radius: 10px; padding: 12px; }
+.hca-technical-disclosure > .hca-form { margin-top: 12px; }
+.hca-technical-policy-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; min-width: 0; }
+.hca-technical-disclosure:has(> .hca-technical-policy-grid) > summary {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px; font-weight: 650; cursor: pointer;
+}
+.hca-technical-disclosure:has(> .hca-technical-policy-grid) > summary::after { content: none; }
+.hca-technical-disclosure[open]:has(> .hca-technical-policy-grid) > summary > svg { transform: rotate(180deg); }
+.hca-technical-disclosure > .hca-technical-policy-grid { margin-top: 12px; }
+.hca-technical-comparison { padding: 12px; border: 1px solid var(--hca-line); border-radius: 10px; }
+.hca-technical-comparison h3 { font-size: 14px; margin-bottom: 8px; font-weight: 700; }
 @media (max-width: 850px) { .hca-operations .hca-document-tab { padding: 12px; } }
-@media (max-width: 500px) { .hca-operations .hca-document-tab { padding: 12px 10px; font-size: 11px; gap: 5px; } }
+@media (max-width: 500px) {
+  .hca-operations .hca-document-tab { flex: 1; min-width: 0; padding: 10px 6px; font-size: 11px; white-space: normal; text-align: center; }
+}
+@media (max-width: 850px) {
+  .hca-drawer-viewport > .hca-technical-sheet.hca-guide-topic-sheet { max-height: calc(100dvh - var(--app-header-height)); }
+  .hca-technical-footer > button { width: 100%; }
+}

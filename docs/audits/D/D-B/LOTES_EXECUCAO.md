@@ -4150,6 +4150,61 @@ mantém o cabeçalho global, as abas e diálogos compartilhados. O build,
 quatro testes unitários, ESLint dirigido, Markdown e a verificação das
 migrations históricas passaram.
 
+### E12-07 — Central técnica e decisões
+
+- A Central técnica segue a v2 com o seletor de ambiente, os cartões de
+  observações, a lista de incidentes, as três abas e a atualização no rodapé.
+  Os componentes técnicos existentes além dos seis ilustrados continuam
+  disponíveis na sequência dos cartões. **Administração técnica** reúne
+  políticas, criação de residência e a consulta às contas globais.
+- A investigação abre um painel com situação, severidade, contagens,
+  correlação e acesso ao histórico paginado. O encerramento pede
+  confirmação explícita. O encerramento direto era uma ação disponível e
+  fica em um bloco próprio quando o incidente ainda está aberto.
+- Uma atualização concorrente exige comparar a versão e adotar a situação
+  vigente. A consulta por ID funciona mesmo quando o incidente deixa a
+  primeira página ou foi encerrado em outra sessão. Na política, a adoção
+  conserva campos editados e atualiza os demais para os valores vigentes.
+- A recuperação usa a mesma chave pelo autor e pelo ambiente. A aba guarda
+  somente metadados da tentativa oficial, por até duas consultas de
+  recuperação. O banco devolve o comprovante existente ou encerra a chave
+  sem executar a decisão. Os painéis compartilham carregamento, confirmação,
+  resultado e detalhes para suporte com as demais superfícies.
+- Observações, histórico e decisões exigem administração global ativa.
+  A consulta técnica mantém as referências minimizadas. Acompanhamento,
+  encerramento e política acrescentam atos técnicos, preservando os registros
+  de estoque, ciência, documentos e entregas de L1–L3.
+
+| Migration | Supabase local | Supabase remoto |
+| --- | --- | --- |
+| `20261124071109_l4_technical_operation_recovery` | Aplicada | Pendente |
+
+A migration acrescenta consulta exata de incidente e recuperação de decisão
+técnica. Os comandos e comprovantes já existentes continuam legíveis
+e sujeitos à autorização global. Os 12 testes de integração passaram,
+incluindo decisão concorrente, chave encerrada sem registro, recuperação
+do comprovante e escopo global com Auth real. A instalação limpa fica
+sujeita à CI do candidato.
+
+Os cinco testes unitários e as 12 verificações dirigidas de navegador
+passaram sem retentativa em Chromium, Android e iOS emulados. A verificação
+de 320 px passou após corrigir a largura mínima das abas. O comprovante
+foi recuperado após recarregar a aba e o histórico registrou um único ato.
+A comparação da política mostrou valores conferidos, vigentes e propostos.
+As capturas em 390 px comparam a estrutura da Central com o laboratório v2.
+A abertura das severidades e a conferência da política passaram em três
+execuções dirigidas adicionais, sem retentativa. As duas novas RPCs só
+concedem execução ao papel autenticado e verificam o escopo global.
+O Advisor local não apontou alertas para essas funções.
+
+O Supabase local tem 366 migrations e o compartilhado tem 362. O Preview
+publicado em `a08742dc` está `READY`, com variáveis de Supabase, PDF, Push
+e avisos cadastradas. A consulta a `/login` retornou 200 e a Central técnica
+exigiu autenticação (401). A produção em `fab595c7` usa o mesmo banco.
+Os quatro contratos locais ainda aguardam a transição descrita em E12-06.
+O Sonar aprovou o commit publicado. O CodeRabbit pulou a análise por tamanho
+da PR, apesar da configuração de revisão automática para drafts.
+
 ### Pendências da CI publicada em `a08742dc`
 
 - No `chromium-1`, o teste da aprovação, compra e chegada da COM passou

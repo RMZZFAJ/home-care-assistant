@@ -64,7 +64,7 @@ const labels: Record<Section, string> = {
   profiles: "Contas globais",
   notificationRecipients: "Destinatários",
   notifications: "Notificações",
-  operations: "Monitoramento e suporte",
+  operations: "Central técnica",
 };
 export function AdminConsole() {
   const params = useSearchParams();
@@ -532,7 +532,7 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
           <AlertSettings rows={rows} products={catalog} patientId={patientId!} userId={context.userId} globalMode={globalMode} onConfirmed={preparationConfirmed} />
         )}
         {section === "audit" ? <AuditHistory patientId={patientId!} /> : null}
-        {section === "operations" && globalMode ? <OperationsConsole key={context.userId} /> : null}
+        {section === "operations" && globalMode ? <OperationsConsole key={context.userId} actorId={context.userId} /> : null}
         {section === "import" && (
           <section className={panelClass}>
             <h2 className="font-bold">Importar protocolos físicos 1–11</h2>

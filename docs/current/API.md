@@ -1899,6 +1899,31 @@ global em páginas de 30 contas, com total e ordenação por nome e ID.
 Exige administração global ativa. A consulta sem profilePage preserva
 o contrato anterior. [Implementação](../audits/D/D-B/ADMINISTRATIVE_PREPARATIONS.md).
 
+## Central técnica e decisões
+
+`GET /api/operations` consulta observações, incidentes e a política do
+ambiente selecionado. Exige sessão atual em modo de administração global.
+Os filtros de ambiente, página e estado são explícitos. Com `incident`,
+a consulta por ID retorna a situação vigente no mesmo ambiente, inclusive
+depois de o incidente mudar de estado ou de página. `history=incident`
+com `incident`, ou `history=policy`, entrega o histórico paginado.
+As respostas são privadas e evitam cache.
+
+`POST /api/operations` aceita `acknowledge`, `resolve` e `configure`.
+O comando compara a revisão esperada e registra decisão e comprovante
+na mesma transação. A interface envia a conta esperada para impedir que uma
+troca de sessão atribua a decisão a outra pessoa. Um conflito 409 exige nova
+leitura e adoção da situação atual antes de confirmar.
+
+A ação `recover` recebe somente ambiente, conta esperada e chave da
+tentativa. No banco, a consulta usa o mesmo bloqueio do comando pelo autor
+e pela chave. Ela devolve o comprovante existente ou encerra uma chave
+sem registro para impedir chegada tardia. A chave é exclusiva do ambiente
+consultado. A interface oferece duas consultas de recuperação e guarda apenas
+metadados da tentativa oficial na aba. A decisão de acompanhamento ou política
+registra um ato técnico. As ações de infraestrutura continuam em suas
+entradas próprias.
+
 ## Consulta técnica de tentativas
 
 GET /api/operations/notifications exige sessão e modo global vigentes.

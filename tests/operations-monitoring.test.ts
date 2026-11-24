@@ -1,7 +1,7 @@
 import { afterEach, expect, it, vi } from "vitest";
 import { randomUUID } from "node:crypto";
 import { apiFailureEvent } from "@/lib/operations/events";
-import { operationsConfirmed, technicalEvent, type OperationsCommand } from "@/lib/operations/contracts";
+import { parseOperationsOutcome, technicalEvent, type OperationAttempt } from "@/lib/operations/contracts";
 import { DatabaseOperationsSink, observeApiFailure } from "@/lib/server/operations-observer";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
@@ -59,8 +59,12 @@ it("unconfigured or unapproved telemetry cannot disclose secrets or alter the or
 });
 
 it("command confirmation binds environment, action, incident, intention and version", () => {
-  const packet: OperationsCommand = { action: "resolve", environment: "preview", incidentId: randomUUID(), expectedVersion: 4, reason: "corrected", idempotencyKey: randomUUID() };
+  const packet: OperationAttempt = { action: "resolve", environment: "preview", incidentId: randomUUID(), expectedVersion: 4, idempotencyKey: randomUUID(), expectedActorId: randomUUID(), attempts: 1 };
   const receipt = { environment: packet.environment, action: packet.action, incidentId: packet.incidentId, version: 5, idempotencyKey: packet.idempotencyKey, recorded: true, noop: false };
-  expect(operationsConfirmed({ data: receipt }, packet)).toBe(true);
-  for (const mutation of [{ environment: "production" }, { action: "acknowledge" }, { incidentId: randomUUID() }, { idempotencyKey: randomUUID() }, { version: 3 }, { recorded: false }, { privateName: "forbidden" }]) expect(operationsConfirmed({ data: { ...receipt, ...mutation } }, packet)).toBe(false);
+  expect(parseOperationsOutcome(receipt, packet)).toEqual(receipt);
+  expect(parseOperationsOutcome({ ...receipt, version: 4, noop: true }, packet).recorded).toBe(true);
+  for (const mutation of [{ environment: "production" }, { action: "acknowledge" }, { incidentId: randomUUID() }, { idempotencyKey: randomUUID() }, { version: 6 }, { version: 3 }, { recorded: false }, { privateName: "forbidden" }]) expect(() => parseOperationsOutcome({ ...receipt, ...mutation }, packet)).toThrow();
+  const absent = { environment: packet.environment, idempotencyKey: packet.idempotencyKey, recorded: false };
+  expect(parseOperationsOutcome(absent, packet)).toEqual(absent);
+  expect(() => parseOperationsOutcome({ ...absent, environment: "production" }, packet)).toThrow();
 });
