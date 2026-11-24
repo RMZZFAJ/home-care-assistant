@@ -347,6 +347,7 @@ test("BAL por plantão: ativação local, cinco etapas, referência, resposta pe
 });
 
 test("pedido de adiamento sem plantão elegível mantém o prazo e oferece a agenda do paciente", async ({ page }) => {
+  test.setTimeout(90_000);
   const { patient, pro, today } = await balanceSetup({ stableCurrentWindow: true, durationMinutes: 720, futureDays: 0 });
   await login(page, pro.email, patient);
   await page.goto("/balancos");
@@ -365,8 +366,9 @@ test("pedido de adiamento sem plantão elegível mantém o prazo e oferece a age
     if (value.method() === "POST" && new URL(value.url()).pathname.startsWith("/api/balances")) writes++;
   });
   const agenda = request.getByRole("link", { name: "Ver agenda", exact: true });
-  await expect(agenda).toHaveAttribute("href", "/escalas?careRecipientId=" + patient);
+  await expect(agenda).toHaveAttribute("href", "/escalas?" + new URLSearchParams({ careRecipientId: patient, day: today }));
   await agenda.click();
+  await expect(page).toHaveURL(url => url.pathname === "/escalas" && url.searchParams.get("day") === today);
   await expect(page.getByLabel("Data de referência", { exact: true })).toHaveValue(today);
   const after = await workspace();
   expect(after.eligibility.assignment).toEqual(before.eligibility.assignment);

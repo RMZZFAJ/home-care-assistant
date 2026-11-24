@@ -26,8 +26,10 @@ export async function loseDecisionResponse(page: Page, endpoint: string) {
   const packets: unknown[] = [];
   await page.route("**" + endpoint, async route => {
     if (route.request().method() !== "POST") return route.continue();
-    packets.push(route.request().postDataJSON());
-    const response = await route.fetch();
+    const packet = route.request().postDataJSON();
+    packets.push(packet);
+    // The relay may repeat a keyed request after a reset before losing the reply on purpose.
+    const response = await route.fetch({ maxRetries: typeof packet?.key === "string" ? 1 : 0 });
     expect(response.ok(), await response.text()).toBe(true);
     await route.abort("failed");
   });

@@ -3846,6 +3846,25 @@ WhatsApp ainda requer homologação do provedor.
   cinco tamanhos, a navegação por teclado e os controles de ausência de
   gravação foram conferidos.
 
+### Entrada na agenda pelo adiamento do BAL
+
+- A [CI de aed71937](https://github.com/RMZZFAJ/home-care-assistant/actions/runs/45286989830)
+  aprovou 876 integrações e seis grupos de navegador. O iOS-1 falhou nas
+  duas tentativas ao abrir **Ver agenda** a partir do adiamento. O navegador
+  já marcava dia 24 em UTC enquanto o plantão do balanço ainda estava no
+  dia 23 no fuso da programação do paciente.
+- O link da agenda leva o dia da atribuição no fuso do balanço, preservando
+  o paciente e o contexto de calendário. O teste verifica o dia no link e
+  na agenda, a atribuição, os adiamentos e a ausência de gravação.
+- Nesse mesmo grupo, a compra mista e a abertura do filtro de consumo
+  passaram na retentativa. O relay de teste repete a mesma requisição com
+  chave de idempotência se a conexão for reiniciada. O toque no filtro
+  aguarda o fim da sobreposição de consulta e a posição do botão.
+- As verificações dirigidas passaram em Chromium, Android e iOS emulados.
+  A repetição da agenda no WebKit confirmou a URL, a data exibida e a
+  ausência de alterações na atribuição e nos adiamentos. Este incremento
+  dispensa migrations.
+
 ## L4
 
 Aguardando ordem e referência aprovadas.

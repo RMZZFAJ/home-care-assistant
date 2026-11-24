@@ -899,11 +899,16 @@ test("relato anterior ao centésimo é acessível por referência e por todas as
   const filters = page.getByRole("button", { name: "Filtrar relatos", exact: true });
   const filterPanel = page.getByRole("dialog", { name: "Filtrar registros", exact: true });
   const openFilters = async () => {
+    await expect(page.locator(".hca-activity-overlay")).toBeHidden();
+    await filters.scrollIntoViewIfNeeded();
+    await page.evaluate(() => new Promise<void>(done => requestAnimationFrame(() => requestAnimationFrame(() => done()))));
     if (info.project.use.hasTouch) await filters.tap();
     else await filters.click();
     await expect(filterPanel).toBeVisible();
   };
-  await page.getByRole("textbox", { name: "Buscar relato ou material", exact: true }).fill("Relato fictício preservado para decisão");
+  const search = page.getByRole("textbox", { name: "Buscar relato ou material", exact: true });
+  await search.fill("Relato fictício preservado para decisão");
+  await search.press("Tab");
   await openFilters();
   const viewport = page.viewportSize();
   for (const width of [360, 412]) {

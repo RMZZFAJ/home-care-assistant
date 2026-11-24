@@ -11,7 +11,7 @@ import {
 import { Notice } from "@/components/workspace";
 import { SearchSelect } from "@/components/ui/search-select";
 import { useState, type RefObject } from "react";
-import { formatZonedDate } from "@/lib/schedules/time";
+import { formatZonedDate, localMinute } from "@/lib/schedules/time";
 import type { BalancePreparationPurpose } from "@/lib/forms/balance-preparation-purposes";
 import type {
   BalancePreparationFields as Values,
@@ -95,6 +95,8 @@ export function BalancePreparationFields({
     );
   const needsLaterShift = purpose === "defer" || purpose === "request_deferral";
   const noDestination = Boolean(reference && a && needsLaterShift && !targets.length);
+  const agendaQuery = noDestination && canReadSchedule && reference ? new URLSearchParams({ careRecipientId: reference.patientId }) : null;
+  if (agendaQuery && a && zone) agendaQuery.set("day", localMinute(a.starts_at, zone).slice(0, 10));
   const label = (t: (typeof targets)[number]) =>
     `${t.professional_name} · ${t.type_name} · ${fmt(t.starts_at)} → ${fmt(t.ends_at)}`;
   const decisionAvailable =
@@ -281,7 +283,7 @@ export function BalancePreparationFields({
           <Notice>
             <strong>Não há outro plantão disponível</strong>
             <p>Peça à família que cadastre um plantão elegível. O pedido precisa indicar quem fará a contagem e quando.</p>
-            {canReadSchedule && reference ? <ActionLink href={`/escalas?careRecipientId=${reference.patientId}`}>Ver agenda</ActionLink> : null}
+            {agendaQuery ? <ActionLink href={`/escalas?${agendaQuery}`}>Ver agenda</ActionLink> : null}
           </Notice>
         ) : <>
           <FormField
