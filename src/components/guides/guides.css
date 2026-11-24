@@ -57,6 +57,7 @@
   border-bottom: 1px solid var(--hca-line);
 }
 .hca-guide-actions > button, .hca-guide-topic-sheet > .hca-modal-footer > :is(button, a) { flex: 1; min-width: 0; white-space: normal; }
+.hca-docked-page.hca-guide-page .hca-guide-actions { position: static; }
 .hca-drawer-viewport > .hca-guide-topic-sheet { width: min(490px, 100%); }
 .hca-guide-topic-sheet .hca-modal-heading-icon {
   display: grid;
@@ -68,6 +69,36 @@
   border: 1px solid var(--hca-line);
   background: var(--hca-tint);
   color: var(--hca-teal);
+}
+
+@media (max-width: 850px) and (min-height: 450px) {
+  /* The actions and navigation take up their own space below the mobile scroller. */
+  .hca-workspace[data-context-mode="patient"]:has(.hca-docked-page) {
+    display: flex;
+    flex-direction: column;
+    height: 100dvh;
+    min-height: 0;
+  }
+  .hca-workspace:has(.hca-docked-page) :is(
+    .hca-workspace-body,
+    .hca-workspace-body > div:not([hidden]):has(.hca-docked-page),
+    .workspace-content:has(.hca-docked-page),
+    .workspace-content > div:has(> .hca-docked-page)
+  ) {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+  }
+  .hca-workspace:has(.hca-docked-page) .workspace-content:has(.hca-docked-page) {
+    width: 100%;
+    margin: 0;
+    padding-bottom: 0;
+  }
+  .hca-workspace:has(.hca-docked-page) .hca-bottom-navigation { position: static; }
+  .hca-workspace .hca-docked-page { grid-template-rows: minmax(0, 1fr) auto; flex: 1; gap: 0; min-height: 0; }
+  .hca-docked-content { overflow: auto; margin-inline: -3px; padding: 3px 3px 12px; }
+  .hca-workspace .hca-docked-page.hca-guide-page :is(button, a) { scroll-margin-block-end: 12px; }
 }
 .hca-guide-topic-sheet .hca-modal-context-head h2 { font-size: 19px; }
 .hca-guide-topic-sheet > .hca-modal-footer { flex: none; background: var(--hca-bg); }

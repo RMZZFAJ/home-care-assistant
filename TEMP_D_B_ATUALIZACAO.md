@@ -4,6 +4,12 @@ O [fechamento A–D da PR 7](docs/audits/FECHAMENTO_PR7.md) reúne os critérios
 e as pendências para a próxima etapa. Este acompanhamento conserva o
 histórico dos incrementos de D-B.
 
+**24/11 — Dossiê de contingência.** A busca por referência ou descrição
+filtra o conjunto autorizado antes de paginar. Fatos, Materiais e Histórico
+abrem em um painel com autoria, registro digital e evidências confirmadas.
+A migration está aplicada no Supabase local e pendente no remoto.
+[Registro de L4](docs/audits/D/D-B/LOTES_EXECUCAO.md#e12-04--consulta-do-dossiê-de-contingência).
+
 **24/11 — Preparação local.** As áreas da residência abrem painéis com
 dados do vínculo e a data da consulta. O retorno do catálogo, do estoque
 e dos demais destinos reabre a área de origem. A lista móvel rola acima

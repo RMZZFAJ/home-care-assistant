@@ -4008,3 +4008,39 @@ Na rodada final de navegador, os nove casos passaram em Chromium, Android
 e iOS emulados. A cobertura incluiu a perda da resposta após a gravação,
 a retomada da mesma tentativa depois de recarregar a aba, a busca parcial
 indisponível e a saída voluntária sem gravar o formulário.
+
+### E12-04 — Consulta do dossiê de contingência
+
+- A página organiza processo, busca e estado da declaração em cartões
+  e linhas da v2. A busca literal usa paciente e processo autorizados
+  antes da paginação. A lista recebe resumos e consulta o dossiê ao abrir.
+  O laboratório exibe um código `CTG` de exemplo. No produto, a lista
+  mostra a referência declarada ou a descrição. O identificador persistido
+  permanece consultável no dossiê e na busca.
+- As abas **Fatos**, **Materiais** e **Histórico** preservam a declaração,
+  os dados físicos desconhecidos, os anexos e a autoria dos atos digitais.
+  O histórico lê a confirmação persistida de cada evidência disponível.
+  O diálogo de consulta oferece nova tentativa e detalhes de suporte.
+- As ações de complementar e conferir verificam o vínculo, a permissão e
+  a independência do revisor. O vínculo digital continua apontando ao
+  registro existente. A consulta não executa nenhum ato físico ou digital.
+
+| Migration | Supabase local | Supabase remoto |
+| --- | --- | --- |
+| `20261124052541_l4_contingency_dossier_search` | Aplicada | Pendente |
+
+O Supabase local registrou 364 versões. O remoto registrou 362 versões,
+com as migrations de criação de residência e de contingência pendentes.
+Os 11 testes de integração
+passaram, incluindo busca além da primeira página, recusa de outro
+paciente e processo, e horário confirmado de anexo do Storage. Os quatro
+testes unitários passaram. A rodada de 15 casos em Chromium, Android e
+iOS emulados passou. Os nove casos dirigidos também passaram após ajustar
+a ordem dos fatos e o rodapé do painel. As capturas comparam a lista em
+360 e 412 px e o dossiê aberto em 412 px. O teste de preparação local
+passou no Chromium com o rodapé compartilhado.
+
+O `chromium-1` da [CI de `a08742dc`](https://github.com/RMZZFAJ/home-care-assistant/actions/runs/45330314424/job/138238031341)
+falhou nas duas tentativas ao localizar o rótulo anterior de contingência
+em Guias. A regressão usa o rótulo aprovado nesta etapa e passou nos três
+navegadores emulados.

@@ -18,5 +18,8 @@ it('never accepts another scope or an incomplete confirmation as the official re
  const scope={patientId:patient,actorId:actor,process:'REQ',key},value={...scope,persistence:'confirmed',caseId:id,revision:1,action:'record',recordedAt:'2026-11-12T12:00:00Z'};
  expect(parseContingencyReceipt(value,scope).caseId).toBe(id);
  for(const invalid of [{...value,patientId:actor},{...value,actorId:patient},{...value,process:'COM'},{...value,key:actor},{...value,caseId:undefined},{...value,revision:undefined}])expect(()=>parseContingencyReceipt(invalid,scope)).toThrow();
- expect(()=>parseContingencyCases({patientId:patient,process:'REQ',page:0,pageSize:25,total:1,canReport:true,data:[]},patient,'REQ',0)).toThrow();
+ const index={patientId:patient,process:'REQ',query:'Caderno',page:0,pageSize:25,total:1,canReport:true,data:[{id,patientId:patient,process:'REQ',recordedAt:value.recordedAt,description:'Fato preservado',reference:null,state:'recorded'}]};
+ expect(parseContingencyCases(index,patient,'REQ',0,'Caderno').data[0].id).toBe(id);
+ expect(()=>parseContingencyCases(index,patient,'REQ',0,'Prontuário')).toThrow();
+ expect(()=>parseContingencyCases({...index,data:[]},patient,'REQ',0,'Caderno')).toThrow();
 });

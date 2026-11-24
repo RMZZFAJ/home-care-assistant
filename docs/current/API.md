@@ -1471,11 +1471,14 @@ reconsulta sem comandos.
 GET /api/contingencies exige careRecipientId e process, com filtros únicos e
 sessão/vínculo local vigentes. Processos: REQ, COM, ENT, RETURN, BAL,
 CONSUMPTION_FAMILY e CONSUMPTION_TEAM. A competência contingency.read e a
-leitura do domínio são revalidadas no banco. view=cases lista páginas de25;
-id consulta a declaração e seus atos imutáveis. view=references recebe
-query/page e consulta somente referências emitidas do mesmo paciente e
-processo, separando entrega e devolução. Respostas são privadas/no-store;
-identidade global sem vínculo local não concede acesso.
+leitura do domínio são revalidadas no banco. `view=cases` entrega páginas
+de 25 resumos. O filtro `query` pesquisa identificador do dossiê,
+referência física, descrição, complementos e código digital vinculado
+antes de paginar. A resposta identifica o filtro e o escopo consultados.
+Com `id`, a consulta traz os fatos, os atos imutáveis e as evidências
+confirmadas daquele dossiê. `view=references` pesquisa referências
+emitidas do mesmo paciente e processo e distingue entrega de devolução.
+As respostas usam `private, no-store`. A leitura depende do vínculo local.
 
 POST recebe expectedActorId, careRecipientId, process, idempotencyKey e
 action. A API compara a conta esperada com Auth antes da RPC. record recebe

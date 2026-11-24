@@ -1,1 +1,42 @@
 .hca-contingency,.hca-contingency-facts,.hca-contingency-rows{display:grid;gap:20px;min-width:0}.hca-contingency article,.hca-contingency>section{min-width:0}.hca-contingency .hca-toolbar{align-items:end}.hca-contingency-facts>p{margin:0}.hca-contingency-rows .ui-card{display:grid;gap:14px}.hca-contingency-rows h3{margin:0}@media(max-width:850px){.hca-contingency .hca-toolbar>.hca-field{width:100%}}
+.hca-contingency-content { display: grid; align-content: start; gap: 16px; min-width: 0; }
+.hca-contingency-content h2 { font-size: 15px; font-weight: 700; }
+.hca-contingency-patient { color: var(--hca-muted); margin: 5px 0 0; font-size: 13px; }
+.hca-contingency-intro { display: grid; gap: 16px; }
+.hca-contingency-list.ui-card { padding: 0 16px 16px; }
+.hca-contingency-list > .hca-section-heading {
+  padding: 10px 16px;
+  margin-inline: -16px;
+  border-radius: 14px 14px 0 0;
+  border-bottom: 1px solid var(--hca-line);
+  background: #f8fbf9;
+}
+.hca-contingency-list > .hca-section-heading h2 { margin: 0; }
+.hca-contingency-lead { display: flex; gap: 12px; align-items: flex-start; }
+.hca-contingency-lead p, .hca-contingency-empty p { color: var(--hca-muted); font-size: 13px; }
+.hca-contingency-search { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 8px; margin: 16px 0 8px; }
+.hca-contingency-empty { display: grid; justify-items: center; text-align: center; padding: 20px 8px; }
+.hca-contingency-pages { justify-content: space-between; }
+.hca-contingency-dossier-navigation { background: var(--hca-paper); border-bottom: 1px solid var(--hca-line); }
+.hca-contingency-state { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; padding: 12px 18px 8px; }
+.hca-contingency-state > span:last-child { color: var(--hca-muted); font-size: 12px; }
+.hca-contingency-dossier .hca-modal-context-head h2 { overflow-wrap: anywhere; }
+.hca-contingency-dossier-navigation .hca-document-tab-list { position: static; margin: 0; padding-inline: 12px; }
+.hca-contingency-view [role="tabpanel"]:not([hidden]) { display: grid; gap: 12px; min-width: 0; }
+.hca-contingency-view :is(p, h3) { margin: 0; }
+.hca-contingency-view .hca-contingency-lead h3 { font-weight: 650; }
+.hca-contingency-view .hca-contingency-technical-id { color: var(--hca-muted); font-size: 12px; }
+.hca-contingency-material { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--hca-line); }
+.hca-contingency-linked { display: grid; gap: 8px; margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--hca-line); }
+.hca-contingency-linked > a { justify-self: start; }
+.hca-contingency > .hca-guide-actions { justify-content: space-between; }
+.hca-contingency > .hca-guide-actions > button { flex: 0 1 auto; }
+
+@media (max-width: 850px) {
+  .hca-drawer-viewport > .hca-contingency-dossier.hca-guide-topic-sheet { max-height: min(92dvh, 740px); }
+  .hca-contingency-dossier .hca-modal-footer:has(> .hca-control--primary:nth-child(3)) {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .hca-contingency-dossier .hca-modal-footer > .hca-control--primary:nth-child(3) { grid-column: 1 / -1; }
+}

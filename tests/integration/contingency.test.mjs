@@ -51,13 +51,21 @@ test('context revoked membership process permissions and remote-style service cr
  const service=createClient(env.url,env.serviceKey,{auth:{persistSession:false}});assert.equal((await service.rpc('contingency_cases',{p_patient:f.patient,p_process:'REQ'})).error?.code,'42501');
 });
 test('references are patient and process scoped and paginated without inferring family science',async()=>{
- const f=await setup(),req=await issue(f.patient,f.products),family=await actor('family',f.patient),created=await recordContingency(family,f.patient),admin=await actor('adminA',f.patient),refs=await rpc(admin,'contingency_references',{p_patient:f.patient,p_process:'REQ'});
+ const f=await setup(),req=await issue(f.patient,f.products),family=await actor('family',f.patient),created=await recordContingency(family,f.patient,'REQ',contingencyBody({knownReference:'Caderno % de intercorrências'})),admin=await actor('adminA',f.patient),refs=await rpc(admin,'contingency_references',{p_patient:f.patient,p_process:'REQ'});
  assert.ok(refs.data.some(x=>x.id===req.id));assert.equal(refs.patientId,f.patient);assert.equal(refs.process,'REQ');
  const another=await setup(),foreign=await issue(another.patient,another.products);await actor('adminA',f.patient);
  assert.equal((await admin.rpc('contingency_command',decision(f.patient,created.caseId,'link_existing',{reason:'Referência de outro paciente deve ser recusada',targetId:foreign.id}))).error?.code,'42501');
  for(let i=0;i<26;i++)await recordContingency(admin,f.patient);
  const first=await rpc(admin,'contingency_cases',{p_patient:f.patient,p_process:'REQ',p_page:0}),next=await rpc(admin,'contingency_cases',{p_patient:f.patient,p_process:'REQ',p_page:1});
  assert.equal(first.total,27);assert.equal(first.data.length,25);assert.equal(next.data.length,2);assert.equal(new Set([...first.data,...next.data].map(x=>x.id)).size,27);
+ assert.ok(!first.data.some(row=>row.id===created.caseId));
+ const index={p_patient:f.patient,p_process:'REQ',p_query:' CADERNO % ',p_page:0};
+ const search=await rpc(admin,'contingency_case_index',index);
+ assert.equal(search.query,'CADERNO %');assert.equal(search.total,1);assert.deepEqual(search.data.map(row=>row.id),[created.caseId]);
+ assert.deepEqual(Object.keys(search.data[0]).sort(),['description','id','patientId','process','recordedAt','reference','state']);
+ assert.equal((await rpc(admin,'contingency_case_index',{...index,p_process:'ENT'})).total,0);
+ assert.equal((await admin.rpc('contingency_case_index',{...index,p_patient:another.patient})).error?.code,'42501');
+ assert.equal((await admin.rpc('contingency_case_dossier',{p_patient:f.patient,p_process:'ENT',p_id:created.caseId})).error?.code,'42501');
 });
 test('case-locked evidence reuses actual Storage attestation recovery and immutable hash selection at reconciliation',async()=>{
  const f=await setup(),req=await issue(f.patient,f.products),pro=await actor('professional',f.patient),created=await recordContingency(pro,f.patient),bytes=await sharp({create:{width:16,height:16,channels:3,background:'white'}}).jpeg().toBuffer(),hash=createHash('sha256').update(bytes).digest('hex'),key=randomUUID(),worker=createClient(env.url,env.serviceKey,{auth:{persistSession:false}});
@@ -69,7 +77,10 @@ test('case-locked evidence reuses actual Storage attestation recovery and immuta
  const token=randomUUID();await rpc(pro,'begin_attachment_upload',{p_id:a.id,p_source_hash:hash,p_hash:hash,p_token:token});assert.ifError((await pro.storage.from('patient-evidence').upload(a.object_path,bytes,{contentType:'image/jpeg',upsert:false})).error);
  await rpc(worker,'settle_attachment_upload',{p_id:a.id,p_actor:fixtures.professional.id,p_token:token,p_outcome:'stored'});await rpc(worker,'finalize_attachment',{p_id:a.id,p_actor:fixtures.professional.id,p_hash:hash,p_mime:'image/jpeg',p_bytes:bytes.length,p_valid:true});await rpc(pro,'bind_validated_attachment',{p_id:a.id});
  const files=await rpc(pro,'contingency_attachment_attempts',{p_patient:f.patient,p_contingency:created.caseId,p_key:key});assert.equal(files.length,1);assert.equal(files[0].sourceSha256,hash);assert.equal(files[0].state,'ready');assert.ifError((await pro.storage.from('patient-evidence').download(a.object_path)).error);
- const before=state(f.patient);await rpc(family,'contingency_command',packet);const d=await detail(family,f.patient,created.caseId);assert.deepEqual(d.events[0].body.evidence,[{id:a.id,sha256:hash}]);assert.equal(state(f.patient),before);await rpc(worker,'finalize_attachment',{p_id:a.id,p_actor:fixtures.professional.id,p_hash:hash,p_mime:'image/jpeg',p_bytes:bytes.length,p_valid:true});await rpc(pro,'bind_validated_attachment',{p_id:a.id});
+ const before=state(f.patient);await rpc(family,'contingency_command',packet);const d=await detail(family,f.patient,created.caseId);assert.deepEqual(d.events[0].body.evidence,[{id:a.id,sha256:hash}]);assert.equal(state(f.patient),before);
+ const dossier=await rpc(family,'contingency_case_dossier',{p_patient:f.patient,p_process:'REQ',p_id:created.caseId});
+ assert.deepEqual(dossier.evidence.map(file=>[file.id,file.filename]),[[a.id,'registro-fisico-ficticio.jpg']]);assert.match(dossier.evidence[0].confirmedAt,/T/);
+ await rpc(worker,'finalize_attachment',{p_id:a.id,p_actor:fixtures.professional.id,p_hash:hash,p_mime:'image/jpeg',p_bytes:bytes.length,p_valid:true});await rpc(pro,'bind_validated_attachment',{p_id:a.id});
  assert.equal((await pro.rpc('prepare_contingency_attachment_attempt',{...args,p_key:randomUUID()})).error?.code,'PT409');
  sql("update public.care_recipient_memberships set status='revoked' where care_recipient_id="+q(f.patient)+" and user_id="+q(fixtures.professional.id));assert.ok((await pro.storage.from('patient-evidence').download(a.object_path)).error);
 });

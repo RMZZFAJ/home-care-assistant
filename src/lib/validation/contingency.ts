@@ -26,5 +26,29 @@ export function parseContingencyReceipt(value:unknown,scope:{patientId:string;pr
 export const storedContingencyContent=z.object({...contingencyContent.shape,materials:z.array(contingencyContent.shape.materials.element.omit({reviewedUnit:true,reviewedDecimals:true}).extend({productName:z.string().nullable(),unit:z.string().nullable(),decimals:z.number().int().nullable()}))});
 export const contingencyCase=z.object({id:z.uuid(),patientId:z.uuid(),process:contingencyProcess,content:storedContingencyContent,actorId:z.uuid(),actorName:z.string(),actorRole:z.string(),recordedAt:instant,revision:z.number().int().positive(),state:z.enum(['recorded','needs_clarification','linked']),canReport:z.boolean(),canReview:z.boolean(),events:z.array(z.object({id:z.uuid(),sequence:z.number().int().positive(),action:z.enum(['supplement','needs_clarification','link_existing']),body:z.record(z.string(),z.unknown()),actorId:z.uuid(),actorName:z.string(),actorRole:z.string(),recordedAt:instant}))});
 export type ContingencyCase=z.infer<typeof contingencyCase>;
-export const contingencyQuery=z.object({careRecipientId:common.careRecipientId,process:contingencyProcess,view:z.enum(['cases','references','recovery']).default('cases'),id:z.uuid().optional(),page:z.coerce.number().int().min(0).max(100000).default(0),query:z.string().max(200).default(''),attemptKey:z.uuid().optional()}).strict();
-export function parseContingencyCases(value:unknown,patient:string,process:string,page:number){const r=z.object({patientId:z.uuid(),process:contingencyProcess,page:z.number().int(),pageSize:z.literal(25),total:z.number().int().nonnegative(),canReport:z.boolean(),data:z.array(contingencyCase)}).safeParse(value);if(!r.success||r.data.patientId!==patient||r.data.process!==process||r.data.page!==page||r.data.data.some(c=>c.patientId!==patient||c.process!==process)||new Set(r.data.data.map(c=>c.id)).size!==r.data.data.length||r.data.data.length!==Math.min(25,Math.max(0,r.data.total-page*25)))throw new Error('A consulta não corresponde às contingências deste paciente. Atualize a seção.');return r.data;}
+export const contingencyDossier=contingencyCase.extend({
+  evidence:z.array(z.object({id:z.uuid(),filename:z.string(),confirmedAt:instant.nullable()}).strict()),
+});
+export type ContingencyDossier=z.infer<typeof contingencyDossier>;
+export const contingencyQuery=z.object({careRecipientId:common.careRecipientId,process:contingencyProcess,view:z.enum(['cases','references','recovery']).default('cases'),id:z.uuid().transform(v=>v.toLowerCase()).optional(),page:z.coerce.number().int().min(0).max(100000).default(0),query:z.string().trim().max(200).default(''),attemptKey:z.uuid().optional()}).strict();
+
+const caseIndexRow = contingencyCase.pick({ id:true, patientId:true, process:true, recordedAt:true, state:true }).extend({
+  reference: z.string().nullable(), description: z.string().min(1).refine(value => Array.from(value).length <= 240),
+}).strict();
+const caseIndex = z.object({
+  patientId: z.uuid(), process: contingencyProcess, query: z.string(), page: z.number().int(), pageSize: z.literal(25),
+  total: z.number().int().nonnegative(), canReport: z.boolean(), data: z.array(caseIndexRow),
+}).strict();
+
+export function parseContingencyCases(value: unknown, patient: string, process: string, page: number, query = '') {
+  const result = caseIndex.safeParse(value);
+  if (!result.success) throw new Error('A consulta não corresponde às contingências deste paciente. Atualize a seção.');
+  const {data} = result;
+  if (data.patientId !== patient || data.process !== process || data.page !== page || data.query !== query
+    || data.data.some(row => row.patientId !== patient || row.process !== process)
+    || new Set(data.data.map(row => row.id)).size !== data.data.length
+    || data.data.length !== Math.min(data.pageSize, Math.max(0, data.total - page * data.pageSize))) {
+    throw new Error('A consulta não corresponde às contingências deste paciente. Atualize a seção.');
+  }
+  return data;
+}

@@ -68,8 +68,8 @@ function PreparationTasks({ context }: { context: WorkspaceContext }) {
   }
 
   useOperationActivity(read.loading, { title: "Consultando a preparação", detail: "Conferindo os registros disponíveis para este vínculo." });
-  return <div className="hca-local-preparation hca-guide-page">
-    <div className="hca-preparation-content">
+  return <div className="hca-local-preparation hca-guide-page hca-docked-page">
+    <div className="hca-preparation-content hca-docked-content">
       <section className="ui-card hca-guide-card hca-preparation-intro">
         <div className="hca-preparation-lead">
           <span className="hca-guide-row-icon"><Icon name="home" /></span>
