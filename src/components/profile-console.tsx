@@ -155,7 +155,7 @@ function ProfileContent({ patientSelected }: { patientSelected: boolean }) {
                 ) : null}
               </SettingsSection>
             </> : null,
-            security: profile ? <>
+            security: active => profile ? <>
               {profile.providers.includes("email") ? (
                 <SettingsSection title="Alterar senha" summary="Proteja seu acesso com autenticação recente">
 
@@ -185,12 +185,10 @@ function ProfileContent({ patientSelected }: { patientSelected: boolean }) {
                 </Notice>
               )}
               <MfaSettings />
-              <div id="contatos-de-acesso"><ContactSettings
-                email={profile.email}
-                phone={profile.phone}
-                providers={profile.providers}
-                onChange={() => setAttempt((value) => value + 1)}
-              /></div>
+              <div id="contatos-de-acesso"><SettingsSection title="Métodos de acesso"><ContactSettings profile={profile} active={active} onChange={() => {
+                window.dispatchEvent(new Event("hca:profile-updated"));
+                setAttempt(value => value + 1);
+              }} /></SettingsSection></div>
               <SettingsSection title="Sessões autenticadas" summary="Dispositivos e acessos vinculados à sua conta">
 
                 <ul className="mt-4 space-y-3">

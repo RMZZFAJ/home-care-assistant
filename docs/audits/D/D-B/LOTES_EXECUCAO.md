@@ -4002,9 +4002,8 @@ confirmação de uma concessão antiga com o efeito exibido no histórico.
   detalhes copiáveis se a falha persistir. Uma seleção antiga encontra a foto
   vigente e mostra o conflito. A associação confirmada continua sendo sucesso
   quando a limpeza de arquivos anteriores fica pendente.
-- A apresentação do início abre pela seção **Acesso e apresentação**. O atalho
-  de contatos leva aos controles existentes em Segurança enquanto o painel
-  próprio de E11-02 está pendente.
+- A apresentação do início e os contatos abrem pela seção
+  **Acesso e apresentação**.
 
 O laboratório v2 foi conferido em 360 e 412 px. As capturas do produto e a
 auditoria em 320 px identificaram um e-mail longo que ultrapassava o cartão.
@@ -4014,6 +4013,33 @@ cobriram a confirmação de um salvamento cuja resposta foi perdida, o conflito
 por edição concorrente, o bloqueio após revogação real e a preservação da
 edição durante a recuperação de uma falha de leitura. Esta etapa usa as APIs
 e o esquema existentes.
+
+### E11-02 — Contatos e métodos de acesso
+
+**Contatos de acesso** abre o mesmo painel em Minha conta e Segurança.
+O endereço confirmado aparece ao lado da solicitação pendente que o Auth
+devolve. O telefone só ganha o estado confirmado depois da verificação e
+da associação do número à conta. A consulta de disponibilidade do SMS não
+envia código. A tentativa de vincular Google passa pelo provedor configurado
+e retorna à entrada da aplicação para respeitar a verificação adicional.
+
+Em sessão antiga, o diálogo confirma a senha da conta elegível. A sessão
+nova mantém o contexto validado no banco. Quando há fator verificado ou a
+conta depende de provedor externo, a interface encaminha para a entrada
+completa. Senha e código ficam nos controles temporários da aba durante o
+preenchimento. Uma resposta perdida de contato pode ser conferida até duas
+vezes pelo estado do Auth. A recuperação do telefone confere a confirmação
+do número no Auth e conclui a associação quando ela ainda estiver pendente.
+
+O laboratório foi comparado em 360 e 412 px. A integração usa o Auth
+existente. Quatro casos em Android e iOS emulados passaram sem retentativa.
+Eles verificaram senha incorreta e correta em sessão antiga, preservação do
+vínculo, resposta perdida recuperada sem reenvio, os dois links de e-mail
+capturados no serviço local e os estados reais de Google e SMS desligados.
+O primeiro link preservou o endereço atual e o segundo ativou o novo.
+Cadastro, aceite e recuperação de senha também passaram nos dois projetos.
+SMS e OAuth habilitados precisam de teste com os provedores configurados.
+Esta etapa não tem migration.
 
 ### E11-04 — Autorização dos avisos ao consultar e abrir
 
@@ -4586,8 +4612,7 @@ e consumo. O aceite integrado continua sujeito à CI do candidato e à
 validação no Preview. As migrations locais aguardam a transição do banco
 compartilhado com a produção.
 Os cenários restantes de E10 ainda precisam de conferência de paridade
-com a v2. A revisão de E11-02 e E11-03 ainda deve comparar os contatos, a
-disponibilidade do Google, a apresentação do MFA e as sessões com o laboratório.
+com a v2. E11-03 ainda precisa alinhar senha, MFA e sessões ao laboratório.
 
 ### Pendências da CI publicada em `a08742dc`
 
@@ -4646,3 +4671,26 @@ impediria o vínculo de referências pela versão atual de produção.
 
 [preview-e7be6b72]: https://home-care-assistant-gxfff9eet-rmzzfajs-projects.vercel.app
 [ci-e7be6b72]: https://github.com/RMZZFAJ/home-care-assistant/actions/runs/45396260206
+
+### Publicação em draft de `d4a53e44`
+
+Os três commits publicados incluem a instalação e atualização da aba, a
+identificação e a foto da conta e os ajustes aos testes de diretório e
+arquivamento. O Preview ficou `READY`. Login, runtime, manifesto,
+service worker e página offline responderam HTTP 200. A central de avisos
+recusou a consulta sem sessão. A validação dos fluxos autenticados de L4 no
+Preview segue dependente do esquema pendente no Supabase.
+
+SonarCloud e as checagens em Linux e Windows passaram. CodeRabbit voltou
+a pular a revisão incremental. A integração de banco registrou 893
+sucessos e duas falhas antes dos navegadores. A criação de residência
+retornou timeout `57014` no lugar da negativa de autorização esperada.
+O teste de retirada da permissão de encerrar uma COM não conseguiu
+observar a espera no bloqueio de estoque. As duas regressões passaram
+isoladamente na stack local, com as mesmas asserções de autorização e
+rollback. A execução completa na CI continua pendente de investigação.
+
+[Preview de d4a53e44][preview-d4a53e44] · [CI de d4a53e44][ci-d4a53e44]
+
+[preview-d4a53e44]: https://home-care-assistant-1b1tmx7gp-rmzzfajs-projects.vercel.app
+[ci-d4a53e44]: https://github.com/RMZZFAJ/home-care-assistant/actions/runs/45413280504

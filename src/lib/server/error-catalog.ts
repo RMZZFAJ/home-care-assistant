@@ -101,6 +101,12 @@ export const errorCatalog = {
     retryable: false,
     recommendedAction: "Entre novamente com sua conta.",
   },
+  RECENT_SESSION_REQUIRED: {
+    category: "authentication",
+    status: 403,
+    retryable: false,
+    recommendedAction: "Confirme novamente que é você.",
+  },
   FORBIDDEN: {
     category: "authorization",
     status: 403,

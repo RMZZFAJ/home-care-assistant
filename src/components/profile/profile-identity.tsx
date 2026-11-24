@@ -3,12 +3,14 @@
 import { useId, useRef, useState, type FormEvent } from "react";
 import { useSearchParams } from "next/navigation";
 import { useWorkspaceState } from "@/components/layout/workspace-context";
-import { ActionButton, ActionLink, DefinitionGrid, FormField, TextInput } from "@/components/ui/controls";
+import { ActionButton, DefinitionGrid, FormField, TextInput } from "@/components/ui/controls";
+import { ContactSettings } from "@/components/auth/contact-settings";
 import { Icon } from "@/components/ui/icon";
 import { useOperationActivity } from "@/components/ui/operation-activity";
 import { Dialog } from "@/components/ui/overlays";
 import { DocumentOperationFailureDialog, operationRecoveryLimit, type DocumentOperationFailure } from "@/components/documents/document-operation-failure-dialog";
 import { usePwa } from "@/components/pwa/pwa-provider";
+import { contactReviewParam } from "@/lib/auth/contact";
 import { api, ApiError } from "@/lib/client/api";
 import { parseProfileRead, type ProfileRead } from "@/lib/validation/profile";
 import { AvatarSettings } from "./avatar-settings";
@@ -27,8 +29,7 @@ export function ProfileIdentity({ active, profile, onChange }: { active: boolean
   const { blocked: runtimeBlocked } = usePwa();
   const { value, error: accessError, selecting } = useWorkspaceState();
   const blocked = runtimeBlocked || Boolean(accessError) || !value || selecting;
-  const params = new URLSearchParams(useSearchParams());
-  params.set("profileTab", "security");
+  const openContacts = useSearchParams().get(contactReviewParam) === "1";
   const formId = useId(), stateId = useId();
   const editRef = useRef<HTMLButtonElement>(null), nameRef = useRef<HTMLInputElement>(null);
   const [draft, setDraft] = useState<Fields | null>(null), [error, setError] = useState("");
@@ -127,9 +128,7 @@ export function ProfileIdentity({ active, profile, onChange }: { active: boolean
     <section className="hca-account-section" aria-label="Acesso e apresentação">
       <header><h2>Acesso e apresentação</h2></header>
       <div className="hca-account-links">
-        <ActionLink href={`/perfil?${params.toString()}#contatos-de-acesso`} className="hca-account-setting">
-          <Icon name="user" /><span><strong>Contatos de acesso</strong><small>{profile.email}</small></span><Icon name="chevron" />
-        </ActionLink>
+        <ContactSettings profile={profile} active={active} onChange={onChange} openOnEntry={openContacts} />
         <PresentationPreference active={active} />
       </div>
     </section>

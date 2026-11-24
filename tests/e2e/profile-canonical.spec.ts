@@ -8,6 +8,7 @@ import { shiftWorker } from "../integration/shift-fixtures.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { sql, sqlLiteral as q } from "../../scripts/test-environment.mjs";
 import { selectContext } from "./auth-context";
+import { confirmationLink } from "./local-mail";
 import { openProfileIdentity, profileIdentityEditor, selectProfileSection } from "./profile-sections";
 import { auditFromTop } from "./accessibility-audit";
 
@@ -46,6 +47,116 @@ async function captureProfileReference(browser: Browser, info: TestInfo) {
 }
 
 test.setTimeout(180_000);
+
+async function openContacts(page: import("@playwright/test").Page, patient: string, email: string) {
+  await page.goto("/login");
+  await page.getByLabel("E-mail", { exact: true }).fill(email);
+  await page.getByLabel("Senha", { exact: true }).fill(fixturePassword);
+  await page.getByRole("button", { name: "Entrar", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Visão geral", exact: true })).toBeVisible();
+  await selectContext(page, patient);
+  await page.goto(`/perfil?careRecipientId=${patient}`);
+  await page.getByRole("button", { name: /^Contatos de acesso/ }).click();
+  return page.getByRole("dialog", { name: "Contatos de acesso", exact: true });
+}
+
+test("E11-02 confirma sessão recente e recupera pedido real de e-mail sem reenviar", async ({ page }) => {
+  const f = await setup(), account = await shiftWorker(f.patient, "family");
+  const contacts = await openContacts(page, f.patient, account.email);
+  const before = await (await page.request.get("/api/profile")).json();
+  const sid = before.sessions.find((session: { current: boolean }) => session.current)?.id;
+  expect(sid).toBeTruthy();
+  sql(`update auth.sessions set created_at = now() - interval '20 minutes' where user_id=${q(account.id)} and id=${q(sid)};`);
+  await contacts.getByRole("button", { name: "Alterar e-mail", exact: true }).click();
+  const email = page.getByRole("dialog", { name: "Alterar e-mail", exact: true });
+  const pending = `contato-${randomUUID()}@example.invalid`;
+  await email.getByRole("textbox", { name: "Novo e-mail", exact: true }).fill(pending);
+  await email.getByRole("button", { name: "Solicitar alteração", exact: true }).click();
+  const recent = page.getByRole("dialog", { name: "Confirme que é você", exact: true });
+  const currentPassword = recent.getByLabel(/Senha atual/);
+  await currentPassword.fill("Senha incorreta 77!");
+  await recent.getByRole("button", { name: "Confirmar sessão", exact: true }).click();
+  await expect(recent.getByText(/Não foi possível confirmar a senha atual/)).toBeVisible();
+  await expect(currentPassword).toHaveValue("");
+  expect((await (await page.request.get("/api/profile")).json()).data.contactStatus).toMatchObject({ recent: false, pendingEmail: null });
+  await currentPassword.fill(fixturePassword);
+  await recent.getByRole("button", { name: "Confirmar sessão", exact: true }).click();
+  await expect(email.getByRole("textbox", { name: "Novo e-mail", exact: true })).toHaveValue(pending);
+  const after = await (await page.request.get("/api/context")).json();
+  expect(after.data.activeContext.care_recipient_id).toBe(f.patient);
+
+  let emailPosts = 0;
+  await page.route("**/api/profile", async route => {
+    if (route.request().method() !== "POST" || route.request().postDataJSON().action !== "email") return route.continue();
+    emailPosts += 1;
+    expect((await route.fetch()).ok()).toBe(true);
+    await route.abort("failed");
+  });
+  await email.getByRole("button", { name: "Solicitar alteração", exact: true }).click();
+  const uncertain = page.getByRole("dialog", { name: "Não foi possível concluir", exact: true });
+  await uncertain.getByRole("button", { name: "Conferir resultado", exact: true }).click();
+  const success = page.getByRole("dialog", { name: "Confirmação solicitada", exact: true });
+  await success.getByRole("button", { name: "Concluir", exact: true }).click();
+  await expect(contacts.getByText(pending, { exact: true })).toBeVisible();
+  expect(emailPosts).toBe(1);
+  await page.reload();
+  await page.getByRole("button", { name: /^Contatos de acesso/ }).click();
+  await expect(contacts.getByText(account.email, { exact: true })).toBeVisible();
+  await expect(contacts.getByText(pending, { exact: true })).toBeVisible();
+  const accountState = (await (await page.request.get("/api/profile")).json()).data;
+  expect(accountState.email).toBe(account.email);
+  expect(accountState.contactStatus).toMatchObject({ recent: true, pendingEmail: pending });
+  await page.goto(await confirmationLink(page, account.email, "Confirm your new email address"));
+  await expect(page).toHaveURL(/\/perfil\?contatos=1/);
+  await expect(contacts.getByText(account.email, { exact: true })).toBeVisible();
+  await expect(contacts.getByText(pending, { exact: true })).toBeVisible();
+
+  await page.goto(await confirmationLink(page, pending, "Confirm your new email address"));
+  await expect(page).toHaveURL(/\/perfil\?contatos=1/);
+  await expect(contacts.getByText(pending, { exact: true })).toBeVisible();
+  await expect(contacts.getByText("Confirme seu novo e-mail", { exact: true })).toHaveCount(0);
+  const confirmed = (await (await page.request.get("/api/profile")).json()).data;
+  expect(confirmed.email).toBe(pending);
+  expect(confirmed.contactStatus).toMatchObject({ emailConfirmed: true, pendingEmail: null });
+});
+
+test("E11-02 distingue Google desligado e SMS indisponível sem iniciar envio", async ({ page }, info) => {
+  const f = await setup(), account = await shiftWorker(f.patient, "family");
+  const writes: string[] = [];
+  page.on("request", request => {
+    if (request.method() === "POST" && new URL(request.url()).pathname === "/api/profile")
+      writes.push(request.postDataJSON().action);
+  });
+  const contacts = await openContacts(page, f.patient, account.email);
+  await expect(contacts.getByRole("button", { name: /Conta Google .*Indisponível/ })).toBeVisible();
+  await contacts.getByRole("button", { name: /Conta Google/ }).click();
+  const google = page.getByRole("dialog", { name: "Acesso Google indisponível", exact: true });
+  await expect(google.getByText(/Em breve/)).toBeVisible();
+  await google.getByRole("button", { name: "Voltar", exact: true }).click();
+  await contacts.getByRole("button", { name: "Alterar telefone", exact: true }).click();
+  const sms = page.getByRole("dialog", { name: "Não foi possível enviar o SMS", exact: true });
+  await expect(sms.getByText(/Seu telefone atual continua válido/)).toBeVisible();
+  await sms.getByRole("button", { name: "Conferir disponibilidade", exact: true }).click();
+  await expect(sms).toBeVisible();
+  await sms.getByRole("button", { name: "Voltar", exact: true }).click();
+  await expect(contacts.getByText("SMS indisponível neste momento", { exact: true })).toBeVisible();
+  await expect(contacts.getByRole("textbox", { name: "Código de confirmação", exact: true })).toHaveCount(0);
+  expect(writes).toEqual([]);
+  const contact = (await (await page.request.get("/api/profile")).json()).data;
+  expect(contact.phone).toBeNull();
+  expect(contact.contactStatus.pendingPhone).toBeNull();
+  const provider = await page.request.post("/api/profile", { data: { action: "prepareLink" } });
+  expect(provider.status()).toBe(503);
+  expect((await provider.json()).code).toBe("NOT_CONFIGURED");
+  for (const width of [360, 412]) {
+    await page.setViewportSize({ width, height: 844 });
+    await expect(contacts).toBeVisible();
+    const box = await contacts.boundingBox();
+    expect(box && box.x + box.width).toBeLessThanOrEqual(width);
+    await info.attach(`e11-contatos-${width}`, { body: await page.screenshot(), contentType: "image/png" });
+  }
+});
+
 test("L4 canais descartam edição concorrente e conferem uma tentativa no máximo duas vezes", async ({ page, browser }, info) => {
   const f = await setup(), account = await shiftWorker(f.patient, "family");
   await page.goto("/login");

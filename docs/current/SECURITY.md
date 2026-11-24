@@ -163,6 +163,15 @@ exigem autenticação recente. Telefone usado em aceite WhatsApp deriva do
 telefone confirmado no Auth. Dados de perfil ou do navegador não comprovam
 posse de telefone. Tokens já emitidos expiram conforme a política do Auth.
 
+O diálogo de sessão recente usa a senha somente em contas com acesso por
+e-mail e senha sem fator adicional verificado. Em contas com MFA ou provedor
+externo, o fluxo retorna à entrada pelo método da conta. O servidor só
+adota a nova sessão após validar a identidade e reaplicar o contexto
+autorizado. O fluxo de contato exige confirmação do Auth e recusa enviar
+pedidos de e-mail ou SMS quando a configuração permitir confirmação
+automática. O Google depende tanto da configuração do aplicativo como da
+habilitação do provedor.
+
 A política de novas senhas respeita o limite do bcrypt configurado no Auth,
 inclusive tamanho em bytes; o aplicativo não calcula hashes de credenciais.
 A referência é o

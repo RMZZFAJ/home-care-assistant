@@ -456,7 +456,14 @@ documentais também exigem expectedVersion para detectar concorrência.
 - **Rota:** /api/profile
 
   **Contrato:** Perfil, foto, contatos e sessões. Atualizar dados pessoais
-  preserva os canais quando a carga omite `preferences`.
+  preserva os canais quando a carga omite `preferences`. A leitura retorna
+  em `contactStatus` a confirmação do e-mail, os contatos pendentes e o estado
+  da autenticação recente. O e-mail e o telefone vigentes ficam em `data`.
+  GET com `contactAvailability=sms` consulta a configuração de confirmação
+  por SMS sem enviar código. POST `confirmSession` confirma a senha para uma
+  conta elegível e revalida o vínculo da sessão com o banco. POST
+  `confirmPhone` confere um número já confirmado pelo Auth e atualiza sua
+  associação na conta sem solicitar SMS nem repetir o código.
 
 - **Rota:** /api/profile/notices
 
