@@ -3,6 +3,13 @@ import type { WorkspaceContext } from "@/types/workspace";
 export function can(context: WorkspaceContext, capability: string) {
   return context.patient?.capabilities?.[capability] === true;
 }
+
+export function canReportConsumption(context: WorkspaceContext, custody: "FAMILY" | "CARE_TEAM") {
+  return custody === "FAMILY"
+    ? context.patient?.canReportFamilyConsumption === true
+    : can(context, "consumption.report") && can(context, "stock.team.read");
+}
+
 export function may(
   context: WorkspaceContext,
   operation: "request" | "manage" | "manageStock" | "countStock",

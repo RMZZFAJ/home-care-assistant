@@ -57,8 +57,7 @@ export function BalanceFollowUp({ context }: { context: WorkspaceContext; }) {
   const resultRef = useRef<HTMLHeadingElement>(null);
   const formatBrazilDate = (value: string | null) =>
     formatZonedDate(value, data?.regime?.timezone);
-  const family = ["family", "admin"].includes(patient.role),
-    approve = family && can(context, "bal.defer.approve"),
+  const approve = can(context, "bal.defer.approve"),
     configure = canManageBalanceRegime(context);
   const requestedDeferral = params.get("purpose") === "request_deferral";
   useEffect(() => {
@@ -171,6 +170,7 @@ export function BalanceFollowUp({ context }: { context: WorkspaceContext; }) {
   const canRequest =
     can(context, "bal.defer.request") &&
     (a?.professional_id === context.userId || patient.role === "supervisor");
+  const canDeferDirectly = approve && a?.professional_id !== context.userId;
   const countAction = a && (available || admission) ? (
     <Link href={balanceCountHref(patient.id, documentId, a)} className="ui-button ui-button-primary" prefetch={false}>
       <Icon name="checklist" width={17} height={17} />{admission ? "Continuar contagem" : "Fazer balanço"}
@@ -203,9 +203,9 @@ export function BalanceFollowUp({ context }: { context: WorkspaceContext; }) {
             primary={countAction}>
             {deferral ? (
               <a className="ui-button ui-button-secondary" href={"#adiamento-" + deferral.id}>Ver pedido de adiamento</a>
-            ) : approve || canRequest ? (
-              <ActionButton onClick={event => open({ kind: "defer", family: approve }, event.currentTarget)}>
-                {approve ? "Adiar com decisão familiar" : "Solicitar adiamento"}
+            ) : canDeferDirectly || canRequest ? (
+              <ActionButton onClick={event => open({ kind: "defer", family: canDeferDirectly }, event.currentTarget)}>
+                {canDeferDirectly ? "Adiar com decisão familiar" : "Solicitar adiamento"}
               </ActionButton>
             ) : null}
           </BalancePreviewCard>

@@ -3,6 +3,7 @@ import { z } from "zod";
 const appliedPermission = z.object({
   actorId: z.uuid(), actorName: z.string().optional(), personId: z.uuid().nullable(),
   role: z.string(), capability: z.string(), before: z.boolean(), after: z.boolean(),
+  familyReportingBefore: z.boolean().optional(), familyReportingAfter: z.boolean().optional(),
 });
 
 const changeSchema = z.object({

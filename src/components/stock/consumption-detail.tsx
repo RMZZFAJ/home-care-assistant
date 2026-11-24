@@ -17,6 +17,7 @@ import {
   type WorkspaceContext,
 } from "@/components/workspace";
 import { useLiveRevision } from "@/lib/use-live-revision";
+import { canReportConsumption } from "@/lib/client/capabilities";
 import { formatBrazilDate } from "@/lib/receipt";
 import { formatQuantity } from "@/lib/quantity";
 import type { CatalogProduct } from "@/types/documents";
@@ -161,12 +162,10 @@ export function ConsumptionDetail({
     data &&
     !reading &&
     !error &&
-    can(context, "consumption.report") &&
-    (data.location !== "FAMILY" ||
-      ["admin", "family"].includes(context.patient!.role));
+    canReportConsumption(context, data.location);
   const followUp = data ? consumptionFollowUp(data) : null;
   const legacy = data?.workflow_mode === "legacy" || data?.workflow_mode === undefined;
-  const mayWriteTeam = context.patient?.is_active !== false && can(context, "consumption.team.write");
+  const mayWriteTeam = context.patient?.is_active !== false && can(context, "consumption.team.write") && can(context, "stock.team.read");
   const mayWrite = Boolean(data && !reading && !error && mayWriteTeam);
   const canAmend = mayWrite && data?.status === "recorded" && (data.reported_by === context.userId || can(context, "consumption.team.correct"));
   const progressType = data?.kind === "shortage" ? "FAL" : "CON";

@@ -22,6 +22,7 @@ import {
   DraftContentSummary,
 } from "@/components/forms/creation-draft-panel";
 import { useCreationDraft } from "@/components/forms/use-creation-draft";
+import { canReportConsumption } from "@/lib/client/capabilities";
 import { navigationForStep } from "@/lib/forms/draft-navigation";
 import { consumptionCommand } from "@/lib/validation/consumption";
 import { validQuantity } from "@/lib/quantity";
@@ -163,7 +164,7 @@ export function ConsumptionPreparation({
             ? "stock.family.manage"
             : "consumption.confirm",
         )
-      : can(context, "consumption.report"));
+      : canReportConsumption(context, fields.location));
   const protectedView =
     sourceDenied ||
     draft.loading ||
@@ -642,10 +643,10 @@ export function ConsumptionPreparation({
             }}
           >
             <option value="">Escolha a custódia</option>
-            {can(context, "stock.team.read") ? (
+            {canReportConsumption(context, "CARE_TEAM") ? (
               <option value="CARE_TEAM">Equipe</option>
             ) : null}
-            {can(context, "stock.family.read") ? (
+            {canReportConsumption(context, "FAMILY") ? (
               <option value="FAMILY">Família</option>
             ) : null}
           </SelectField>

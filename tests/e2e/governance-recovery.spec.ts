@@ -1,7 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 import { randomUUID } from "node:crypto";
 import { mkdirSync } from "node:fs";
-import { actor, fixtures, rpc, setup } from "../integration/v4-fixtures.mjs";
+import { actor, fixtures, rpc, setup, adjustCapability } from "../integration/v4-fixtures.mjs";
 import { sql, sqlLiteral } from "../../scripts/test-environment.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { selectContext } from "./auth-context";
@@ -60,6 +60,32 @@ async function widths(page: Page, label: string) {
     await audit(page, `${label} ${width}`);
   }
 }
+
+test("L4 diferencia a autorização da custódia familiar de uma permissão antiga de relato", async ({ page }) => {
+  const f = await setup();
+  await adjustCapability(f.admin, f.patient, { capability: "stock.family.read", subjectRole: "professional", enabled: true });
+  // This row represents a saved team reporting grant from before the scope was explicit.
+  sql(`insert into public.capability_overrides(care_recipient_id, capability, subject_user, enabled)
+    values (${sqlLiteral(f.patient)}, 'consumption.report', ${sqlLiteral(fixtures.professional.id)}, true);`);
+  await login(page, "adminA", f.patient);
+  await page.goto("/configuracoes?area=permissions&careRecipientId=" + f.patient);
+  const matrix = page.getByRole("region", { name: "Matriz de permissões", exact: true });
+  await matrix.getByLabel("Visualizar permissões", { exact: true }).selectOption(fixtures.professional.id);
+  await matrix.getByRole("button", { name: /^Relatar faltas e consumo/ }).click();
+  const edit = page.getByRole("dialog", { name: "Relatar faltas e consumo", exact: true });
+  await expect(edit.getByLabel("Exceção pessoal", { exact: true })).toHaveValue("true");
+  await edit.getByRole("button", { name: "Revisar alteração", exact: true }).click();
+  const review = page.getByRole("dialog", { name: "Permitir além da função?", exact: true });
+  await expect(review).toContainText("poderá relatar faltas e consumo da família");
+  await review.getByRole("checkbox", { name: "Confirmo a ampliação deste acesso", exact: true }).check();
+  const commit = page.waitForResponse(response =>
+    response.request().method() === "POST" && new URL(response.url()).pathname === "/api/patient-settings");
+  await review.getByRole("button", { name: "Confirmar ampliação", exact: true }).click();
+  expect((await commit).status()).toBe(200);
+  await expect(review).toHaveCount(0);
+  await matrix.getByRole("link", { name: /^Histórico de permissões/ }).click();
+  await expect(page.getByText(/Relatos da família restritos → permitidos/)).toBeVisible();
+});
 
 test("D3 proposta administrativa recupera a mesma intenção e ambas as entradas recusam rebase ou conteúdo alterado", async ({ page }, info) => {
   const f = await setup();

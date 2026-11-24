@@ -9,8 +9,7 @@ import { BalanceWorkspacePreparation } from "./balance-workspace-preparation";
 import { useBalanceWorkspace } from "./use-balance-workspace";
 
 export function canManageBalanceRegime(context: WorkspaceContext) {
-  const role = context.patient?.role;
-  return (role === "family" || role === "admin") && can(context, "bal.schedule.manage");
+  return can(context, "bal.schedule.manage");
 }
 
 export function BalanceRegimeSettings({ context, patientId }: { context: WorkspaceContext; patientId: string }) {

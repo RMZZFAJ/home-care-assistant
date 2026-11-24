@@ -138,7 +138,8 @@ function Reports({ context }: { context: WorkspaceContext }) {
   const failure = current?.failure;
   const showFailure = Boolean(listContext && !showingActivity && failure?.interactive && failure !== dismissed);
   const filterFormId = useId();
-  const mayRecordTeam = can(context, "consumption.team.write") && context.patient?.is_active !== false;
+  const mayRecordTeam = can(context, "consumption.team.write") && can(context, "stock.team.read") &&
+    context.patient?.is_active !== false;
   const mayReadStock = can(context, "stock.family.read") || can(context, "stock.team.read");
   const mayOpenLegacy = mayReadStock || can(context, "consumption.report");
   const hasFilters = filterKeys.some(key => Boolean(fields[key]));

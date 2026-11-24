@@ -110,6 +110,13 @@ e contexto local. A aplicação impede autoelevação, preserva um administrador
 local com poderes efetivos e registra a mudança anterior e posterior.
 Decisões independentes e atribuições físicas preservam seus próprios requisitos.
 
+A exceção de contagem vale para BAL facultativo. Na programação vigente,
+contar continua exigindo plantão válido e atribuição da própria pessoa.
+O autor do pedido de adiamento depende de decisão de outra pessoa.
+No consumo, leitura coletiva do estoque familiar não autoriza relato nessa
+custódia fora das funções de família e administração. A exceção exige
+confirmação individual no relato e leitura vigente da custódia familiar.
+
 Ledger e eventos confirmados são imutáveis para clientes. Saldo vem de
 movimentos transacionais não negativos. SHA-256 compara conteúdo canônico;
 não é assinatura assimétrica nem proteção contra administradores do banco.

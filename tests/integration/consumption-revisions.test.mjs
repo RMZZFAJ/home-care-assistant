@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { randomUUID } from "node:crypto";
-import { setup, actor, rpc, fixtures, env } from "./v4-fixtures.mjs";
+import { setup, actor, rpc, fixtures, env, adjustCapability } from "./v4-fixtures.mjs";
 import { sql, sqlLiteral } from "../../scripts/test-environment.mjs";
 import { whileAdvisoryWaits, whileRowWaits } from "./lock-barrier.mjs";
 
@@ -192,6 +192,46 @@ test("professional author can clarify their own team report without changing the
   });
   assert.equal(forbidden.error?.code, "42501");
   assert.equal(row(familyId).version, 1);
+});
+
+test("family reporting needs confirmed individual scope in addition to reading family stock", async () => {
+  const f = await setup();
+  const professional = await actor("professional", f.patient);
+  const stock = ledger(f.patient);
+  const current = async () => (await rpc(professional, "my_workspace")).patients
+    .find(patient => patient.id === f.patient);
+  const body = {
+    p_patient: f.patient, p_kind: "shortage", p_location: "FAMILY",
+    p_text: "Relato da falta informado pela família.", p_lines: [],
+  };
+  const send = () => professional.rpc("report_extraordinary_consumption", { ...body, p_key: randomUUID() });
+  await adjustCapability(f.admin, f.patient, { capability: "stock.family.read", subjectRole: "professional", enabled: true });
+  const visible = await current();
+  assert.equal(visible.capabilities["stock.family.read"], true);
+  assert.equal(visible.capabilities["consumption.report"], true);
+  assert.equal(visible.canReportFamilyConsumption, false);
+  assert.equal((await send()).error?.code, "42501");
+  const subject = { capability: "consumption.report", subjectUser: fixtures.professional.id, reviewedRole: "professional" };
+  await assert.rejects(adjustCapability(f.admin, f.patient, { ...subject, enabled: true }),
+    /individual access confirmation required/);
+  const grant = await adjustCapability(f.admin, f.patient, { ...subject, enabled: true, confirmIndividual: true });
+  assert.equal(grant.resolution.permission.familyReportingBefore, false);
+  assert.equal(grant.resolution.permission.familyReportingAfter, true);
+  assert.equal((await current()).canReportFamilyConsumption, true);
+  const report = await send();
+  assert.ifError(report.error);
+  assert.equal(row(report.data).reported_by, fixtures.professional.id);
+  const saved = await supplement({ ...f, id: report.data }, professional, "A família confirmou a falta no armário.");
+  assert.equal(saved.version, 2);
+  const withdrawn = await adjustCapability(f.admin, f.patient, { ...subject, enabled: null });
+  assert.equal(withdrawn.resolution.permission.familyReportingBefore, true);
+  assert.equal(withdrawn.resolution.permission.familyReportingAfter, false);
+  assert.equal((await current()).canReportFamilyConsumption, false);
+  assert.equal((await send()).error?.code, "42501");
+  await adjustCapability(f.admin, f.patient, { ...subject, capability: "access.manage", enabled: true, confirmIndividual: true });
+  await assert.rejects(adjustCapability(professional, f.patient, { ...subject, enabled: true, confirmIndividual: true }),
+    /self elevation is unavailable/);
+  assert.equal(ledger(f.patient), stock);
 });
 
 test("opposing concurrent consumption decisions keep one first decision and at most one debit", async () => {

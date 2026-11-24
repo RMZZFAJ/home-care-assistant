@@ -3,7 +3,7 @@ import { test, expect, type Page } from "@playwright/test";
 import { mkdirSync, readFileSync } from "node:fs";
 import { fixtureFile } from "../../scripts/test-environment.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
-import { setup, rpc } from "../integration/v4-fixtures.mjs";
+import { setup, rpc, fixtures, adjustCapability } from "../integration/v4-fixtures.mjs";
 import {
   balanceSetup,
   dayOffset,
@@ -119,6 +119,27 @@ async function capture(page: Page, name: string, operational = false) {
     await frame();
   }
 }
+
+test("L4 mostra a nova contagem facultativa somente enquanto a pessoa tem a permissão", async ({ page }) => {
+  const f = await setup();
+  await login(page, fixtures.reader.email, f.patient);
+  const url = "/balancos?careRecipientId=" + f.patient;
+  await page.goto(url);
+  const create = page.getByRole("link", { name: "Nova contagem", exact: true });
+  await expect(page.getByText("Não há contagem pendente neste momento.", { exact: true })).toBeVisible();
+  await expect(create).toHaveCount(0);
+  const subject = { capability: "bal.count", subjectUser: fixtures.reader.id, reviewedRole: "reader" };
+  await adjustCapability(f.admin, f.patient, { ...subject, enabled: true, confirmIndividual: true });
+  await page.reload();
+  await expect(create).toBeVisible();
+  await create.click();
+  await expect(page).toHaveURL(/\/fichas\/bal/);
+  await expect(page.getByRole("navigation", { name: "Etapas da ficha", exact: true })).toBeVisible();
+  await adjustCapability(f.admin, f.patient, { ...subject, enabled: null });
+  await page.goto(url);
+  await expect(page.getByText("Não há contagem pendente neste momento.", { exact: true })).toBeVisible();
+  await expect(create).toHaveCount(0);
+});
 
 test("BAL por plantão: ativação local, cinco etapas, referência, resposta perdida e documento real", async ({
   page,

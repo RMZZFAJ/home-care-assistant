@@ -6,7 +6,7 @@ import {
 } from "@playwright/test";
 import { readFileSync, mkdirSync } from "node:fs";
 import { randomUUID } from "node:crypto";
-import { setup, actor, rpc, fixtures } from "../integration/v4-fixtures.mjs";
+import { setup, actor, rpc, fixtures, adjustCapability } from "../integration/v4-fixtures.mjs";
 import { shiftWorker } from "../integration/shift-fixtures.mjs";
 import {
   fixtureFile,
@@ -35,6 +35,48 @@ async function login(
 }
 const detail = (page: Page) =>
   page.locator('section[aria-label="Detalhe do relato"]');
+
+test("L4 habilita relato na custódia familiar apenas com a concessão individual", async ({ page }) => {
+  const f = await setup();
+  await adjustCapability(f.admin, f.patient, { capability: "stock.family.read", subjectRole: "professional", enabled: true });
+  await login(page, f.patient, "professional");
+  const url = "/consumo?careRecipientId=" + f.patient;
+  await page.goto(url);
+  const drawer = page.getByRole("dialog", { name: "Registrar relato", exact: true });
+  const custody = drawer.getByRole("combobox", { name: "Custódia", exact: true });
+  const open = async () => {
+    await page.getByRole("button", { name: "Mais opções de consumo", exact: true }).click();
+    await page.getByRole("menuitem", { name: "Relatos anteriores", exact: true }).click();
+    await expect(custody).toBeVisible();
+  };
+  await open();
+  await expect(custody.locator('option[value="FAMILY"]')).toHaveCount(0);
+  const text = "A família comunicou a falta de material.";
+  const denied = () => page.request.post("/api/consumption", { data: {
+    action: "report", careRecipientId: f.patient, kind: "shortage", location: "FAMILY", text,
+    idempotencyKey: randomUUID(), lines: [],
+  } });
+  expect((await denied()).status()).toBe(403);
+
+  const subject = { capability: "consumption.report", subjectUser: fixtures.professional.id, reviewedRole: "professional" };
+  await adjustCapability(f.admin, f.patient, { ...subject, enabled: true, confirmIndividual: true });
+  await page.reload();
+  await open();
+  await custody.selectOption("FAMILY");
+  await drawer.getByRole("combobox", { name: "Tipo", exact: true }).selectOption("shortage");
+  await drawer.getByLabel("O que aconteceu?", { exact: true }).fill(text);
+  await drawer.getByRole("button", { name: "Revisar relato", exact: true }).click();
+  const commit = page.waitForResponse(response =>
+    response.request().method() === "POST" && new URL(response.url()).pathname === "/api/consumption/preparations/commit");
+  await drawer.getByRole("button", { name: "Registrar relato sem desconto", exact: true }).click();
+  expect((await commit).status()).toBe(200);
+  await expect(drawer).toHaveCount(0);
+  await adjustCapability(f.admin, f.patient, { ...subject, enabled: null });
+  await page.goto(url);
+  await open();
+  await expect(custody.locator('option[value="FAMILY"]')).toHaveCount(0);
+  expect((await denied()).status()).toBe(403);
+});
 
 async function prepareDecision(dialog: Locator) {
   await dialog

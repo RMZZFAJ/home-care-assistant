@@ -69,6 +69,9 @@ export function GovernanceProposals({ context, directory, version, revision, bus
             {" "}Aplicada por {applied.actorName ?? directory.find(person => person.id === applied.actorId)?.name ?? (applied.actorId === change.proposed_by ? change.proposerName : "identidade histórica")}
             {" "}em <time dateTime={change.decided_at}>{formatBrazilDate(change.decided_at)}</time>.
           </p>}
+          {applied?.familyReportingBefore !== undefined && applied.familyReportingAfter !== undefined && <p>
+            Relatos da família {applied.familyReportingBefore ? "permitidos" : "restritos"} → {applied.familyReportingAfter ? "permitidos" : "restritos"}.
+          </p>}
           <p>Versão de origem: {change.base_version}. Configuração vigente: {version}.</p>
           {change.base_version !== version && change.status === "pending" ? <Notice error>A configuração mudou após esta proposta. Preserve a proposta original e prepare outra após revisar a configuração vigente.</Notice> : null}
           <details><summary className="cursor-pointer font-semibold">Comparar configuração vigente e proposta</summary>

@@ -3933,6 +3933,7 @@ comparações das superfícies com os dados e contratos reais.
 | `20261124083708_l4_person_permission_snapshot` | Aplicada | Pendente |
 | `20261124091649_l4_personal_permission_exceptions` | Aplicada | Pendente |
 | `20261124092143` — consumidores operacionais | Aplicada | Pendente |
+| `20261124093850` — balanço e consumo | Aplicada | Pendente |
 
 Os nove casos de integração de governança passaram no Supabase local. O
 caso novo comparou todas as capacidades da pessoa às usadas pelo banco e
@@ -3959,6 +3960,31 @@ sem retentativa e verificou a marcação explícita e o histórico exibido.
 O build, o lint dos arquivos alterados e o contrato das 84 migrations
 históricas passaram. O Advisor local apontou somente a extensão
 `unaccent` no esquema público, já existente antes desta rodada.
+
+Em Balanço, a concessão individual permite emitir contagem facultativa.
+O regime programado exige plantão válido, prazo, versão e atribuição da
+própria pessoa. O revisor delegado pode decidir o adiamento de outra pessoa;
+o autor do pedido segue sujeito à revisão independente. Programação,
+projeções e controles de decisão usam as capacidades vigentes.
+
+Em Consumo, a leitura coletiva de estoque familiar preserva somente a
+visibilidade. Para relatar nessa custódia fora das funções de família e
+administração, a pessoa precisa da confirmação individual em
+`consumption.report` e de leitura vigente do estoque familiar. A interface
+segue o alcance devolvido pelo banco. O histórico distingue o efeito nessa
+custódia da capacidade geral, que pode manter relatos na equipe. A baixa
+de consumo de L3 e a correção exigem as capacidades próprias, leitura da
+equipe e referência autorizada. Um relato de falta preserva o ledger.
+
+Os oito casos dirigidos com Auth real passaram, incluindo contagem
+facultativa, tentativa fora da atribuição, adiamento por outra pessoa,
+perda de permissão, relato familiar, registro e correção de consumo da
+equipe e vínculo da sugestão do WhatsApp à própria baixa de L3.
+Após explicitar o efeito na custódia no histórico, três casos de integração
+passaram novamente, incluindo a recusa de autoelevação. Os três testes no
+Android emulado passaram sem retentativa. Eles conferiram a entrada da
+contagem facultativa, a opção de custódia na criação de um relato e a
+confirmação de uma concessão antiga com o efeito exibido no histórico.
 
 ### E12-01 — Guias e ajuda na tarefa
 
@@ -4310,12 +4336,11 @@ passaram no Chromium após esse ajuste, sem retentativa.
 
 ### Pendências para o aceite de L4
 
-E10-04 ainda exige a conferência de balanço e consumo com concessão,
-revogação e condições específicas de cada operação. A conferência de
-chegadas COM, a regularização ENT, o estoque familiar e a administração de
-acesso pessoal já têm exercícios dirigidos com Auth real. As migrations
-locais continuam pendentes no banco compartilhado e o Preview publicado
-ainda serve o commit anterior.
+E10-04 tem exercícios dirigidos com Auth real em conferência de chegadas
+COM, regularização ENT, estoque familiar, administração de acesso, balanço
+e consumo. O aceite integrado continua sujeito à CI do candidato e à
+validação no Preview. As migrations locais aguardam a transição do banco
+compartilhado com a produção.
 Os demais cenários de E10 e E11 ainda precisam de conferência de paridade
 com a v2. Os testes de E12 não comprovam esse aceite.
 

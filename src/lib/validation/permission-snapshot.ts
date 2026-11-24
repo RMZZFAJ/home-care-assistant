@@ -7,6 +7,7 @@ const permission = z.object({
   effective: z.boolean(),
   inherited: z.boolean(),
   exception: z.boolean().nullable(),
+  familyReportingConfirmed: z.boolean().optional(),
   origin: z.enum(["default", "profile", "personal", "limited"]),
 }).strict();
 

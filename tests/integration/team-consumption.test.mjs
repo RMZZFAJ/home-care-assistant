@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
 import test from "node:test";
-import { actor, fixtures, issue, rpc, setup } from "./v4-fixtures.mjs";
+import { actor, fixtures, issue, rpc, setup, adjustCapability } from "./v4-fixtures.mjs";
 import { personalReminderFixture, reminderState, shiftReminder } from "./notice-reference-fixtures.mjs";
 import { seedFlowSuggestion } from "./flow-preparation-fixtures.mjs";
 import { sql, sqlLiteral as q } from "../../scripts/test-environment.mjs";
@@ -44,6 +44,37 @@ async function teamFixture(t) {
   const lines = values => f.products.map((productId, i) => ({ productId, quantity: String(values[i]) }));
   return { ...f, professional, command, args, reference, correctionReference, quantities, lines };
 }
+
+test("a reader may record and correct team consumption only with the relevant individual grants", async t => {
+  const f = await teamFixture(t);
+  const reader = await actor("reader", f.patient);
+  const facts = { p_patient: f.patient, p_products: f.products };
+  const change = (capability, enabled) => adjustCapability(f.admin, f.patient, {
+    capability, enabled, subjectUser: fixtures.reader.id, reviewedRole: "reader",
+    ...(enabled ? { confirmIndividual: true } : {}),
+  });
+  assert.equal((await reader.rpc("team_consumption_reference", facts)).error?.code, "42501");
+  const issueBody = { action: "issue", lines: f.lines([1, 1]) };
+  const original = await f.command(issueBody);
+  const initialStock = await f.quantities();
+  await change("consumption.team.write", true);
+  const reference = await rpc(reader, "team_consumption_reference", facts);
+  const receipt = await rpc(reader, "submit_team_consumption", f.args(issueBody, randomUUID(), reference.referenceHash));
+  assert.equal((await rpc(reader, "consumption_record_detail", { p_id: receipt.id })).reported_by, fixtures.reader.id);
+  const correct = { action: "correct", reportId: original.id, expectedVersion: original.version,
+    reason: "A conferência apurou uma unidade adicional.", lines: f.lines([2, 1]) };
+  const target = { ...facts, p_report: original.id };
+  assert.equal((await reader.rpc("team_consumption_correction_reference", target)).error?.code, "42501");
+  await change("consumption.team.correct", true);
+  const review = await rpc(reader, "team_consumption_correction_reference", target);
+  const result = await rpc(reader, "submit_team_consumption", f.args(correct, randomUUID(), review.referenceHash));
+  assert.equal(result.version, 2);
+  assert.deepEqual(await f.quantities(), initialStock.map((item, index) => ({ ...item, team: item.team - (index === 0 ? 2 : 1) })));
+  await change("consumption.team.correct", null);
+  assert.equal((await reader.rpc("team_consumption_correction_reference", target)).error?.code, "42501");
+  await change("consumption.team.write", null);
+  assert.equal((await reader.rpc("team_consumption_reference", facts)).error?.code, "42501");
+});
 
 test("a WhatsApp suggestion is linked atomically to one reviewed team debit", async t => {
   const f = await teamFixture(t);

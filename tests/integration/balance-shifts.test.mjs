@@ -1,11 +1,81 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
-import { actor, env, rpc, setup } from "./v4-fixtures.mjs";
+import { actor, env, rpc, setup, fixtures, adjustCapability } from "./v4-fixtures.mjs";
 import { sql, sqlLiteral } from "../../scripts/test-environment.mjs";
 import { balanceSetup, balanceCommand, shiftWorker, shiftCommand, dayOffset } from "./shift-fixtures.mjs";
 import { saveResource, resourcePacket } from "./schedule-resource-fixtures.mjs";
 const workspace = (client, patient) => rpc(client, "balance_workspace", { p_patient: patient });
+const readerCount = (admin, patient, enabled) => adjustCapability(admin, patient, {
+  capability: "bal.count", subjectUser: fixtures.reader.id, reviewedRole: "reader", enabled,
+  ...(enabled ? { confirmIndividual: true } : {}),
+});
+
+test("a personal count grant can issue an optional BAL and still requires an assigned shift in a scheduled regime", async () => {
+  const f = await setup();
+  const reader = await actor("reader", f.patient);
+  const args = {
+    p_patient: f.patient, p_type: "BAL", p_draft: false,
+    p_payload: { lines: f.products.map(productId => ({ productId, quantity: "0" })) },
+  };
+  const issue = () => reader.rpc("create_supply_document", { ...args, p_key: randomUUID() });
+  assert.equal((await issue()).error?.code, "42501");
+  await readerCount(f.admin, f.patient, true);
+  const issued = await issue();
+  assert.ifError(issued.error);
+  assert.equal(issued.data.created_by, fixtures.reader.id);
+  await readerCount(f.admin, f.patient, null);
+  assert.equal((await issue()).error?.code, "42501");
+
+  const scheduled = await balanceSetup();
+  const scheduledReader = await actor("reader", scheduled.patient);
+  await readerCount(scheduled.admin, scheduled.patient, true);
+  const own = await workspace(scheduledReader, scheduled.patient);
+  const actual = await workspace(scheduled.pro.client, scheduled.patient);
+  const assignment = actual.eligibility.assignment;
+  assert.equal(own.eligibility.available, false);
+  assert.equal((await scheduledReader.rpc("create_supply_document", {
+    ...args, p_patient: scheduled.patient, p_key: randomUUID(),
+    p_payload: {
+      lines: scheduled.products.map(productId => ({ productId, quantity: "0" })),
+      balanceAssignment: { id: assignment.id, version: assignment.version, referenceRevision: actual.referenceRevision },
+    },
+  })).error?.code, "42501");
+  assert.equal((await workspace(scheduled.pro.client, scheduled.patient)).eligibility.available, true);
+});
+
+test("a delegated BAL reviewer can decide a request from another person and cannot decide their own", async () => {
+  const { patient, admin, pro } = await balanceSetup();
+  const supervisor = await shiftWorker(patient, "supervisor");
+  const before = await workspace(pro.client, patient), assignment = before.eligibility.assignment;
+  const target = before.targets.find(shift => shift.starts_at >= assignment.ends_at);
+  const requested = { assignmentId: assignment.id, targetShiftId: target.id, reason: "Conferência do horário da equipe." };
+  const request = await balanceCommand(pro.client, patient, "request_deferral", requested, assignment.version);
+  const adjust = (subjectUser, reviewedRole, enabled) => adjustCapability(admin, patient, {
+    capability: "bal.defer.approve", subjectUser, reviewedRole, enabled,
+    ...(enabled ? { confirmIndividual: true } : {}),
+  });
+  await adjust(pro.id, "professional", true);
+  await adjust(supervisor.id, "supervisor", true);
+  const body = { id: request.id, approve: true, reason: "O plantão de destino foi confirmado." };
+  const decide = client => client.rpc("balance_command", {
+    p_patient: patient, p_action: "decide_deferral", p_body: body, p_key: randomUUID(), p_version: assignment.version,
+  });
+  assert.equal((await decide(pro.client)).error?.code, "42501");
+  const self = await workspace(pro.client, patient);
+  assert.equal(self.deferrals.find(entry => entry.id === request.id).decisionContext.canReject, false);
+  assert.equal((await pro.client.rpc("balance_command", {
+    p_patient: patient, p_action: "defer", p_body: requested, p_key: randomUUID(), p_version: assignment.version,
+  })).error?.code, "42501");
+  await adjust(supervisor.id, "supervisor", null);
+  assert.equal((await decide(supervisor.client)).error?.code, "42501");
+  await adjust(supervisor.id, "supervisor", true);
+  const accepted = await decide(supervisor.client);
+  assert.ifError(accepted.error);
+  assert.equal(accepted.data.decided_by, supervisor.id);
+  assert.equal((await workspace(pro.client, patient)).eligibility.assignment.shift_id, target.id);
+});
+
 test("BAL is opt-in and all count entrypoints enforce actual designated shift and idempotency", async () => {
   const legacy = await setup();
   assert.equal((await workspace(legacy.admin, legacy.patient)).enabled, false);

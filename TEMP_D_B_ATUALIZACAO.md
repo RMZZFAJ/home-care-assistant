@@ -8,8 +8,9 @@ histórico dos incrementos de D-B.
 usam todas as capacidades vigentes. A lista pessoal identifica a origem no
 banco. A revisão exige confirmação para ampliar o acesso ou alterar
 `access.manage`. O Supabase local registra o efeito e o histórico e aplica
-a decisão à administração da residência e à conferência de chegadas COM.
-A cobertura dos demais consumidores de autorização continua em E10-04.
+a decisão à administração da residência, a compras, regularização, estoque,
+balanço e consumo. As contraprovas locais verificaram a preservação de
+plantão, custódia e revisão independente.
 [Registro de L4](docs/audits/D/D-B/LOTES_EXECUCAO.md#e10-04--matriz-de-perfis-e-consulta-individual).
 
 **24/11 — Central técnica.** Incidentes e política consultam versões reais e

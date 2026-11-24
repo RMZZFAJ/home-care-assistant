@@ -109,17 +109,16 @@ export function BalanceWorkspacePreparation({
   const content = { values, referenceHash: reference.referenceHash, referenceVersion: reference.referenceVersion };
   const saved = { values: initialValues, ...initialReference };
   const dirty = JSON.stringify(content) !== JSON.stringify(saved);
-  const family = ["family", "admin"].includes(patient.role),
-    allowDeferral = family && can(context, "bal.defer.approve");
+  const assignment = source?.workspace.assignments.find(a => a.id === targetResourceId);
+  const allowDeferral = can(context, "bal.defer.approve");
   const canWrite =
     purpose === "configure" || purpose === "assign"
-      ? family && can(context, "bal.schedule.manage")
+      ? can(context, "bal.schedule.manage")
       : purpose === "request_deferral"
         ? can(context, "bal.defer.request") &&
-          (source?.workspace.assignments.find((a) => a.id === targetResourceId)
-            ?.professional_id === context.userId ||
+          (assignment?.professional_id === context.userId ||
             patient.role === "supervisor")
-        : allowDeferral;
+        : allowDeferral && (purpose !== "defer" || assignment?.professional_id !== context.userId);
   const protectedView =
     referenceForbidden;
   const deferralCommand = review?.command.action === "request_deferral" || review?.command.action === "defer"

@@ -22,6 +22,7 @@ type Member = { id: string; name: string; role: string };
 type Edit = {
   code: string; scope: "person" | "role"; id: string; name: string; critical: boolean;
   editable: boolean; inherited: boolean; current: boolean | null; version: number; opener: HTMLElement; personRole?: string;
+  familyReportingConfirmed?: boolean;
 };
 const groups: Record<string, string> = {
   req: "Requisições", com: "Compras", ent: "Entregas", bal: "Balanços", stock: "Estoques", schedule: "Escalas",
@@ -71,7 +72,8 @@ export function PermissionMatrix({ patientId, patientName, version, revision, gl
   function openPerson(row: PersonalPermission, opener: HTMLElement) {
     if (!person || !snapshot) return;
     setEdit({ code: row.code, scope: "person", id: person.id, name: person.name, critical: row.critical || row.code === "access.manage",
-      editable: true, inherited: row.inherited, current: row.exception, version: snapshot.policyVersion, opener, personRole: snapshot.role });
+      editable: true, inherited: row.inherited, current: row.exception, version: snapshot.policyVersion, opener,
+      personRole: snapshot.role, familyReportingConfirmed: row.familyReportingConfirmed });
   }
 
   return <section aria-label="Matriz de permissões" className="hca-permission-page hca-form">
@@ -162,15 +164,17 @@ function PermissionEditor({ edit, patientName, version, globalMode, busy, config
   const [acknowledged, setAcknowledged] = useState(false);
   const next = value === "inherit" ? null : value === "true";
   const person = edit.scope === "person";
-  const beyond = person && next === true && !edit.inherited;
+  const familyConsumption = edit.code === "consumption.report" && !["admin", "family"].includes(edit.personRole ?? "");
+  const beyond = person && next === true && (!edit.inherited || familyConsumption);
   const managesAccess = person && edit.code === "access.manage";
   const requiresAcknowledgment = beyond || managesAccess;
+  const changed = next !== edit.current || (person && familyConsumption && next === true && !edit.familyReportingConfirmed);
   const stale = version > edit.version;
   const title = !edit.editable ? "Definir uma exceção individual" :
     review ? (beyond ? "Permitir além da função?" : edit.critical ? "Confirmar permissão crítica" : "Confirmar alteração de permissão") : label(edit.code);
 
   async function confirm() {
-    if (saving || busy || stale || requiresAcknowledgment && !acknowledged) return;
+    if (!changed || saving || busy || stale || requiresAcknowledgment && !acknowledged) return;
     setSaving(true);
     try {
       await configure({
@@ -183,7 +187,7 @@ function PermissionEditor({ edit, patientName, version, globalMode, busy, config
 
   return <Dialog open title={title} headingIcon="shield" keyboardScrollable onClose={close} closeDisabled={saving} finalFocus={() => edit.opener.isConnected ? edit.opener : false}
     footer={<><ActionButton disabled={saving} onClick={review && !stale ? () => { setReview(false); setAcknowledged(false); } : close}>{review && !stale ? "Voltar à alteração" : "Voltar"}</ActionButton>
-      {edit.editable ? <ActionButton variant="primary" disabled={busy || saving || stale || next === edit.current || review && requiresAcknowledgment && !acknowledged}
+      {edit.editable ? <ActionButton variant="primary" disabled={busy || saving || stale || !changed || review && requiresAcknowledgment && !acknowledged}
         onClick={review ? () => void confirm() : () => setReview(true)}>{review ? (globalMode ? "Registrar proposta" : beyond ? "Confirmar ampliação" : "Confirmar permissão") : "Revisar alteração"}</ActionButton> :
         !person && selected && <ActionButton variant="primary" onClick={() => viewPerson(selected)}>Conferir exceção pessoal</ActionButton>}
     </>}>
@@ -201,7 +205,9 @@ function PermissionEditor({ edit, patientName, version, globalMode, busy, config
         </FormField> : null}
       {review && !stale && requiresAcknowledgment && <>
         {beyond && <FeedbackBanner tone="warning" heading="Acesso fora do padrão">
-          <p>{edit.name} poderá exercer esta permissão além da configuração da função {roleLabel(edit.personRole).toLocaleLowerCase("pt-BR")}. A exceção se limita a esta pessoa nesta residência.</p>
+          <p>{familyConsumption
+            ? `${edit.name} poderá relatar faltas e consumo da família se também puder consultar o estoque familiar. A exceção se limita a esta pessoa nesta residência.`
+            : `${edit.name} poderá exercer esta permissão além da configuração da função ${roleLabel(edit.personRole).toLocaleLowerCase("pt-BR")}. A exceção se limita a esta pessoa nesta residência.`}</p>
         </FeedbackBanner>}
         {managesAccess && <p>{(next ?? edit.inherited)
           ? "Com este acesso, a pessoa pode gerir permissões e participantes e decidir propostas da residência."

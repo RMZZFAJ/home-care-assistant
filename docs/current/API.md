@@ -1060,6 +1060,12 @@ amplia o acesso herdado, ou altera `access.manage`, precisa de
 `confirmIndividual: true` e `reviewedRole` com a função conferida. A aplicação
 revalida versão, vínculo e função. O histórico guarda autor, alvo, capacidade
 e resultados efetivos anterior e posterior em `resolution.permission`.
+Para funções fora da família e da administração, a confirmação da exceção
+de `consumption.report` também é exigida quando a função já permite relatar
+na equipe. O relato na custódia familiar exige leitura do estoque familiar.
+`GET /api/context` projeta `canReportFamilyConsumption` no vínculo ativo.
+O histórico registra o resultado anterior e posterior desse acesso à
+custódia separadamente da capacidade geral de relatar.
 Propostas globais pelo alias /api/admin também exigem idempotencyKey e
 expectedVersion do cliente, preservados em cada reenvio. A rota não gera
 automaticamente outra chave nem busca uma versão nova para reaplicar o comando.
