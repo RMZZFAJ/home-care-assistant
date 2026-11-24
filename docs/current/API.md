@@ -1042,6 +1042,15 @@ busca referência/conteúdo no paciente autorizado. page inicia em1 e tem teto
 1000000; pageSize usa20 e aceita1–50. NULL explícito é inválido nas RPCs.
 Filtros precedem contagem/paginação, com ordem created_at/id determinística.
 
+Com `permissionPerson`, `GET /api/patient-settings` exige um único
+`careRecipientId` e um único `permissionPerson`. A resposta privada e sem cache
+contém pessoa, função, versão da política e todas as capacidades definidas.
+Cada linha indica resultado, herança do perfil e origem do cálculo vigente.
+A consulta exige administração local no paciente ou administração global ativa.
+A RPC `patient_permission_snapshot` revalida autoridade e vínculo atual.
+A decisão por capacidade continua dependente da sessão e do contexto de quem
+executa a operação.
+
 POST /api/patient-settings recebe careRecipientId, kind, change,
 idempotencyKey e expectedVersion; decisões incluem requestId e decision.
 Propostas globais pelo alias /api/admin também exigem idempotencyKey e

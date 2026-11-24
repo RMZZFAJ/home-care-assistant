@@ -10,5 +10,9 @@ export const capabilityLabels: Record<string,string> = {
 "bal.read":"Consultar BAL","bal.count":"Contar estoque da equipe","bal.approve.family":"Revisar BAL pelo grupo familiar","bal.approve.supervisor":"Revisar BAL pela supervisão",
 "stock.family.read":"Consultar estoque familiar","stock.family.manage":"Movimentar e corrigir estoque familiar","stock.team.read":"Consultar estoque da equipe",
 "catalog.manage":"Administrar catálogo e medidas","access.manage":"Administrar acessos do paciente","notifications.manage":"Configurar notificações","audit.read":"Consultar auditoria",
-"consumption.report":"Relatar faltas e consumo","consumption.confirm":"Confirmar consumo extraordinário"
+"consumption.report":"Relatar faltas e consumo","consumption.confirm":"Confirmar consumo extraordinário",
+"consumption.team.write":"Registrar consumo da equipe","consumption.team.correct":"Corrigir consumo da equipe",
+"contingency.read":"Consultar contingências","contingency.report":"Registrar contingência","contingency.review":"Revisar contingência",
+"req.science":"Registrar ciência da REQ","req.archive":"Arquivar e encerrar REQ",
+"ent.regularize":"Regularizar entrega administrativamente","ent.follow_up":"Acompanhar apuração de entrega"
 };

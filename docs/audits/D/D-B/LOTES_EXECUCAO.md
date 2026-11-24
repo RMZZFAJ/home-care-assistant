@@ -3902,6 +3902,41 @@ comparações das superfícies com os dados e contratos reais.
   limite de 100. A [CI do commit](https://github.com/RMZZFAJ/home-care-assistant/actions/runs/45320276465)
   estava em execução na conferência do Preview.
 
+### E10-04 — Matriz de perfis e consulta individual
+
+- A matriz usa todas as definições do banco, com busca, agrupamento e as
+  cinco colunas. O cabeçalho e a coluna de nomes ficam fixos na área de
+  rolagem da tabela. A visão individual usa lista compacta por área.
+- Cada linha pessoal mostra o resultado efetivo e a origem para o vínculo
+  real. A API exige paciente e pessoa explícitos, valida o resultado por
+  escopo e protege a resposta contra cache. A RPC usa o cálculo atual das
+  capacidades, com administração local ou global ativa e vínculo vigente.
+- As configurações admitidas pelo contrato atual abrem edição e revisão
+  antes do envio. O comando guarda a versão examinada. A consulta de
+  alterações leva à lista de propostas de governança filtrada por capacidade.
+- A próxima parte de E10-04 ainda precisa aplicar e auditar a ampliação
+  individual aprovada. A interface usa os limites atuais até a mudança
+  chegar ao cálculo, aos comandos e aos consumidores de autorização.
+
+| Migration | Supabase local | Supabase remoto |
+| --- | --- | --- |
+| `20261124083708_l4_person_permission_snapshot` | Aplicada | Pendente |
+
+Os nove casos de integração de governança passaram no Supabase local. O
+caso novo comparou todas as capacidades da pessoa às usadas pelo banco e
+conferiu origem, versão, papel, escopo, revogação e concessões de execução.
+O Supabase local registrou 367 migrations e o remoto registrou 362. O Advisor
+local não listou alertas ligados à leitura individual.
+
+A primeira rodada dirigida passou em seis testes de navegador. O caso de
+E10-04 comparou produto e laboratório em 360 e 412 px nos três navegadores.
+O fechamento da revisão preservou a política. A confirmação enviou a versão
+consultada e a leitura individual refletiu a configuração salva. As capturas
+revelaram sobreposição no ícone de pesquisa e diferença na ordem das áreas.
+Os dois ajustes passaram em Chromium, Android e iOS. As 48 definições
+atuais também foram conferidas contra os rótulos da v2, com nova execução
+dirigida no Chromium após completar os nove rótulos ausentes.
+
 ### E12-01 — Guias e ajuda na tarefa
 
 - Os assuntos são apresentados por função e abrem o painel de orientação
@@ -4197,7 +4232,8 @@ execuções dirigidas adicionais, sem retentativa. As duas novas RPCs só
 concedem execução ao papel autenticado e verificam o escopo global.
 O Advisor local não apontou alertas para essas funções.
 
-O Supabase local tem 366 migrations e o compartilhado tem 362. O Preview
+Ao fechar a Central técnica, o Supabase local registrou 366 migrations e o
+compartilhado registrou 362. O Preview
 publicado em `a08742dc` está `READY`, com variáveis de Supabase, PDF, Push
 e avisos cadastradas. A consulta a `/login` retornou 200 e a Central técnica
 exigiu autenticação (401). A produção em `fab595c7` usa o mesmo banco.
@@ -4251,8 +4287,8 @@ passaram no Chromium após esse ajuste, sem retentativa.
 
 ### Pendências para o aceite de L4
 
-A matriz vigente ainda desabilita `access.manage` na pessoa e bloqueia a
-concessão individual fora de `allowed_roles`, em conflito com E10-04.
+As alterações pessoais de `access.manage` e as concessões individuais fora
+de `allowed_roles` ainda estão bloqueadas, em conflito com E10-04.
 O banco ainda reserva `access.manage` ao papel de administrador e impede
 a alteração dessa capacidade. A entrega dessa decisão exige validar o
 cálculo de autorização e os consumidores de UI, API, RPC e RLS juntos.

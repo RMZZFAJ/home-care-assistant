@@ -206,10 +206,12 @@ test("administração usa listas, painéis de edição e confirmação crítica 
   const before = (await (await page.request.get("/api/patient-settings?careRecipientId=" + patientA)).json()).data.version;
   await page.getByRole("searchbox", { name: "Pesquisar permissões", exact: true }).fill("Movimentar e corrigir estoque familiar");
   await page.getByRole("button", { name: /Movimentar e corrigir estoque familiar · Profissional ·/ }).click();
-  await page.getByRole("menuitemradio", { name: "Permitir", exact: true }).click();
-  await expect(page.getByRole("dialog", { name: "Confirmar alteração crítica", exact: true })).toBeVisible();
+  await page.getByRole("combobox", { name: "Configuração deste perfil", exact: true }).selectOption("true");
+  await page.getByRole("button", { name: "Revisar alteração", exact: true }).click();
+  await expect(page.getByRole("dialog", { name: "Confirmar permissão crítica", exact: true })).toBeVisible();
   expect((await (await page.request.get("/api/patient-settings?careRecipientId=" + patientA)).json()).data.version).toBe(before);
-  await page.getByRole("button", { name: "Voltar", exact: true }).click();
+  await page.getByRole("button", { name: "Voltar à alteração", exact: true }).click();
+  await page.getByRole("dialog", { name: "Movimentar e corrigir estoque familiar", exact: true }).getByRole("button", { name: "Voltar", exact: true }).click();
   await capture(page, "permissoes-matriz", info.project.name);
   await page.getByRole("navigation", { name: "Áreas da configuração", exact: true }).getByRole("link", { name: "Notificações", exact: true }).click();
   await expect(page.getByRole("table", { name: "Canais por evento e função", exact: true })).toBeVisible();

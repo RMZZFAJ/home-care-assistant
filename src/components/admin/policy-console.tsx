@@ -71,9 +71,11 @@ const defaults: Record<string, unknown> = {
 export function PolicyConsole() {
   const params = useSearchParams();
   const scheduleArea = params.get("area") === "schedules";
+  const permissionArea = params.get("area") === "permissions";
   const day = params.get("day");
   return (
-    <Workspace title={scheduleArea ? "Configurações de plantões" : "Permissões, comunicação e regras"} administration>
+    <Workspace title={scheduleArea ? "Configurações de plantões" : permissionArea ? "Permissões" : "Permissões, comunicação e regras"}
+      eyebrow={permissionArea ? "Organização da residência" : undefined} administration>
       {(context) =>
         context.patient && scheduleArea ? (
           <div className="hca-form-stack">
@@ -214,6 +216,7 @@ function Policies({ context }: { context: WorkspaceContext }) {
     change: Record<string, unknown>,
     requestId?: string,
     decision?: string,
+    reviewedVersion?: number,
   ) {
     if (!data || savingRef.current || locked) return false;
     savingRef.current = true;
@@ -224,10 +227,10 @@ function Policies({ context }: { context: WorkspaceContext }) {
         kind,
         change,
         idempotencyKey: crypto.randomUUID(),
-        expectedVersion:
+        expectedVersion: reviewedVersion ?? (
           kind === "settings"
             ? (editingVersion ?? data.data.version)
-            : (currentVersionRef.current ?? data.data.version),
+            : (currentVersionRef.current ?? data.data.version)),
         ...(requestId ? { requestId, decision } : {}),
       });
       return await confirmed(result);
@@ -301,12 +304,12 @@ function Policies({ context }: { context: WorkspaceContext }) {
     : conflict ? <Notice error>Revise a configuração vigente antes de preparar outra intenção. <ActionButton disabled={busy} onClick={() => void reviewCurrent()}>Revisar configuração vigente</ActionButton></Notice> : null;
   return (
     <div className="space-y-5">
-      <p className="text-sm text-(--muted)">
+      {tab === "permissions" ? <p className="text-sm text-(--muted)">Perfis da residência e exceções de cada pessoa.</p> : <p className="text-sm text-(--muted)">
         {context.activeContext?.mode === "global"
           ? "Atuação global: mudanças neste paciente geram propostas para aprovação local."
           : "Atuação local: alterações autorizadas são aplicadas imediatamente."}{" "}
         · Política v{data.data.version}
-      </p>
+      </p>}
       {error ? <Notice error>{error}{!command.uncertain && !conflict ? <ActionButton onClick={() => { setError(""); setReadAttempt(value => value + 1); }}>Consultar configuração novamente</ActionButton> : null}</Notice> : null}
       {message ? <Notice>{message}</Notice> : null}
       {recovery}
@@ -329,11 +332,16 @@ function Policies({ context }: { context: WorkspaceContext }) {
       </div>
       {tab === "permissions" ? (
         <PermissionMatrix
+          patientId={patientId}
+          patientName={context.patient!.display_name}
+          version={data.data.version}
+          revision={liveRevision}
+          globalMode={context.activeContext?.mode === "global"}
           definitions={data.definitions}
           overrides={data.overrides}
           directory={data.directory}
           busy={locked}
-          configure={configure}
+          configure={(change, version) => configure("capability", change, undefined, undefined, version)}
         />
       ) : null}
       {tab === "notifications" ? (

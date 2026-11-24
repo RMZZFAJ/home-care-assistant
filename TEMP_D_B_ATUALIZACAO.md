@@ -4,6 +4,13 @@ O [fechamento A–D da PR 7](docs/audits/FECHAMENTO_PR7.md) reúne os critérios
 e as pendências para a próxima etapa. Este acompanhamento conserva o
 histórico dos incrementos de D-B.
 
+**24/11 — Matriz de permissões.** As cinco funções e a consulta individual
+usam todas as capacidades vigentes. A lista pessoal identifica a origem no
+banco. Alterações já autorizadas pelo contrato passam pela revisão da versão
+consultada. A ampliação de exceções e a verificação dos consumidores de
+autorização continuam na fila de E10-04.
+[Registro de L4](docs/audits/D/D-B/LOTES_EXECUCAO.md#e10-04--matriz-de-perfis-e-consulta-individual).
+
 **24/11 — Central técnica.** Incidentes e política consultam versões reais e
 recuperam a decisão pela mesma chave. Continuidade e envios abrem evidências
 e tentativas por fonte. O Preview publicado responde com as variáveis

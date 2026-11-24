@@ -6,6 +6,50 @@ import { sql, sqlLiteral } from "../../scripts/test-environment.mjs";
 import { whileAdvisoryWaits, whileRowWaits } from "./lock-barrier.mjs";
 
 const packet = (patient, change = { reminderHours: 3 }) => ({ p_patient: patient, p_kind: "settings", p_change: change, p_key: randomUUID(), p_version: 1 });
+
+test("the scoped permission snapshot enumerates actual capabilities and distinguishes default, profile, personal and role limits", async () => {
+  const f = await setup();
+  const other = await setup();
+  try {
+    const admin = await actor("adminA", f.patient);
+    const global = await actor("global");
+    const professional = await actor("professional", f.patient);
+    const query = { p_patient: f.patient, p_subject: fixtures.professional.id };
+    const snapshot = client => rpc(client, "patient_permission_snapshot", query);
+    const initial = await snapshot(admin);
+    assert.deepEqual(await snapshot(global), initial);
+    assert.equal(initial.role, "professional");
+    assert.equal(initial.personId, fixtures.professional.id);
+    assert.equal(initial.careRecipientId, f.patient);
+    assert.deepEqual(initial.permissions.map(row => row.code), sql("select code from public.capability_definitions order by code;").split(/\r?\n/));
+    const req = data => data.permissions.find(row => row.code === "req.create");
+    assert.equal(req(initial).origin, "default");
+    assert.equal(req(initial).effective, true);
+    assert.equal(initial.permissions.find(row => row.code === "com.read").origin, "limited");
+    assert.equal(initial.permissions.find(row => row.code === "com.read").effective, false);
+    const set = (subject, enabled, version) => rpc(admin, "configure_patient_access", {
+      ...packet(f.patient, { capability: "req.create", ...subject, enabled }), p_kind: "capability", p_version: version,
+    });
+    await set({ subjectRole: "professional" }, false, initial.policyVersion);
+    const configured = await snapshot(admin);
+    assert.equal(req(configured).origin, "profile");
+    assert.equal(req(configured).effective, false);
+    await set({ subjectUser: fixtures.professional.id }, true, configured.policyVersion);
+    const personal = await snapshot(admin);
+    assert.deepEqual(req(personal), { code: "req.create", critical: false, roleEligible: true, inherited: false, effective: true, exception: true, origin: "personal" });
+    const effective = await rpc(professional, "patient_capabilities", { p_patient: f.patient });
+    assert.deepEqual(Object.fromEntries(personal.permissions.map(row => [row.code, row.effective])), effective);
+    assert.equal((await professional.rpc("patient_permission_snapshot", query)).error?.code, "42501");
+    assert.equal((await admin.rpc("patient_permission_snapshot", { ...query, p_patient: other.patient })).error?.code, "42501");
+    await rpc(admin, "admin_set_membership_status", { p_care_recipient_id: f.patient, p_user_id: fixtures.professional.id, p_status: "revoked" });
+    assert.equal((await admin.rpc("patient_permission_snapshot", query)).error?.code, "42501");
+    assert.equal((await global.rpc("patient_permission_snapshot", query)).error?.code, "42501");
+    assert.equal(sql(`select has_function_privilege('anon','public.patient_permission_snapshot(uuid,uuid)','execute') or has_function_privilege('service_role','public.patient_permission_snapshot(uuid,uuid)','execute');`), "f");
+  } finally {
+    sql(`update public.care_recipients set is_active=false where id in (${sqlLiteral(f.patient)},${sqlLiteral(other.patient)});`);
+  }
+});
+
 test("51 governance changes retain the oldest pending proposal, reference search, both administrators and bounded scoped pages", async () => {
   const f = await setup(), global = await actor("global");
   const changes = [];

@@ -31,6 +31,85 @@ async function compare(actual: Locator, model: Locator, properties: string[]) {
 }
 const cardProperties = ["border-radius", "border-top-color", "padding-top", "padding-left"];
 
+test("E10-04 consulta todas as permissões e grava a alteração somente depois da revisão", async ({ page, browser }, info) => {
+  const f = await setup();
+  const before = facts(f.patient);
+  const writes: string[] = [];
+  const reference = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+  try {
+    await login(page, f.patient);
+    await page.goto("/configuracoes?area=permissions");
+    page.on("request", request => { if (request.method() === "POST" && new URL(request.url()).pathname === "/api/patient-settings") writes.push(request.method()); });
+    const matrix = page.getByRole("region", { name: "Matriz de permissões", exact: true });
+    const table = matrix.getByRole("table", { name: "Permissões efetivas", exact: true });
+    await expect(matrix.getByRole("searchbox", { name: "Pesquisar permissões", exact: true })).toHaveCSS("padding-left", "38px");
+    const count = Number(sql("select count(*) from public.capability_definitions;"));
+    await expect(table.locator('th[scope="row"]')).toHaveCount(count);
+    await expect(table.getByRole("columnheader")).toHaveCount(6);
+    await expect(table.getByRole("rowheader", { name: "Consultar requisições", exact: true })).toBeVisible();
+    await expect(table.getByRole("rowheader", { name: /^Arquivar e encerrar REQ/ })).toBeVisible();
+    const model = await reference.newPage();
+    await model.route(/^https?:/, route => route.abort());
+    await model.goto(pathToFileURL(resolve("hca-laboratorio-04-v2-aprovado.html")).href + "#E10-04/permissions");
+    for (const width of [360, 412]) {
+      await model.getByRole("combobox", { name: "Visualização", exact: true }).selectOption(String(width));
+      await page.setViewportSize({ width, height: 900 });
+      const frame = model.locator("#device-frame");
+      await expect(frame.getByRole("heading", { name: "Permissões por perfil", exact: true })).toBeVisible();
+      await info.attach(`L4-permissions-${width}`, { body: await frame.screenshot(), contentType: "image/png" });
+      await auditFromTop(page, `E10-04 matrix ${width}`);
+      await info.attach(`permissions-${width}`, { body: await page.screenshot(), contentType: "image/png" });
+    }
+    await reference.close();
+    await page.bringToFront();
+    const view = matrix.getByRole("combobox", { name: "Visualizar permissões", exact: true });
+    const snapshotRead = page.waitForResponse(response => new URL(response.url()).searchParams.get("permissionPerson") === fixtures.professional.id);
+    await view.selectOption(fixtures.professional.id);
+    const response = await snapshotRead;
+    expect(response.status()).toBe(200);
+    expect(response.headers()["cache-control"]).toContain("no-store");
+    const data = await response.json();
+    expect(data.permissions).toHaveLength(count);
+    expect(data).toMatchObject({ personId: fixtures.professional.id, careRecipientId: f.patient, role: "professional" });
+    await expect(matrix.locator("li .hca-guide-row")).toHaveCount(count);
+    await expect(matrix.getByRole("button", { name: /^Emitir REQ Padrão da função Permite/ })).toBeVisible();
+    await expect(matrix).toContainText("Limite da função");
+    await auditFromTop(page, "E10-04 personal permissions");
+    await view.selectOption("");
+    await matrix.getByRole("searchbox", { name: "Pesquisar permissões", exact: true }).fill("Emitir REQ");
+    const editorButton = matrix.getByRole("button", { name: /^Emitir REQ · Profissional ·/ });
+    await editorButton.click();
+    const editor = page.getByRole("dialog", { name: "Emitir REQ", exact: true });
+    await editor.getByRole("combobox", { name: "Configuração deste perfil" }).selectOption("false");
+    await editor.getByRole("button", { name: "Revisar alteração", exact: true }).click();
+    const review = page.getByRole("dialog", { name: "Confirmar alteração de permissão", exact: true });
+    await expect(review).toContainText("Herdar · permitido");
+    await expect(review).toContainText("Restringir");
+    await review.press("Escape");
+    await expect(editorButton).toBeFocused();
+    expect(writes).toEqual([]);
+    expect(facts(f.patient)).toBe(before);
+    await editorButton.click();
+    await editor.getByRole("combobox", { name: "Configuração deste perfil" }).selectOption("false");
+    await editor.getByRole("button", { name: "Revisar alteração", exact: true }).click();
+    const written = page.waitForResponse(result => new URL(result.url()).pathname === "/api/patient-settings" && result.request().method() === "POST");
+    await review.getByRole("button", { name: "Confirmar permissão", exact: true }).click();
+    const saved = await written;
+    expect(saved.status()).toBe(200);
+    expect(saved.request().postDataJSON()).toMatchObject({
+      kind: "capability", expectedVersion: data.policyVersion,
+      change: { capability: "req.create", subjectRole: "professional", enabled: false },
+    });
+    await expect(review).toBeHidden();
+    await view.selectOption(fixtures.professional.id);
+    await expect(matrix.getByRole("button", { name: /^Emitir REQ Configuração da função Restrito/ })).toBeVisible();
+    expect(writes).toEqual(["POST"]);
+  } finally {
+    await reference.close();
+    sql(`update public.care_recipients set is_active=false where id=${q(f.patient)};`);
+  }
+});
+
 test("15 ADM02 ADM03 patient resources and policy follow the model without changing facts by navigation", async ({ page, browser }, info) => {
   const f = await setup(); await login(page, f.patient);
   await page.goto(`/admin?section=patient&careRecipientId=${f.patient}`);

@@ -213,10 +213,12 @@ test("D3 lista encontra proposta antiga e compara cinco tipos sem decidir por le
   const matrix = page.getByRole("region", { name: "Matriz de permissões", exact: true });
   const opener = matrix.getByRole("button", { name: /^Emitir REQ · Profissional ·/ });
   await opener.click();
-  await expect(page.getByRole("menuitemradio")).toHaveCount(3);
-  for (const option of [/^Herdar/, /^Permitir$/, /^Restringir$/]) await expect(page.getByRole("menuitemradio", { name: option })).toBeVisible();
-  await expect(page.getByRole("menu").locator('input[type="search"],input[type="text"]')).toHaveCount(0);
-  await page.getByRole("menuitemradio", { name: /^Herdar/ }).press("Escape"); await expect(opener).toBeFocused();
+  const editor = page.getByRole("dialog", { name: "Emitir REQ", exact: true });
+  const configuration = editor.getByRole("combobox", { name: "Configuração deste perfil", exact: true });
+  await expect(configuration.getByRole("option")).toHaveCount(3);
+  for (const option of [/^Herdar/, /^Permitir$/, /^Restringir$/]) await expect(configuration.getByRole("option", { name: option })).toBeAttached();
+  await expect(editor.locator('input[type="search"],input[type="text"]')).toHaveCount(0);
+  await editor.press("Escape"); await expect(opener).toBeFocused();
   const deniedName = "Residência negada " + randomUUID().slice(0, 8);
   expect((await page.request.post("/api/admin", { data: { action: "recipient", id: null, displayName: deniedName, isActive: true, isDevelopment: true, initialAdministratorEmail: fixtures.adminA.email } })).status()).toBe(403);
   expect(sql(`select count(*) from public.care_recipients where display_name=${sqlLiteral(deniedName)};`)).toBe("0");
