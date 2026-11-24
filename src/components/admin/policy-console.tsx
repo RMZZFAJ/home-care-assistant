@@ -336,6 +336,8 @@ function Policies({ context }: { context: WorkspaceContext }) {
       </div>
       {tab === "permissions" ? (
         <PermissionMatrix
+          key={`${patientId}:${params.get("person") ?? ""}`}
+          initialPersonId={params.get("person") ?? ""}
           patientId={patientId}
           patientName={context.patient!.display_name}
           version={data.data.version}

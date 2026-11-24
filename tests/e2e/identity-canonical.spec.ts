@@ -7,6 +7,7 @@ import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { sql, sqlLiteral as q } from "../../scripts/test-environment.mjs";
 import { selectContext } from "./auth-context";
 import { auditFromTop } from "./accessibility-audit";
+import { openMembershipDetails } from "./membership-panel";
 
 test.setTimeout(180_000);
 const widths = [320, 390, 768, 1024, 1440];
@@ -123,24 +124,51 @@ test("15 ID04 membership rows preserve canonical presentation, search and creden
   const people = page.getByRole("region", { name: "Pessoas e vínculos", exact: true }); await expect(people).toBeVisible();
   const before = facts(first.patient), writes: string[] = [];
   page.on("request", r => { if (r.method() !== "GET" && new URL(r.url()).pathname.startsWith("/api/") && new URL(r.url()).pathname !== "/api/context") writes.push(r.url()); });
-  const reference = await browser.newContext();
+  const reference = await browser.newContext({ viewport: { width: 1280, height: 1000 }, isMobile: false, hasTouch: false, deviceScaleFactor: 1 });
   try {
-    const model = await reference.newPage(); await model.route(/^https?:/, route => route.abort()); await model.goto(referenceUrl + "#pessoas/pessoas");
-    const row = people.getByRole("article").first(); await expect(row).toBeVisible();
-    for (const width of widths) {
-      await page.setViewportSize({ width, height: 900 }); await model.setViewportSize({ width, height: 900 }); await model.screenshot();
-      await compare(people.locator(".hca-identity-list"), model.locator(".card").first(), ["border-radius", "border-top-color"]);
-      await compare(row, model.locator(".record").first(), ["display", "column-gap", "padding-top", "padding-left"]);
-      await compare(row.locator(".hca-avatar"), model.locator(".record .avatar").first(), ["width", "height", "border-radius", "background-color", "color"]);
+    const model = await reference.newPage();
+    await model.route(/^https?:/, route => route.abort());
+    await model.goto(pathToFileURL(resolve("hca-laboratorio-04-v2-aprovado.html")).href + "#E10-02/overview");
+    const row = people.locator(".hca-member-list").getByRole("button").first();
+    const modelRow = model.locator("#device-frame .l4-person-row").first();
+    await expect(row).toBeVisible();
+    await expect(people.getByRole("searchbox", { name: "Pesquisar pessoas", exact: true })).toHaveCSS("padding-left", "38px");
+    for (const width of [320, 360, 390, 412, 768, 1024, 1440]) {
+      await page.setViewportSize({ width, height: 900 });
+      const preset = width <= 375 ? "360" : "412";
+      await model.getByRole("combobox", { name: "Visualização", exact: true }).selectOption(preset);
+      await expect(model.locator("#device-frame")).toHaveCSS("width", preset + "px");
+      const modelCard = model.locator("#device-frame .section").filter({ has: model.getByRole("heading", { name: "Pessoas vinculadas", exact: true }) });
+      await compare(people.locator(".hca-people-card"), modelCard, ["border-radius", "border-top-color", "background-color"]);
+      await compare(row, modelRow, ["display", "column-gap", "padding-top", "padding-left"]);
+      await compare(row.locator(".hca-avatar"), modelRow.locator(".l4-person-avatar"), ["width", "height", "border-radius", "background-color", "color"]);
       await auditFromTop(page, "identity canonical people " + width);
+      if (width === 360 || width === 412) {
+        await info.attach(`L4-pessoas-${width}`, { body: await model.locator("#device-frame").screenshot(), contentType: "image/png" });
+        await info.attach(`pessoas-${width}`, { body: await page.screenshot(), contentType: "image/png" });
+      }
     }
     await people.getByRole("searchbox", { name: "Pesquisar pessoas", exact: true }).fill("Sem correspondência fictícia");
-    await expect(people.getByRole("heading", { name: "Nenhum vínculo nesta seleção", exact: true })).toBeVisible();
+    await expect(people.getByText(/Nenhum vínculo nesta seleção/)).toBeVisible();
     await people.getByRole("searchbox", { name: "Pesquisar pessoas", exact: true }).fill("");
-    const opener = row.getByRole("button", { name: "Conferir credencial", exact: true }); await opener.click();
+    await row.click();
+    const opener = page.getByRole("dialog").getByRole("button", { name: /^Credencial profissional/ }); await opener.click();
     const drawer = page.getByRole("dialog", { name: "Conferência familiar da credencial", exact: true });
     await expect(drawer).toBeVisible(); await drawer.press("Escape"); await expect(drawer).toHaveCount(0); await expect(opener).toBeFocused();
     expect(facts(first.patient)).toBe(before); expect(writes).toEqual([]);
+    await page.getByRole("dialog").getByRole("button", { name: "Voltar", exact: true }).click();
+    await expect(row).toBeFocused();
+    const details = await openMembershipDetails(page, "Teste professional");
+    const edit = page.getByRole("dialog", { name: "Editar vínculo", exact: true });
+    await details.getByRole("button", { name: /^Editar vínculo/ }).click();
+    await edit.getByLabel("Função na residência", { exact: true }).selectOption("reader");
+    await edit.getByRole("button", { name: "Voltar", exact: true }).click();
+    await (await openMembershipDetails(page, "Teste professional")).getByRole("button", { name: /^Editar vínculo/ }).click();
+    await expect(edit.getByLabel("Função na residência", { exact: true })).toHaveValue("professional");
+    await edit.getByRole("button", { name: "Voltar", exact: true }).click();
+    await (await openMembershipDetails(page, "Teste professional")).getByRole("link", { name: /^Ver permissões/ }).click();
+    await expect(page.getByRole("combobox", { name: "Visualizar permissões", exact: true })).toHaveValue(fixtures.professional.id);
+    expect(writes).toEqual([]);
     mkdirSync("output/playwright/phase-d", { recursive: true });
     await page.screenshot({ path: `output/playwright/phase-d/identity-canonical-${info.project.name}.png` });
   } finally { await reference.close(); }

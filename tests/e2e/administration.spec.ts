@@ -6,6 +6,7 @@ import { randomUUID } from "node:crypto";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { setup } from "../integration/v4-fixtures.mjs";
 import { shiftWorker } from "../integration/shift-fixtures.mjs";
+import { membershipRow, openMembershipDetails } from "./membership-panel";
 import {
   assertLocalProject,
   sql,
@@ -185,19 +186,17 @@ test.describe("administração integrada no ambiente local", () => {
       [secondPatient, "reader"],
     ]) {
       await section(page, patientId, "Vínculos");
-      await page.getByRole("button", { name: "Vincular conta", exact: true }).click();
+      await page.getByRole("button", { name: "Vincular pessoa", exact: true }).click();
       await page
-        .getByRole("combobox", { name: "Conta vinculada", exact: true })
+        .getByRole("combobox", { name: "Conta a vincular", exact: true })
         .selectOption(shared.id);
       await page
-        .getByRole("combobox", { name: "Função neste paciente", exact: true })
+        .getByRole("combobox", { name: "Função na residência", exact: true })
         .selectOption(role);
-      await submit(page, "Salvar vínculo", "membership");
-      await expect(
-        page
-          .getByRole("article")
-          .filter({ has: page.getByText("Teste shared", { exact: true }) }),
-      ).toBeVisible();
+      await page.getByRole("button", { name: "Revisar vínculo", exact: true }).click();
+      await page.getByRole("dialog", { name: "Confirmar vínculo?", exact: true }).getByRole("button", { name: "Salvar vínculo", exact: true }).click();
+      await page.getByRole("dialog", { name: "Vínculo atualizado", exact: true }).getByRole("button", { name: "Concluir", exact: true }).click();
+      await expect(membershipRow(page, "Teste shared")).toBeVisible();
     }
     await page.goto(`/admin?careRecipientId=${firstPatient}`);
     await selectContext(page, firstPatient);
@@ -220,27 +219,19 @@ test.describe("administração integrada no ambiente local", () => {
     await expect(
       page.getByRole("button", { name: "Contas globais", exact: true }),
     ).toHaveCount(0);
-    const member = page
-      .getByRole("article")
-      .filter({ has: page.getByText("Teste shared", { exact: true }) });
+    const member = await openMembershipDetails(page, "Teste shared");
     const revoked = page.waitForResponse(
       (response) =>
-        new URL(response.url()).pathname === "/api/admin" &&
+        new URL(response.url()).pathname === "/api/admin/memberships" &&
         response.request().method() === "POST" &&
-        response.request().postDataJSON().action === "membershipStatus",
+        response.request().postDataJSON().purpose === "membershipStatus",
     );
-    await member.getByRole("button", { name: "Revogar", exact: true }).click();
+    await member.getByRole("button", { name: /^Revisar desligamento/ }).click();
+    await page.getByRole("dialog", { name: "Revisar desligamento", exact: true }).getByRole("button", { name: "Revogar vínculo", exact: true }).click();
     await page.getByRole("button", { name: "Revogar agora", exact: true }).click();
     expect((await revoked).ok()).toBeTruthy();
-    await expect(
-      page.getByText("Estado do vínculo atualizado.", { exact: true }),
-    ).toBeVisible();
-    await expect(
-      page
-        .getByRole("article")
-        .filter({ has: page.getByText("Teste shared", { exact: true }) })
-        .getByText("Revogado", { exact: true }),
-    ).toBeVisible();
+    await page.getByRole("dialog", { name: "Vínculo revogado", exact: true }).getByRole("button", { name: "Concluir", exact: true }).click();
+    await expect(membershipRow(page, "Teste shared").getByText("Revogado", { exact: true })).toBeVisible();
     const forbidden = await page.request.get(
       `/api/admin?section=memberships&careRecipientId=${secondPatient}`,
     );

@@ -137,7 +137,6 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
   const versionRef = useRef<number | null>(null);
   const [versionAttempt, setVersionAttempt] = useState(0);
   const [conflict, setConflict] = useState(false);
-  const [confirmationRevision, setConfirmationRevision] = useState(0);
   const [localBusy, setLocalBusy] = useState(false);
   const busy = localBusy || command.busy || command.uncertain || conflict;
   const [error, setError] = useState("");
@@ -225,7 +224,6 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
   }, [load, queueRevision]);
   async function confirmed(result: AdministrativeResult, packet: AdministrativeIntent) {
     setMessage(result.pendingApproval ? "Proposta global registrada. Um administrador local distinto deve aprovar em Permissões, comunicação e regras." : packet.success);
-    setConfirmationRevision(value => value + 1);
     if (packet.payload.action === "historicalImport") setReport(result.data);
     intentRef.current = null;
     // A failing read after this point cannot make the completed command uncertain.
@@ -234,8 +232,7 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
     return result;
   }
   function preparationConfirmed(outcome: AdministrativeOutcome) {
-    setMessage(["alerts", "notificationRecipients"].includes(section) ? "" : administrativeOutcomeText(outcome));
-    setConfirmationRevision(value => value + 1);
+    setMessage(["alerts", "notificationRecipients", "memberships"].includes(section) ? "" : administrativeOutcomeText(outcome));
     void (async () => {
       if (outcome.kind==="local" && ["membership","membershipStatus"].includes(outcome.action)) await context.refresh();
       await load();
@@ -318,13 +315,6 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
           Comprovantes do catálogo
         </Link>
       ) : null}
-      {section === "memberships" && patientId ? (
-        <div className="hca-toolbar">
-          <Link className={buttonClass} href={`/configuracoes?area=people&careRecipientId=${patientId}`}>
-            Permissões e alterações com dupla aprovação
-          </Link>
-        </div>
-      ) : null}
       {error && (
         <Notice error>
           {error}
@@ -354,15 +344,16 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
             }}
           />
         ) : null}
-        {section === "memberships" && patientId ? (
+        {section === "memberships" && patientId && !readDenied ? (
           <MembershipManagement
+            key={JSON.stringify([context.userId, patientId, globalMode])}
             userId={context.userId} globalMode={globalMode} onConfirmed={preparationConfirmed}
             credentialReviewAllowed={!globalMode}
             mayRegularize={can(context, "ent.regularize")}
-            confirmationRevision={confirmationRevision}
             rows={rows}
             directory={directory}
             patientId={patientId}
+            patientName={context.patient?.display_name ?? "Residência"}
           />
         ) : null}
         {section === "invitations" && patientId ? <InvitationManagement patientId={patientId} userId={context.userId} /> : null}

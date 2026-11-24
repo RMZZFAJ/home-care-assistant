@@ -201,12 +201,15 @@ export function databaseError(
       "A referência administrativa mudou. Compare os dados atuais antes de confirmar. Seu preenchimento foi preservado.",
       409,
     );
-  if (error?.code === "23505" && message === "administrative preparation intent differs")
+  if ((error?.code === "23505" && message === "administrative preparation intent differs") ||
+    (error?.code === "PT409" && message === "membership intent differs"))
     throw new ApiError(
       "IDEMPOTENCY_CONFLICT",
       "Esta tentativa já identifica outra alteração. Consulte o resultado antes de continuar.",
       409,
     );
+  if (error?.code === "PT409" && message === "membership form must be reviewed before submission")
+    throw new ApiError("VERSION_CONFLICT", "Reabra a lista de pessoas e revise o vínculo antes de confirmar.");
   if (error?.code === "PT409" && message === "stale catalogue preparation reference")
     throw new ApiError(
       "VERSION_CONFLICT",

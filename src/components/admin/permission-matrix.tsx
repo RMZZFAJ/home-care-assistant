@@ -47,12 +47,13 @@ function groupPermissions<T extends { code: string }>(items: T[]) {
   return new Map([...result].sort(([left], [right]) => (groupOrder.get(left) ?? groupOrder.size) - (groupOrder.get(right) ?? groupOrder.size)));
 }
 
-export function PermissionMatrix({ patientId, patientName, version, revision, globalMode, definitions, overrides, directory, busy, configure }: {
+export function PermissionMatrix({ initialPersonId = "", patientId, patientName, version, revision, globalMode, definitions, overrides, directory, busy, configure }: {
+  initialPersonId?: string;
   patientId: string; patientName: string; version: number; revision: number; globalMode: boolean;
   definitions: Definition[]; overrides: Override[]; directory: Member[]; busy: boolean;
   configure: (change: Record<string, unknown>, version: number) => Promise<boolean>;
 }) {
-  const [personId, setPersonId] = useState("");
+  const [personId, setPersonId] = useState(initialPersonId);
   const [search, setSearch] = useState("");
   const [group, setGroup] = useState("");
   const [edit, setEdit] = useState<Edit | null>(null);

@@ -1040,8 +1040,8 @@ o conteúdo das propostas.
 `before` e `identity` para confirmar a edição revisada. O comando reaproveita
 a governança e a auditoria do paciente. Uma alteração local autorizada retorna
 `applied`. A atuação global retorna uma proposta `pending` para decisão local
-independente. Uma referência desatualizada exige nova revisão. A criação usa
-o fluxo de preparação de residência.
+independente. Uma referência desatualizada exige nova revisão. O cadastro de
+outra residência usa o fluxo de criação a partir da revisão.
 
 Em caso de resposta perdida, `action=recover` recebe o mesmo `patientId` e
 `key`. Sob a trava da governança, devolve o estado oficial ou encerra a
@@ -1057,15 +1057,31 @@ Cada grupo respeita a capacidade de leitura do processo: falta de acesso retorna
 available=false/total=null, nunca zero inventado. Totais antecedem o limite de
 20 registros por grupo e 20 linhas por ENT; a interface informa o recorte.
 
-A consulta não revoga, transfere, recebe, conta, aprova ou movimenta estoque.
-Revogar agora permanece disponível durante carregamento/erro da prévia, usando
-o comando de revogação existente com autorização vigente no servidor. Após a
-revogação, P05 e os processos de BAL/escala encaminham as tarefas futuras sem
-atribuir a outra pessoa a autoria do passado. Atualizar a prévia conserva a
-última consulta identificada e restaura foco após a resposta.
+A consulta é informativa. A pessoa autorizada pode confirmar a revogação
+durante o carregamento ou uma falha da consulta de pendências, desde que a
+referência do vínculo esteja disponível. Após a revogação, P05 e os processos
+de BAL e escala encaminham as tarefas futuras e preservam a autoria do passado.
+Atualizar a prévia conserva a última consulta identificada e restaura o foco
+após a resposta.
 
-Editar função mantém a identidade da conta em leitura; outra conta usa vínculo
-ou convite explícito. Vínculo revogado usa a ação própria de reativação.
+`GET /api/admin/memberships` recebe `patientId`, `mode`, `purpose` e
+`targetId` para editar, reativar ou revogar um vínculo. A inclusão de conta
+existente usa `selection` no lugar de `targetId`. A resposta contém a
+referência da revisão, a situação confirmada e a elegibilidade no contexto.
+Editar a função mantém a identidade da conta. Uma conta nova recebe convite.
+
+`POST /api/admin/memberships` recebe o mesmo escopo, `key` e `intent` com
+`fields` e `referenceHash`. A transação compara a referência sob a trava da
+governança, verifica a autorização vigente e aplica a alteração local ou cria
+uma proposta global para decisão independente. O formulário permanece em
+memória até a confirmação. O comando legado recusa novas gravações de rascunho
+de vínculo e conserva os comprovantes existentes.
+
+Com `intent: null`, o comando consulta a chave da operação submetida ou
+encerra a tentativa ausente. A chave encerrada impede um envio tardio da
+alteração. Quando a própria alteração retira a autoridade de quem executou,
+somente a sessão original pode recuperar seu comprovante. A interface guarda
+a referência da tentativa e oferece até duas consultas de recuperação.
 
 /api/admin administra recursos locais e contas globais conforme autorização.
 Convites são criados, reemitidos e revogados por administração local;

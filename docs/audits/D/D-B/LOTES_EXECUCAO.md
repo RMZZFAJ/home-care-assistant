@@ -4828,3 +4828,79 @@ produto. O build local e as verificações dirigidas passaram.
 | `20261124161308` | Aplicada | Pendente |
 
 O Supabase local contém 377 migrations nesta conferência.
+
+#### Publicação de residência e convites
+
+Os commits `1d57da08` e `75ab9d5f` foram publicados na branch
+`feat/phase-d-continuation`, na PR 8 em draft. O Preview de `75ab9d5f`
+ficou `READY`. O login, o runtime, o manifesto, o service worker e a
+página offline responderam HTTP 200. As rotas de administração da residência
+e dos convites devolveram HTTP 401 a chamadas sem sessão.
+
+A Vercel confirmou o endereço da branch e as variáveis de Supabase, PDF,
+Web Push e notificações no escopo de Preview. O Preview e a produção usam
+o mesmo Supabase, com 362 migrations. O banco ainda não tem as funções de
+administração da residência e dos convites. A verificação autenticada desses
+fluxos no Preview depende de um banco separado com as migrations do candidato.
+Na conferência, produção seguia em `fab595c7`.
+
+O SonarCloud aprovou o Quality Gate de `75ab9d5f`. O CodeRabbit pulou a
+revisão após falhar ao retomar o histórico incremental. A CI do SHA seguia
+em execução.
+
+[PR 8][pr-residence-preview] · [Preview de 75ab9d5f][preview-75ab9d5f] ·
+[CI de 75ab9d5f][ci-75ab9d5f]
+
+[pr-residence-preview]: https://github.com/RMZZFAJ/home-care-assistant/pull/8
+[preview-75ab9d5f]: https://home-care-assistant-7fq8z834g-rmzzfajs-projects.vercel.app
+[ci-75ab9d5f]: https://github.com/RMZZFAJ/home-care-assistant/actions/runs/45440037521
+
+#### Painel de pessoas, edição e desligamento
+
+Pessoas vinculadas usa as linhas compactas, os avatares e o painel lateral
+do E10-02. A ficha da pessoa mostra residência, função e situação. **Ver
+permissões** abre a consulta da pessoa na matriz real. A edição compara a
+função atual e a proposta, preserva a identidade e os sinalizadores de
+estoque existentes. A conferência de credencial continua disponível no
+contexto local autorizado e retorna o foco à ação que a abriu.
+
+A revisão de desligamento consulta as pendências reais. A autorização para
+revogar depende do vínculo e da referência revisada. Uma falha na leitura
+de pendências ainda permite a revogação urgente. A decisão tem confirmação
+separada. Autoria, recebimentos, estoque e acompanhamento de tarefas
+permanecem nos respectivos processos, inclusive após o desligamento.
+
+A edição fica em memória até a confirmação. O comando antigo recusa
+novos rascunhos de vínculo. A operação oficial recebe uma chave, compara a
+referência sob a trava da governança, aplica a alteração local ou registra
+proposta global para decisão local independente. A consulta de recuperação
+usa apenas a chave e o escopo. Ela confirma o resultado registrado ou encerra
+a tentativa ausente, impedindo aplicação tardia. A sessão original pode
+recuperar a alteração que retirou sua própria autoridade. A recuperação tem
+até duas consultas e usa o diálogo compartilhado.
+
+O laboratório usa conta por e-mail no formulário ilustrativo. O produto
+preserva a seleção de contas já vinculadas no contexto local e a busca
+paginada no contexto global. Uma pessoa sem vínculo local entra por convite.
+Busca de participantes, propostas com dupla aprovação e acompanhamento de
+pendências da pessoa desligada preservam funções existentes. O fluxo visual
+do destinatário do convite e a composição completa da credencial profissional
+seguem como trabalho aberto.
+
+| Migration | Supabase local | Supabase remoto |
+| --- | --- | --- |
+| `20261124164759` | Aplicada | Pendente |
+
+O Supabase local contém 378 migrations nesta conferência. A migration entrou
+de forma incremental, sem reset. A validação usou Auth real e dados fictícios
+do ambiente local.
+
+Os testes de navegador cobriram edição, revogação urgente com consulta de
+pendências indisponível, isolamento entre residências, resposta perdida na
+autorrevogação, conferência familiar, recuperação da proposta e comparação
+com o laboratório em Chromium, Android e iPhone emulados. As rodadas
+dirigidas corrigiram o código HTTP de conflito e a densidade em telas
+estreitas. A comparação final confirmou o cartão e as linhas do E10-02,
+incluindo capturas a 360 e 412 px, descarte ao fechar a edição e acesso à
+matriz já na pessoa selecionada. O build, o TypeScript, o lint dirigido e o
+guard das 84 migrations históricas passaram.

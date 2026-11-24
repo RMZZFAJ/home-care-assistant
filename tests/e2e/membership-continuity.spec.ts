@@ -10,6 +10,7 @@ import {
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { selectContext } from "./auth-context";
 import { audit } from "./accessibility-audit";
+import { openMembershipDetails } from "./membership-panel";
 async function open(page: Page, patient: string) {
   const ids = JSON.parse(readFileSync(fixtureFile, "utf8"));
   await page.goto("/login");
@@ -22,7 +23,7 @@ async function open(page: Page, patient: string) {
   await selectContext(page, patient);
   await page.goto(`/admin?section=memberships&careRecipientId=${patient}`);
   await expect(
-    page.getByRole("heading", { name: "Pessoas e vínculos", exact: true }),
+    page.getByRole("heading", { name: "Pessoas vinculadas", exact: true }),
   ).toBeVisible();
 }
 const member = (patient: string, user: string) =>
@@ -42,11 +43,8 @@ test("C030 editar função fixa a mesma pessoa e conserva o vínculo de outra co
     `update public.care_recipient_memberships set can_count_stock=true where care_recipient_id=${sqlLiteral(f.patient)} and user_id=${sqlLiteral(fixtures.professional.id)};`,
   );
   await open(page, f.patient);
-  await page
-    .getByLabel("Editar vínculo de " + person(fixtures.professional.id), {
-      exact: true,
-    })
-    .click();
+  const details = await openMembershipDetails(page, person(fixtures.professional.id));
+  await details.getByRole("button", { name: /^Editar vínculo/ }).click();
   const editor = page.getByRole("dialog", {
     name: "Editar vínculo",
     exact: true,
@@ -54,7 +52,7 @@ test("C030 editar função fixa a mesma pessoa e conserva o vínculo de outra co
   await expect(editor).toBeVisible();
   expect(
     await editor
-      .getByRole("combobox", { name: "Conta vinculada", exact: true })
+      .getByRole("combobox", { name: "Conta a vincular", exact: true })
       .count(),
   ).toBe(0);
   await expect(
@@ -65,33 +63,37 @@ test("C030 editar função fixa a mesma pessoa e conserva o vínculo de outra co
     await audit(page, "vinculo-mesma-pessoa-" + width);
   }
   await editor
-    .getByRole("combobox", { name: "Função neste paciente", exact: true })
+    .getByRole("combobox", { name: "Função na residência", exact: true })
     .selectOption("supervisor");
+  await editor.getByRole("button", { name: "Revisar vínculo", exact: true }).click();
+  const review = page.getByRole("dialog", { name: "Confirmar vínculo?", exact: true });
+  await expect(review).toContainText("Supervisor");
   const response = page.waitForResponse(
     (r) =>
-      new URL(r.url()).pathname === "/api/admin" &&
+      new URL(r.url()).pathname === "/api/admin/memberships" &&
       r.request().method() === "POST" &&
-      r.request().postDataJSON().action === "membership",
+      r.request().postDataJSON().purpose === "membership",
   );
-  await editor
+  await review
     .getByRole("button", { name: "Salvar vínculo", exact: true })
     .click();
   const saved = await response;
   expect(saved.ok(), await saved.text()).toBe(true);
-  expect(saved.request().postDataJSON().administrativePreparation.fields.userId).toBe(fixtures.professional.id);
+  expect(saved.request().postDataJSON().intent.fields.userId).toBe(fixtures.professional.id);
   await expect(editor).toHaveCount(0);
+  await page.getByRole("dialog", { name: "Vínculo atualizado", exact: true }).getByRole("button", { name: "Concluir", exact: true }).click();
   expect(member(f.patient, fixtures.reader.id)).toBe(other);
   const changed = JSON.parse(member(f.patient, fixtures.professional.id));
   expect(changed.role).toBe("supervisor");
   expect(changed.can_count_stock).toBe(true);
   expect(changed.status).toBe("active");
   await page
-    .getByRole("button", { name: "Vincular conta", exact: true })
+    .getByRole("button", { name: "Vincular pessoa", exact: true })
     .click();
   await expect(
     page
-      .getByRole("dialog", { name: "Vincular conta existente", exact: true })
-      .getByRole("combobox", { name: "Conta vinculada", exact: true }),
+      .getByRole("dialog", { name: "Vincular pessoa", exact: true })
+      .getByRole("combobox", { name: "Conta a vincular", exact: true }),
   ).toBeEnabled();
 });
 
@@ -106,12 +108,10 @@ test("desligamento mostra ENT parcial e preserva a revogação urgente quando a 
       `select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where care_recipient_id=${sqlLiteral(f.patient)};`,
     );
   await open(page, f.patient);
-  const row = page.getByRole("article").filter({
-    has: page.getByText(person(fixtures.professional.id), { exact: true }),
-  });
-  await row.getByRole("button", { name: "Revogar", exact: true }).click();
+  const details = await openMembershipDetails(page, person(fixtures.professional.id));
+  await details.getByRole("button", { name: /^Revisar desligamento/ }).click();
   const dialog = page.getByRole("dialog", {
-    name: "Revogar vínculo",
+    name: "Revisar desligamento",
     exact: true,
   });
   await expect(dialog).toBeVisible();
@@ -145,7 +145,7 @@ test("desligamento mostra ENT parcial e preserva a revogação urgente quando a 
     }),
   ).toBeVisible();
   await expect(
-    dialog.getByRole("button", { name: "Revogar agora", exact: true }),
+    dialog.getByRole("button", { name: "Revogar vínculo", exact: true }),
   ).toBeEnabled();
   for (const width of [1440, 768, 390, 320]) {
     await page.setViewportSize({ width, height: 900 });
@@ -160,15 +160,17 @@ test("desligamento mostra ENT parcial e preserva a revogação urgente quando a 
   });
   const response = page.waitForResponse(
     (r) =>
-      new URL(r.url()).pathname === "/api/admin" &&
+      new URL(r.url()).pathname === "/api/admin/memberships" &&
       r.request().method() === "POST" &&
-      r.request().postDataJSON().action === "membershipStatus",
+      r.request().postDataJSON().purpose === "membershipStatus",
   );
-  await dialog
+  await dialog.getByRole("button", { name: "Revogar vínculo", exact: true }).click();
+  await page.getByRole("dialog", { name: "Revogar vínculo?", exact: true })
     .getByRole("button", { name: "Revogar agora", exact: true })
     .click();
   expect((await response).ok()).toBe(true);
   await expect(dialog).toHaveCount(0);
+  await page.getByRole("dialog", { name: "Vínculo revogado", exact: true }).getByRole("button", { name: "Concluir", exact: true }).click();
   expect(JSON.parse(member(f.patient, fixtures.professional.id)).status).toBe(
     "revoked",
   );

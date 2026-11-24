@@ -5,6 +5,7 @@ import { officialState } from "../integration/private-draft-fixtures.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { selectContext } from "./auth-context";
 import { audit } from "./accessibility-audit";
+import { openMembershipDetails } from "./membership-panel";
 
 test.setTimeout(180_000);
 type Fixture = Awaited<ReturnType<typeof credentialFixture>>;
@@ -19,7 +20,8 @@ async function login(page: Page, f: Fixture, email = fixtures.adminA.email) {
 const drawer = (page: Page) => page.getByRole("dialog", { name: "Conferência familiar da credencial", exact: true });
 async function open(page: Page, f: Fixture) {
   await page.goto(`/admin?careRecipientId=${f.patient}&section=memberships`);
-  const opener = page.getByRole("article").filter({ has: page.getByRole("heading", { name: "Técnica fictícia", exact: true }) }).getByRole("button", { name: "Conferir credencial", exact: true });
+  const details = await openMembershipDetails(page, "Técnica fictícia");
+  const opener = details.getByRole("button", { name: /^Credencial profissional/ });
   await opener.click();
   await expect(drawer(page).getByRole("region", { name: "Declaração consultada", exact: true })).toContainText("001234");
   return opener;

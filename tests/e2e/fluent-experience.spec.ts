@@ -204,7 +204,7 @@ test("administração usa listas, painéis de edição e confirmação crítica 
   await page.getByRole("button", { name: "Descartar alterações", exact: true }).click();
   await page.getByRole("button", { name: "Outras áreas", exact: true }).click();
   await page.getByRole("menuitem", { name: "Pessoas e vínculos", exact: true }).click();
-  await expect(page.getByRole("heading", { name: "Pessoas e vínculos", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Pessoas vinculadas", exact: true })).toBeVisible();
   await capture(page, "pessoas-lista", info.project.name);
   await page.getByRole("link", { name: "Permissões e alterações com dupla aprovação", exact: true }).click();
   await page.getByRole("navigation", { name: "Áreas da configuração", exact: true }).getByRole("link", { name: "Permissões", exact: true }).click();

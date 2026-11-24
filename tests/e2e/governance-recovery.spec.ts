@@ -6,7 +6,7 @@ import { sql, sqlLiteral } from "../../scripts/test-environment.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { selectContext } from "./auth-context";
 import { audit } from "./accessibility-audit";
-import type { AdministrativeAttempt } from "../../src/lib/validation/administrative-preparation";
+import type { ReviewedMembershipCommand } from "../../src/lib/validation/reviewed-membership";
 
 test.setTimeout(180_000);
 mkdirSync("output/playwright/phase-d", { recursive: true });
@@ -91,56 +91,58 @@ test("D3 proposta administrativa recupera a mesma intenção e ambas as entradas
   const f = await setup();
   await login(page, "global", null);
   await page.goto(`/admin?careRecipientId=${f.patient}&section=memberships`);
-  await page.getByRole("button", { name: "Vincular conta", exact: true }).click();
-  const drawer = page.getByRole("dialog", { name: "Vincular conta existente", exact: true });
+  await page.getByRole("button", { name: "Vincular pessoa", exact: true }).click();
+  const drawer = page.getByRole("dialog", { name: "Vincular pessoa", exact: true });
   await drawer.getByLabel("Buscar conta pelo nome", { exact: true }).fill("Teste professional");
   await drawer.getByRole("button", { name: "Buscar contas", exact: true }).click();
-  await drawer.getByLabel("Conta vinculada", { exact: true }).selectOption(fixtures.professional.id);
-  await drawer.getByLabel("Função neste paciente", { exact: true }).selectOption("family");
-  const packets: { action: string; administrativePreparation: AdministrativeAttempt }[] = [];
-  let first = true;
-  await page.route("**/api/admin", async route => {
+  await drawer.getByLabel("Conta a vincular", { exact: true }).selectOption(fixtures.professional.id);
+  await drawer.getByLabel("Função na residência", { exact: true }).selectOption("family");
+  const packets: ReviewedMembershipCommand[] = [];
+  await page.route("**/api/admin/memberships", async route => {
     if (route.request().method() !== "POST") return route.continue();
     packets.push(route.request().postDataJSON());
-    if (first) { first = false; const response = await route.fetch(); expect(response.status()).toBe(200); await route.fulfill({ status: 400, contentType: "application/json", body: "{unreadable-after-commit" }); }
+    if (packets.length === 1) { const response = await route.fetch(); expect(response.status()).toBe(200); await route.fulfill({ status: 400, contentType: "application/json", body: "{unreadable-after-commit" }); }
     else if (packets.length === 2) await route.fulfill({ status: 403, json: { code: "FORBIDDEN", error: "Permissão indisponível nesta recuperação fictícia." } });
     else if (packets.length === 3) await route.fulfill({ status: 200, json: { data: {} } });
     else await route.continue();
   });
-  await drawer.getByRole("button", { name: "Salvar vínculo", exact: true }).click();
-  await expect(drawer.getByRole("button", { name: "Recuperar mesma alteração administrativa", exact: true })).toBeEnabled();
-  await expect(drawer.getByLabel("Função neste paciente", { exact: true })).toBeDisabled();
-  await expect(drawer.getByLabel("Função neste paciente", { exact: true })).toHaveValue("family");
+  await drawer.getByRole("button", { name: "Revisar vínculo", exact: true }).click();
+  await page.getByRole("dialog", { name: "Enviar proposta de vínculo?", exact: true }).getByRole("button", { name: "Propor vínculo", exact: true }).click();
+  const failure = page.getByRole("dialog", { name: "Não foi possível confirmar o vínculo", exact: true });
+  const reconcile = failure.getByRole("button", { name: "Conferir resultado", exact: true });
+  await expect(reconcile).toBeEnabled();
+  await expect(drawer).toHaveCount(0);
   expect(count(f.patient)).toBe(1);
-  await drawer.getByRole("button", { name: "Recuperar mesma alteração administrativa", exact: true }).click();
-  await expect(drawer.getByRole("alert").filter({ hasText: "O resultado da primeira tentativa continua incerto" })).toBeVisible();
-  await expect(drawer.getByRole("button", { name: "Recuperar mesma alteração administrativa", exact: true })).toBeEnabled();
+  await reconcile.click();
+  await expect.poll(() => packets.length).toBe(2);
+  await expect(reconcile).toBeEnabled();
   expect(count(f.patient)).toBe(1);
-  await drawer.getByRole("button", { name: "Recuperar mesma alteração administrativa", exact: true }).click();
-  await expect(drawer.getByRole("alert").filter({ hasText: "O resultado da primeira tentativa continua incerto" })).toBeVisible();
-  await expect(drawer.getByRole("button", { name: "Recuperar mesma alteração administrativa", exact: true })).toBeEnabled();
-  await expect(drawer.getByLabel("Função neste paciente", { exact: true })).toBeDisabled();
+  await reconcile.click();
+  await expect(failure.getByRole("button", { name: "Copiar detalhes", exact: true })).toBeEnabled();
+  await expect(reconcile).toHaveCount(0);
+  await expect(failure).toContainText("Copie os detalhes e avise o responsável pelo sistema.");
+  expect(packets).toHaveLength(3);
+  const original = packets[0];
+  for (const pointer of packets.slice(1)) expect(pointer).toEqual({ ...original, intent: null });
   expect(count(f.patient)).toBe(1);
-  await drawer.getByRole("button", { name: "Recuperar mesma alteração administrativa", exact: true }).click();
-  await expect(page.getByRole("status").filter({ hasText: "Proposta global registrada." })).toBeVisible();
-  expect(packets).toHaveLength(4); for (const replay of packets.slice(1)) expect(replay).toEqual(packets[0]); expect(count(f.patient)).toBe(1);
   const row = JSON.parse(sql(`select to_jsonb(c) from public.access_change_requests c where care_recipient_id=${sqlLiteral(f.patient)};`));
-  const original = packets[0].administrativePreparation;
+  const recovered = await page.request.post("/api/admin/memberships", { data: { ...original, intent: null } });
+  expect(recovered.status()).toBe(200); expect((await recovered.json()).outcome.proposalId).toBe(row.id);
   const settingsPacket = { careRecipientId: f.patient, kind: "membership", change: { userId: fixtures.professional.id, role: "family" }, idempotencyKey: original.key, expectedVersion: row.base_version };
   const replay = await page.request.post("/api/patient-settings", { data: settingsPacket });
   expect(replay.status()).toBe(200); expect((await replay.json()).data.id).toBe(row.id);
   for (const [path, body] of [
-    ["/api/admin", { ...packets[0], administrativePreparation: { ...original, fields: { ...original.fields, role: "reader" } } }],
-    ["/api/admin", { ...packets[0], administrativePreparation: { ...original, referenceHash: "0".repeat(64) } }],
+    ["/api/admin/memberships", { ...original, intent: { ...original.intent, fields: { ...original.intent?.fields, role: "reader" } } }],
+    ["/api/admin/memberships", { ...original, intent: { ...original.intent, referenceHash: "0".repeat(64) } }],
     ["/api/patient-settings", { ...settingsPacket, change: { ...settingsPacket.change, role: "reader" } }],
     ["/api/patient-settings", { ...settingsPacket, expectedVersion: Number(settingsPacket.expectedVersion) + 1 }],
   ] as const) expect((await page.request.post(path, { data: body })).status()).toBe(409);
   const { key: removedKey, ...noIntent } = original;
   expect(removedKey).toBeTruthy();
-  expect((await page.request.post("/api/admin", { data: { ...packets[0], administrativePreparation: noIntent } })).status()).toBe(400);
+  expect((await page.request.post("/api/admin/memberships", { data: noIntent })).status()).toBe(400);
   expect(count(f.patient)).toBe(1);
   expect(sql(`select role from public.care_recipient_memberships where care_recipient_id=${sqlLiteral(f.patient)} and user_id=${sqlLiteral(fixtures.professional.id)};`)).toBe("professional");
-  await widths(page, "D3 recovered administrative proposal");
+  await widths(page, "E10-02 pending proposal after two recovery attempts");
   await page.screenshot({ path: `output/playwright/phase-d/d3-governance-recovered-${info.project.name}.png`, fullPage: true });
 });
 

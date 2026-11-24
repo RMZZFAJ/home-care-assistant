@@ -17,3 +17,26 @@
 .hca-invitation-form .hca-people-hint, .hca-invitation-content .hca-people-hint { margin-top: 0; }
 .hca-invitation-footer { display: flex; flex-wrap: wrap; gap: 8px; }
 .hca-invitation-result .hca-modal-content p { overflow-wrap: anywhere; }
+.hca-member-panel { display: grid; gap: 16px; }
+.hca-linked-people { border-radius: 15px; border-color: #dbe6df; background: #fff; }
+.hca-linked-people > header { background: #fcfdfb; border-bottom-color: #dbe6df; }
+.hca-linked-people > header > h2 { font-size: 14px; }
+.hca-linked-people > header > button { min-height: 36px; padding: 4px 10px; font-size: 12px; }
+.hca-linked-people .hca-input-adornment > input.hca-text-input { padding-inline-start: 38px; }
+.hca-member-policy-link { margin-top: 16px; max-width: 100%; white-space: normal; }
+.hca-member-list .hca-guide-row { gap: 12px; min-height: 0; padding: 16px 14px; border-top: 0; border-bottom: 1px solid #dbe6df; }
+.hca-member-list li:last-child .hca-guide-row { border-bottom: 0; }
+.hca-member-list .hca-guide-row-label { display: flex; flex-direction: column; gap: 4px; }
+.hca-member-list .hca-guide-row-label strong { letter-spacing: -.2px; }
+.hca-member-list .hca-avatar { width: 41px; height: 41px; border-radius: 13px; background: #e8f0ea; color: #41685b; border-color: #d5e2d8; }
+@media (max-width: 375px) {
+  .hca-member-list .hca-guide-row { gap: 10px; padding: 14px 12px; }
+  .hca-member-list .hca-guide-row-label strong { font-size: 13px; }
+}
+.hca-member-panel h3 { font-size: 14px; font-weight: 700; }
+.hca-member-hero { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; border: 1px solid var(--hca-line); border-radius: 16px; padding: 16px; background: var(--hca-tint); overflow-wrap: anywhere; }
+.hca-member-hero > div:not(.hca-avatar) { min-width: 0; flex: 1; }
+.hca-member-hero p { color: var(--hca-muted); font-size: 13px; }
+.hca-member-actions { padding: 8px 12px 0; border: 1px solid var(--hca-line); border-radius: 16px; }
+.hca-member-actions > h3 { padding: 6px 0; }
+.hca-member-actions .hca-guide-row[data-danger] strong { color: var(--hca-red); }

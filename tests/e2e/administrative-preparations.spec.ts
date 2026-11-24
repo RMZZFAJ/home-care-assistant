@@ -4,6 +4,7 @@ import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { sql, sqlLiteral as q } from "../../scripts/test-environment.mjs";
 import { selectContext } from "./auth-context";
 import { auditFromTop } from "./accessibility-audit";
+import { openMembershipDetails } from "./membership-panel";
 
 async function login(page: Page, patient: string) {
   await page.goto("/login");
@@ -87,22 +88,25 @@ test("own revocation with a lost response remains recoverable on the profile in 
   const f=await setup();
   await login(page,f.patient);
   await page.goto(`/admin?careRecipientId=${f.patient}&section=memberships`);
-  const own=page.getByRole("article").filter({has:page.getByText("Teste adminA",{exact:true})});
-  await own.getByRole("button",{name:"Revogar",exact:true}).click();
-  const dialog=page.getByRole("dialog",{name:"Revogar vínculo",exact:true});
+  const own = await openMembershipDetails(page, "Teste adminA");
+  await own.getByRole("button", { name: /^Revisar desligamento/ }).click();
+  await page.getByRole("dialog", { name: "Revisar desligamento", exact: true }).getByRole("button", { name: "Revogar vínculo", exact: true }).click();
+  const dialog = page.getByRole("dialog", { name: "Revogar vínculo?", exact: true });
   let sent=0;
-  await page.route("**/api/admin",async route=>{
-    if(route.request().method()!=="POST" || route.request().postDataJSON().action!=="membershipStatus") return route.continue();
+  await page.route("**/api/admin/memberships",async route=>{
+    if(route.request().method()!=="POST" || !route.request().postDataJSON().intent) return route.continue();
     sent++;
     const response=await route.fetch();
     expect(response.ok(),await response.text()).toBe(true);
     await route.abort("failed");
   });
+  const dropped = page.waitForEvent("requestfailed", { predicate: request => request.url().endsWith("/api/admin/memberships") && request.method() === "POST" });
   await dialog.getByRole("button",{name:"Revogar agora",exact:true}).click();
+  await dropped;
   await page.goto("/perfil");
-  const recovery=page.getByRole("region",{name:"Recuperar alterações administrativas",exact:true});
-  await recovery.getByRole("button",{name:"Consultar confirmação administrativa",exact:true}).click();
-  await expect(recovery.getByText("Estado do vínculo atualizado.",{exact:true})).toBeVisible();
+  await page.getByRole("button", { name: "Conferir resultado", exact: true }).click();
+  await page.getByRole("dialog", { name: "Não foi possível confirmar o vínculo", exact: true }).getByRole("button", { name: "Conferir resultado", exact: true }).click();
+  await expect(page.getByRole("dialog", { name: "Vínculo revogado", exact: true })).toBeVisible();
   expect(sent).toBe(1);
   expect(sql(`select status from public.care_recipient_memberships where care_recipient_id=${q(f.patient)} and user_id=${q(fixtures.adminA.id)};`)).toBe("revoked");
 });
