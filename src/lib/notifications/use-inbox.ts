@@ -1,9 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { api, ApiError } from "@/lib/client/api";
 import { useLiveRevision } from "@/lib/use-live-revision";
 import { parseInboxPage, type InboxPage } from "./inbox";
+
+const inboxChanged = "hca:personal-inbox-changed";
 
 export function useInbox({ patientId, page = 1, pageSize = 20, unread = false, surface = "center", poll = false, paused = false }: {
   patientId?: string; page?: number; pageSize?: number; unread?: boolean; surface?: "bell" | "center"; poll?: boolean; paused?: boolean;
@@ -13,6 +15,9 @@ export function useInbox({ patientId, page = 1, pageSize = 20, unread = false, s
   const key = JSON.stringify([selection, attempt, live, paused]);
   const [result, setResult] = useState<{ key: string; selection: string; data: InboxPage; receivedAt: string } | null>(null);
   const [failure, setFailure] = useState<{ key: string; selection: string; message: string; unavailable: boolean } | null>(null);
+  const invalidate = useCallback(() => {
+    if (patientId) window.dispatchEvent(new CustomEvent(inboxChanged, { detail: patientId }));
+  }, [patientId]);
   const url = "/api/notifications?" + new URLSearchParams({ ...(patientId ? { careRecipientId: patientId } : {}), page: String(page), pageSize: String(pageSize), unread: String(unread), surface });
   useEffect(() => {
     if (!patientId || paused) return;
@@ -22,7 +27,18 @@ export function useInbox({ patientId, page = 1, pageSize = 20, unread = false, s
     }).catch(reason => {
       if (!controller.signal.aborted) setFailure({ key, selection, message: reason instanceof Error ? reason.message : "Não foi possível consultar as notificações.", unavailable: reason instanceof ApiError && [401, 403, 404, 409].includes(reason.status) });
     });
-    return () => controller.abort();
+    const clear = (event: Event) => {
+      if (!(event instanceof CustomEvent) || event.detail !== patientId) return;
+      controller.abort();
+      setResult(null);
+      setFailure(null);
+      setAttempt(value => value + 1);
+    };
+    window.addEventListener(inboxChanged, clear);
+    return () => {
+      controller.abort();
+      window.removeEventListener(inboxChanged, clear);
+    };
   }, [key, selection, url, patientId, paused, page, pageSize, unread, surface]);
   useEffect(() => {
     if (!poll || !patientId || paused) return;
@@ -45,5 +61,6 @@ export function useInbox({ patientId, page = 1, pageSize = 20, unread = false, s
     fresh,
     error: failure?.selection === selection ? failure.message : "",
     refresh: () => setAttempt(value => value + 1),
+    invalidate,
   };
 }

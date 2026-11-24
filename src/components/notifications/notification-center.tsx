@@ -1,6 +1,5 @@
 "use client";
 import { CheckboxField, Pill } from "@/components/ui/controls";
-import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { api, buttonClass, Notice, Workspace } from "../workspace";
@@ -10,23 +9,24 @@ import { documentEventLabel } from "@/lib/notifications/event-labels";
 import { Icon } from "@/components/ui/primitives";
 import "./notification-center.css";
 
-import { notificationHref,notificationTargetLabel } from "@/lib/notifications/navigation";
 import { useInbox } from "@/lib/notifications/use-inbox";
 import { PushArrival } from "./push-arrival";
 import { DeliveryImpact } from "./delivery-impact";
+import { InboxNoticeDetails } from "./inbox-notice-details";
 export function NotificationCenter() {
   return (
     <Workspace title="Central de notificações">
       {(context) => (
         <><PushArrival />{context.activeContext?.mode === "patient" && context.patient ? <DeliveryImpact key={context.patient.id} patientId={context.patient.id} /> : null}<Center
-          key={`${context.activeContext?.mode}:${context.patient?.id ?? "none"}`}
+          key={`${context.userId}:${context.activeContext?.mode}:${context.patient?.id ?? "none"}`}
           patientId={context.activeContext?.mode === "patient" ? context.patient?.id : undefined}
+          patientName={context.patient?.display_name}
         /></>
       )}
     </Workspace>
   );
 }
-function Center({ patientId }: { patientId?: string }) {
+function Center({ patientId, patientName }: { patientId?: string; patientName?: string }) {
   const params = useSearchParams(), router = useRouter();
   const urlPage = Math.max(1, Math.min(100_000, Number.parseInt(params.get("page") ?? "1", 10) || 1));
   const urlUnread = params.get("unread") === "true", queryKey = JSON.stringify([urlPage, urlUnread]);
@@ -37,6 +37,7 @@ function Center({ patientId }: { patientId?: string }) {
   }
   const { page, unread } = selection.queryKey === queryKey ? selection : { page: urlPage, unread: urlUnread };
   const [writeError, setWriteError] = useState("");
+  const [noticeId, setNoticeId] = useState<string | null>(null);
   const inbox = useInbox({ patientId, page, unread });
   const navigate = (nextPage: number, nextUnread = unread) => {
     // Controlled fields and the read scope change in the same event.
@@ -107,15 +108,9 @@ function Center({ patientId }: { patientId?: string }) {
             </p>
             </div>
             <div className="hca-inbox-actions">
-              {row.document_id ||
-              row.requisition_id ||
-              row.reminder_id ||
-              row.consumption_report_id ||
-              row.alert_event_id ? (
-                <Link className={buttonClass} href={notificationHref(row)}>
-                  {notificationTargetLabel(row)}
-                </Link>
-              ) : null}
+              <button type="button" className={buttonClass} onClick={() => setNoticeId(row.id)} aria-label={`Ver aviso de ${row.operational_documents?.code ?? documentEventLabel(row.event_key ?? row.document_events?.action)}`}>
+                Ver aviso <Icon name="chevron" width={16} height={16} />
+              </button>
               {!row.seen_at ? (
                 <button
                   className={buttonClass}
@@ -185,6 +180,7 @@ function Center({ patientId }: { patientId?: string }) {
         Vista no aplicativo é independente da entrega ou leitura confirmada pelo
         provedor externo e não registra ciência ou aceite do documento.
       </p>
+      {patientId && noticeId ? <InboxNoticeDetails key={noticeId} patientId={patientId} patientName={patientName} noticeId={noticeId} onClose={() => setNoticeId(null)} onUnavailable={inbox.invalidate} /> : null}
     </section>
   );
 }

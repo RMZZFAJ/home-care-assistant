@@ -101,7 +101,7 @@ export function WorkspaceShell({ children, showOnboarding = false }: { children:
         <option value="" disabled>Selecione um paciente</option>
         {data.patients.filter((patient) => data.activeContext?.mode !== "patient" || patient.hasMembership).map((patient) => <option key={patient.id} value={patient.id}>{patient.display_name}{patient.is_active === false ? " (inativo)" : ""}</option>)}
       </SelectField></label> : <span className="text-sm text-(--muted)">Home Care Assistant</span>}</div>
-      {value ? <NotificationBell key={`${value.activeContext?.mode}:${value.patient?.id ?? "none"}`} patientId={value.activeContext?.mode === "patient" ? value.patient?.id : undefined} disabled={selecting} /> : null}
+      {value ? <NotificationBell key={`${value.userId}:${value.activeContext?.mode}:${value.patient?.id ?? "none"}`} patientId={value.activeContext?.mode === "patient" ? value.patient?.id : undefined} patientName={value.patient?.display_name} disabled={selecting} /> : null}
       <ProfileMenu />
     </header>
     {desktop && !collapsed ? <aside id="workspace-navigation" className="hca-desktop-navigation print:hidden" inert={blocked}>{value?.patient ? <div className="side-context"><span><Icon name="home" width={17} height={17} /></span><div><small>PACIENTE ATUAL</small><strong>{value.patient.display_name}</strong></div></div> : null}{navigation}</aside> : null}

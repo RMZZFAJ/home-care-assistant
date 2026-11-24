@@ -1,7 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 import { randomUUID } from "node:crypto";
 import { mkdirSync } from "node:fs";
-import { fixtures, actor, rpc, setup } from "../integration/v4-fixtures.mjs";
+import { adjustCapability, fixtures, actor, rpc, setup } from "../integration/v4-fixtures.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { sql, sqlLiteral as q } from "../../scripts/test-environment.mjs";
 import { selectContext } from "./auth-context";
@@ -109,4 +109,42 @@ test("notification history rejects mismatched or incomplete reads and ignores la
     await expect(center(page).getByRole("alert")).toBeVisible(); await expect.poll(() => ids(page)).toEqual([]);
     expect(facts(f.patient)).toBe(before);
   } finally { release(); }
+});
+
+test("notification detail discards a row received before its destination permission was withdrawn", async ({ page }) => {
+  const f = await populated();
+  const before = facts(f.patient);
+  await login(page, f.patient);
+  await page.goto(`/notificacoes?careRecipientId=${f.patient}&page=6`);
+  const row = center(page).locator(`li[data-notification-id="${f.notification}"]`);
+  const open = row.getByRole("button", { name: `Ver aviso de ${f.doc.code}`, exact: true });
+  await expect(open).toBeVisible();
+  let release = () => {};
+  const gate = new Promise<void>(resolve => { release = resolve; });
+  // Hold automatic list refreshes to reproduce a click on an already rendered row.
+  await page.route("**/api/notifications?*", async route => {
+    if (!new URL(route.request().url()).searchParams.has("noticeId")) await gate;
+    await route.continue();
+  });
+  try {
+    await adjustCapability(f.admin, f.patient, {
+      capability: "com.read", enabled: false, subjectUser: fixtures.family.id, reviewedRole: "family",
+    });
+    const detail = page.waitForResponse(response => new URL(response.url()).searchParams.get("noticeId") === f.notification);
+    await open.click();
+    expect((await detail).status()).toBe(404);
+    const denied = page.getByRole("dialog", { name: "Aviso indisponível", exact: true });
+    await expect(denied.getByRole("alert")).toHaveText("Este aviso não está disponível no vínculo selecionado.");
+    await expect(denied.getByText(f.doc.code)).toHaveCount(0);
+    await expect(denied.getByRole("button", { name: /Abrir/ })).toHaveCount(0);
+    await denied.getByRole("button", { name: "Voltar aos avisos", exact: true }).click();
+    await expect(page.getByRole("button", { name: "Notificações", exact: true })).toBeVisible();
+    release();
+    await expect(row).toHaveCount(0);
+    const bell = await page.request.get(`/api/notifications?careRecipientId=${f.patient}&surface=bell`);
+    expect(await bell.json()).toMatchObject({ data: [], total: 0, unreadCount: 0 });
+    expect(facts(f.patient)).toBe(before);
+  } finally {
+    release();
+  }
 });

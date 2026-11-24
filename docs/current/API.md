@@ -468,11 +468,15 @@ documentais também exigem expectedVersion para detectar concorrência.
 
 Na caixa pessoal, GET /api/notifications usa o paciente selecionado na sessão
 revogável do banco e filtra também a identidade destinatária. O parâmetro
-careRecipientId, quando informado, deve corresponder a essa seleção: divergência
-retorna409 CONTEXT_REQUIRED. Sem contexto de paciente, responde
+`careRecipientId`, quando informado, deve corresponder a essa seleção.
+Divergência retorna `409 CONTEXT_REQUIRED`. Sem contexto de paciente, responde
 availability=patient_context_required, sem consultar notificações de outros
 pacientes. A seleção é conferida novamente depois das leituras autorizadas.
-Resposta consultada inclui availability=ready, careRecipientId, data, total,
+O banco aplica a permissão atual de leitura do destino antes de paginar e
+contar. Lista, total e contagem do sino vêm da mesma consulta. O GET com
+`noticeId` consulta novamente a mesma autorização para um único aviso e retorna
+`404` se o aviso estiver fora do alcance da pessoa no vínculo selecionado.
+A resposta paginada inclui availability=ready, careRecipientId, data, total,
 unreadCount, page, pageSize, unread e surface. A central confere a seleção,
 o tamanho esperado da página e identidades únicas; resposta inconsistente
 não substitui a leitura válida. O sino exclui silenciosas antes da paginação;

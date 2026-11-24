@@ -3986,6 +3986,39 @@ Android emulado passaram sem retentativa. Eles conferiram a entrada da
 contagem facultativa, a opção de custódia na criação de um relato e a
 confirmação de uma concessão antiga com o efeito exibido no histórico.
 
+### E11-01 — Autorização dos avisos ao consultar e abrir
+
+A central, o sino e a visão geral consultam somente avisos do destinatário
+no vínculo selecionado. A política do Supabase confere a leitura da ficha,
+requisição antiga, estoque de origem, relato, escala ou balanço do aviso.
+O recorte é aplicado antes da paginação, do total e da contagem do sino.
+
+O painel abre após consultar o aviso por ID. O botão de destino consulta a
+autorização outra vez. Se o acesso mudou, o painel retira o conteúdo e
+oferece voltar à lista atualizada. Consultar o painel é uma leitura. O sino
+marca como vista ao abrir o destino por escolha da pessoa. Ciência, aceite,
+estoque e conclusão de tarefas seguem seus próprios atos.
+
+| Migration | Local | Remoto |
+| --- | --- | --- |
+| `20261124095525_l4_inbox_destination_authority` | Aplicada | Pendente |
+
+O banco local tem 371 versões. O Supabase compartilhado tem 362 versões e
+ainda aguarda a transição de contrato de E12-06. O Preview publicado em
+`a08742dc` respondeu ao login e a `/api/runtime` com HTTP 200. A consulta
+técnica sem sessão respondeu 401. O Sonar aprovou esse commit. O CodeRabbit
+informou que pulou a PR com 274 arquivos para um limite de 100.
+
+A integração com Auth real passou para estoque, consumo, escala e balanço.
+Sete cenários móveis passaram. Os casos de abertura explícita e revogação
+depois da listagem também passaram no Chromium móvel e no WebKit de iPhone
+após o ajuste que limpa a contagem antiga do sino. As execuções dirigidas
+usaram zero retentativas. O Advisor local retornou o aviso já registrado
+sobre a extensão `unaccent` no esquema público.
+
+A busca e os filtros de tipo e pendência previstos no laboratório v2, os
+modais de falha de leitura e as preferências continuam em execução no E11.
+
 ### E12-01 — Guias e ajuda na tarefa
 
 - Os assuntos são apresentados por função e abrem o painel de orientação
