@@ -1,5 +1,5 @@
 import { selectProfileSection } from "./profile-sections";
-import { test, expect, type Page, type Response as BrowserResponse } from "@playwright/test";
+import { test, expect, type Page, type Response as BrowserResponse, type TestInfo } from "@playwright/test";
 import { createECDH, createHash, randomBytes, randomUUID } from "node:crypto";
 import { createClient } from "@supabase/supabase-js";
 import { mkdirSync } from "node:fs";
@@ -20,8 +20,10 @@ test.setTimeout(180000);
 test.use({ serviceWorkers: "allow" });
 const owned = new Set<string>();
 const panel = (page: Page) =>
-  page.getByRole("region", { name: "Avisos neste aparelho", exact: true });
+  page.getByRole("dialog", { name: "Avisos neste aparelho", exact: true });
 const devicesPanel = (page: Page) => page.getByRole("region", { name: "Aparelhos com avisos", exact: true });
+const deviceSheet = (page: Page, name = "Este aparelho") => page.getByRole("dialog", { name, exact: true });
+const activate = (page: Page) => panel(page).getByRole("button", { name: /^(Ativar neste aparelho|Concluir ativação)$/ });
 function subscription() {
   const key = createECDH("prime256v1");
   key.generateKeys();
@@ -68,15 +70,24 @@ async function adapter(
   page: Page,
   value: ReturnType<typeof subscription>,
   outcome: "granted" | "denied",
+  persistBrowserState = false,
 ) {
   await page.addInitScript(
-    ({ value, outcome }) => {
+    ({ value, outcome, persistBrowserState }) => {
+      const storageKey = "fixture-browser-push:" + value.endpoint;
+      const persisted = persistBrowserState ? JSON.parse(sessionStorage.getItem(storageKey) ?? "null") : null;
       const state = {
-        permission: "default" as NotificationPermission,
+        permission: (persisted?.permission ?? "default") as NotificationPermission,
         requests: 0,
         subscriptions: 0,
-        active: false,
-        key: null as ArrayBuffer | null,
+        active: Boolean(persisted?.active),
+        key: persisted?.key ? Uint8Array.from(persisted.key).buffer : null,
+      };
+      const persist = () => {
+        if (persistBrowserState) sessionStorage.setItem(storageKey, JSON.stringify({
+          permission: state.permission, active: state.active,
+          key: state.key ? Array.from(new Uint8Array(state.key)) : null,
+        }));
       };
       (
         window as unknown as { hcaPushCapability: typeof state }
@@ -92,6 +103,7 @@ async function adapter(
         toJSON: () => value,
         unsubscribe: async () => {
           state.active = false;
+          persist();
           return true;
         },
       };
@@ -103,6 +115,7 @@ async function adapter(
           state.key = Uint8Array.from(
             options.applicationServerKey as Uint8Array,
           ).buffer;
+          persist();
           return current;
         },
       };
@@ -115,6 +128,7 @@ async function adapter(
           static requestPermission() {
             state.requests++;
             state.permission = outcome;
+            persist();
             return Promise.resolve(outcome);
           }
         },
@@ -129,9 +143,44 @@ async function adapter(
         { configurable: true, get: () => manager },
       );
     },
-    { value, outcome },
+    { value, outcome, persistBrowserState },
   );
 }
+async function openPushPanel(page: Page) {
+  await page.getByRole("button", { name: /^Avisos do aplicativo/ }).press("Enter");
+  await expect(panel(page)).toBeVisible();
+}
+
+async function acceptPush(page: Page, label?: string) {
+  await expect(activate(page)).toBeEnabled();
+  await activate(page).press("Enter");
+  const dialog = page.getByRole("dialog", { name: "Ativar avisos neste aparelho?", exact: true });
+  if (label) await dialog.getByLabel("Nome do aparelho (opcional)", { exact: true }).fill(label);
+  await dialog.getByRole("checkbox", { name: /^Quero receber avisos/ }).check();
+  await dialog.getByRole("button", { name: "Continuar ativação", exact: true }).press("Enter");
+}
+
+async function concludePush(page: Page, title: string) {
+  const dialog = page.getByRole("dialog", { name: title, exact: true });
+  await expect(dialog).toBeVisible();
+  await dialog.getByRole("button", { name: "Concluir", exact: true }).press("Enter");
+  await expect(dialog).toBeHidden();
+}
+
+async function openCurrentTest(page: Page, label = "Este aparelho") {
+  await panel(page).getByRole("button", { name: "Enviar um teste pessoal", exact: true }).press("Enter");
+  await expect(deviceSheet(page, label)).toBeVisible();
+}
+
+async function capturePushPanel(page: Page, info: TestInfo, name: string) {
+  const directory = "output/playwright/l4-device-panels";
+  mkdirSync(directory, { recursive: true });
+  for (const width of [360, 412]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.screenshot({ path: `${directory}/produto-${name}-${width}-${info.project.name}.png` });
+  }
+}
+
 async function openProfile(page: Page, patient: string, openNoticesDirectly = false) {
   await page.goto("/login");
   await page.getByLabel("E-mail", { exact: true }).fill(fixtures.family.email);
@@ -143,12 +192,8 @@ async function openProfile(page: Page, patient: string, openNoticesDirectly = fa
   await selectContext(page, patient);
   await page.goto(openNoticesDirectly ? "/perfil?profileTab=notices" : "/perfil");
   if (!openNoticesDirectly) await selectProfileSection(page, "notices");
-  await expect(
-    panel(page).getByRole("button", {
-      name: "Ativar avisos neste aparelho",
-      exact: true,
-    }),
-  ).toBeVisible();
+  await openPushPanel(page);
+  await expect(activate(page)).toBeVisible();
 }
 
 type DiagnosticRequest = { method: string; search: string; body: string | null };
@@ -156,7 +201,7 @@ type DiagnosticResponse = { waitForAbort: true } | { json: unknown; status?: num
 
 async function openControlledPersonalTest(page: Page, reply: (request: DiagnosticRequest) => DiagnosticResponse) {
   const fixture = await setup();
-  await adapter(page, subscription(), "granted");
+  await adapter(page, subscription(), "granted", true);
   // The browser simulates the provider response and its availability flag.
   // The local app still enrolls the real Auth session with external sending off.
   await page.exposeFunction("hcaFixturePushTest", reply);
@@ -187,8 +232,10 @@ async function openControlledPersonalTest(page: Page, reply: (request: Diagnosti
     };
   });
   await openProfile(page, fixture.patient, true);
-  await panel(page).getByRole("button", { name: "Ativar avisos neste aparelho", exact: true }).click();
-  const start = panel(page).getByRole("button", { name: "Enviar aviso de teste neste aparelho", exact: true });
+  await acceptPush(page);
+  await concludePush(page, "Inscrição confirmada");
+  await openCurrentTest(page);
+  const start = deviceSheet(page).getByRole("button", { name: "Enviar teste", exact: true });
   await expect(start).toBeEnabled();
   return start;
 }
@@ -209,13 +256,14 @@ test("L4 teste pessoal limita a espera a 30 segundos e consulta a mesma chave du
 
   await page.clock.install();
   await start.click();
-  const waiting = page.getByRole("dialog", { name: "Aguardando o serviço" });
+  const waiting = deviceSheet(page).getByRole("status").filter({ hasText: "Aguardando o serviço" });
   await expect(waiting).toBeVisible();
   await expect.poll(() => posted.length).toBe(1);
-  await page.clock.fastForward(27_000);
+  await capturePushPanel(page, info, "teste");
+  await page.clock.fastForward(24_000);
   await expect(waiting).toBeVisible();
   await info.attach("teste-pessoal-em-espera", { body: await page.screenshot(), contentType: "image/png" });
-  await page.clock.fastForward(3_100);
+  await page.clock.fastForward(6_100);
   const timeout = page.getByRole("dialog", { name: "O teste não respondeu a tempo", exact: true });
   const unconfirmed = page.getByRole("dialog", { name: "Não foi possível confirmar o teste", exact: true });
   await expect(timeout).toBeVisible();
@@ -235,7 +283,9 @@ test("L4 teste pessoal limita a espera a 30 segundos e consulta a mesma chave du
   await expect(unconfirmed).toBeHidden();
   await page.reload();
   await expect(page.getByRole("tab", { name: "Avisos e aplicativo", exact: true })).toHaveAttribute("aria-selected", "true");
-  await panel(page).getByRole("button", { name: "Ver detalhes do teste", exact: true }).press("Enter");
+  await openPushPanel(page);
+  await openCurrentTest(page);
+  await deviceSheet(page).getByRole("button", { name: "Ver detalhes do teste", exact: true }).press("Enter");
   await expect(unconfirmed).toBeVisible();
   expect(checked.map(params => [params.get("deviceId"), params.get("idempotencyKey")]))
     .toEqual(Array.from({ length: 2 }, () => [posted[0].deviceId, posted[0].idempotencyKey]));
@@ -279,7 +329,7 @@ test("Web Push liga consentimento real de API, evento interno, worker controlado
     second = subscription();
   const deviceLabel = "Navegador fictício " + randomUUID().slice(0, 8);
   const otherDeviceLabel = "Outro aparelho fictício " + randomUUID().slice(0, 8);
-  await adapter(page, first, "granted");
+  await adapter(page, first, "granted", true);
   await openProfile(page, f.patient);
   expect(
     await page.evaluate(
@@ -288,20 +338,12 @@ test("Web Push liga consentimento real de API, evento interno, worker controlado
           .hcaPushCapability.requests,
     ),
   ).toBe(0);
-  await panel(page)
-    .getByLabel("Nome do aparelho (opcional)", { exact: true })
-    .fill(deviceLabel);
-  await panel(page)
-    .getByRole("button", { name: "Ativar avisos neste aparelho", exact: true })
-    .click();
-  await expect(
-    panel(page).getByText(
-      "Avisos vinculados a esta conta neste aparelho. Isso não confirma entrega, ciência ou recebimento físico.",
-      { exact: true },
-    ),
-  ).toBeVisible();
-  await expect(panel(page).getByText("Avisos ativados nesta conta e sessão, neste aparelho.", { exact: true })).toBeVisible();
-  await expect(panel(page).getByRole("button", { name: "Enviar aviso de teste neste aparelho", exact: true })).toBeDisabled();
+  await acceptPush(page, deviceLabel);
+  await concludePush(page, "Inscrição confirmada");
+  await expect(panel(page).getByText("Confirmada para a sessão atual", { exact: true })).toBeVisible();
+  await openCurrentTest(page, deviceLabel);
+  await expect(deviceSheet(page, deviceLabel).getByRole("button", { name: "Enviar teste", exact: true })).toBeDisabled();
+  await deviceSheet(page, deviceLabel).getByRole("button", { name: "Voltar", exact: true }).press("Enter");
   // The guarded local runner keeps external delivery off; enrollment is not delivery proof.
   const consent = await (await page.request.get("/api/push/devices?context=consent")).json();
   const thisDevice = consent.devices.find((device: { fingerprint: string }) => device.fingerprint === createHash("sha256").update(first.endpoint).digest("hex"));
@@ -336,10 +378,8 @@ test("Web Push liga consentimento real de API, evento interno, worker controlado
     p_label: otherDeviceLabel,
     p_key_version: "ephemeral-push-test-v1",
   });
-  await panel(page)
-    .getByRole("button", { name: "Consultar aparelhos novamente", exact: true })
-    .click();
-  await selectProfileSection(page, "devices");
+  await panel(page).getByRole("button", { name: "Ver dispositivos", exact: true }).press("Enter");
+  await expect(page.getByRole("tab", { name: "Dispositivos", exact: true })).toHaveAttribute("aria-selected", "true");
   await expect(
     devicesPanel(page).getByText(otherDeviceLabel, { exact: true }),
   ).toBeVisible();
@@ -421,19 +461,50 @@ test("Web Push liga consentimento real de API, evento interno, worker controlado
   const apiDevices = await (await page.request.get("/api/push/devices")).json();
   expect(JSON.stringify(apiDevices)).not.toContain(first.endpoint);
   expect(JSON.stringify(apiDevices)).not.toContain(first.keys.auth);
-  await page.goto("/perfil");
-  await selectProfileSection(page, "devices");
-  await devicesPanel(page)
-    .getByRole("button", {
-      name: "Desativar avisos de " + deviceLabel,
-      exact: true,
-    })
-    .click();
+  await page.goto("/perfil?profileTab=devices");
+  await devicesPanel(page).getByRole("button", { name: new RegExp(deviceLabel) }).press("Enter");
+  const device = deviceSheet(page, deviceLabel);
+  await expect(device).toBeVisible();
+  const renamed = deviceLabel + " atualizado";
+  await device.getByRole("textbox", { name: "Nome do aparelho", exact: true }).fill(renamed);
+  await device.getByRole("button", { name: "Salvar nome", exact: true }).press("Enter");
+  await concludePush(page, "Nome do aparelho atualizado");
+  const renamedSheet = deviceSheet(page, renamed);
+  await expect(renamedSheet).toBeVisible();
+  await page.evaluate(() => {
+    const realFetch = window.fetch.bind(window);
+    window.fetch = async (input, init) => {
+      const receipt = await realFetch(input, init);
+      const url = new URL(input instanceof Request ? input.url : input, location.origin);
+      if (receipt.ok && url.pathname === "/api/push/devices" && init?.method === "PATCH" &&
+        typeof init.body === "string" && JSON.parse(init.body).action === "pause")
+        throw new TypeError("Failed to fetch after confirmed synthetic pause");
+      return receipt;
+    };
+  });
+  await renamedSheet.getByRole("button", { name: "Pausar por 8 horas", exact: true }).press("Enter");
+  await page.getByRole("dialog", { name: "Pausar avisos por 8 horas?", exact: true })
+    .getByRole("button", { name: "Pausar por 8 horas", exact: true }).press("Enter");
+  await page.getByRole("dialog", { name: "O resultado dos avisos ainda não foi confirmado", exact: true })
+    .getByRole("button", { name: "Conferir resultado", exact: true }).press("Enter");
+  await concludePush(page, "Avisos pausados");
+  await expect(renamedSheet.getByText("Uma pausa nos avisos", { exact: true })).toBeVisible();
+  await capturePushPanel(page, info, "pausa");
+  expect(sql(`select count(*) from private.web_push_device_events where device_id=${sqlLiteral(thisDevice.id)} and event='pause';`)).toBe("1");
+  await renamedSheet.getByRole("button", { name: "Retomar avisos", exact: true }).press("Enter");
+  await page.getByRole("dialog", { name: "Retomar os avisos?", exact: true })
+    .getByRole("button", { name: "Retomar avisos", exact: true }).press("Enter");
+  await concludePush(page, "Avisos retomados");
+  await renamedSheet.getByRole("button", { name: "Revogar inscrição", exact: true }).press("Enter");
+  await page.getByRole("dialog", { name: "Revogar esta inscrição?", exact: true })
+    .getByRole("button", { name: "Revogar inscrição", exact: true }).press("Enter");
+  await concludePush(page, "Inscrição revogada");
+  await renamedSheet.getByRole("button", { name: "Voltar", exact: true }).press("Enter");
   await expect(
     devicesPanel(page)
       .getByRole("listitem")
-      .filter({ has: page.getByText(deviceLabel, { exact: true }) })
-      .getByText("Desativado", { exact: true }),
+      .filter({ has: page.getByText(renamed, { exact: true }) })
+      .getByText("Revogado", { exact: true }),
   ).toBeVisible();
   expect(
     sql(
@@ -450,37 +521,27 @@ test("Web Push liga consentimento real de API, evento interno, worker controlado
 });
 test("Web Push negado não repete pedido, não inscreve e mantém a central e o fallback sem suporte", async ({
   page,
-}) => {
+}, info) => {
   const f = await setup(),
     value = subscription();
   await adapter(page, value, "denied");
   await openProfile(page, f.patient);
   await page.bringToFront();
-  const activate = panel(page).getByRole("button", { name: "Ativar avisos neste aparelho", exact: true });
-  await activate.scrollIntoViewIfNeeded();
+  await activate(page).scrollIntoViewIfNeeded();
   await expect.poll(() => page.evaluate(async () =>
     (await navigator.serviceWorker.getRegistration("/"))?.active?.state,
   )).toBe("activated");
-  await expect(activate).toBeEnabled();
-  await activate.click();
+  await expect(activate(page)).toBeEnabled();
+  await acceptPush(page);
   await expect.poll(() => page.evaluate(() =>
     (window as unknown as { hcaPushCapability: { requests: number } }).hcaPushCapability.requests,
   )).toBe(1);
-  await expect(
-    panel(page).getByText(
-      "Permissão não concedida. Suas pendências continuam na central de notificações.",
-      { exact: true },
-    ),
-  ).toBeVisible();
-  await expect(
-    panel(page).getByRole("button", {
-      name: "Ativar avisos neste aparelho",
-      exact: true,
-    }),
-  ).toBeDisabled();
+  await expect(panel(page).getByText("Permissão bloqueada", { exact: true })).toBeVisible();
+  await capturePushPanel(page, info, "bloqueio");
+  await expect(activate(page)).toHaveCount(0);
   await panel(page)
-    .getByRole("button", { name: "Consultar aparelhos novamente", exact: true })
-    .click();
+    .getByRole("button", { name: "Conferir permissão", exact: true })
+    .press("Enter");
   expect(
     await page.evaluate(
       () =>
@@ -500,19 +561,14 @@ test("Web Push negado não repete pedido, não inscreve e mantém a central e o 
     });
   });
   await panel(page)
-    .getByRole("button", { name: "Consultar aparelhos novamente", exact: true })
-    .click();
+    .getByRole("button", { name: "Conferir permissão", exact: true })
+    .press("Enter");
   await expect(
-    panel(page).getByText(/Este navegador não oferece avisos neste modo/),
+    panel(page).getByText("Este navegador não oferece avisos", { exact: true }),
   ).toBeVisible();
-  await expect(
-    panel(page).getByRole("button", {
-      name: "Ativar avisos neste aparelho",
-      exact: true,
-    }),
-  ).toHaveCount(0);
+  await expect(activate(page)).toHaveCount(0);
   await auditFromTop(page, "push-unavailable");
-  await page.goto("/notificacoes");
+  await panel(page).getByRole("link", { name: "Abrir central", exact: true }).press("Enter");
   await expect(
     page.getByRole("heading", { name: "Avisos", exact: true }),
   ).toBeVisible();
@@ -531,9 +587,9 @@ test("preparação recusada explica a falha, bloqueia permissão Push e recupera
     };
   });
   await openProfile(page, f.patient);
-  await expect(panel(page).getByRole("button", { name: "Ativar avisos neste aparelho", exact: true })).toBeDisabled();
+  await expect(activate(page)).toBeDisabled();
   expect(await page.evaluate(() => (window as unknown as { hcaPushCapability: { requests: number; subscriptions: number } }).hcaPushCapability)).toMatchObject({ requests: 0, subscriptions: 0 });
-  await selectProfileSection(page, "notices");
+  await panel(page).getByRole("button", { name: "Voltar", exact: true }).press("Enter");
   const app = page.getByRole("region", { name: "Aplicativo neste aparelho", exact: true });
   await expect(app.getByRole("alert").filter({ hasText: "Não foi possível iniciar a preparação" })).toBeVisible();
   const attempts = await page.evaluate(() => (window as unknown as { hcaRegistrationGate: { calls: number } }).hcaRegistrationGate.calls);
@@ -546,18 +602,27 @@ test("preparação recusada explica a falha, bloqueia permissão Push e recupera
   await expect(app.getByText("Orientação pública disponível para falta de conexão.", { exact: true })).toBeVisible();
   expect(await page.evaluate(() => performance.timeOrigin)).toBe(clock);
   expect(await page.evaluate(() => matchMedia("(display-mode: standalone)").matches)).toBe(false);
+  const checkUpdates = app.getByRole("button", { name: "Consultar atualizações", exact: true });
   for (const width of [1440, 768, 390, 320]) {
     await page.setViewportSize({ width, height: 950 });
-    // Reflow must start this visual task at its actual section, rather than
-    // preserving a previous viewport's arbitrary mid-control scroll offset.
-    await app.evaluate(element => element.scrollIntoView({ block: "start" }));
-    await audit(page, "PWA-preparation-recovery-" + width);
+    // Audit the page at its known origin, then check the actual update target
+    // at a separate, reachable scroll position.
+    await auditFromTop(page, "PWA-preparation-recovery-" + width);
+    await checkUpdates.evaluate(element => element.scrollIntoView({ block: "center" }));
+    await checkUpdates.focus();
+    await expect(checkUpdates).toBeFocused();
+    await expect.poll(() => checkUpdates.evaluate(element => {
+      const bounds = element.getBoundingClientRect();
+      return [-11, 11].every(offset => element.contains(document.elementFromPoint(
+        bounds.left + bounds.width / 2, bounds.top + bounds.height / 2 + offset,
+      )));
+    })).toBe(true);
   }
-  const activate = panel(page).getByRole("button", { name: "Ativar avisos neste aparelho", exact: true });
-  await expect(activate).toBeEnabled();
+  await openPushPanel(page);
+  await expect(activate(page)).toBeEnabled();
   expect(await page.evaluate(() => (window as unknown as { hcaPushCapability: { requests: number } }).hcaPushCapability.requests)).toBe(0);
-  await activate.click();
-  await expect(panel(page).getByText(/^Avisos vinculados a esta conta neste aparelho/)).toBeVisible();
+  await acceptPush(page);
+  await concludePush(page, "Inscrição confirmada");
   expect(await page.evaluate(() => (window as unknown as { hcaPushCapability: { requests: number; subscriptions: number } }).hcaPushCapability)).toMatchObject({ requests: 1, subscriptions: 1 });
   expect(sql(`select count(*) from private.web_push_devices where fingerprint=${sqlLiteral(createHash("sha256").update(value.endpoint).digest("hex"))} and user_id=${sqlLiteral(fixtures.family.id)} and state='active';`)).toBe("1");
 });
@@ -567,7 +632,7 @@ for (const account of ["professional", "family"] as const) test("Web Push refuse
   const f = await setup(), value = subscription();
   await adapter(page, value, "granted");
   await openProfile(page, f.patient);
-  await expect(panel(page).getByRole("button", { name: "Ativar avisos neste aparelho", exact: true })).toBeEnabled();
+  await expect(activate(page)).toBeEnabled();
   await page.evaluate(() => {
     const permission = Notification.requestPermission.bind(Notification);
     (Notification as unknown as { requestPermission: () => Promise<NotificationPermission> }).requestPermission = () => new Promise(resolve => {
@@ -575,9 +640,7 @@ for (const account of ["professional", "family"] as const) test("Web Push refuse
     });
   });
   await page.bringToFront();
-  const enroll = panel(page).getByRole("button", { name: "Ativar avisos neste aparelho", exact: true });
-  await enroll.focus();await expect(enroll).toBeFocused();await expect(enroll).toBeEnabled();
-  await enroll.press("Enter");
+  await acceptPush(page);
   await expect.poll(() => page.evaluate(() => typeof (window as unknown as { releasePushPermission?: unknown }).releasePushPermission)).toBe("function");
   const originalContext = await (await page.request.get("/api/push/devices?context=consent")).json();
   expect(originalContext.contextReference).toMatch(/^[a-f0-9]{64}$/);
@@ -596,7 +659,8 @@ for (const account of ["professional", "family"] as const) test("Web Push refuse
   const refreshedProfile = (await (await page.request.get("/api/profile")).json()).data;
   // A different account remounts its own settings; the same account with a
   // new session must retain the explicit stale-consent refusal.
-  await expect.poll(async () => (account !== "family" && (await page.getByLabel("Menu do usuário", { exact: true }).textContent())?.includes(refreshedProfile.full_name)) || await panel(page).getByRole("alert").isVisible()).toBe(true);
+  const rejected = page.getByRole("dialog", { name: "Não foi possível concluir a alteração dos avisos", exact: true });
+  await expect.poll(async () => (account !== "family" && (await page.getByLabel("Menu do usuário", { exact: true }).textContent())?.includes(refreshedProfile.full_name)) || await rejected.isVisible()).toBe(true);
   page.off("response", observe);
   for (const rejected of automatic) {
     expect(rejected.status(), await rejected.text()).toBe(409);
@@ -607,14 +671,14 @@ for (const account of ["professional", "family"] as const) test("Web Push refuse
   expect(await refused.json()).toMatchObject({ code: "VERSION_CONFLICT" });
   const fingerprint = createHash("sha256").update(value.endpoint).digest("hex");
   expect(sql("select count(*) from private.web_push_devices where fingerprint=" + sqlLiteral(fingerprint) + ";")).toBe("0");
-  if (account === "family") await expect(panel(page).getByRole("alert")).toContainText("sessão");
+  if (account === "family") await expect(rejected).toContainText("sessão");
   const legacy = await (await page.request.get("/api/push/devices")).json();
   expect(legacy).not.toHaveProperty("contextReference");
   await page.reload();
-  await selectProfileSection(page, "notices");
-  const activate = panel(page).getByRole("button", { name: "Ativar avisos neste aparelho", exact: true });
-  await expect(activate).toBeEnabled(); await activate.click();
-  await expect(panel(page).getByText("Avisos vinculados a esta conta neste aparelho. Isso não confirma entrega, ciência ou recebimento físico.", { exact: true })).toBeVisible();
+  await openPushPanel(page);
+  await expect(activate(page)).toBeEnabled();
+  await acceptPush(page);
+  await concludePush(page, "Inscrição confirmada");
   const device = JSON.parse(sql("select jsonb_build_object('id',id,'userId',user_id,'state',state) from private.web_push_devices where fingerprint=" + sqlLiteral(fingerprint) + ";"));
   expect(device).toMatchObject({ userId: fixtures[account].id, state: "active" });
   const staleCommand = await page.request.patch("/api/push/devices", { data: { id: device.id, action: "revoke", contextReference: originalContext.contextReference } });

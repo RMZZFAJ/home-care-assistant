@@ -181,21 +181,26 @@ export function PersonalPushTest({ deviceId, shown, eligible, contextReference, 
   const expiredAction = result?.state === "expired"
     ? { label: "Consultar aparelhos", onClick: () => { close(); refreshDevice(); } } : undefined;
   if (!shown && !attempt && !result) return null;
-  return <div className="hca-personal-push-test">
+  return <section className="hca-push-block hca-personal-push-test">
     <h3>Teste pessoal</h3>
-    {result && !waiting ? <p role="status">{result.title}{nextTest ? ` · Próximo teste a partir de ${nextTest}.` : null}</p>
-      : <p>Envie um aviso discreto para conferir este aparelho.</p>}
-    <ActionButton ref={triggerRef} onClick={() => void run(Boolean(attempt))}
-      disabled={Boolean(waiting) || offline && !exhausted || !attempt && (!eligible || coolingDown)}>
-      <Icon name={attempt ? "refresh" : "send"} width={16} height={16} />
-      {attempt ? exhausted ? "Ver detalhes do teste" : "Conferir este teste" : "Enviar aviso de teste neste aparelho"}
-    </ActionButton>
-    {active && waiting ? <Dialog open closeDisabled title={waiting === "sending" ? "Aguardando o serviço" : "Conferindo o teste"}
-      kicker="Teste pessoal" headingIcon="clock" onClose={() => {}} popupClassName="hca-push-test-wait">
-      <p role="status">A resposta será aguardada por até 30 segundos.</p>
-      <div className="hca-push-test-track" aria-hidden="true"><span /></div>
-      <p>Consulta da mesma tentativa, sem reenvio.</p>
-    </Dialog> : null}
+    <div className="hca-push-block-content">
+      {waiting ? <div className="hca-push-test-wait" role="status">
+        <Icon name="clock" width={22} height={22} />
+        <div>
+          <strong>{waiting === "sending" ? "Aguardando o serviço" : "Conferindo o teste"}</strong>
+          <p>A resposta será aguardada por até 30 segundos.</p>
+          <div className="hca-push-test-track" aria-hidden="true"><span /></div>
+          <small>Consulta da mesma tentativa, sem reenvio.</small>
+        </div>
+      </div> : result ? <p role="status">{result.title}{nextTest ? ` · Próximo teste a partir de ${nextTest}.` : null}</p>
+        : <p>Envie um aviso discreto para conferir este aparelho.</p>}
+      <ActionButton ref={triggerRef} onClick={() => void run(Boolean(attempt))}
+        disabled={Boolean(waiting) || offline && !exhausted || !attempt && (!eligible || coolingDown)}>
+        <Icon name={attempt ? "refresh" : "send"} width={16} height={16} />
+        {attempt ? exhausted ? "Ver detalhes do teste" : "Conferir este teste" : "Enviar teste"}
+      </ActionButton>
+      <small>A exibição do aviso é conferida no próprio aparelho.</small>
+    </div>
     {active && !waiting && result && dialogOpen && (result.state === "accepted"
       ? <Dialog open success title={result.title} subtitle={result.description} onClose={close} finalFocus={triggerRef}
         footer={<ActionButton variant="primary" onClick={close}>Concluir</ActionButton>}>{null}</Dialog>
@@ -209,5 +214,5 @@ export function PersonalPushTest({ deviceId, shown, eligible, contextReference, 
         onClose={close} closeLabel="Voltar" finalFocus={triggerRef}
         action={canCheck ? { label: "Conferir este teste", onClick: () => void run(true) } : expiredAction} />
     )}
-  </div>;
+  </section>;
 }

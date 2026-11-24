@@ -171,7 +171,7 @@ test("15 ID02 NOT02 NOT04 profile tabs follow the model and retain unsaved field
   await expect(page.getByRole("region", { name: "Ciência de requisições", exact: true })).toBeVisible();
   await selectProfileSection(page, "devices");
   await expect(page.getByRole("region", { name: "Aparelhos com avisos", exact: true })).toBeVisible();
-  await expect(page.getByRole("button", { name: "Consultar aparelhos novamente", exact: true })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Atualizar dispositivos", exact: true })).toBeVisible();
   expect(guideReads).toEqual([]);
   await selectProfileSection(page, "help");
   await expect(page.getByRole("region", { name: "Guias e ajuda", exact: true })).toBeVisible();

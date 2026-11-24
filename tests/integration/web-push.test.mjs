@@ -484,6 +484,44 @@ test("concurrent workers claim disjoint deliveries, pause keeps the internal not
   );
 });
 
+test("device changes keep one scoped receipt, compare the reviewed version and preserve subscription when renaming", async () => {
+  const owner = await login(), otherSession = await login(), stranger = await login("professional");
+  const sub = subscription(), key = randomUUID();
+  const enrollment = { p_key: key, p_action: "enroll", p_input: { subscription: sub, label: "Meu notebook", keyVersion: "test-v1" } };
+  const anonymous = createClient(env.url, env.anonKey, { auth: { persistSession: false } });
+  for (const denied of [anonymous, service]) {
+    assert.equal((await denied.rpc("apply_my_web_push_change", enrollment)).error?.code, "42501");
+    assert.equal((await denied.rpc("my_web_push_device_receipt", { p_key: key })).error?.code, "42501");
+  }
+  const first = await rpc(owner, "apply_my_web_push_change", enrollment);
+  owned.add(first.id);
+  assert.deepEqual(await rpc(owner, "apply_my_web_push_change", enrollment), first);
+  assert.deepEqual(Object.keys(first).sort(), ["action", "id"]);
+  assert.deepEqual(await rpc(owner, "my_web_push_device_receipt", { p_key: key }), first);
+  for (const denied of [otherSession, stranger])
+    assert.equal(await rpc(denied, "my_web_push_device_receipt", { p_key: key }), null);
+  assert.equal((await otherSession.rpc("apply_my_web_push_change", enrollment)).error?.code, "PT409");
+  const row = async () => (await rpc(owner, "my_web_push_devices")).find(device => device.id === first.id);
+  const expectedVersion = (await row()).updatedAt;
+  const rename = { p_key: randomUUID(), p_action: "rename", p_input: { id: first.id, expectedVersion, label: "Notebook da família" } };
+  assert.equal((await stranger.rpc("apply_my_web_push_change", rename)).error?.code, "42501");
+  assert.equal((await otherSession.rpc("apply_my_web_push_change", rename)).error?.code, "42501");
+  assert.deepEqual(await rpc(owner, "apply_my_web_push_change", rename), { id: first.id, action: "rename" });
+  assert.deepEqual(await rpc(owner, "apply_my_web_push_change", rename), { id: first.id, action: "rename" });
+  assert.equal((await row()).label, rename.p_input.label);
+  assert.equal((await row()).state, "active");
+  assert.equal((await row()).currentSession, true);
+  assert.equal(sql(`select count(*) from private.web_push_device_events where device_id=${sqlLiteral(first.id)} and event='rename';`), "1");
+  assert.equal(sql(`select count(*) from private.web_push_device_events where device_id=${sqlLiteral(first.id)} and event='consent';`), "1");
+  const pause = { p_key: randomUUID(), p_action: "pause", p_input: { id: first.id, expectedVersion } };
+  assert.equal((await owner.rpc("apply_my_web_push_change", pause)).error?.code, "PT409");
+  pause.p_input.expectedVersion = (await row()).updatedAt;
+  const changes = await Promise.all([rpc(owner, "apply_my_web_push_change", pause), rpc(owner, "apply_my_web_push_change", pause)]);
+  assert.deepEqual(changes[0], changes[1]);
+  assert.equal(sql(`select count(*) from private.web_push_device_events where device_id=${sqlLiteral(first.id)} and event='pause';`), "1");
+  assert.ok(Date.parse((await row()).mutedUntil) > Date.now());
+});
+
 test("personal Push test binds Auth and session, reserves once, rate limits and fences concurrent dispatch", async () => {
   const owner = await login(), otherSession = await login(), stranger = await login("professional");
   const device = await enroll(owner), key = randomUUID();

@@ -4119,6 +4119,46 @@ desligado. As capturas e a comparação de 360 e 412 px ficam em
 com o ícone compartilhado de resultado incerto. A espera ainda está em
 diálogo. Na v2, ela aparece dentro do painel deste aparelho.
 
+### E11-06 e E11-07 — Ativação, aparelhos e teste pessoal
+
+- **Avisos do aplicativo** abre o painel do aparelho. A situação distingue
+  suporte, permissão nativa, vínculo da inscrição com a sessão, serviço
+  indisponível e pausa. A confirmação da ativação pede consentimento antes
+  de abrir a permissão do navegador. A negativa oferece instruções e uma
+  consulta da permissão.
+- A aba **Dispositivos** abre o detalhe de cada inscrição. O painel usa
+  o nome e a data registrados pelo sistema. Os exemplos de navegador no
+  laboratório ilustram metadados que o contrato de aparelhos não coleta.
+- O aparelho atual permite editar o nome e testar a inscrição elegível.
+  A barra de espera fica no painel do aparelho, como em E11-07. O aviso
+  de prazo e os resultados usam os diálogos compartilhados. **Salvar nome**
+  grava a alteração e abre o resultado. Pausa, retomada e revogação têm
+  confirmação explícita.
+- As operações mantêm comprovante restrito à conta e à sessão de origem.
+  Uma resposta perdida pode ser consultada duas vezes pelo mesmo
+  identificador. A versão da inscrição protege a ação confirmada em outra
+  sessão. A alteração do nome mantém a inscrição, sua fila e o consentimento.
+
+| Migration | Local | Remoto |
+| --- | --- | --- |
+| `20261124115540_l4_push_device_commands` | Aplicada | Pendente |
+
+O Supabase local registrou 375 migrations. Passaram 12 testes de integração
+com Auth real, incluindo isolamento do comprovante, concorrência e
+renomeação sem novo consentimento. O Advisor conservou o aviso anterior
+para a extensão `unaccent`.
+
+Dez verificações dirigidas de perfil, espera do teste, permissão bloqueada,
+preparação e gestão de aparelhos passaram nos dois navegadores emulados.
+A gravação direta do nome e o ciclo de pausa, retomada e revogação passaram
+na reexecução nos dois navegadores, sem retentativas.
+O caso de pausa descartou a resposta HTTP depois da gravação, recuperou
+o comprovante por GET e verificou um único evento. A validação de preparação
+em 320 px mantém a auditoria na página e confere foco e área acessível
+do botão de atualização na própria região. Os testes foram feitos com
+transporte controlado. As capturas de bloqueio, pausa e teste em 360 e
+412 px ficam em `output/playwright/l4-device-panels/`.
+
 ### E12-01 — Guias e ajuda na tarefa
 
 - Os assuntos são apresentados por função e abrem o painel de orientação
@@ -4468,6 +4508,12 @@ continua pelo menu **Outras áreas**. A visão técnica e a continuidade
 passaram no Chromium após esse ajuste, sem retentativa.
 
 ### Pendências para o aceite de L4
+
+A mensagem de encaminhamento pede que os anexos de L4 sejam ignorados pelo
+Git. A seção 2 do comando mestre pede o versionamento no arranjo de L1–L3.
+Os dois anexos foram versionados em `b95c3872`, e a CI lê o HTML para as
+comparações de E10–E12. O SHA-256 local do HTML confere com o comando
+mestre. A decisão do responsável sobre o versionamento está pendente.
 
 E10-04 tem exercícios dirigidos com Auth real em conferência de chegadas
 COM, regularização ENT, estoque familiar, administração de acesso, balanço

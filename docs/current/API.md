@@ -1663,6 +1663,18 @@ Auth e autorização nativos continuam obrigatórios. O GET original não muda
 sua forma. POST /api/push/session revoga somente as
 inscrições vinculadas à sessão corrente. Todos os comandos conferem origem/CSRF.
 
+No fluxo L4, POST e PATCH enviam `idempotencyKey`. PATCH também envia a versão
+consultada em `expectedVersion` e aceita `rename` com `label` para a inscrição
+vinculada à sessão. Pausar, retomar e revogar continuam disponíveis para os
+aparelhos da própria conta. Uma versão divergente é recusada com
+`VERSION_CONFLICT`. Renomear mantém consentimento e fila de entrega.
+
+`GET /api/push/devices?attempt=<uuid>` consulta o comprovante da conta e sessão
+que iniciaram a ação. O resultado tem ID e ação, sem dados da inscrição, ou
+`data: null` quando não existe comprovante visível. Consultar mantém o nome,
+o consentimento e a duração da pausa registrados. O fluxo oferece até duas
+consultas antes de apresentar os detalhes para suporte.
+
 `POST /api/push/test` recebe `deviceId`, `idempotencyKey` e `contextReference`.
 Exige conta/sessão atuais, inscrição própria e envio habilitado. Apenas as
 RPCs de serviço obtêm a inscrição e concluem o resultado, após revalidar

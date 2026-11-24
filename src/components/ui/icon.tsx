@@ -47,6 +47,7 @@ const paths = {
   "eye": "M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12 M9 12a3 3 0 1 0 6 0a3 3 0 1 0-6 0",
   "layers": "m3 8 9-5 9 5-9 5z M3 12l9 5 9-5 M3 16l9 5 9-5",
   "phone": "M7 2h10v20H7z M10 18h4",
+  "monitor": "M3 4h18v13H3z M12 17v4 M8 21h8",
   "sliders": "M4 7h16 M4 17h16 M8 4v6 M16 14v6",
   "logout": "M10 3H4v18h6 M10 12h11 M16 7l5 5-5 5",
   "chart": "M4 3v18h17 M8 17v-5 M13 17V8 M18 17V5",

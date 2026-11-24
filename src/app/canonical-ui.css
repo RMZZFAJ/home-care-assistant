@@ -363,7 +363,8 @@ html { scroll-padding-block-start: calc(var(--app-header-height) + 12px); }
   .hca-document-tab { padding: 12px; }
   /* Reserve the tab row as well as the header when bringing a field into view. */
   .hca-workspace .hca-document-panel,
-  .hca-workspace .hca-document-panel :is(a,button,input,select,textarea,summary,[tabindex]) { scroll-margin-block-start: 68px; }
+  .hca-workspace .hca-profile-panel .hca-settings-section,
+  .hca-workspace :is(.hca-document-panel, .hca-profile-panel) :is(a,button,input,select,textarea,summary,[tabindex]) { scroll-margin-block-start: 68px; }
 }
 @media (max-width: 500px) { .hca-document-milestones { gap: 7px; } .hca-milestone-title { display: block; font-size: 10px; } .hca-milestone-index { margin-bottom: 5px; } .hca-document-milestones li > p { font-size: 9px; line-height: 1.4; margin: 4px 0 0; } .hca-document-tab-list { gap: 0; } .hca-document-tab { padding: 12px 10px; font-size: 11px; gap: 5px; } .hca-document-tab > svg { width: 14px; } .hca-milestone-track { height: 4px; } }
 .hca-progress-feed > .hca-section-heading > div { flex: 1 1 240px; }

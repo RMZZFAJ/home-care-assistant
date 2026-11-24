@@ -33,6 +33,8 @@ export function databaseError(
   const message = error?.message ?? "";
   if (error?.code === "PT409" && message === "stale preference version")
     throw new ApiError("VERSION_CONFLICT", "A preferência mudou em outra sessão. Confira a versão atual.", 409);
+  if (error?.code === "PT409" && ["stale push device version", "push device attempt differs"].includes(message))
+    throw new ApiError("VERSION_CONFLICT", "A situação deste aparelho mudou. Confira o registro atual antes de confirmar outra ação.", 409);
   if (error?.code === "PT409" && message === "reviewed residence administrator changed")
     throw new ApiError("VERSION_CONFLICT", "A conta administradora mudou durante a revisão. Confira o e-mail antes de revisar novamente.", 409);
   if (error?.code === "PT409" && message === "requisition stock reference changed")

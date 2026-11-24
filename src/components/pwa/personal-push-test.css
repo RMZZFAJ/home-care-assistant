@@ -1,12 +1,18 @@
-.hca-personal-push-test {
-  display: grid;
-  justify-items: start;
-  gap: .5rem;
+.hca-push-test-wait {
+  display: flex;
+  gap: .65rem;
+  width: 100%;
 }
 
-.hca-push-test-wait .hca-modal-content {
+.hca-push-test-wait > div {
   display: grid;
-  gap: .75rem;
+  flex: 1;
+  gap: .4rem;
+}
+
+.hca-push-test-wait > svg {
+  flex: none;
+  color: var(--hca-teal);
 }
 
 .hca-push-test-track {

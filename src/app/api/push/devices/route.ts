@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { api, ApiError, authenticate, readJson, rpc } from "@/lib/server/api";
+import { api, ApiError, authenticate, parseUuid, readJson, rpc } from "@/lib/server/api";
 import {
   pushDeviceCommand,
   pushDevices,
@@ -16,11 +16,16 @@ export const runtime = "nodejs";
 export async function GET(request: Request) {
   return api("push.devices", async () => {
     const auth = await authenticate();
+    const query = new URL(request.url).searchParams;
+    if (query.has("attempt")) {
+      const data = await rpc(auth.client, "my_web_push_device_receipt", { p_key: parseUuid(query.get("attempt")) });
+      return NextResponse.json({ data });
+    }
     const devices = pushDevices.parse(
       await rpc(auth.client, "my_web_push_devices"),
     );
     const configuration = readablePushConfiguration();
-    const includeContext = new URL(request.url).searchParams.get("context") === "consent";
+    const includeContext = query.get("context") === "consent";
     return NextResponse.json({
       devices,
       available: !!configuration,
@@ -44,6 +49,13 @@ export async function POST(request: Request) {
       );
     await requirePushRequestContext(auth, input.contextReference, config);
     validatePushPublicKey(input.subscription);
+    if (input.idempotencyKey) {
+      const data = await rpc(auth.client, "apply_my_web_push_change", {
+        p_key: input.idempotencyKey, p_action: "enroll",
+        p_input: { subscription: input.subscription, label: input.label, keyVersion: config.keyVersion },
+      });
+      return NextResponse.json({ data });
+    }
     const data = await rpc(auth.client, "subscribe_web_push", {
       p_subscription: input.subscription,
       p_label: input.label,
@@ -57,6 +69,14 @@ export async function PATCH(request: Request) {
     const input = await readJson(request, pushDeviceCommand);
     const auth = await authenticate();
     await requirePushRequestContext(auth, input.contextReference, readablePushConfiguration());
+    if (input.idempotencyKey) {
+      const data = await rpc(auth.client, "apply_my_web_push_change", {
+        p_key: input.idempotencyKey,
+        p_action: input.action,
+        p_input: { id: input.id, expectedVersion: input.expectedVersion, ...(input.action === "rename" ? { label: input.label } : {}) },
+      });
+      return NextResponse.json({ data });
+    }
     const data = await rpc(auth.client, "web_push_device_command", {
       p_id: input.id,
       p_action: input.action,
