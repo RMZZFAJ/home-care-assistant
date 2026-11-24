@@ -1,15 +1,17 @@
 import { z } from "zod";
 
 export const invitationDecision = z.enum(["accept", "decline"]);
+export const invitationToken = z.string().regex(/^[A-Za-z0-9_-]{43}$/);
 export const invitationIntent = z.object({
-  token: z.string().regex(/^[A-Za-z0-9_-]{43}$/),
+  token: invitationToken,
   expectedActor: z.uuid(),
   decision: invitationDecision,
 }).strict();
 export type InvitationIntent = z.infer<typeof invitationIntent>;
-const preview = z.object({
+const preview = z.strictObject({
   state: z.enum(["ready", "login_required", "wrong_account", "accepted", "declined", "expired", "revoked", "invalid"]),
   patientName: z.string().min(1).optional(),
+  patientId: z.uuid().optional(),
   recipientEmail: z.email().optional(),
   role: z.enum(["admin", "family", "professional", "supervisor", "reader"]).optional(),
   inviterName: z.string().nullable().optional(),
@@ -25,6 +27,9 @@ const response = z.object({ data: preview, actorId: z.uuid().nullable() }).super
   }
   if (!value.actorId || !value.data.patientName || !value.data.recipientEmail || !value.data.role || !value.data.expiresAt || typeof value.data.canManageStock !== "boolean" || typeof value.data.canCountStock !== "boolean") {
     ctx.addIssue({ code: "custom", message: "Incomplete invitation preview" });
+  }
+  if ((value.data.state === "accepted") !== Boolean(value.data.patientId)) {
+    ctx.addIssue({ code: "custom", message: "Invitation destination does not match the current state" });
   }
 });
 export function parseInvitationRead(value: unknown) {

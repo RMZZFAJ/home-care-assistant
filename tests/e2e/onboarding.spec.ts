@@ -43,8 +43,8 @@ test("convite → cadastro pessoal → confirmação de e-mail → aceite → re
   await expect(page).toHaveURL(/\/login$/);
   await page.goto(invitationUrl);
   await page.getByText("Ainda não tenho conta", { exact: true }).click();
-  await page.getByLabel("Nome", { exact: true }).fill("Pessoa convidada E2E");
-  await page.getByLabel("E-mail do convite", { exact: true }).fill(email);
+  await page.getByRole("textbox", { name: "Nome", exact: true }).fill("Pessoa convidada E2E");
+  await page.getByRole("textbox", { name: "E-mail do convite", exact: true }).fill(email);
   await page.getByLabel("Senha pessoal", { exact: true }).fill(fixturePassword);
   const registered = page.waitForResponse(
     (response) =>
@@ -59,6 +59,7 @@ test("convite → cadastro pessoal → confirmação de e-mail → aceite → re
   await expect(
     page.getByText("Se o cadastro for elegível", { exact: false }),
   ).toBeVisible();
+  await page.getByRole("dialog", { name: "Confira seu e-mail", exact: true }).getByRole("button", { name: "Concluir", exact: true }).click();
   // An unconfirmed identity must not acquire a patient membership.
   const beforeConfirmation = await page.request.post(
     "/api/invitations/accept",
@@ -81,16 +82,13 @@ test("convite → cadastro pessoal → confirmação de e-mail → aceite → re
   await expect(page).toHaveURL(/\/convites\/aceitar$/);
   await page
     .getByRole("button", {
-      name: "Aceitar convite com minha conta",
+      name: "Aceitar convite",
       exact: true,
     })
     .click();
-  await expect(
-    page.getByText("Convite aceito.", { exact: false }),
-  ).toBeVisible();
-  await page
-    .getByRole("link", { name: "Abrir Home Care Assistant", exact: true })
-    .click();
+  await page.getByRole("dialog", { name: "Convite aceito", exact: true }).getByRole("button", { name: "Concluir", exact: true }).click();
+  await page.getByRole("button", { name: "Selecionar residência", exact: true }).click();
+  await page.getByRole("dialog", { name: "Residência selecionada", exact: true }).getByRole("button", { name: "Concluir", exact: true }).click();
   // The header can be ready before the authorized context chooser mounts.
   await expect(
     page.getByRole("heading", { name: "Visão geral", exact: true }),

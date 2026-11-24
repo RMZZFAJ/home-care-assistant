@@ -18,6 +18,7 @@ export function useOperationSupport({ cause, operation, result, fallbackCode, at
   const supportRef = useRef<HTMLDetailsElement>(null);
   const diagnosisRef = useRef<HTMLPreElement>(null);
   const [copyStatus, setCopyStatus] = useState("");
+  const [observedAt] = useState(() => new Date().toISOString());
   const error = cause instanceof ApiError ? cause : null;
   const code = error?.code && /^[A-Z][A-Z0-9_]{0,63}$/.test(error.code) ? error.code : fallbackCode;
   const reference = error?.correlationId;
@@ -27,6 +28,7 @@ export function useOperationSupport({ cause, operation, result, fallbackCode, at
     "Operação: " + operation,
     "Resultado: " + result,
     "Código: " + code,
+    "Instante: " + observedAt,
     ...(reference && uuid.test(reference) ? ["Referência: " + reference] : []),
     ...(attemptReference && uuid.test(attemptReference) ? ["Tentativa: " + attemptReference] : []),
     attemptLabel + ": " + attempts,

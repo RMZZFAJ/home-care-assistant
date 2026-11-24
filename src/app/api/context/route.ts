@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import {
   api,
+  ApiError,
   authenticatedIdentity,
   readJson,
   rpc,
@@ -12,9 +13,12 @@ export async function POST(request: Request) {
   return api("context.select", async () => {
     const input = await readJson(
       request,
-      z.object({ careRecipientId: uuid.nullable() }).strict(),
+      z.strictObject({ careRecipientId: uuid.nullable(), expectedActor: uuid.optional() }),
     );
-    const { client } = await authenticatedIdentity();
+    const { client, user } = await authenticatedIdentity();
+    if (input.expectedActor && input.expectedActor !== user.id) {
+      throw new ApiError("VERSION_CONFLICT", "A conta mudou. Entre com a conta convidada para selecionar a residência.");
+    }
     return NextResponse.json({
       data: await rpc(client, "select_active_context", {
         p_patient: input.careRecipientId,

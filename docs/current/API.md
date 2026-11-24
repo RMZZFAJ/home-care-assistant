@@ -1310,6 +1310,13 @@ Aceitar/recusar revalida os fatos e não recebe paciente ou papel editáveis.
 O envelope da prévia contém `data` e `actorId`, identidade Auth consultada
 no servidor, ou `null` no acesso anônimo. `ready` e `accepted` exigem sessão
 confirmada e prévia completa; os demais estados não incluem dados do paciente.
+Uma conta Auth confirmada pode consultar seu convite antes de ter um perfil
+no aplicativo. A prévia mantém a consulta somente para leitura. Se a primeira
+decisão for recusa, a transação registra a identidade necessária à autoria da
+auditoria e encerra o convite. O aceite é a ação que pode conceder vínculo.
+Somente `accepted` traz `patientId`, e apenas para o destinatário com vínculo
+ativo em residência ativa. A função exibida nesse estado é a do vínculo
+vigente. A resposta da prévia usa `private, no-store`.
 `POST /api/invitations/accept` admite `expectedActor` para vincular a intenção
 à conta que conferiu a prévia. Se a conta mudou, retorna `VERSION_CONFLICT`
 sem executar a decisão. O parâmetro é opcional por compatibilidade; toda
@@ -1318,7 +1325,11 @@ A interface confirma aceite ou recusa pela prévia atual do mesmo token,
 sem deduzir o vínculo de uma resposta HTTP bem-sucedida. Uma tentativa incerta
 conserva token, conta e decisão na aba; a recuperação consulta o resultado e
 só reenvia explicitamente a mesma intenção quando o convite ainda está pronto.
-Respostas atrasadas não substituem outro convite ou outra conta.
+São permitidas duas recuperações, inclusive após recarregar a aba. Respostas
+atrasadas ficam restritas ao convite e à conta da consulta de origem.
+A ação Selecionar residência revalida o aceite e chama `POST /api/context`
+com `careRecipientId` e `expectedActor`. O servidor verifica a identidade antes
+de selecionar o contexto local. A navegação aguarda a confirmação do destino.
 Retry de aprovação já confirmada retorna recuperação explícita por reemissão;
 o administrador local pode rotacionar o link existente, sem novo convite.
 

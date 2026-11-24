@@ -50,7 +50,7 @@ test("15 ID01 ID03 public access, recovery and invitation preserve the canonical
     await page.getByRole("link", { name: "Abrir convite", exact: true }).click();
     await expect(page.getByText("Este link não contém um convite válido.", { exact: false })).toBeVisible();
     await expect(page.getByRole("region", { name: "Resumo do vínculo convidado", exact: true })).toHaveCount(0);
-    await expect(page.getByRole("button", { name: "Aceitar convite com minha conta", exact: true })).toHaveCount(0);
+    await expect(page.getByRole("button", { name: "Aceitar convite", exact: true })).toHaveCount(0);
     await auditFromTop(page, "public canonical missing invitation");
     await page.goto("/recuperar-senha");
     await expect(page.getByRole("heading", { name: "Definir nova senha", exact: true })).toBeVisible();

@@ -10,7 +10,7 @@ export const operationRecoveryLimit = 2;
 export type DocumentOperationFailure = { outcome: "rejected" | "uncertain"; description: string; cause?: unknown };
 
 export function DocumentOperationFailureDialog({
-  title, description, outcome, cause, operation, fallbackCode, attempts, attemptReference, guidance, exhaustedMessage, onClose, closeLabel, action, finalFocus,
+  title, description, outcome, cause, operation, fallbackCode, attempts, attemptReference, guidance, exhaustedMessage, onClose, closeLabel, action, readOnlyAction, finalFocus,
 }: DocumentOperationFailure & {
   title: string;
   operation: string;
@@ -22,6 +22,7 @@ export function DocumentOperationFailureDialog({
   onClose: () => void;
   closeLabel: string;
   action?: { label: string; onClick: () => void };
+  readOnlyAction?: { label: string; onClick: () => void };
   finalFocus?: ComponentProps<typeof Dialog>["finalFocus"];
 }) {
   const { copy, details } = useOperationSupport({
@@ -33,6 +34,7 @@ export function DocumentOperationFailureDialog({
     popupClassName={guidance ? "hca-operation-result-dialog" : undefined}
     footer={<>
       <ActionButton onClick={onClose}>{closeLabel}</ActionButton>
+      {readOnlyAction ? <ActionButton onClick={readOnlyAction.onClick}>{readOnlyAction.label}</ActionButton> : null}
       {action ? <ActionButton variant="primary" onClick={action.onClick}><Icon name="refresh" />{action.label}</ActionButton>
         : <ActionButton variant="primary" onClick={() => void copy()}><Icon name="copy" />Copiar detalhes</ActionButton>}
     </>}>

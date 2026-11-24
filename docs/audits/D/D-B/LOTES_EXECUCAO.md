@@ -4904,3 +4904,46 @@ estreitas. A comparação final confirmou o cartão e as linhas do E10-02,
 incluindo capturas a 360 e 412 px, descarte ao fechar a edição e acesso à
 matriz já na pessoa selecionada. O build, o TypeScript, o lint dirigido e o
 guard das 84 migrations históricas passaram.
+
+#### Jornada de quem recebe o convite
+
+O E10-02 apresenta a residência e quem convidou em um cartão de identificação,
+seguido da conta, da função e da validade. A recusa exige confirmação em
+diálogo. Conta errada, link inválido, expirado ou revogado recebem o estado
+correspondente com conteúdo protegido. Trocar a conta preserva o link nesta
+aba e consulta o convite novamente depois do login.
+
+O aceite e a recusa usam os modais compartilhados. A resposta da gravação
+é conferida por uma nova leitura do mesmo convite. A recuperação mantém
+a mesma decisão, permite consulta sem reenvio e tem limite de duas tentativas
+mesmo após recarregar. O diagnóstico informa operação, código, instante e
+número de tentativas. A prévia e as respostas atrasadas são vinculadas à conta
+e ao link que iniciaram a consulta.
+
+Após o aceite, Selecionar residência verifica novamente a validade do vínculo
+e confirma a seleção real no servidor para a conta convidada. O painel de
+confirmação apresenta a função vigente. O fluxo preserva cadastro por e-mail,
+confirmação, as opções de provedor já configuradas e a consulta às permissões
+específicas de estoque. Essas funções existentes aparecem em áreas recolhíveis
+porque o laboratório usa uma conta previamente cadastrada e um vínculo simples.
+
+| Migration | Supabase local | Supabase remoto |
+| --- | --- | --- |
+| `20261124173052` | Aplicada | Pendente |
+
+O Supabase local tem 379 migrations nesta conferência. A aplicação foi
+incremental, sem reset. Auth real local confirmou a proteção do destino e a
+revogação da autoridade para convites pendentes. Uma conta recém-confirmada
+pode consultar o próprio convite antes do primeiro vínculo. A recusa registra
+a identidade para a auditoria e conserva zero vínculos. A confirmação por e-mail
+da suíte usa a caixa local de testes. A validação de entrega por um provedor
+externo permanece pendente.
+
+Passaram três casos dirigidos de integração com Auth real. Chromium,
+Android e iPhone emulados passaram na consulta da conta correta, proteção de
+convite expirado, seleção da residência confirmada, recuperação de recusa e
+aceite, isolamento de respostas atrasadas e limite de recuperação após reload.
+A prévia foi comparada com o cartão do laboratório em 360 e 412 px. A rodada
+final do cadastro completo passou nos três navegadores, incluindo e-mail
+confirmado localmente, primeiro aceite e recuperação de senha. Build, tipos,
+lint e guard das 84 migrations históricas passaram.
