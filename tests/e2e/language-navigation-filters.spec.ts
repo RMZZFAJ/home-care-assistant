@@ -38,7 +38,43 @@ test("seis perfis abrem destinos pessoais e unidades com nomes compatíveis e se
 
 test("aviso real de compra abre a ficha e conserva o paciente anunciado",async({page})=>{
  const f=await setup(),family=await actor("family",f.patient),doc=await rpc(family,"create_supply_document",{p_patient:f.patient,p_type:"COM",p_payload:{origin:"purchase",lines:[{productId:f.products[0],quantity:"1"}]},p_key:randomUUID(),p_draft:false}),before=official(f.patient);
- await login(page,f.patient,"family");await page.goto(`/notificacoes?careRecipientId=${f.patient}`);const row=page.getByRole("region",{name:"Acompanhamento pessoal",exact:true}).getByRole("listitem").filter({hasText:doc.code}),link=row.getByRole("link",{name:"Abrir compra ou doação",exact:true});await expect(row.locator("p > div")).toHaveCount(0);await expect(link).toHaveAttribute("href",`/fichas/${doc.id}?careRecipientId=${f.patient}`);await link.click();await expect(page).toHaveURL(new RegExp(`/fichas/${doc.id}\\?careRecipientId=${f.patient}`));await expect(page.locator(".hca-workspace")).toHaveAttribute("data-context-patient",f.patient);await expect(page.getByRole("heading",{name:doc.code,exact:true})).toBeVisible();expect(official(f.patient)).toBe(before);
+ await login(page,f.patient,"family");
+ const inbox = "/notificacoes?" + new URLSearchParams({ careRecipientId: f.patient, q: doc.code });
+ await page.goto(inbox);
+ const origin = page.url();
+ const row = page.getByRole("region", { name: "Acompanhamento pessoal", exact: true }).getByRole("listitem").filter({ hasText: doc.code });
+ const open = row.getByRole("button", { name: "Ver aviso de " + doc.code, exact: true });
+ const details = page.getByRole("dialog", { name: doc.code, exact: true });
+ const inboxWrites: string[] = [];
+ page.on("request", request => {
+   if (new URL(request.url()).pathname === "/api/notifications" && request.method() === "POST") inboxWrites.push(request.url());
+ });
+ const noticeId = await row.getAttribute("data-notification-id");
+ expect(noticeId).toBeTruthy();
+ await expect(row.locator("p > div")).toHaveCount(0);
+ await open.click();
+ await expect(details).toBeVisible();
+ await details.getByRole("button", { name: "Voltar", exact: true }).click();
+ await expect(open).toBeFocused();
+ await open.press("Enter");
+ const destination = details.getByRole("button", { name: "Abrir compra ou doação", exact: true });
+ await expect(destination).toBeEnabled();
+ const [rechecked] = await Promise.all([
+   page.waitForResponse(response => {
+     const url = new URL(response.url());
+     return url.pathname === "/api/notifications" && url.searchParams.get("noticeId") === noticeId;
+   }),
+   destination.click(),
+ ]);
+ expect(rechecked.ok()).toBe(true);
+ await expect(page).toHaveURL(url => url.pathname === "/fichas/" + doc.id && url.searchParams.get("careRecipientId") === f.patient);
+ await expect(page.locator(".hca-workspace")).toHaveAttribute("data-context-patient", f.patient);
+ await expect(page.getByRole("heading", { name: doc.code, exact: true })).toBeVisible();
+ await page.goBack();
+ await expect(page).toHaveURL(origin);
+ await expect(open).toBeVisible();
+ expect(inboxWrites).toEqual([]);
+ expect(official(f.patient)).toBe(before);
 });
 
 test("entregas ignoram resposta invertida e distinguem erro de vazio sem perder foco no filtro",async({page})=>{

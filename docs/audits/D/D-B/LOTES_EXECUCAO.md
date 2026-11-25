@@ -5383,3 +5383,55 @@ de erro na consulta. O axe executou nas duas larguras sem violações.
 [sonar-cf840b8b]: https://github.com/RMZZFAJ/home-care-assistant/runs/138866692873
 [rabbit-cf840b8b]: https://github.com/RMZZFAJ/home-care-assistant/runs/138866169285
 [ci-cf840b8b]: https://github.com/RMZZFAJ/home-care-assistant/actions/runs/45513184461
+
+### Revisão de E11-04 — Painel de aviso e retorno à central
+
+A central, o sino e a visão geral usam o mesmo painel de aviso com
+identificação do paciente, data, situação de leitura e destino específico.
+O painel mantém o cabeçalho da aplicação visível e os botões no rodapé.
+A área Na ficha apresenta a tarefa que ainda consta no contrato de
+avisos. O painel usa os valores vindos da consulta autorizada.
+
+Ao fechar na central, o foco retorna à linha. Se o aviso for retirado
+porque perdeu acesso, o foco vai para a busca. A abertura do destino
+consulta novamente a permissão. O painel da central separa a leitura
+da marcação como vista. A abertura explícita pelo sino conserva a
+marcação existente sem registrar ciência ou concluir a ação da ficha.
+
+Os testes de compra, plantão e sino passaram a abrir o painel antes
+da navegação. A referência visual da central foi atualizada para E11-04
+do laboratório v2. A regressão de plantão confirma o paciente, a
+referência e o fuso de origem, além de reapurar o balanço e o alerta de
+estoque sem alterar fatos operacionais. O ajuste usa o esquema existente.
+
+As capturas do painel a 360 e 412 px mostram identificação, estado de
+leitura, autoria, tarefa e rodapé na mesma sequência do laboratório.
+O painel exibe o evento e o instante registrados pelo sistema. O cabeçalho
+mantém o seletor de paciente de L1. O axe passou nas duas larguras na
+central e no painel, e a área rolável ficou dentro da largura do aparelho.
+
+O build de produção local e 41 testes unitários de navegação e consulta
+de avisos passaram. Sete cenários em Chromium passaram sem retentativa
+entre as rodadas. A compra verificou a segunda leitura de autorização,
+o retorno para a mesma busca e a ausência de escrita de visto na central.
+O sino preservou a exclusão de silenciosas antes da paginação. As
+auditorias da central e da tela Mais foram separadas em dois casos,
+mantendo as larguras, verificações de acessibilidade e destinos.
+Os avisos de compra e de plantão passaram também nos perfis mobile e
+WebKit de iPhone, com quatro execuções sem retentativa.
+As três verificações de central, Mais e sino passaram em Chromium e
+WebKit após isolar as contas fictícias dos vínculos acumulados em
+rodadas locais. A parte do sino manteve dois pacientes, com ausência
+confirmada do aviso no outro vínculo e retorno ao aviso original.
+
+O [iOS-3 publicado][ci-cf840b8b-ios3] terminou com 197 aprovados, quatro
+falhas e dois casos aprovados apenas na segunda tentativa. A execução é
+do commit anterior a estes ajustes. Ela ainda aponta as regressões de
+senha e OTP e do cartão de arquivamento. Os dois casos que passaram após
+repetição cobrem recuperação de confirmação da agenda e a comunicação
+entre duas sessões durante ciência e compartilhamento.
+No caso de arquivamento, a recusa ocorreu ao restaurar a própria
+permissão depois de revogá-la. A proteção de L4 recusa essa forma de
+autoelevação. A reprodução com um administrador distinto segue pendente.
+
+[ci-cf840b8b-ios3]: https://github.com/RMZZFAJ/home-care-assistant/actions/runs/45513184461/job/138881089378

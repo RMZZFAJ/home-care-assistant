@@ -37,7 +37,7 @@ export function ManagementDashboard({ context, data }: { context: WorkspaceConte
     </div>
     <div className="dashboard-grid"><div className="dashboard-main"><div className="hca-home-tasks"><TaskList title="Suas pendências" tasks={data.pendingTasks} /></div><OpenRequests patientId={context.patient!.id} /></div>
       <aside className="dashboard-aside"><DashboardComplements simple={simple} title="Avisos e escala">
-        <DashboardNotices patientId={context.patient!.id} /><WeekSchedule context={context} /><ShiftSummary data={data} />
+        <DashboardNotices patientId={context.patient!.id} patientName={context.patient!.display_name} /><WeekSchedule context={context} /><ShiftSummary data={data} />
       </DashboardComplements></aside>
     </div>
     <CriticalStockSummary data={data} />

@@ -15,9 +15,16 @@ async function widths(page:Page,label:string){for(const width of [320,390,768,14
 test("aviso localiza o plantão futuro no fuso próprio, evento BAL e alerta sem criar nova obrigação",async({page})=>{
  const f=await referenceFixture(),before=reminderState(f);await login(page,f);
  await page.goto(path("/notificacoes",f,f.scheduleRef));
- // A notification's stored reference, not its creation day, selects the agenda.
- const destination=path("/escalas",f,f.scheduleRef);const link=page.locator(`a[href="${destination}"]`).first();
- await expect(link).toBeVisible();await link.click();
+ const inbox = await page.request.get("/api/notifications?careRecipientId=" + f.patient + "&q=Plantão+alterado");
+ expect(inbox.ok()).toBe(true);
+ const scheduleNotice = (await inbox.json()).data.find((row: { reminder_id?: string }) => row.reminder_id === f.scheduleRef);
+ expect(scheduleNotice).toBeTruthy();
+ const row = page.getByRole("region", { name: "Acompanhamento pessoal", exact: true }).locator(`li[data-notification-id="${scheduleNotice.id}"]`);
+ await row.getByRole("button", { name: "Ver aviso de Plantão alterado", exact: true }).click();
+ const detail = page.getByRole("dialog", { name: "Plantão alterado", exact: true });
+ await detail.getByRole("button", { name: "Abrir escalas e plantões", exact: true }).click();
+ await expect(page).toHaveURL(url => url.pathname === "/escalas" && url.searchParams.get("careRecipientId") === f.patient &&
+   url.searchParams.get("ref") === f.scheduleRef && url.searchParams.get("refKind") === "reminder");
  await expect(page.getByLabel("Data de referência",{exact:true})).toHaveValue(f.day);await expect(card(page)).toContainText("Alteração fictícia para referência individual");
  await expect(card(page)).toContainText("America/Manaus");await expect(card(page)).toContainText("Referência atual autorizada");await widths(page,"D3 exact future schedule");
  await page.goto(path("/balancos",f,f.balanceRef));await expect(card(page).getByRole("heading",{name:"Atribuição indicada pelo aviso",exact:true})).toBeVisible();await widths(page,"D3 BAL event reference");

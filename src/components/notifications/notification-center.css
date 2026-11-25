@@ -23,12 +23,18 @@
 .hca-inbox-open { display: grid; grid-template-columns: 32px minmax(0, 1fr) 16px; gap: 10px; align-items: start; width: 100%; padding: 18px 0 12px; text-align: left; }
 .hca-inbox-open:focus-visible { outline-offset: -2px; }
 .hca-inbox-icon { width: 32px; height: 32px; display: grid; place-items: center; border: 1px solid #e2ede6; border-radius: 10px; background: var(--hca-tint); color: var(--hca-teal); }
-.hca-inbox-content { display: grid; gap: 5px; min-width: 0; overflow-wrap: anywhere; font-size: 11px; color: var(--hca-muted); }
-.hca-inbox-meta { display: flex; flex-wrap: wrap; align-items: baseline; gap: 5px 9px; }
-.hca-inbox-meta strong { color: var(--hca-teal); }
-.hca-inbox-title { color: var(--ink); font-size: 13px; line-height: 1.5; font-weight: 650; }
+.hca-inbox-content { display: grid; gap: 7px; min-width: 0; overflow-wrap: anywhere; font-size: 11px; color: var(--hca-muted); }
+.hca-inbox-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 5px 9px; font-size: 9px; }
+.hca-inbox-meta strong { color: var(--hca-teal); font-weight: 700; letter-spacing: .04em; }
+.hca-inbox-title { color: var(--ink); font-size: 12px; line-height: 1.5; font-weight: 650; letter-spacing: -.1px; }
 .hca-inbox-open > svg, .hca-inbox-unseen { margin-top: 5px; justify-self: end; color: var(--hca-teal); }
 .hca-inbox-unseen { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
 .hca-inbox-actions { display: flex; align-items: center; flex-wrap: wrap; justify-content: space-between; gap: 5px; padding: 0 0 14px 42px; }
 .hca-inbox-empty { display: grid; justify-items: center; gap: 10px; padding: 24px; text-align: center; border: 1px dashed var(--hca-line); border-radius: 12px; background: var(--hca-paper); color: var(--hca-muted); font-size: 13px; }
 .hca-inbox-note { padding: 8px 0; color: var(--hca-muted); font-size: 12px; }
+@media (max-width: 420px) {
+  .hca-inbox-row { padding-inline: 12px; }
+  .hca-inbox-open { grid-template-columns: 29px minmax(0, 1fr) 16px; }
+  .hca-inbox-icon { width: 29px; height: 29px; }
+  .hca-inbox-actions { padding-inline-start: 0; }
+}

@@ -22,7 +22,7 @@ export function OperationsDashboard({ context, data }: { context: WorkspaceConte
       {can(context, "consumption.report") ? <Link href="/consumo" className="btn" prefetch={false}><Icon name="forms" />Registrar consumo</Link> : null}
     </div>
     <div className="dashboard-grid"><TaskList title={supervisor ? "Pendências da equipe" : "Suas pendências"} tasks={data.pendingTasks} /><aside className="dashboard-aside">
-      <DashboardComplements simple={simple} title="Avisos recentes"><DashboardNotices patientId={context.patient!.id} /></DashboardComplements>
+      <DashboardComplements simple={simple} title="Avisos recentes"><DashboardNotices patientId={context.patient!.id} patientName={context.patient!.display_name} /></DashboardComplements>
       {supervisor ? <div className="metrics-grid"><MetricCard label="Balanços para revisar" value={data.balances} href="/historico?type=BAL&status=submitted" icon="forms" action="Ver balanços" /><MetricCard label="Entregas a conferir" value={data.teamReceipts} href="/entregas" icon="truck" action="Ver entregas" /></div> : null}
       {data.nextShift ? <DashboardComplements simple={simple} title="Resumo de plantão"><ShiftSummary data={data} /></DashboardComplements> : null}
     </aside></div>

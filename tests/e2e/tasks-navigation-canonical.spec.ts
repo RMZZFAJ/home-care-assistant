@@ -3,7 +3,8 @@ import { randomUUID } from "node:crypto";
 import { mkdirSync } from "node:fs";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
-import { actor, fixtures, issue, rpc, setup } from "../integration/v4-fixtures.mjs";
+import { fixtures, issue, rpc, setup } from "../integration/v4-fixtures.mjs";
+import { shiftWorker } from "../integration/shift-fixtures.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { sql, sqlLiteral as q } from "../../scripts/test-environment.mjs";
 import { selectContext } from "./auth-context";
@@ -17,9 +18,9 @@ const facts = (patient: string) => sql(`select jsonb_build_object(
  'requisitions',(select jsonb_agg(to_jsonb(r) order by id) from public.requisitions r where care_recipient_id=${q(patient)}),
  'science',(select jsonb_agg(to_jsonb(s) order by id) from public.requisition_science_events s where care_recipient_id=${q(patient)}),
  'stock',(select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where care_recipient_id=${q(patient)}));`);
-async function login(page: Page, patient: string, role = "adminA") {
+async function login(page: Page, patient: string, account: string | { email: string } = "adminA") {
   await page.goto("/login");
-  await page.getByLabel("E-mail", { exact: true }).fill(fixtures[role].email);
+  await page.getByLabel("E-mail", { exact: true }).fill(typeof account === "string" ? fixtures[account].email : account.email);
   await page.getByLabel("Senha", { exact: true }).fill(fixturePassword);
   await page.getByRole("button", { name: "Entrar", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Visão geral", exact: true })).toBeVisible();
@@ -104,32 +105,48 @@ test("15 ADM-01 empty and failed reads never fabricate an attention task or glob
   expect(facts(f.patient)).toBe(before);
 });
 
-test("15 NOT-01 and ADM-06 keep native notices and every authorized destination in canonical responsive records", async ({ page, browser }, info) => {
-  const f = await setup(), family = await actor("family", f.patient);
-  const doc = await rpc(family, "create_supply_document", { p_patient: f.patient, p_type: "COM", p_key: randomUUID(), p_draft: false,
+test("15 NOT-01 keeps native notices in canonical responsive records", async ({ page, browser }, info) => {
+  const f = await setup(), family = await shiftWorker(f.patient, "family");
+  const doc = await rpc(family.client, "create_supply_document", { p_patient: f.patient, p_type: "COM", p_key: randomUUID(), p_draft: false,
     p_payload: { origin: "purchase", lines: [{ productId: f.products[0], quantity: "1" }] } });
   const before = facts(f.patient);
-  await login(page, f.patient, "family");
+  await login(page, f.patient, family);
   await page.goto("/notificacoes?careRecipientId=" + f.patient);
   const center = page.getByRole("region", { name: "Acompanhamento pessoal", exact: true });
-  const row = center.getByRole("listitem").filter({ hasText: doc.code });
+  const row = center.getByRole("list", { name: "Avisos consultados", exact: true }).getByRole("listitem").filter({ hasText: doc.code });
   await expect(row).toBeVisible();
-  const reference = await browser.newContext();
+  const reference = await browser.newContext({ viewport: { width: 1280, height: 900 } });
   try {
     const model = await reference.newPage(); await model.route(/^https?:/, route => route.abort());
-    await model.goto(pathToFileURL(resolve("Home_Care_Assistant_Modelo_Integral.html")).href + "#notificacoes");
+    await model.goto(pathToFileURL(resolve("hca-laboratorio-04-v2-aprovado.html")).href + "#E11-04/unseen");
+    for (const width of [360, 412]) {
+      await page.setViewportSize({ width, height: 900 });
+      await model.getByRole("combobox", { name: "Visualização", exact: true }).selectOption(String(width));
+      const modelRow = model.locator(".e11-notice-row.unseen").first();
+      await expect(modelRow).toBeVisible();
+      await compare(row, modelRow, ["background-image", "padding-left", "padding-top"]);
+      await compare(row.locator(".hca-inbox-title"), modelRow.locator(".e11-notice-copy b"), ["font-size", "font-weight", "line-height"]);
+    }
     for (const width of widths) {
-      await page.setViewportSize({ width, height: 900 }); await model.setViewportSize({ width, height: 900 });
-      await compare(row, model.locator(".notice-row.unread").first(), ["background-color", "padding-left", "padding-top", "column-gap"]);
-      await compare(row.getByRole("heading"), model.locator(".notice-row.unread h3").first(), ["font-size", "font-weight"]);
+      await page.setViewportSize({ width, height: 900 });
       await auditFromTop(page, "NOT01 notice " + width);
     }
     mkdirSync("output/playwright/phase-d", { recursive: true });
     await center.screenshot({ path: `output/playwright/phase-d/inbox-${info.project.name}.png` });
     await row.getByRole("button", { name: "Marcar como vista", exact: true }).click();
     await expect(row.getByText("Vista no aplicativo", { exact: true })).toBeVisible();
-    expect(sql(`select count(*) from public.requisition_notifications where document_id=${q(doc.id)} and recipient_user_id=${q(fixtures.family.id)} and seen_at is not null;`)).toBe("1");
+    expect(sql(`select count(*) from public.requisition_notifications where document_id=${q(doc.id)} and recipient_user_id=${q(family.id)} and seen_at is not null;`)).toBe("1");
     expect(facts(f.patient)).toBe(before);
+  } finally { await reference.close(); }
+});
+
+test("15 ADM-06 keeps every authorized destination in canonical responsive records", async ({ page, browser }, info) => {
+  const f = await setup(), family = await shiftWorker(f.patient, "family"), before = facts(f.patient);
+  await login(page, f.patient, family);
+  const reference = await browser.newContext();
+  try {
+    const model = await reference.newPage();
+    await model.route(/^https?:/, route => route.abort());
     await page.goto("/mais?careRecipientId=" + f.patient);
     const destinations = page.getByRole("navigation", { name: "Rotina e funções autorizadas", exact: true });
     await expect(destinations).toBeVisible();

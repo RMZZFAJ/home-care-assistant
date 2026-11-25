@@ -1,0 +1,17 @@
+.hca-overlay:has(.hca-inbox-notice-sheet) > .hca-modal-backdrop {
+  position: fixed;
+  inset: var(--app-header-height) 0 0;
+}
+.hca-inbox-notice-sheet > .hca-modal-head { align-items: start; }
+.hca-inbox-notice-detail { padding: 5px 0 22px; }
+.hca-inbox-notice-meta { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 18px; }
+.hca-inbox-notice-meta time { color: var(--hca-muted); font-size: 11px; }
+.hca-inbox-notice-detail h3 { margin-bottom: 10px; font-size: 18px; font-weight: 700; line-height: 1.45; }
+.hca-inbox-notice-detail p, .hca-inbox-notice-seen { display: flex; gap: 7px; align-items: start; color: var(--hca-muted); font-size: 12px; }
+.hca-inbox-notice-detail p svg, .hca-inbox-notice-seen svg { flex: none; }
+.hca-inbox-notice-task { padding: 0; }
+.hca-inbox-notice-task h3 { padding: 12px 14px; border-bottom: 1px solid var(--hca-line); font-weight: 700; }
+.hca-inbox-notice-task-status { display: grid; grid-template-columns: 32px minmax(0, 1fr) auto; align-items: start; gap: 8px; padding: 14px; }
+.hca-inbox-notice-task-status p { margin-top: 4px; color: var(--hca-muted); font-size: 12px; }
+.hca-inbox-notice-task-icon { display: grid; place-items: center; height: 32px; border-radius: 9px; background: var(--hca-tint); color: var(--hca-teal); }
+.hca-inbox-notice-seen { margin-top: 14px; }

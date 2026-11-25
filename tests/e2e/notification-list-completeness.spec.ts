@@ -149,6 +149,21 @@ test("inbox combines label search, type and live tasks before pagination", async
       await page.setViewportSize({ width, height: 900 });
       await auditFromTop(page, `E11-04 inbox ${width}`);
       await info.attach(`avisos-${width}`, { body: await page.screenshot(), contentType: "image/png" });
+      if (info.project.name === "chromium") {
+        await model.locator(".e11-notice-open").first().click();
+        await expect(frame.getByRole("heading", { name: "Na ficha", exact: true })).toBeVisible();
+        await open.click();
+        const notice = page.getByRole("dialog", { name: code, exact: true });
+        await expect(notice.getByRole("heading", { name: "Na ficha", exact: true })).toBeVisible();
+        const panel = notice.getByRole("region", { name: "Conteúdo de " + code, exact: true });
+        await expect.poll(() => panel.evaluate(node => node.scrollWidth <= node.clientWidth)).toBe(true);
+        await auditFromTop(page, `E11-04 painel de aviso ${width}`);
+        await info.attach(`L4-painel-aviso-${width}`, { body: await frame.screenshot({ path: info.outputPath(`laboratorio-${width}.png`) }), contentType: "image/png" });
+        await info.attach(`painel-aviso-${width}`, { body: await page.screenshot({ path: info.outputPath(`produto-${width}.png`), animations: "disabled" }), contentType: "image/png" });
+        await notice.getByRole("button", { name: "Voltar", exact: true }).click();
+        await expect(open).toBeFocused();
+        await frame.getByRole("button", { name: "Voltar", exact: true }).click();
+      }
     }
   } finally {
     await reference.close();
@@ -200,6 +215,7 @@ test("notification detail discards a row received before its destination permiss
     await expect(denied.getByText(f.doc.code)).toHaveCount(0);
     await expect(denied.getByRole("button", { name: /Abrir/ })).toHaveCount(0);
     await denied.getByRole("button", { name: "Voltar aos avisos", exact: true }).click();
+    await expect(center(page).getByRole("searchbox", { name: "Buscar aviso ou ficha", exact: true })).toBeFocused();
     await expect(page.getByRole("button", { name: "Notificações", exact: true })).toBeVisible();
     release();
     await expect(row).toHaveCount(0);

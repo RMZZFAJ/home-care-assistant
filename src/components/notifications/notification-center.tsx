@@ -1,7 +1,7 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { useEffect, useId, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { ActionButton, Pill, SelectField, TextInput } from "@/components/ui/controls";
 import { Dialog } from "@/components/ui/overlays";
 import { Icon } from "@/components/ui/icon";
@@ -71,6 +71,8 @@ function Center({ patientId, patientName }: { patientId?: string; patientName?: 
 
   const [writeError, setWriteError] = useState("");
   const [noticeId, setNoticeId] = useState<string | null>(null);
+  const noticeTriggerRef = useRef<HTMLButtonElement>(null);
+  const searchRef = useRef<HTMLInputElement>(null);
   const [proposedKind, setProposedKind] = useState<InboxKind | "" | null>(null);
   const [dismissedError, setDismissedError] = useState<string | null>(null);
   const inbox = useInbox({ patientId, page, kind, search, unread: filter === "unread", tasks: filter === "tasks" });
@@ -96,7 +98,7 @@ function Center({ patientId, patientName }: { patientId?: string; patientName?: 
         <span><strong>{inbox.fresh ? inbox.data?.actionCount : "–"}</strong><small>com ação pendente</small></span>
       </div>
       <div className="hca-inbox-search">
-        <TextInput type="search" leading={<Icon name="search" width={17} height={17} />} placeholder="Buscar aviso ou ficha"
+        <TextInput ref={searchRef} type="search" leading={<Icon name="search" width={17} height={17} />} placeholder="Buscar aviso ou ficha"
           aria-label="Buscar aviso ou ficha" maxLength={inboxSearchLimit} value={searchText}
           onChange={event => setInput({ search, text: event.currentTarget.value })} />
         <ActionButton aria-label="Filtrar avisos" onClick={() => setProposedKind(kind ?? "")}><Icon name="filter" /></ActionButton>
@@ -122,7 +124,10 @@ function Center({ patientId, patientName }: { patientId?: string; patientName?: 
     {writeError ? <Notice error>{writeError}</Notice> : null}
     {inbox.loading ? <p className="my-3 text-sm" role="status">Consultando notificações…</p> : null}
     <ul className="hca-inbox-list" aria-label="Avisos consultados">
-      {rows.map(row => <InboxRow key={row.id} row={row} fresh={inbox.fresh} onOpen={() => setNoticeId(row.id)} onSeen={() => { void markSeen(row.id); }} />)}
+      {rows.map(row => <InboxRow key={row.id} row={row} fresh={inbox.fresh} onOpen={opener => {
+        noticeTriggerRef.current = opener;
+        setNoticeId(row.id);
+      }} onSeen={() => { void markSeen(row.id); }} />)}
     </ul>
     {inbox.fresh && !rows.length ? <div className="hca-inbox-empty">
       <p>{search || kind ? "Nenhum aviso encontrado" : "Nenhuma notificação neste filtro."}</p>
@@ -134,7 +139,9 @@ function Center({ patientId, patientName }: { patientId?: string; patientName?: 
       <ActionButton disabled={page * 20 >= total || !inbox.fresh} onClick={() => navigatePage(page + 1)}>Próxima</ActionButton>
     </nav> : null}
     {!inbox.scopeRequired ? <p className="hca-inbox-note"><Icon name="eye" width={16} height={16} />Visto organiza sua leitura. A tarefa continua na ficha.</p> : null}
-    {patientId && noticeId ? <InboxNoticeDetails key={noticeId} patientId={patientId} patientName={patientName} noticeId={noticeId} onClose={() => setNoticeId(null)} onUnavailable={inbox.invalidate} /> : null}
+    {patientId && noticeId ? <InboxNoticeDetails key={noticeId} patientId={patientId} patientName={patientName} noticeId={noticeId}
+      onClose={() => setNoticeId(null)} onUnavailable={inbox.invalidate}
+      finalFocus={() => noticeTriggerRef.current?.isConnected ? noticeTriggerRef.current : searchRef.current} /> : null}
     {proposedKind !== null ? <Dialog open title="Filtrar avisos" kicker="Central de avisos" headingIcon="filter" onClose={() => setProposedKind(null)}
       footer={<><ActionButton onClick={() => setProposedKind(null)}>Cancelar</ActionButton><ActionButton variant="primary" onClick={() => {
         updateInboxUrl({ page: "1", kind: proposedKind || null }); setProposedKind(null);
@@ -158,11 +165,11 @@ function Center({ patientId, patientName }: { patientId?: string; patientName?: 
   </section>;
 }
 
-function InboxRow({ row, fresh, onOpen, onSeen }: { row: InboxNotification; fresh: boolean; onOpen: () => void; onSeen: () => void }) {
+function InboxRow({ row, fresh, onOpen, onSeen }: { row: InboxNotification; fresh: boolean; onOpen: (opener: HTMLButtonElement) => void; onSeen: () => void }) {
   const title = documentEventLabel(row.event_key ?? row.document_events?.action);
   const titleId = useId();
   return <li data-notification-id={row.id} className={"hca-inbox-row" + (row.seen_at ? "" : " hca-inbox-unread")}>
-    <button type="button" className="hca-inbox-open" onClick={onOpen} aria-label={"Ver aviso de " + (row.reference_code ?? title)} aria-describedby={titleId}>
+    <button type="button" className="hca-inbox-open" onClick={event => onOpen(event.currentTarget)} aria-label={"Ver aviso de " + (row.reference_code ?? title)} aria-describedby={titleId}>
       <span className="hca-inbox-icon"><Icon name={inboxNoticeIcon(row)} width={19} height={19} /></span>
       <span className="hca-inbox-content">
         <span className="hca-inbox-meta"><strong>{row.reference_code ?? "Atualização operacional"}</strong><time dateTime={row.created_at}>{formatBrazilDate(row.created_at)}</time></span>

@@ -9,14 +9,16 @@ import {
 } from "../../scripts/test-environment.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { selectContext } from "./auth-context";
+import { shiftWorker } from "../integration/shift-fixtures.mjs";
+import { setup as seedPatient } from "../integration/v4-fixtures.mjs";
 test.setTimeout(180000);
 test.afterEach(async ({ page }) => {
   await page.unrouteAll({ behavior: "wait" });
 });
 const fixtures = () => JSON.parse(readFileSync(fixtureFile, "utf8"));
-async function login(page: Page, role: string, patient: string | null) {
+async function login(page: Page, account: string | { email: string }, patient: string | null) {
   await page.goto("/login");
-  await page.getByLabel("E-mail", { exact: true }).fill(fixtures()[role].email);
+  await page.getByLabel("E-mail", { exact: true }).fill(typeof account === "string" ? fixtures()[account].email : account.email);
   await page.getByLabel("Senha", { exact: true }).fill(fixturePassword);
   await page.getByRole("button", { name: "Entrar", exact: true }).click();
   await expect(
@@ -239,17 +241,21 @@ test("V4 review: matriz reconcilia horários, intervalo, versões e falhas sem s
 });
 
 test("V4 review: sino filtra silenciosas antes da página e ficha acompanha estado posterior ao vivo", async ({
-  page,
   browser,
 }) => {
-  const { patient, product } = await setup(page),
-    familyContext = await browser.newContext(),
+  const { patient, products: [product] } = await seedPatient();
+  const { patient: otherPatient } = await seedPatient();
+  const familyUser = await shiftWorker(patient, "family");
+  const administrator = await shiftWorker(patient, "admin");
+  sql(`insert into public.care_recipient_memberships(care_recipient_id,user_id,role)
+    values(${sqlLiteral(otherPatient)},${sqlLiteral(familyUser.id)},'family');`);
+  const familyContext = await browser.newContext(),
     proContext = await browser.newContext();
   try {
     const family = await familyContext.newPage(),
       pro = await proContext.newPage();
-    await login(family, "family", patient);
-    await login(pro, "adminA", patient);
+    await login(family, familyUser, patient);
+    await login(pro, administrator, patient);
     const com = (
       await post(family, "/api/documents", {
         careRecipientId: patient,
@@ -265,7 +271,7 @@ test("V4 review: sino filtra silenciosas antes da página e ficha acompanha esta
       "select id from public.requisition_notifications where document_id=" +
         sqlLiteral(receipt.requisitionId) +
         " and recipient_user_id=" +
-        sqlLiteral(fixtures().family.id) +
+        sqlLiteral(familyUser.id) +
         " and channel='internal' limit 1",
     );
     sql(
@@ -304,7 +310,7 @@ test("V4 review: sino filtra silenciosas antes da página e ficha acompanha esta
       exact: true,
     });
     await expect(
-      bell.getByRole("link").filter({ hasText: receipt.code }),
+      bell.getByRole("button").filter({ hasText: receipt.code }),
     ).toHaveCount(1);
     await family.keyboard.press("Escape");
     // The 25 newer silent records occupy the first communications page.
@@ -334,12 +340,6 @@ test("V4 review: sino filtra silenciosas antes da página e ficha acompanha esta
       )
       .toBe(0);
     await family.goto("/notificacoes?careRecipientId=" + patient);
-    const otherPatient = (
-      await (await family.request.get("/api/context")).json()
-    ).data.patients.find(
-      (p: { id: string; hasMembership: boolean }) =>
-        p.id !== patient && p.hasMembership,
-    ).id;
     const picker = family.getByLabel("Pessoa assistida", { exact: true });
     await picker.selectOption(otherPatient);
     await expect
@@ -355,12 +355,8 @@ test("V4 review: sino filtra silenciosas antes da página e ficha acompanha esta
       family.getByRole("button", { name: /^Notificações/ }),
     ).toBeVisible();
     await family.getByRole("button", { name: /^Notificações/ }).click();
-    await expect(
-      family
-        .getByRole("region", { name: "Notificações recentes", exact: true })
-        .getByRole("link")
-        .and(family.locator('a[href*="' + receipt.requisitionId + '"]')),
-    ).toHaveCount(0);
+    await expect(bell.getByText("Você está em dia. As próximas atualizações aparecerão aqui.", { exact: true })).toBeVisible();
+    await expect(bell.getByRole("button").filter({ hasText: receipt.code })).toHaveCount(0);
     await family.keyboard.press("Escape");
     await picker.selectOption(patient);
     await expect
@@ -376,7 +372,7 @@ test("V4 review: sino filtra silenciosas antes da página e ficha acompanha esta
     await expect(
       family
         .getByRole("region", { name: "Notificações recentes", exact: true })
-        .getByRole("link")
+        .getByRole("button")
         .filter({ hasText: receipt.code }),
     ).toHaveCount(1);
   } finally {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState, type RefObject } from "react";
+import { useCallback, useEffect, useRef, useState, type ComponentProps } from "react";
 import { useRouter } from "next/navigation";
 import { ActionButton, Pill } from "@/components/ui/controls";
 import { Drawer } from "@/components/ui/overlays";
@@ -13,6 +13,7 @@ import { notificationHref, notificationTargetLabel } from "@/lib/notifications/n
 import { formatBrazilDate } from "@/lib/receipt";
 import { useLiveRevision } from "@/lib/use-live-revision";
 import { useScopedRead } from "@/lib/use-scoped-read";
+import "./inbox-notice-details.css";
 
 const unavailable = (status?: number) => status === 401 || status === 403 || status === 404 || status === 409;
 
@@ -22,7 +23,7 @@ export function InboxNoticeDetails({ patientId, patientName, noticeId, onClose, 
   noticeId: string;
   onClose: () => void;
   onUnavailable: () => void;
-  finalFocus?: RefObject<HTMLButtonElement | null>;
+  finalFocus?: ComponentProps<typeof Drawer>["finalFocus"];
   markOnOpen?: boolean;
 }) {
   const router = useRouter();
@@ -35,6 +36,7 @@ export function InboxNoticeDetails({ patientId, patientName, noticeId, onClose, 
   const [openingError, setOpeningError] = useState<{ denied: boolean; message: string } | null>(null);
   const denied = unavailable(detail.errorStatus) || openingError?.denied === true;
   const row = denied || detail.loading || detail.error ? null : detail.data;
+  const eventTitle = row ? documentEventLabel(row.event_key ?? row.document_events?.action) : null;
 
   useEffect(() => () => navigationRef.current?.abort(), []);
   useEffect(() => { if (denied) onUnavailable(); }, [denied, onUnavailable]);
@@ -67,28 +69,41 @@ export function InboxNoticeDetails({ patientId, patientName, noticeId, onClose, 
 
   return <Drawer
     open onClose={onClose} finalFocus={finalFocus} headingIcon={row ? inboxNoticeIcon(row) : "bell"}
-    title={denied ? "Aviso indisponível" : row?.reference_code ?? "Aviso"}
+    popupClassName="hca-preference-sheet hca-inbox-notice-sheet" keyboardScrollable
+    title={denied ? "Aviso indisponível" : row?.reference_code ?? eventTitle ?? "Aviso"}
     kicker={row && patientName ? `Avisos · ${patientName}` : undefined}
     footer={<>
-      <ActionButton onClick={onClose}>{denied ? "Voltar aos avisos" : "Fechar"}</ActionButton>
+      <ActionButton onClick={onClose}>{denied ? "Voltar aos avisos" : "Voltar"}</ActionButton>
       {detail.error && !denied ? <ActionButton onClick={detail.refresh}>Consultar novamente</ActionButton> : null}
-      {row ? <ActionButton variant="primary" disabled={opening} onClick={() => { void openDestination(); }}>{notificationTargetLabel(row)}</ActionButton> : null}
+      {row ? <ActionButton variant="primary" disabled={opening} onClick={() => { void openDestination(); }}>
+        {notificationTargetLabel(row)}<Icon name="arrow" width={16} height={16} />
+      </ActionButton> : null}
     </>}
   >
     {denied ? <p role="alert">Este aviso não está disponível no vínculo selecionado.</p> : null}
     {!denied && detail.loading ? <p role="status">Consultando aviso…</p> : null}
     {!denied && (openingError?.message || detail.error) ? <p role="alert">{openingError?.message ?? detail.error}</p> : null}
-    {row ? <div className="flex flex-col gap-2">
-      <div className="flex flex-wrap items-center justify-between gap-2 text-sm">
-        <Pill tone={row.seen_at ? "neutral" : "info"}>{row.seen_at ? "Vista no aplicativo" : "Não vista"}</Pill>
-        <time dateTime={row.created_at}>{formatBrazilDate(row.created_at)}</time>
+    {row ? <>
+      <div className="hca-inbox-notice-detail">
+        <div className="hca-inbox-notice-meta">
+          <Pill tone={row.seen_at ? "neutral" : "info"}>{row.seen_at ? "Vista no aplicativo" : "Não vista"}</Pill>
+          <time dateTime={row.created_at}>{formatBrazilDate(row.created_at)}</time>
+        </div>
+        {row.reference_code ? <h3>{eventTitle}</h3> : null}
+        {row.document_events?.actorName ? <p><Icon name="user" width={16} height={16} />{row.document_events.actorName}</p> : null}
       </div>
-      <h3 className="font-semibold">{documentEventLabel(row.event_key ?? row.document_events?.action)}</h3>
-      {row.document_events?.actorName ? <p className="flex items-center gap-2"><Icon name="users" width={16} height={16} />{row.document_events.actorName}</p> : null}
-      {row.task ? <section aria-label="Ação na ficha" className="mt-3 grid gap-2 rounded-xl border border-(--hca-line) p-3">
-        <span className="flex flex-wrap items-center justify-between gap-2"><strong>{inboxTaskLabels[row.task]}</strong><Pill tone="warning">Pendente</Pill></span>
-        <p className="text-sm">{row.seen_at ? "Você já viu o aviso. A ação continua pendente na ficha." : "Abra a ficha para registrar a ação."}</p>
+      {row.task ? <section aria-label="Ação na ficha" className="ui-card hca-inbox-notice-task">
+        <h3>Na ficha</h3>
+        <div className="hca-inbox-notice-task-status">
+          <span className="hca-inbox-notice-task-icon"><Icon name="clock" width={17} height={17} /></span>
+          <div><strong>{inboxTaskLabels[row.task]}</strong><p>Esta ação ainda precisa ser concluída.</p></div>
+          <Pill tone="warning">Pendente</Pill>
+        </div>
       </section> : null}
-    </div> : null}
+      {row.task && row.seen_at ? <p className="hca-inbox-notice-seen"><Icon name="eye" width={16} height={16} />
+        Você já viu o aviso. A ação continua pendente na ficha.
+      </p> : null}
+      {opening ? <p role="status">Conferindo acesso ao destino…</p> : null}
+    </> : null}
   </Drawer>;
 }
