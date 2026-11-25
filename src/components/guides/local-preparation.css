@@ -4,6 +4,11 @@
 .hca-preparation-lead p, .hca-preparation-intro > p { color: var(--hca-muted); font-size: 13px; }
 .hca-preparation-intro { display: grid; gap: 12px; }
 .hca-local-preparation h2 { font-size: 15px; font-weight: 700; }
+.hca-preparation-lead h2 { margin: 0 0 4px; }
+.hca-preparation-lead p, .hca-preparation-intro > .hca-preparation-hint { margin: 0; line-height: 1.6; }
+.hca-preparation-hint { display: flex; align-items: flex-start; gap: 8px; }
+.hca-preparation-hint > svg { flex: none; margin-top: 2px; }
+.hca-guide-card > .hca-preparation-registration { margin-bottom: 12px; }
 .hca-local-preparation .hca-guide-actions { justify-content: space-between; }
 .hca-local-preparation .hca-guide-actions > :is(a, button) { flex: none; min-width: 0; max-width: 100%; white-space: normal; }
 .hca-local-preparation .hca-guide-actions > button { margin-inline-start: auto; }

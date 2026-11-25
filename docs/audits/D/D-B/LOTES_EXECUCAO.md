@@ -5489,3 +5489,23 @@ a seção Áreas da preparação começar abaixo do recorte inicial no
 produto. No laboratório, o título da seção já aparece nesse recorte.
 Estes ajustes não exigem migration. O resultado da CI e do Preview
 do SHA já publicado continua sendo o de `cf840b8b`.
+
+### E12-02 — Áreas visíveis na primeira tela
+
+Uma verificação antes da alteração reproduziu, no build de `e48a1445`,
+o título da lista cortado pelo limite da área rolável. O cartão inicial
+seguiu a sequência do laboratório, com orientação, paciente e instante
+da consulta. A situação do cadastro e o fuso de referência passaram
+para Conferência física e continuidade, com os mesmos valores da API.
+
+As capturas em 360 e 412 px mostram o título Áreas da preparação
+acima do rodapé, com a rolagem na posição inicial. O teste mede o
+título inteiro dentro da área rolável e a posição dos dois botões.
+O cabeçalho e a navegação continuam sendo os componentes compartilhados.
+
+Os quatro cenários da preparação passaram em Chromium e WebKit de
+iPhone, oito execuções sem retentativa. Incluíram a jornada de adoção e
+estoque, a atualização somente de leitura, a recuperação de consulta,
+a recusa de acesso global e a comparação responsiva de 320 a 1440 px.
+O build de produção, TypeScript e os lints dirigidos passaram. O
+incremento não exige migration e ainda aguarda CI no SHA candidato.

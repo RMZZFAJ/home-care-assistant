@@ -54,6 +54,8 @@ test("local preparation connects real creation adoption and opening stock withou
  const data=(await(await page.request.get(endpoint(f.patient))).json()).data;
  expect(data.catalogue.activeProducts).toBe(1);expect(data.stock.familyMovements).toBe(1);expect(data.stock.teamMovements).toBe(0);
  const continuity=page.getByRole("region",{name:"Conferência física e continuidade",exact:true});await expect(continuity).toContainText("não confirma estoque físico");
+ await expect(continuity.getByRole("definition").filter({hasText:/^Ativo$/})).toHaveCount(1);
+ await expect(continuity.getByRole("definition").filter({hasText:/^America\/Sao_Paulo$/})).toHaveCount(1);
  const refreshed=page.waitForResponse(response=>response.request().method()==="GET"&&response.url()===new URL(endpoint(f.patient),page.url()).href);
  await page.getByRole("button",{name:"Atualizar situação",exact:true}).click();
  expect((await refreshed).ok()).toBe(true);
@@ -61,13 +63,15 @@ test("local preparation connects real creation adoption and opening stock withou
  expect(physical(f.patient)).toBe(before);expect(sql("select count(*) from public.stock_movements where care_recipient_id="+q(f.patient)+" and product_id="+q(model))).toBe("1");
 });
 
-test("E12-02 local preparation follows the approved mobile footer and fits all screen widths",async({page,browser},info)=>{
+test("E12-02 local preparation shows the areas above the approved mobile footer and fits all screen widths",async({page,browser},info)=>{
  const {patient}=await setup(), administrator=await shiftWorker(patient,"admin");
  await login(page,administrator,patient);
  await page.goto("/preparacao-local?careRecipientId="+patient);
  const contingency=page.getByRole("link",{name:"Orientação de contingência",exact:true});
  const refresh=page.getByRole("button",{name:"Atualizar situação",exact:true});
- await expect(page.getByRole("region",{name:"Áreas da preparação",exact:true})).toBeVisible();
+ const areas=page.getByRole("region",{name:"Áreas da preparação",exact:true});
+ const areaHeading=areas.getByRole("heading",{name:"Áreas da preparação",exact:true});
+ await expect(areas).toBeVisible();
  const reference=await browser.newContext({viewport:{width:1280,height:900}});
  mkdirSync("output/playwright/l4/reference",{recursive:true});
  try {
@@ -82,6 +86,12 @@ test("E12-02 local preparation follows the approved mobile footer and fits all s
    if(!size)throw new Error("O laboratório não exibiu a área comparada.");
    await page.setViewportSize({width,height:Math.round(size.height)});
    await auditFromTop(page,"E12-02 local preparation "+width);
+   await expect.poll(() => areaHeading.evaluate(heading => {
+    const scrollArea = heading.closest(".hca-docked-content");
+    if (!(scrollArea instanceof HTMLElement)) return false;
+    const title = heading.getBoundingClientRect(), bounds = scrollArea.getBoundingClientRect();
+    return scrollArea.scrollTop === 0 && title.top >= bounds.top && title.bottom <= bounds.bottom;
+   }), { message: "The area heading should fit inside the initial scroller" }).toBe(true);
    const left=await contingency.boundingBox(), right=await refresh.boundingBox();
    expect(left && right ? right.y>=left.y+left.height && right.x>left.x && right.x+right.width<=width : false).toBe(true);
    await frame.screenshot({path:"output/playwright/l4/reference/local-preparation-"+width+".png"});

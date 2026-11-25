@@ -78,10 +78,8 @@ function PreparationTasks({ context }: { context: WorkspaceContext }) {
         {read.data ? <DefinitionGrid items={[
           { label: "Paciente", value: read.data.patient.name },
           { label: historical ? "Última consulta confirmada" : "Consulta", value: formatBrazilDate(read.data.observedAt) },
-          { label: "Situação do cadastro", value: read.data.patient.active ? "Ativo" : "Inativo" },
-          ...(read.data.patient.referenceTimeZone ? [{ label: "Fuso indicado na preparação", value: read.data.patient.referenceTimeZone }] : []),
         ]} /> : null}
-        <p>Os dados orientam a preparação. A conferência física continua com as pessoas responsáveis.</p>
+        <p className="hca-preparation-hint"><Icon name="info" width={16} height={16} /><span>Os dados abaixo orientam a preparação. A conferência física continua com as pessoas responsáveis.</span></p>
       </section>
       {read.data ? <>
         <section className="ui-card hca-guide-card hca-preparation-areas" aria-label="Áreas da preparação">
@@ -96,6 +94,10 @@ function PreparationTasks({ context }: { context: WorkspaceContext }) {
         </section>
         <section className="ui-card hca-guide-card" aria-label="Conferência física e continuidade">
           <h2>Conferência física e continuidade</h2>
+          <DefinitionGrid className="hca-preparation-registration" items={[
+            { label: "Situação do cadastro", value: read.data.patient.active ? "Ativo" : "Inativo" },
+            ...(read.data.patient.referenceTimeZone ? [{ label: "Fuso indicado na preparação", value: read.data.patient.referenceTimeZone }] : []),
+          ]} />
           <p>Combine com os responsáveis como guardar referências físicas, comunicar interrupções e retomar cada fato sem duplicação. A pessoa que regulariza o fato registra a própria autoria.</p>
           <p>Esta consulta mostra metadados registrados. Ela não confirma estoque físico, presença, ciência, recebimento ou início do atendimento.</p>
           <Link className="hca-control hca-control--secondary" href={scope("/guias")}>Reabrir orientação do meu papel</Link>
