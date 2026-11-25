@@ -80,7 +80,8 @@ import type { DocumentDecisionIntention } from "@/lib/validation/document-decisi
 import { DocumentHeader, DocumentMoreButton, DocumentMoreLink } from "./document-header";
 import { DocumentIssuanceResult } from "./document-issuance-result";
 import { canRecordFamilyReview, FamilyFulfillmentReview, type OpenPendingFamilyReview } from "./family-fulfillment-review";
-import { DocumentChangeFacts, DocumentFreshness } from "./document-freshness";
+import { ChangeFacts } from "@/components/ui/change-facts";
+import { DocumentFreshness } from "./document-freshness";
 import { DocumentFamilyDecisionNotice } from "./document-family-decision-notice";
 import { supplyChanges } from "@/lib/documents/document-changes";
 import { useDocumentCopy } from "@/lib/documents/use-document-copy";
@@ -1800,7 +1801,7 @@ export function SupplyDocumentContent({
         conflict={receiptConflict ? <section className="hca-form-stack" aria-label="Alterações na conferência">
           <Notice>A ficha mudou durante a conferência.</Notice>
           {receiptReference ? <>
-            <DocumentChangeFacts changes={[
+            <ChangeFacts changes={[
               { id: "version", label: "Versão da ficha", before: String(data.version), after: String(receiptReference.version) },
               ...supplyChanges(data, receiptReference),
             ]} />

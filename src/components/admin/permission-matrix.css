@@ -41,3 +41,26 @@
 .hca-permission-group .hca-guide-row { padding: 10px 16px; }
 .hca-permission-group .hca-guide-row-icon[data-allowed="false"] { color: var(--hca-muted); background: var(--hca-bg); }
 .hca-permission-group .hca-status { flex: none; }
+.hca-overlay:has(.hca-permission-history-sheet) > .hca-modal-backdrop {
+  position: fixed;
+  inset: var(--app-header-height) 0 0;
+}
+.hca-permission-history-entry h3 {
+  border-bottom: 1px solid var(--hca-line);
+  overflow-wrap: anywhere;
+}
+.hca-permission-history-entry .hca-guide-row { color: var(--hca-ink); cursor: default; }
+.hca-permission-history-comparison { padding: 0 16px 14px; }
+.hca-permission-history-comparison > dl { margin-bottom: 0; }
+.hca-permission-history-comparison .hca-document-change-list > div {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 6px 12px;
+  border: 0;
+  border-top: 1px solid var(--hca-line);
+  border-radius: 0;
+  padding: 12px 0 7px;
+}
+.hca-permission-history-comparison :is(dt, dd) { margin: 0; font-size: 13px; }

@@ -158,11 +158,18 @@ test("retry de aprovação oferece reemissão explícita sem duplicar convite ne
   expect(recovered).not.toHaveProperty("invitationUrl");
   expect(recovered.invitationRecovery).toMatchObject({ action: "reissue", invitationId: issued.data.resolution.invitationId });
   expect(sql(`select count(*) from public.care_recipient_invitations where care_recipient_id=${sqlLiteral(f.patient)};`)).toBe("1");
-  await page.goto("/configuracoes?area=people");
-  const renewed = page.waitForResponse(response => response.request().method() === "POST" && new URL(response.url()).pathname === "/api/admin");
-  await page.getByRole("button", { name: "Reemitir convite e invalidar link anterior", exact: true }).click();
-  expect((await renewed).ok()).toBe(true);
-  const newLink = await page.getByRole("textbox", { name: "Convite aprovado", exact: true }).inputValue();
+  await page.goto("/configuracoes?area=people&careRecipientId=" + f.patient);
+  const row = page.getByRole("article", { name: "Proposta " + proposal.id.slice(0, 8), exact: true });
+  await row.getByRole("button").click();
+  await page.getByRole("dialog", { name: "Proposta aprovada", exact: true }).getByRole("link", { name: "Reemitir convite", exact: true }).click();
+  const invitation = page.getByRole("dialog", { name: "Convite da residência", exact: true });
+  await invitation.getByRole("button", { name: "Reemitir link", exact: true }).click();
+  const [renewed] = await Promise.all([
+    page.waitForResponse(response => response.request().method() === "POST" && new URL(response.url()).pathname === "/api/admin/invitations"),
+    page.getByRole("dialog", { name: "Reemitir convite?", exact: true }).getByRole("button", { name: "Reemitir convite", exact: true }).click(),
+  ]);
+  expect(renewed.ok()).toBe(true);
+  const newLink = await page.getByRole("textbox", { name: "Link", exact: true }).inputValue();
   expect(newLink).not.toBe(issued.invitationUrl);
   const oldToken = new URLSearchParams(new URL(issued.invitationUrl).hash.slice(1)).get("token");
   const oldPreview = await page.request.post("/api/invitations/preview", { data: { token: oldToken } });

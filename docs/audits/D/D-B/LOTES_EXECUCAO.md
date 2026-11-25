@@ -5329,3 +5329,57 @@ conferiram a comparação de versões, a cópia da referência, o limite de
 retentativas, a recusa de leitura fora do escopo e os dois resultados da
 consulta de uma edição. As capturas de 360 e 412 px foram comparadas com o
 laboratório. O botão de atualização ficou visível ao abrir o painel.
+
+### Revisão de E10 — Histórico de permissões e jornadas administrativas
+
+A [PR 8][pr-l4-history] em rascunho recebeu os commits `4e7494ca`,
+`6bb334dc` e `cf840b8b`. O [Preview deste SHA][preview-cf840b8b] ficou
+`READY`. As variáveis de aplicação, Supabase, PDF, Web Push e worker
+estavam cadastradas no destino. O endereço do deploy e o alias da branch
+retornaram `ready` no runtime. Login, verificação pública e recursos do
+PWA também responderam com o conteúdo esperado. O
+[SonarCloud][sonar-cf840b8b] aprovou o Quality Gate. A revisão automática
+estava habilitada para rascunhos. O [CodeRabbit][rabbit-cf840b8b] pulou a
+revisão incremental.
+A [CI de cf840b8b][ci-cf840b8b] concluiu as validações de Linux e Windows
+e o job de banco. Os sete jobs de navegador estavam em execução na
+conferência.
+
+A simulação de migrations confirmou 23 versões pendentes no banco
+compartilhado. A migration `20261124063932` continua exigindo uma
+versão do registro que a aplicação de produção em `fab595c7` ainda
+não envia. Os testes de runtime comprovam a configuração base do Preview.
+As jornadas dependentes das migrations aguardam um destino compatível.
+
+A [CI anterior][ci-8bec6567] confirmou falhas repetidas nos navegadores
+após a concessão de exceções. A abertura de Histórico de permissões
+levava às propostas. A referência aprovada abre um painel na matriz e
+compara os valores gravados. O painel agora consulta as autorizações
+aplicadas na residência, com paginação, autoria, instante e antes/depois.
+Relatos da família aparecem com comparação própria quando o ato registrou
+esses valores. Registros sem comparação conservam os dados do ato e
+informam a indisponibilidade. A consulta usa a API e a RPC existentes.
+O ajuste usa o esquema existente.
+
+Os testes de catálogo e reemissão passaram a usar os controles vigentes
+de descarte e a proposta aguardando aceite. A checagem de reemissão
+continua comparando as duas URLs, recusando o token anterior e verificando
+que continua havendo um único convite sem vínculo criado.
+Passaram nove execuções dirigidas, três por projeto Chromium, mobile e iOS,
+sem repetição automática. A reemissão passou nos mesmos três projetos em
+rodada separada. A jornada administrativa usou uma conta e uma residência
+fictícias isoladas para evitar o acúmulo de vínculos de outras execuções.
+
+O reteste final em Chromium passou no build de produção local. As
+capturas de produto e laboratório a 360 e 412 px confirmaram o painel
+abaixo do cabeçalho, o comparativo em linha e o botão Voltar no rodapé.
+O sistema mantém no cabeçalho o seletor de paciente aprovado em L1.
+O teste também verificou ausência de rolagem horizontal, a posição do
+fundo do painel após rolar a matriz, o retorno de foco e a recuperação
+de erro na consulta. O axe executou nas duas larguras sem violações.
+
+[pr-l4-history]: https://github.com/RMZZFAJ/home-care-assistant/pull/8
+[preview-cf840b8b]: https://vercel.com/rmzzfajs-projects/home-care-assistant/H1jMwoMGzcNH97sy2QD4hRCjMNup
+[sonar-cf840b8b]: https://github.com/RMZZFAJ/home-care-assistant/runs/138866692873
+[rabbit-cf840b8b]: https://github.com/RMZZFAJ/home-care-assistant/runs/138866169285
+[ci-cf840b8b]: https://github.com/RMZZFAJ/home-care-assistant/actions/runs/45513184461

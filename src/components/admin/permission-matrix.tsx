@@ -1,7 +1,6 @@
 "use client";
 
-import Link from "next/link";
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { ActionButton, CheckboxField, DataTable, DefinitionGrid, FormField, Pill, SelectField, TextInput } from "@/components/ui/controls";
 import { FeedbackBanner } from "@/components/ui/feedback";
 import { Icon } from "@/components/ui/icon";
@@ -13,6 +12,7 @@ import { capabilityLabels } from "@/lib/capability-labels";
 import { roleLabel } from "@/lib/role-labels";
 import { useScopedRead } from "@/lib/use-scoped-read";
 import { parsePermissionSnapshot, type PersonalPermission } from "@/lib/validation/permission-snapshot";
+import { PermissionHistory } from "./permission-history";
 import "../guides/guides.css";
 import "./permission-matrix.css";
 
@@ -57,6 +57,8 @@ export function PermissionMatrix({ initialPersonId = "", patientId, patientName,
   const [search, setSearch] = useState("");
   const [group, setGroup] = useState("");
   const [edit, setEdit] = useState<Edit | null>(null);
+  const [historyOpen, setHistoryOpen] = useState(false);
+  const historyTriggerRef = useRef<HTMLButtonElement>(null);
   const person = directory.find(row => row.id === personId);
   const decode = useCallback((value: unknown) => parsePermissionSnapshot(value, patientId, personId, version), [patientId, personId, version]);
   const details = useScopedRead(person ? "/api/patient-settings?" + new URLSearchParams({ careRecipientId: patientId, permissionPerson: person.id }) : null, String(revision), decode);
@@ -68,7 +70,6 @@ export function PermissionMatrix({ initialPersonId = "", patientId, patientName,
   const filtered = definitions.filter(row => matches(row.code));
   const personalRows = snapshot?.permissions.filter(row => matches(row.code)) ?? [];
   const roleSettings = new Map(overrides.filter(row => row.subject_role).map(row => [row.capability + ":" + row.subject_role, row.enabled]));
-  const history = "/configuracoes?" + new URLSearchParams({ area: "people", careRecipientId: patientId, proposalKind: "capability", proposalStatus: "all" });
 
   function openPerson(row: PersonalPermission, opener: HTMLElement) {
     if (!person || !snapshot) return;
@@ -143,10 +144,11 @@ export function PermissionMatrix({ initialPersonId = "", patientId, patientName,
     </div>}
     <div className="ui-card hca-permission-group">
       <h3>Acompanhar alterações</h3>
-      <Link className="hca-guide-row" href={history} prefetch={false}>
-        <span className="hca-guide-row-icon"><Icon name="history" /></span><span className="hca-guide-row-label"><strong>Histórico de permissões</strong><small>Responsáveis e alterações registradas</small></span><Icon name="chevron" width={14} />
-      </Link>
+      <button ref={historyTriggerRef} type="button" className="hca-guide-row" onClick={() => setHistoryOpen(true)}>
+        <span className="hca-guide-row-icon"><Icon name="history" /></span><span className="hca-guide-row-label"><strong>Histórico de permissões</strong><small>Responsável, antes e depois de cada decisão</small></span><Icon name="chevron" width={14} />
+      </button>
     </div>
+    {historyOpen && <PermissionHistory patientId={patientId} revision={revision} opener={historyTriggerRef} onClose={() => setHistoryOpen(false)} />}
     {edit && <PermissionEditor edit={edit} patientName={patientName} version={version} globalMode={globalMode} busy={busy} configure={configure}
       people={edit.scope === "role" ? directory.filter(row => row.role === edit.id) : []}
       close={() => setEdit(null)} viewPerson={id => { setPersonId(id); setEdit(null); }} />}

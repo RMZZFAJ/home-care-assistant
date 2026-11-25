@@ -140,7 +140,7 @@ test("E10-05 vincula a reemissão ao convite da proposta que aguarda aceite", as
   expect(sql(`select count(*) from public.care_recipient_memberships where care_recipient_id=${sqlLiteral(f.patient)} and user_id=${sqlLiteral(fixtures.adminB.id)};`)).toBe("0");
 });
 
-test("L4 confirma a exceção crítica além da função e registra a mudança efetiva", async ({ page }) => {
+test("L4 confirma a exceção crítica além da função e registra a mudança efetiva", async ({ page, browser }, info) => {
   const f = await setup();
   await login(page, "adminA", f.patient);
   await page.goto("/configuracoes?area=permissions&careRecipientId=" + f.patient);
@@ -165,8 +165,55 @@ test("L4 confirma a exceção crítica além da função e registra a mudança e
   expect((await completion).status()).toBe(200);
   await expect(review).toHaveCount(0);
   await expect(matrix.getByRole("button", { name: /^Administrar acessos do paciente/ })).toContainText("Exceção pessoal");
-  await matrix.getByRole("link", { name: /^Histórico de permissões/ }).click();
-  await expect(page.getByText(/Permissão efetiva restrita → permitida/)).toBeVisible();
+  const historyTrigger = matrix.getByRole("button", { name: /^Histórico de permissões/ });
+  const history = page.getByRole("dialog", { name: "Histórico de permissões", exact: true });
+  const origin = page.url();
+  await page.route("**/api/patient-settings?*kind=capability*", route =>
+    route.fulfill({ status: 503, json: { error: "Consulta temporariamente indisponível" } }), { times: 1 });
+  await historyTrigger.click();
+  await expect(history.getByRole("alert")).toContainText("Consulta temporariamente indisponível");
+  await history.getByRole("button", { name: "Consultar novamente", exact: true }).click();
+  const record = history.getByRole("article").filter({ hasText: title });
+  await expect(record.getByRole("heading", { name: /professional/i })).toBeVisible();
+  await expect(record).toContainText(/Teste adminA/i);
+  const comparison = record.locator("dl > div").filter({ has: page.getByText("Acesso", { exact: true }) });
+  await expect(comparison.locator("del")).toContainText("Restrita");
+  await expect(comparison.locator("strong")).toContainText("Permitida");
+  await expect(page).toHaveURL(origin);
+  if (info.project.name === "chromium") {
+    const reference = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+    try {
+      const model = await reference.newPage();
+      await model.route(/^https?:/, route => route.abort());
+      await model.goto(pathToFileURL(resolve("hca-laboratorio-04-v2-aprovado.html")).href + "#E10-04/role-limit");
+      await model.getByRole("switch", { name: "Confirmo a ampliação deste acesso", exact: true }).check();
+      await model.getByRole("button", { name: "Confirmar ampliação", exact: true }).click();
+      await expect(model.getByRole("heading", { name: "Permissão atualizada", exact: true })).toBeVisible();
+      await model.getByRole("button", { name: "Concluir", exact: true }).click();
+      await model.getByRole("button", { name: /^Histórico de permissões/ }).click();
+      const frame = model.locator("#device-frame");
+      for (const width of [360, 412]) {
+        await model.getByRole("combobox", { name: "Visualização", exact: true }).selectOption(String(width));
+        await expect(model.getByRole("heading", { name: "Histórico de permissões", exact: true })).toBeVisible();
+        await page.setViewportSize({ width, height: await frame.evaluate(node => node.clientHeight) });
+        const scrollArea = history.getByRole("region", { name: "Conteúdo de Histórico de permissões", exact: true });
+        await expect.poll(() => scrollArea.evaluate(node => node.scrollWidth <= node.clientWidth)).toBe(true);
+        await expect.poll(() => history.evaluate(node => {
+          const bounds = node.getBoundingClientRect();
+          const footer = node.querySelector(".hca-modal-footer")?.getBoundingClientRect();
+          const backdrop = node.closest(".hca-overlay")?.querySelector(".hca-modal-backdrop")?.getBoundingClientRect();
+          return bounds.top > 40 && Boolean(footer && backdrop &&
+            Math.abs(footer.bottom - bounds.bottom) <= 2 && Math.abs(backdrop.top - bounds.top) <= 2);
+        })).toBe(true);
+        await audit(page, "E10-04 histórico de permissões " + width);
+        await info.attach("laboratorio-historico-permissoes-" + width, { body: await frame.screenshot({ path: info.outputPath("laboratorio-" + width + ".png") }), contentType: "image/png" });
+        await info.attach("historico-permissoes-" + width, { body: await page.screenshot({ path: info.outputPath("produto-" + width + ".png"), animations: "disabled" }), contentType: "image/png" });
+      }
+    } finally { await reference.close(); }
+  }
+  await history.getByRole("button", { name: "Voltar", exact: true }).click();
+  await expect(history).toHaveCount(0);
+  await expect(historyTrigger).toBeFocused();
 });
 
 async function widths(page: Page, label: string) {
@@ -202,8 +249,12 @@ test("L4 diferencia a autorização da custódia familiar de uma permissão anti
   await review.getByRole("button", { name: "Confirmar ampliação", exact: true }).click();
   expect((await commit).status()).toBe(200);
   await expect(review).toHaveCount(0);
-  await matrix.getByRole("link", { name: /^Histórico de permissões/ }).click();
-  await expect(page.getByText(/Relatos da família restritos → permitidos/)).toBeVisible();
+  await matrix.getByRole("button", { name: /^Histórico de permissões/ }).click();
+  const history = page.getByRole("dialog", { name: "Histórico de permissões", exact: true });
+  const record = history.getByRole("article").filter({ hasText: "Relatar faltas e consumo" });
+  const comparison = record.locator("dl > div").filter({ has: page.getByText("Relatos da família", { exact: true }) });
+  await expect(comparison.locator("del")).toContainText("Restritos");
+  await expect(comparison.locator("strong")).toContainText("Permitidos");
 });
 
 test("D3 proposta administrativa recupera a mesma intenção e ambas as entradas recusam rebase ou conteúdo alterado", async ({ page }, info) => {

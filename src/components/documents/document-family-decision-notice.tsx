@@ -10,7 +10,7 @@ import { api, ApiError } from "@/lib/client/api";
 import { formatQuantity } from "@/lib/quantity";
 import { formatBrazilDate } from "@/lib/receipt";
 import { useScopedRead } from "@/lib/use-scoped-read";
-import { DocumentChangeFacts } from "./document-freshness";
+import { ChangeFacts } from "@/components/ui/change-facts";
 
 const decision = z.enum(["partial", "complete"]);
 const decisionResponse = z.object({
@@ -103,7 +103,7 @@ export function DocumentFamilyDecisionNotice({ id, patientId, userId, code, revi
       footer={<ActionButton variant="primary" disabled={busy} onClick={() => void acknowledge()}>
         {busy ? "Confirmando…" : error ? "Confirmar novamente" : "Entendi"}
       </ActionButton>}>
-      <DocumentChangeFacts changes={[{
+      <ChangeFacts changes={[{
         id: notice.id, label: kept ? "Decisão familiar" : "Atendimento da necessidade",
         before: !kept && notice.previous ? labels[notice.previous] : undefined,
         after: labels[notice.decision] + (kept ? " mantido" : ""),
