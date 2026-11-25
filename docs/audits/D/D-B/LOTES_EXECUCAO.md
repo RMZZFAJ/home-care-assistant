@@ -5117,8 +5117,7 @@ A lista foi comparada em 360 e 412 px com a mesma concessão de contagem.
 O link direto posiciona o título e o filtro abaixo da barra de abas fixa.
 O teste conferiu que o botão recebe o clique e que a primeira proposta
 termina antes de 300 px a partir do início da seção. O sistema inclui
-a faixa horizontal de abas e a edição de função abaixo da lista. A
-legenda da aba ativa pode exigir rolagem horizontal em 360 px.
+a faixa horizontal de abas e a edição de função abaixo da lista.
 
 Passaram três execuções visuais sem retentativa em Chromium, Android e
 iPhone emulados. As seis execuções dirigidas anteriores em Chromium e
@@ -5130,6 +5129,16 @@ propostas, configuração,
 vínculos, permissões e estoque. As capturas finais estão em
 `output/playwright/l4-proposal-list-viewport-report/`. Build de produção,
 TypeScript e lint dirigido passaram. A alteração dispensa migration.
+
+Na revisão seguinte, a faixa passou a revelar toda a aba ativa ao abrir
+um link direto, redimensionar a janela ou trocar de aba. Quando os nomes
+não cabem juntos, a faixa oferece rolagem manual para os outros destinos.
+Em 320 px, a verificação deslocou a faixa manualmente, conferiu a posição
+vertical e alternou pelo teclado entre Permissões e Pessoas e propostas.
+As três execuções em Chromium, Android e iPhone emulados passaram sem
+retentativa e confirmaram a aba ativa íntegra em 360 e 412 px. O build,
+TypeScript e lint dirigido passaram. As capturas ficam em
+`output/playwright/l4-proposal-active-tab-report/`.
 
 ### E10-06 — Regras, avisos e limites de estoque
 

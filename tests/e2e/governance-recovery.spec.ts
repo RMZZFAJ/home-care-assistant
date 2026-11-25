@@ -38,10 +38,21 @@ test("E10-05 compara a concessão pessoal de contagem com a referência visual",
     p_key: randomUUID(), p_version: current.data.version,
   });
   await login(page, reviewer, f.patient);
+  await page.setViewportSize({ width: 360, height: 708 });
   await page.goto(`/configuracoes?area=people&careRecipientId=${f.patient}#propostas`);
   const list = page.getByRole("region", { name: "Propostas de configuração", exact: true });
+  const navigation = page.getByRole("navigation", { name: "Áreas da configuração", exact: true });
+  const people = navigation.getByRole("link", { name: "Pessoas e propostas", exact: true });
+  const permissions = navigation.getByRole("link", { name: "Permissões", exact: true });
+  const activeTabVisible = () => navigation.evaluate(element => {
+    const viewport = element.getBoundingClientRect();
+    const tab = element.querySelector('[aria-current="page"]')?.getBoundingClientRect();
+    return Boolean(tab && tab.left >= viewport.left - 1 && tab.right <= viewport.right + 1);
+  });
   const opener = page.getByRole("article", { name: "Proposta " + proposal.id.slice(0, 8), exact: true }).getByRole("button");
   await expect(opener).toBeVisible();
+  await expect(people).toHaveAttribute("aria-current", "page");
+  await expect.poll(activeTabVisible).toBe(true);
   const review = page.getByRole("dialog", { name: "Conferir proposta", exact: true });
   const compare = review.getByRole("region", { name: "Compare a alteração", exact: true });
   const layout: { inset: number; backdropInset: number; actionRows: boolean; comparisonLine: boolean }[] = [];
@@ -54,10 +65,11 @@ test("E10-05 compara a concessão pessoal de contagem com a referência visual",
     }
     for (const width of [360, 412]) {
       await page.setViewportSize({ width, height: 708 });
+      await expect.poll(activeTabVisible).toBe(true);
       await list.evaluate(element => element.scrollIntoView({ block: "start", behavior: "instant" }));
       const [section, card, header, tabs, roleEditor] = await Promise.all([list.boundingBox(), opener.boundingBox(),
         page.locator(".app-header").boundingBox(),
-        page.getByRole("navigation", { name: "Áreas da configuração", exact: true }).boundingBox(),
+        navigation.boundingBox(),
         page.getByRole("heading", { name: "Função no paciente", exact: true }).boundingBox()]);
       expect(section && card && header && tabs && roleEditor).toBeTruthy();
       const navigationGap = section!.y - Math.max(header!.y + header!.height, tabs!.y + tabs!.height);
@@ -129,6 +141,26 @@ test("E10-05 compara a concessão pessoal de contagem com a referência visual",
   const snapshot = await rpc(reviewer.client, "patient_permission_snapshot", { p_patient: f.patient, p_subject: recipient.id });
   expect(snapshot.permissions.find((row: { code: string }) => row.code === "bal.count")).toMatchObject({ effective: true, exception: true, origin: "personal" });
   expect(sql(`select status from public.access_change_requests where id=${sqlLiteral(proposal.id)};`)).toBe("applied");
+
+  await page.setViewportSize({ width: 320, height: 708 });
+  await expect.poll(activeTabVisible).toBe(true);
+  const initialScroll = await navigation.evaluate(element => element.scrollLeft);
+  expect(initialScroll).toBeGreaterThan(0);
+  const manualScroll = await navigation.evaluate(async element => {
+    const verticalBefore = window.scrollY;
+    element.scrollLeft = 0;
+    await new Promise<void>(resolve => requestAnimationFrame(() => requestAnimationFrame(() => resolve())));
+    return { horizontal: element.scrollLeft, verticalBefore, verticalAfter: window.scrollY };
+  });
+  expect(manualScroll.horizontal).toBe(0);
+  expect(manualScroll.verticalAfter).toBe(manualScroll.verticalBefore);
+  await permissions.press("Enter");
+  await expect(permissions).toHaveAttribute("aria-current", "page");
+  await expect.poll(activeTabVisible).toBe(true);
+  await people.press("Enter");
+  await expect(people).toHaveAttribute("aria-current", "page");
+  await expect.poll(activeTabVisible).toBe(true);
+  await expect(list.getByRole("button", { name: "Filtrar propostas", exact: true })).toBeVisible();
 });
 
 test("E10-05 confirma uma proposta, recupera a resposta perdida e abre a configuração atual de uma proposta superada", async ({ page }) => {

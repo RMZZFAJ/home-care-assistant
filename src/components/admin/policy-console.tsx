@@ -1,6 +1,6 @@
 "use client";
 import { ActionButton } from "@/components/ui/controls";
-import { useEffect, useRef, useState, type FormEvent } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type FormEvent } from "react";
 import {
   api,
   ApiError,
@@ -100,6 +100,28 @@ export function PolicyConsole() {
 function PolicyNavigation({ tab, scheduleAccess }: { tab: string; scheduleAccess: boolean }) {
   const params = useSearchParams();
   const router = useRouter();
+  const navigationRef = useRef<HTMLElement | null>(null);
+  useLayoutEffect(() => {
+    const navigation = navigationRef.current;
+    const current = navigation?.querySelector<HTMLAnchorElement>('a[aria-current="page"]');
+    if (!navigation || !current) return;
+
+    const revealCurrent = () => {
+      const viewport = navigation.getBoundingClientRect();
+      const bounds = current.getBoundingClientRect();
+      if (bounds.left < viewport.left) {
+        navigation.scrollLeft += Math.floor(bounds.left - viewport.left);
+      } else if (bounds.right > viewport.right) {
+        navigation.scrollLeft += Math.ceil(bounds.right - viewport.right);
+      }
+    };
+
+    revealCurrent();
+    const observer = new ResizeObserver(revealCurrent);
+    observer.observe(navigation);
+    for (const link of navigation.querySelectorAll("a")) observer.observe(link);
+    return () => observer.disconnect();
+  }, [tab, scheduleAccess]);
   const rules = ruleAreas.includes(tab);
   const areas: [string, string, IconName][] = rules ? [
     ["rules", "Regras", "settings"], ["notifications", "Avisos", "bell"], ["thresholds", "Estoque", "box"],
@@ -108,7 +130,7 @@ function PolicyNavigation({ tab, scheduleAccess }: { tab: string; scheduleAccess
     ["notifications", "Avisos", "bell"], ["people", "Pessoas e propostas", "users"],
   ];
   if (!rules && (scheduleAccess || tab === "schedules")) areas.push(["schedules", "Plantões", "calendar"]);
-  return <nav aria-label="Áreas da configuração" className="hca-configuration-tabs hca-document-tab-list">
+  return <nav ref={navigationRef} aria-label="Áreas da configuração" className="hca-configuration-tabs hca-document-tab-list">
     {areas.map(([area, label, icon]) => {
       const query = new URLSearchParams(params.toString());
       query.set("area", area);
