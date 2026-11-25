@@ -92,11 +92,23 @@
   border-radius: 10px;
 }
 .hca-proposal-comparison-row h3 { margin-bottom: 7px; font-weight: 650; }
-.hca-governance-review > .hca-modal-content { flex: 1; }
+.hca-overlay:has(.hca-governance-review) > .hca-modal-backdrop { position: fixed; inset: var(--app-header-height) 0 0; }
+.hca-governance-review .hca-modal-subtitle, .hca-proposal-change { overflow-wrap: anywhere; }
+.hca-proposal-change .hca-document-change-list { margin-bottom: 0; }
+.hca-proposal-change .hca-document-change-list dd { font-size: 14px; }
+.hca-proposal-scope { display: flex; align-items: flex-start; gap: 8px; padding: 0 16px 14px; color: var(--hca-muted); font-size: 12px; }
+.hca-proposal-scope > svg { flex: none; margin-top: 2px; }
+.hca-proposal-details { border-top: 1px solid var(--hca-line); }
+.hca-proposal-details summary { min-height: 44px; color: var(--hca-teal); }
+.hca-proposal-details > .hca-definition-grid { margin-top: 6px; }
 .hca-governance-review .hca-modal-footer .hca-control--danger:not(:disabled) {
   background: var(--hca-red);
   border-color: var(--hca-red);
   color: white;
+}
+@media (max-width: 500px) {
+  .hca-governance-review > .hca-modal-footer { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .hca-governance-review > .hca-modal-footer > :is(:only-child, .hca-governance-approve) { grid-column: 1 / -1; }
 }
 .hca-residence-admin-note { padding: 12px; border: 1px solid var(--hca-line); border-radius: 11px; background: #f4f8f3; }
 .hca-residence-admin-denied {

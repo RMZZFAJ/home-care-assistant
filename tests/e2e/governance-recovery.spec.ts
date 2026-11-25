@@ -26,7 +26,84 @@ async function login(page: Page, account: "global" | "adminA" | { email: string 
 test.afterEach(async ({ page }) => { await page.unrouteAll({ behavior: "wait" }); });
 const count = (patient: string) => Number(sql(`select count(*) from public.access_change_requests where care_recipient_id=${sqlLiteral(patient)};`));
 
-test("E10-05 confirma uma proposta, recupera a resposta perdida e abre a configuração atual de uma proposta superada", async ({ page, browser }, info) => {
+test("E10-05 compara a concessão pessoal de contagem com a referência visual", async ({ page, browser }, info) => {
+  const f = await setup(), author = await actor("global"), reviewer = await shiftWorker(f.patient, "admin");
+  const recipient = await shiftWorker(f.patient, "professional");
+  sql(`update public.profiles set full_name='Joana Castro' where id=${sqlLiteral(recipient.id)};`);
+  const permission = { capability: "bal.count", subjectUser: recipient.id, reviewedRole: "professional", confirmIndividual: true };
+  await adjustCapability(f.admin, f.patient, { ...permission, enabled: false });
+  const current = await rpc(f.admin, "patient_governance", { p_patient: f.patient });
+  const proposal = await rpc(author, "configure_patient_access", {
+    p_patient: f.patient, p_kind: "capability", p_change: { ...permission, enabled: true },
+    p_key: randomUUID(), p_version: current.data.version,
+  });
+  await login(page, reviewer, f.patient);
+  await page.goto(`/configuracoes?area=people&careRecipientId=${f.patient}`);
+  const opener = page.getByRole("article", { name: "Proposta " + proposal.id.slice(0, 8), exact: true }).getByRole("button");
+  await opener.click();
+  const review = page.getByRole("dialog", { name: "Conferir proposta", exact: true });
+  const compare = review.getByRole("region", { name: "Compare a alteração", exact: true });
+  const layout: { inset: number; backdropInset: number; actionRows: boolean; comparisonLine: boolean }[] = [];
+  const reference = info.project.name === "chromium" ? await browser.newContext({ viewport: { width: 1280, height: 900 }, isMobile: false, hasTouch: false, deviceScaleFactor: 1 }) : null;
+  try {
+    const model = await reference?.newPage();
+    if (model) {
+      await model.route(/^https?:/, route => route.abort());
+      await model.goto(pathToFileURL(resolve("hca-laboratorio-04-v2-aprovado.html")).href + "#E10-05/pending");
+      await model.getByRole("button", { name: /Permitir contagem para Joana Castro/ }).click();
+      await expect(model.getByRole("heading", { name: "Conferir proposta", exact: true })).toBeVisible();
+    }
+    for (const width of [360, 412]) {
+      await page.setViewportSize({ width, height: 900 });
+      await page.evaluate(() => document.fonts.ready);
+      if (model) {
+        await model.getByRole("combobox", { name: "Visualização", exact: true }).selectOption(String(width));
+        await info.attach("laboratorio-proposta-contagem-" + width, { body: await model.locator("#device-frame").screenshot(), contentType: "image/png" });
+      }
+      await info.attach("produto-proposta-contagem-" + width, { body: await page.screenshot({ animations: "disabled" }), contentType: "image/png" });
+      const [header, panel, backdrop, back, reject, approve, before, after] = await Promise.all([
+        page.locator(".app-header").boundingBox(), review.boundingBox(),
+        page.locator(".hca-overlay:has(.hca-governance-review) > .hca-modal-backdrop").boundingBox(),
+        review.getByRole("button", { name: "Voltar", exact: true }).boundingBox(),
+        review.getByRole("button", { name: "Rejeitar proposta", exact: true }).boundingBox(),
+        review.getByRole("button", { name: "Aprovar proposta", exact: true }).boundingBox(),
+        compare.locator("del").boundingBox(), compare.locator("dd > strong").boundingBox(),
+      ]);
+      expect(header && panel && backdrop && back && reject && approve && before && after).toBeTruthy();
+      layout.push({ inset: Math.abs(panel!.y - header!.y - header!.height),
+        backdropInset: Math.abs(backdrop!.y - header!.y - header!.height),
+        comparisonLine: Math.abs(before!.y - after!.y) < 2,
+        actionRows: Math.abs(back!.y - reject!.y) < 1 && approve!.y > back!.y + back!.height && Math.abs(approve!.width - (reject!.x + reject!.width - back!.x)) < 2 });
+    }
+  } finally { await reference?.close(); await page.bringToFront(); }
+  for (const measurement of layout) {
+    expect(measurement.inset).toBeLessThan(2);
+    expect(measurement.backdropInset).toBeLessThan(2);
+    expect(measurement.comparisonLine).toBe(true);
+    expect(measurement.actionRows).toBe(true);
+  }
+  await expect(compare).toContainText("Contar estoque da equipe");
+  await expect(compare).toContainText("Restrito");
+  await expect(compare).toContainText("Permitir para Joana Castro");
+  const more = review.getByText("Detalhes da proposta", { exact: true });
+  await more.focus();
+  await more.press("Enter");
+  await expect(review.getByText("Função conferida", { exact: true })).toBeVisible();
+  await expect(review.getByText(proposal.id, { exact: true })).toBeVisible();
+  await review.getByRole("button", { name: "Voltar", exact: true }).click();
+  await expect(opener).toBeFocused();
+  await opener.press("Enter");
+  await review.getByRole("button", { name: "Aprovar proposta", exact: true }).click();
+  const confirmation = page.getByRole("dialog", { name: "Aprovar esta proposta?", exact: true });
+  await expect(confirmation).toContainText("Permitir para Joana Castro");
+  await confirmation.getByRole("button", { name: "Aprovar proposta", exact: true }).click();
+  await page.getByRole("dialog", { name: "Proposta aplicada", exact: true }).getByRole("button", { name: "Concluir", exact: true }).click();
+  const snapshot = await rpc(reviewer.client, "patient_permission_snapshot", { p_patient: f.patient, p_subject: recipient.id });
+  expect(snapshot.permissions.find((row: { code: string }) => row.code === "bal.count")).toMatchObject({ effective: true, exception: true, origin: "personal" });
+  expect(sql(`select status from public.access_change_requests where id=${sqlLiteral(proposal.id)};`)).toBe("applied");
+});
+
+test("E10-05 confirma uma proposta, recupera a resposta perdida e abre a configuração atual de uma proposta superada", async ({ page }) => {
   const f = await setup(), author = await actor("global"), reviewer = await shiftWorker(f.patient, "admin");
   const create = (days: number) => rpc(author, "configure_patient_access", {
     p_patient: f.patient, p_kind: "settings", p_change: { archiveDays: days }, p_key: randomUUID(), p_version: 1,
@@ -61,22 +138,6 @@ test("E10-05 confirma uma proposta, recupera a resposta perdida e abre a configu
   const values = review.getByRole("region", { name: "Compare a alteração", exact: true });
   await expect(values).toContainText("43");
   await expect(values.getByText("7", { exact: true })).toBeVisible();
-  if (info.project.name === "chromium") {
-    const reference = await browser.newContext({ viewport: { width: 1280, height: 900 }, isMobile: false, hasTouch: false, deviceScaleFactor: 1 });
-    try {
-      const model = await reference.newPage();
-      await model.route(/^https?:/, route => route.abort());
-      await model.goto(pathToFileURL(resolve("hca-laboratorio-04-v2-aprovado.html")).href + "#E10-05/pending");
-      await model.getByRole("button", { name: /Permitir contagem para Joana Castro/ }).click();
-      for (const width of [360, 412]) {
-        await page.setViewportSize({ width, height: 900 });
-        await model.getByRole("combobox", { name: "Visualização", exact: true }).selectOption(String(width));
-        await expect(model.getByRole("heading", { name: "Conferir proposta", exact: true })).toBeVisible();
-        await info.attach("L4-proposta-" + width, { body: await model.locator("#device-frame").screenshot(), contentType: "image/png" });
-        await info.attach("proposta-" + width, { body: await page.screenshot(), contentType: "image/png" });
-      }
-    } finally { await reference.close(); }
-  }
   await review.getByRole("button", { name: "Aprovar proposta", exact: true }).click();
   await expect(confirm).toBeVisible();
   expect(packets).toHaveLength(0);

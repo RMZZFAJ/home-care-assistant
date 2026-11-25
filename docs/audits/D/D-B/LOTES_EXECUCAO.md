@@ -5076,14 +5076,35 @@ de capturar a leitura autorizada. O reteste usou contas isoladas e uma
 única nova conexão permitida na leitura GET de teste. Preservou as
 verificações de autorização, conteúdo reservado e retorno do foco.
 
-As capturas de 360 e 412 px desta rodada mostram o mesmo fluxo de revisão
-com propostas de tipos diferentes. No laboratório, a proposta concede
-contagem a uma pessoa. No produto, ela altera o prazo de arquivamento.
-O cabeçalho da aplicação permanece visível na referência. O produto usa
-o painel compartilhado em tela cheia nessas larguras. Em 412 px, o rodapé
-do produto põe as três ações na mesma linha. A referência mantém a ação
-principal em uma segunda linha. Resta comparar a concessão de contagem com
-dados correspondentes para conferir a composição do comparador.
+As primeiras capturas de 360 e 412 px usavam tipos diferentes de proposta.
+A comparação seguinte usou, dos dois lados, a mudança de restrito para
+permitido na contagem do estoque da equipe para Joana Castro. No build
+anterior à correção, o painel cobriu os 104 px do cabeçalho real. Em 412 px,
+as três ações apareciam na mesma linha. A mudança de permissão ocupava
+vários cartões de campos separados.
+
+O painel passou a usar a moldura compartilhada de edição abaixo do
+cabeçalho e a composição de comparação com valor vigente e proposta.
+Em 360 e 412 px, Voltar e Rejeitar ficam acima de Aprovar proposta.
+A fonte dos valores é a configuração vigente e a proposta real.
+Função conferida, situação, versões e referência continuam disponíveis em
+Detalhes da proposta. O cabeçalho real tem duas linhas porque inclui
+o seletor de paciente. O laboratório mostra uma linha nessa cena.
+
+A rodada de regressão passou em dez execuções de Chromium e WebKit de
+iPhone. Cobriu proposta superada, perda da resposta, revogação do próprio
+vínculo, reemissão do convite e leitura de regras de aviso. As capturas
+mostraram que, após rolar a página, o fundo ainda desfocava o cabeçalho.
+Também mostraram a quebra da comparação em 360 px. O ajuste final fixou
+o fundo abaixo do cabeçalho e manteve os dois valores na mesma linha.
+
+A comparação final passou em Chromium, Android e iPhone emulados, sem
+retentativa. Em 360 e 412 px, o teste mediu a posição do fundo, a linha
+dos valores e os dois níveis de ação do rodapé. Conferiu a abertura dos
+detalhes pelo teclado, o retorno do foco e a exceção pessoal efetiva após
+a decisão. As capturas estão em `output/playwright/l4-proposal-parity-final-report/`.
+Passaram 34 testes unitários da apresentação, build de produção,
+TypeScript e lint dirigido. O ajuste dispensa migration.
 
 ### E10-06 — Regras, avisos e limites de estoque
 

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useCallback, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { ChangeFacts } from "@/components/ui/change-facts";
 import { ActionButton, DefinitionGrid, FormField, LoadingIndicator, Pill, SelectField, TextInput } from "@/components/ui/controls";
 import { FeedbackBanner } from "@/components/ui/feedback";
 import { Icon } from "@/components/ui/icon";
@@ -47,7 +48,30 @@ function mayRemoveOwnAccess(proposal: GovernanceProposal, userId: string, role: 
     "status" in args && args.status === "revoked";
 }
 
-function ProposalComparison({ comparison, currentOnly = false }: { comparison: Comparison; currentOnly?: boolean }) {
+function permissionChange(proposal: GovernanceProposal, comparison: Comparison) {
+  if (proposal.kind !== "capability" || !comparison.supported) return null;
+  const label = comparison.rows.find(row => row.key === "capability")?.proposed;
+  const current = proposal.current?.enabled;
+  const configured = current === null ? proposal.current?._inheritedEnabled : current;
+  const proposed = proposal.proposed.enabled;
+  if (!label || typeof configured !== "boolean" || (typeof proposed !== "boolean" && proposed !== null)) return null;
+  const state = configured ? "Permitido" : "Restrito";
+  const before = current === null ? "Herdado · " + state.toLowerCase() : state;
+  const profile = comparison.rows.find(row => row.key === "subjectRole")?.proposed;
+  const target = proposal.subjectName ? " para " + proposal.subjectName : profile ? " para o perfil " + profile : "";
+  const after = proposed === null ? comparison.rows.find(row => row.key === "enabled")?.proposed
+    : (proposed ? "Permitir" : "Restringir") + target;
+  return after ? { id: "permission", label, before, after } : null;
+}
+
+function ProposalComparison({ comparison, permission, currentOnly = false }: {
+  comparison: Comparison;
+  permission?: ReturnType<typeof permissionChange>;
+  currentOnly?: boolean;
+}) {
+  if (permission && !currentOnly) return <div className="hca-proposal-change">
+    <ChangeFacts changes={[permission]} proposal />
+  </div>;
   return <div className="hca-form-stack">
     {comparison.rows.map(row => <div className="hca-proposal-comparison-row" key={row.key}>
       <h3>{row.label}</h3>
@@ -98,16 +122,23 @@ function ProposalReview({ proposal, patientName, comparison, version, independen
   const treated = ["applied", "rejected", "awaiting_acceptance"].includes(proposal.status);
   const stale = proposal.base_version !== version;
   const permission = proposal.resolution?.permission;
+  const compactPermission = pending && !current ? permissionChange(proposal, comparison) : null;
+  const proposalDetails = [
+    { label: "Situação", value: statusLabel(proposal.status) },
+    { label: "Versão de origem", value: proposal.base_version },
+    { label: "Configuração vigente", value: version },
+  ];
   return <Drawer open title={current ? "Configuração atual" : pending ? "Conferir proposta" : awaiting ? "Proposta aprovada" : "Decisão da proposta"}
-    subtitle={proposalTitle(proposal, comparison)} kicker="ORGANIZAÇÃO DA RESIDÊNCIA" headingIcon="checklist" popupClassName="hca-governance-review"
+    subtitle={proposalTitle(proposal, comparison)} kicker="ORGANIZAÇÃO DA RESIDÊNCIA" headingIcon="note"
+    popupClassName="hca-preference-sheet hca-residence-settings-sheet hca-governance-review"
     keyboardScrollable
     onClose={current ? () => setCurrent(false) : onClose} finalFocus={focus} footer={<>
       <ActionButton onClick={current ? () => setCurrent(false) : onClose}>Voltar</ActionButton>
       {current ? <Link className="hca-control hca-control--primary" href={currentSettingsLink(proposal)}>Abrir configuração</Link> : null}
       {!current && pending && independent ? <>
-        <ActionButton variant="danger" disabled={disabled || !proposal.reviewReference} onClick={() => onDecision("reject")}>Rejeitar proposta</ActionButton>
+        <ActionButton variant="danger" aria-label="Rejeitar proposta" disabled={disabled || !proposal.reviewReference} onClick={() => onDecision("reject")}>Rejeitar</ActionButton>
         {stale ? <ActionButton variant="primary" disabled={disabled} onClick={() => setCurrentOpen(true)}><Icon name="edit" />Preparar nova proposta</ActionButton>
-          : <ActionButton variant="primary" disabled={disabled || !comparison.supported || !proposal.reviewReference}
+          : <ActionButton className="hca-governance-approve" variant="primary" disabled={disabled || !comparison.supported || !proposal.reviewReference}
             onClick={() => onDecision("approve")}><Icon name="check" />Aprovar proposta</ActionButton>}
       </> : null}
       {!current && awaiting && invitationHref && !disabled ? <Link className="hca-control hca-control--primary"
@@ -127,9 +158,7 @@ function ProposalReview({ proposal, patientName, comparison, version, independen
         { label: "Residência", value: patientName },
         { label: "Proponente", value: proposal.proposerName },
         { label: "Registro", value: formatBrazilDate(proposal.created_at) },
-        { label: "Situação", value: statusLabel(proposal.status) },
-        { label: "Versão de origem", value: proposal.base_version },
-        { label: "Configuração vigente", value: version },
+        ...(!compactPermission ? proposalDetails : []),
         ...(treated ? [{ label: "Quem decidiu", value: proposal.reviewerName ?? permission?.actorName ?? "Identidade histórica" },
           { label: "Decisão em", value: formatBrazilDate(proposal.decided_at) }] : []),
       ]} />
@@ -141,9 +170,19 @@ function ProposalReview({ proposal, patientName, comparison, version, independen
       </FeedbackBanner> : null}
       <section className="hca-residence-admin-section" aria-label="Compare a alteração">
         <header><h2>{current ? "Valores vigentes" : "Compare a alteração"}</h2></header>
-        <ProposalComparison comparison={comparison} currentOnly={current} />
+        <ProposalComparison comparison={comparison} permission={compactPermission} currentOnly={current} />
+        {compactPermission && !stale ? <p className="hca-proposal-scope">
+          <Icon name="info" width={15} height={15} />A alteração só será aplicada nesta residência após aprovação local.
+        </p> : null}
       </section>
-      <div className="hca-field-hint wrap-anywhere">Referência da proposta {proposal.id}</div>
+      {compactPermission ? <details className="hca-proposal-details">
+        <summary>Detalhes da proposta</summary>
+        <DefinitionGrid items={[
+          ...proposalDetails,
+          ...comparison.rows.filter(row => !["capability", "enabled"].includes(row.key)).map(row => ({ label: row.label, value: row.proposed })),
+          { label: "Referência da proposta", value: proposal.id, wide: true },
+        ]} />
+      </details> : <div className="hca-field-hint wrap-anywhere">Referência da proposta {proposal.id}</div>}
     </div>
     {currentOpen ? <Dialog open title="Rever a configuração atual" headingIcon="history" onClose={() => setCurrentOpen(false)}
       footer={<><ActionButton onClick={() => setCurrentOpen(false)}>Voltar</ActionButton><ActionButton variant="primary" disabled={disabled}
@@ -286,7 +325,8 @@ export function GovernanceProposals({ context, directory, version, revision, bus
           <p>{decision.action === "approve" ? "A decisão ficará no histórico da residência. Quando necessário, o vínculo dependerá do aceite do destinatário."
             : "A configuração vigente será mantida. A proposta e sua decisão continuarão disponíveis no histórico."}</p>
           {ownAccessChange ? <FeedbackBanner tone="warning">A aprovação pode encerrar seu acesso à administração desta residência. Se perder a resposta, confira a decisão em Minha conta.</FeedbackBanner> : null}
-          {decision.action === "approve" && comparison ? <ProposalComparison comparison={comparison} /> : null}
+          {decision.action === "approve" && comparison && proposal ? <ProposalComparison comparison={comparison}
+            permission={permissionChange(proposal, comparison)} /> : null}
         </div>}
     </Dialog> : null}
   </section>;
