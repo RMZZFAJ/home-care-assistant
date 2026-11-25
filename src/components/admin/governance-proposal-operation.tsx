@@ -12,13 +12,48 @@ import { proposalAttemptInput, proposalAttemptPointer, proposalDecisionResponse 
 
 const pendingSchema = z.strictObject({
   pointer: proposalAttemptPointer, retries: z.number().int().min(0).max(operationRecoveryLimit),
+  ownAccessChange: z.boolean().optional(),
 });
 type Pending = z.infer<typeof pendingSchema>;
 type Intent = NonNullable<z.infer<typeof proposalAttemptInput>["intent"]>;
 type Result = z.infer<typeof proposalDecisionResponse>;
 
-export function useGovernanceProposalOperation(userId: string, patientId: string) {
-  const storage = ["hca", "proposal-decision", userId, patientId].join(":");
+const proposalStorage = (userId: string, patientId: string) => `hca:proposal-decision:${userId}:${patientId}`;
+const ownAccessStorage = (userId: string) => `hca:proposal-decision:${userId}:own-access`;
+
+function readAttempt(userId: string, patientId?: string): Pending | null {
+  try {
+    const own = patientId ? null : proposalAttemptPointer.parse(JSON.parse(sessionStorage.getItem(ownAccessStorage(userId)) ?? "null"));
+    const scope = patientId ?? own?.careRecipientId;
+    if (!scope) return null;
+    const saved = pendingSchema.parse(JSON.parse(sessionStorage.getItem(proposalStorage(userId, scope)) ?? "null"));
+    if (saved.pointer.careRecipientId !== scope || own && (!saved.ownAccessChange ||
+      saved.pointer.proposalId !== own.proposalId || saved.pointer.attemptKey !== own.attemptKey)) return null;
+    return saved;
+  } catch { return null; }
+}
+
+export function hasOwnGovernanceProposalAttempt(userId: string, patientId: string) {
+  return readAttempt(userId)?.pointer.careRecipientId === patientId;
+}
+
+function writeAttempt(userId: string, attempt: Pending) {
+  try {
+    sessionStorage.setItem(proposalStorage(userId, attempt.pointer.careRecipientId), JSON.stringify(attempt));
+    if (attempt.ownAccessChange) sessionStorage.setItem(ownAccessStorage(userId), JSON.stringify(attempt.pointer));
+  } catch { /* The open workspace still holds the exact reference. */ }
+}
+
+function clearAttempt(userId: string, pointer: Pending["pointer"]) {
+  try {
+    const own = readAttempt(userId)?.pointer.attemptKey === pointer.attemptKey;
+    if (readAttempt(userId, pointer.careRecipientId)?.pointer.attemptKey === pointer.attemptKey)
+      sessionStorage.removeItem(proposalStorage(userId, pointer.careRecipientId));
+    if (own) sessionStorage.removeItem(ownAccessStorage(userId));
+  } catch { /* Session storage can be unavailable. */ }
+}
+
+export function useGovernanceProposalOperation(userId: string, patientId?: string) {
   const [pending, setPending] = useState<Pending | null>(null);
   const [ready, setReady] = useState(false);
   const [failure, setFailure] = useState<{ cause: unknown; uncertain: boolean; key: string } | null>(null);
@@ -31,52 +66,56 @@ export function useGovernanceProposalOperation(userId: string, patientId: string
     lifetimeRef.current = controller;
     void Promise.resolve().then(() => {
       if (controller.signal.aborted) return;
-      try {
-        const parsed = pendingSchema.safeParse(JSON.parse(sessionStorage.getItem(storage) ?? "null"));
-        if (parsed.success && parsed.data.pointer.careRecipientId === patientId) setPending(parsed.data);
-      } catch { /* Recovery continues while this workspace stays open. */ }
+      setPending(readAttempt(userId, patientId));
       setReady(true);
     });
     return () => controller.abort();
-  }, [patientId, storage]);
+  }, [patientId, userId]);
   useOperationActivity(busy, { title: "Conferindo decisão da proposta" });
 
-  function keep(value: Pending | null) {
-    setPending(value);
-    try {
-      if (value) sessionStorage.setItem(storage, JSON.stringify(value));
-      else sessionStorage.removeItem(storage);
-    } catch { /* The exact reference remains in this workspace. */ }
+  function clear(pointer: Pending["pointer"]) {
+    clearAttempt(userId, pointer);
+    setPending(null);
   }
 
-  async function run(initial: { proposalId: string; intent: Intent } | null) {
+  async function run(initial: { proposalId: string; intent: Intent; ownAccessChange: boolean } | null) {
     const signal = lifetimeRef.current?.signal;
     if (!signal || signal.aborted || !ready || runningRef.current || result) return;
-    if (initial ? pending !== null : !pending || pending.retries >= operationRecoveryLimit) return;
-    const attempt: Pending = pending
-      ? { ...pending, retries: pending.retries + 1 }
-      : { pointer: { careRecipientId: patientId, proposalId: initial!.proposalId, attemptKey: crypto.randomUUID() }, retries: 0 };
+    const saved = readAttempt(userId, patientId) ?? pending;
+    let attempt: Pending;
+    if (initial) {
+      if (!patientId || saved) return;
+      attempt = {
+        pointer: { careRecipientId: patientId, proposalId: initial.proposalId, attemptKey: crypto.randomUUID() },
+        retries: 0, ownAccessChange: initial.ownAccessChange,
+      };
+    } else {
+      if (!saved || saved.retries >= operationRecoveryLimit) return;
+      attempt = { ...saved, retries: saved.retries + 1 };
+    }
     runningRef.current = true;
-    keep(attempt);
+    writeAttempt(userId, attempt);
+    setPending(attempt);
     setBusy(true);
     setFailure(null);
     try {
       const reply = proposalDecisionResponse.parse(await api<unknown>("/api/patient-settings/proposals", {
         ...attempt.pointer, intent: initial?.intent ?? null,
       }, signal));
-      if (reply.result.careRecipientId !== patientId || reply.result.proposalId !== attempt.pointer.proposalId ||
+      if (reply.result.careRecipientId !== attempt.pointer.careRecipientId || reply.result.proposalId !== attempt.pointer.proposalId ||
         reply.result.attemptKey !== attempt.pointer.attemptKey ||
         (initial && (reply.result.state !== "recorded" ||
           (initial.intent.decision === "reject") !== (reply.result.status === "rejected"))))
         throw new Error("A resposta não confirma a decisão desta proposta.");
       if (signal.aborted) return;
-      keep(null);
+      // Revocation can unmount the administrative screen before the result is seen.
+      if (!attempt.ownAccessChange) clear(attempt.pointer);
       setResult(reply);
     } catch (cause) {
       if (signal.aborted) return;
       const definite = initial !== null && cause instanceof ApiError && cause.status >= 400 && cause.status < 500 &&
         cause.status !== 408 && !["PERSISTENCE_UNCONFIRMED", "RECONCILIATION_REQUIRED"].includes(cause.code ?? "");
-      if (definite) keep(null);
+      if (definite) clear(attempt.pointer);
       setFailure({ cause, uncertain: !definite, key: attempt.pointer.attemptKey });
     } finally {
       runningRef.current = false;
@@ -86,18 +125,21 @@ export function useGovernanceProposalOperation(userId: string, patientId: string
 
   return {
     busy, ready, pending, failure, result,
-    submit: (proposalId: string, intent: Intent) => run({ proposalId, intent }),
+    submit: (proposalId: string, intent: Intent, ownAccessChange: boolean) => run({ proposalId, intent, ownAccessChange }),
     recover: () => run(null),
     openRecovery: () => pending && setFailure({ cause: null, uncertain: true, key: pending.pointer.attemptKey }),
     closeFailure: () => setFailure(null),
-    closeResult: () => setResult(null),
+    closeResult: () => {
+      if (result) clear(result.result);
+      setResult(null);
+    },
   };
 }
 
 export function GovernanceProposalFeedback({ operation, onRefresh, focus }: {
   operation: ReturnType<typeof useGovernanceProposalOperation>;
   onRefresh: () => void;
-  focus: RefObject<HTMLElement | null>;
+  focus?: RefObject<HTMLElement | null>;
 }) {
   const { pending, failure, result, busy } = operation;
   function finish() {
@@ -112,7 +154,7 @@ export function GovernanceProposalFeedback({ operation, onRefresh, focus }: {
     closed: ["Tentativa encerrada", "A consulta confirmou que esta tentativa não registrou uma decisão."],
   } as const;
   return <>
-    {pending && !busy && !failure ? <FeedbackBanner tone="warning">
+    {pending && !busy && !failure && !result ? <FeedbackBanner tone="warning">
       Há uma decisão de proposta aguardando confirmação. <ActionButton onClick={operation.openRecovery}>Conferir resultado</ActionButton>
     </FeedbackBanner> : null}
     {failure && !busy ? <DocumentOperationFailureDialog
@@ -133,4 +175,9 @@ export function GovernanceProposalFeedback({ operation, onRefresh, focus }: {
       </FormField> : state === "awaiting_acceptance" ? <p>O convite pode ser reemitido no painel da proposta, se o link original não estiver disponível.</p> : null}
     </Dialog> : null}
   </>;
+}
+
+export function OwnGovernanceProposalRecovery({ userId, onRefresh }: { userId: string; onRefresh: () => void }) {
+  const operation = useGovernanceProposalOperation(userId);
+  return <GovernanceProposalFeedback operation={operation} onRefresh={onRefresh} />;
 }

@@ -213,6 +213,6 @@ export function WorkspaceProvider({ children }: { children: ReactNode; }) {
     ? issuing ?? { title: "Preparando seu espaço", detail: "Estamos conferindo sua sessão e os acessos autorizados." }
     : { title: "Mudando de paciente", stage: selectionStage, steps: selectionSteps, detail: "Aguarde a confirmação da operação." });
   return <Context value={state}>{publicPage ? <>{publicVerification ? null : notices}<div inert={blocked}>{children}</div></>
-    : revoked ? <WorkspaceAccessRevoked key={scope} />
+    : revoked ? <WorkspaceAccessRevoked key={scope} userId={revocation.userId} patientId={revocation.patientId} />
     : <WorkspaceShell showOnboarding={pathname === "/"}>{children}</WorkspaceShell>}</Context>;
 }

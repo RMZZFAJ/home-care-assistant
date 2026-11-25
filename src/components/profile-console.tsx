@@ -20,6 +20,7 @@ import { ProfileTabs, useProfileSection } from "./profile/profile-tabs";
 import { PushSettings } from "./pwa/push-settings";
 import { ChannelPreferences } from "./profile/channel-preferences";
 import { AdministrativePendingRecovery } from "./admin/administrative-pending-recovery";
+import { OwnGovernanceProposalRecovery } from "./admin/governance-proposal-operation";
 import { ReviewedOwnMembershipRecovery } from "./admin/reviewed-membership-operation";
 import { useOperationActivity } from "./ui/operation-activity";
 type Profile = ProfileRead["data"];
@@ -34,6 +35,7 @@ export function ProfileConsole() {
     </div></div>}>
       {context => <><AdministrativePendingRecovery key={context.userId} userId={context.userId} />
         <ReviewedOwnMembershipRecovery key={`membership:${context.userId}`} userId={context.userId} />
+        <OwnGovernanceProposalRecovery key={`proposal:${context.userId}`} userId={context.userId} onRefresh={() => void context.refresh()} />
         <ProfileContent key={context.userId} patientSelected={context.activeContext?.mode === "patient" && Boolean(context.patient)} />
       </>}
     </Workspace>

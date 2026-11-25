@@ -4,12 +4,17 @@ import { useRef, useState } from "react";
 import { ActionButton, ActionLink } from "@/components/ui/controls";
 import { Dialog } from "@/components/ui/overlays";
 import { Icon } from "@/components/ui/icon";
+import { hasOwnGovernanceProposalAttempt } from "@/components/admin/governance-proposal-operation";
 
 /** Only the neutral frame remains mounted after a confirmed loss of membership. */
-export function WorkspaceAccessRevoked() {
+export function WorkspaceAccessRevoked({ userId, patientId }: { userId: string; patientId: string }) {
   const [open, setOpen] = useState(true);
+  const [hasDecision, setHasDecision] = useState(false);
   const returnRef = useRef<HTMLAnchorElement>(null);
-  const close = () => setOpen(false);
+  const close = () => {
+    setHasDecision(hasOwnGovernanceProposalAttempt(userId, patientId));
+    setOpen(false);
+  };
 
   return <div className="hca-revoked-workspace">
     <header className="hca-revoked-header">
@@ -20,7 +25,10 @@ export function WorkspaceAccessRevoked() {
       <Icon name="lock" width={25} height={25} />
       <h1>Acesso encerrado</h1>
       <p>Esta sessão não tem mais acesso a esta residência.</p>
-      {!open ? <ActionLink href="/" ref={returnRef}>Voltar ao início</ActionLink> : null}
+      {!open ? <div className="hca-form-stack">
+        <ActionLink href="/" ref={returnRef}>Voltar ao início</ActionLink>
+        {hasDecision ? <ActionLink href="/perfil">Conferir decisão na minha conta</ActionLink> : null}
+      </div> : null}
     </main>
     <Dialog open={open} title="O acesso à residência foi revogado" kicker="Aviso de acesso"
       subtitle="Os dados desta residência deixaram de estar disponíveis." headingIcon="lock"

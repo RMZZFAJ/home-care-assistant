@@ -36,6 +36,17 @@ function proposalTitle(change: GovernanceProposal, comparison: Comparison) {
   return change.subjectName ? title + " · " + change.subjectName : title;
 }
 
+function mayRemoveOwnAccess(proposal: GovernanceProposal, userId: string, role: string) {
+  const change = proposal.proposed;
+  if (proposal.kind === "membership") return change.userId === userId && change.role !== role;
+  if (proposal.kind === "capability" && change.capability === "access.manage" && change.enabled !== true)
+    return typeof change.subjectUser === "string" ? change.subjectUser === userId : change.subjectRole === role;
+  const args = change.args;
+  return proposal.kind === "administration" && change.operation === "membershipStatus" &&
+    typeof args === "object" && args !== null && "userId" in args && args.userId === userId &&
+    "status" in args && args.status === "revoked";
+}
+
 function ProposalComparison({ comparison, currentOnly = false }: { comparison: Comparison; currentOnly?: boolean }) {
   return <div className="hca-form-stack">
     {comparison.rows.map(row => <div className="hca-proposal-comparison-row" key={row.key}>
@@ -182,6 +193,7 @@ export function GovernanceProposals({ context, directory, version, revision, bus
   const confirming = decision && decision.proposalId === proposal?.id;
   const canConfirm = Boolean(confirming && actionsAvailable && decision.reference === proposal?.reviewReference &&
     (decision.action === "reject" || comparison?.supported && proposal?.base_version === currentVersion));
+  const ownAccessChange = Boolean(decision?.action === "approve" && proposal && mayRemoveOwnAccess(proposal, context.userId, patient.role));
 
   function navigate(values: Record<string, string>) {
     const next = new URLSearchParams(params.toString());
@@ -203,7 +215,7 @@ export function GovernanceProposals({ context, directory, version, revision, bus
     setSelectedId(null);
     setDecision(null);
     focusRef.current = listHeadingRef.current;
-    void operation.submit(decision.proposalId, { reference: decision.reference, decision: decision.action });
+    void operation.submit(decision.proposalId, { reference: decision.reference, decision: decision.action }, ownAccessChange);
   }
 
   const orderedGroups: { title: string; rows: GovernanceProposal[] }[] = [];
@@ -273,6 +285,7 @@ export function GovernanceProposals({ context, directory, version, revision, bus
         : <div className="hca-form-stack">
           <p>{decision.action === "approve" ? "A decisão ficará no histórico da residência. Quando necessário, o vínculo dependerá do aceite do destinatário."
             : "A configuração vigente será mantida. A proposta e sua decisão continuarão disponíveis no histórico."}</p>
+          {ownAccessChange ? <FeedbackBanner tone="warning">A aprovação pode encerrar seu acesso à administração desta residência. Se perder a resposta, confira a decisão em Minha conta.</FeedbackBanner> : null}
           {decision.action === "approve" && comparison ? <ProposalComparison comparison={comparison} /> : null}
         </div>}
     </Dialog> : null}

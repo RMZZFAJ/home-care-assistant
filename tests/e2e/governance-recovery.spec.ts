@@ -88,8 +88,12 @@ test("E10-05 confirma uma proposta, recupera a resposta perdida e abre a configu
   await retry.click();
   await expect(failure.getByText(/Tentativas de recuperação/)).toBeAttached();
   await expect.poll(() => lookups).toBe(1);
-  // Reopening the workspace keeps the receipt reference and the spent consultation.
-  await page.reload();
+  // An ordinary proposal stays recoverable in its own workspace, with the same consultation count.
+  const original = page.url();
+  await page.goto("/perfil");
+  await expect(page.getByRole("heading", { name: "Minha conta", exact: true })).toBeVisible();
+  await expect(page.getByText("Há uma decisão de proposta aguardando confirmação.")).toHaveCount(0);
+  await page.goto(original);
   await list.getByRole("button", { name: "Conferir resultado", exact: true }).click();
   await retry.click();
   const result = page.getByRole("dialog", { name: "Proposta aplicada", exact: true });
@@ -104,6 +108,63 @@ test("E10-05 confirma uma proposta, recupera a resposta perdida e abre a configu
   await page.getByRole("dialog", { name: "Rever a configuração atual", exact: true }).getByRole("button", { name: "Ver configuração atual", exact: true }).click();
   await expect(page.getByRole("dialog", { name: "Configuração atual", exact: true })).toContainText("43");
   expect(sql(`select status from public.access_change_requests where id=${sqlLiteral(obsolete.id)};`)).toBe("pending");
+});
+
+test("E10-05 recupera a decisão da própria revogação sem reabrir a administração", async ({ page }) => {
+  const f = await setup(), author = await actor("global"), reviewer = await shiftWorker(f.patient, "admin");
+  const proposal = await rpc(author, "configure_patient_access", {
+    p_patient: f.patient, p_kind: "administration", p_version: 1, p_key: randomUUID(),
+    p_change: { operation: "membershipStatus", args: { userId: reviewer.id, status: "revoked" } },
+  });
+  await login(page, reviewer, f.patient);
+  await page.goto(`/configuracoes?area=people&careRecipientId=${f.patient}`);
+  const list = page.getByRole("region", { name: "Propostas de configuração", exact: true });
+  await list.getByRole("article", { name: "Proposta " + proposal.id.slice(0, 8), exact: true }).getByRole("button").click();
+  const review = page.getByRole("dialog", { name: "Conferir proposta", exact: true });
+  await review.getByRole("button", { name: "Aprovar proposta", exact: true }).click();
+  const packets: { careRecipientId: string; proposalId: string; attemptKey: string; intent: unknown }[] = [];
+  await page.route("**/api/patient-settings/proposals", async route => {
+    const packet = route.request().postDataJSON();
+    packets.push(packet);
+    if (!packet.intent) return route.continue();
+    const committed = await route.fetch();
+    expect(committed.status()).toBe(200);
+    await route.abort("connectionreset");
+  });
+  const dropped = page.waitForEvent("requestfailed", { predicate: request => request.url().endsWith("/api/patient-settings/proposals") });
+  const confirmation = page.getByRole("dialog", { name: "Aprovar esta proposta?", exact: true });
+  await expect(confirmation).toContainText("A aprovação pode encerrar seu acesso à administração desta residência.");
+  await confirmation.getByRole("button", { name: "Aprovar proposta", exact: true }).click();
+  await dropped;
+  expect(packets).toHaveLength(1);
+  const { careRecipientId, proposalId, attemptKey } = packets[0];
+  const unrelatedSession = await reviewer.client.rpc("review_governance_proposal", {
+    p_patient: careRecipientId, p_proposal: proposalId, p_key: attemptKey,
+    p_decision: null, p_reference: null, p_invitation_hash: null,
+  });
+  expect(unrelatedSession.error?.code).toBe("42501");
+  const decisionRecord = () => sql(`select status || ':' || approved_by from public.access_change_requests where id=${sqlLiteral(proposal.id)};`);
+  expect(decisionRecord()).toBe("applied:" + reviewer.id);
+  const membershipStatus = () => sql(`select status from public.care_recipient_memberships where care_recipient_id=${sqlLiteral(f.patient)} and user_id=${sqlLiteral(reviewer.id)};`);
+  expect(membershipStatus()).toBe("revoked");
+  expect((await page.request.get(`/api/patient-settings?careRecipientId=${f.patient}&changesOnly=true`)).status()).toBe(404);
+  await page.evaluate(() => window.dispatchEvent(new Event("hca:data-changed")));
+  const revocation = page.getByRole("dialog", { name: "O acesso à residência foi revogado", exact: true });
+  await revocation.getByRole("button", { name: "Entendi", exact: true }).click();
+  await expect(list).toHaveCount(0);
+  await page.getByRole("link", { name: "Conferir decisão na minha conta", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Minha conta", exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Conferir resultado", exact: true }).click();
+  const failure = page.getByRole("dialog", { name: "A resposta da decisão não chegou", exact: true });
+  await failure.getByRole("button", { name: "Conferir resultado", exact: true }).click();
+  await page.getByRole("dialog", { name: "Proposta aplicada", exact: true }).getByRole("button", { name: "Concluir", exact: true }).click();
+  expect(packets.slice(1)).toEqual([{ careRecipientId, proposalId, attemptKey, intent: null }]);
+  expect(decisionRecord()).toBe("applied:" + reviewer.id);
+  expect(membershipStatus()).toBe("revoked");
+  await page.reload();
+  await expect(page.getByRole("heading", { name: "Minha conta", exact: true })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Conferir resultado", exact: true })).toHaveCount(0);
+  await expect(list).toHaveCount(0);
 });
 
 test("E10-05 vincula a reemissão ao convite da proposta que aguarda aceite", async ({ page }) => {

@@ -115,10 +115,10 @@ test("E10-06 cadastra destinatário pendente e descarta edição voluntária sem
 
 test("own revocation with a lost response remains recoverable on the profile in the original authenticated session",async({page})=>{
   test.setTimeout(120_000);
-  const f=await setup();
-  await login(page,f.patient);
+  const f=await setup(), reviewer=await shiftWorker(f.patient,"admin");
+  await login(page,f.patient,reviewer.email);
   await page.goto(`/admin?careRecipientId=${f.patient}&section=memberships`);
-  const own = await openMembershipDetails(page, "Teste adminA");
+  const own = await openMembershipDetails(page, "Profissional fictício de plantão");
   await own.getByRole("button", { name: /^Revisar desligamento/ }).click();
   await page.getByRole("dialog", { name: "Revisar desligamento", exact: true }).getByRole("button", { name: "Revogar vínculo", exact: true }).click();
   const dialog = page.getByRole("dialog", { name: "Revogar vínculo?", exact: true });
@@ -138,5 +138,5 @@ test("own revocation with a lost response remains recoverable on the profile in 
   await page.getByRole("dialog", { name: "Não foi possível confirmar o vínculo", exact: true }).getByRole("button", { name: "Conferir resultado", exact: true }).click();
   await expect(page.getByRole("dialog", { name: "Vínculo revogado", exact: true })).toBeVisible();
   expect(sent).toBe(1);
-  expect(sql(`select status from public.care_recipient_memberships where care_recipient_id=${q(f.patient)} and user_id=${q(fixtures.adminA.id)};`)).toBe("revoked");
+  expect(sql(`select status from public.care_recipient_memberships where care_recipient_id=${q(f.patient)} and user_id=${q(reviewer.id)};`)).toBe("revoked");
 });

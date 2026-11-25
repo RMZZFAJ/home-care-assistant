@@ -5049,9 +5049,41 @@ detectou a necessidade de foco por teclado na área rolável a 320 px. Após o
 ajuste, esse cenário e a recuperação de proposta após perda da resposta
 passaram novamente.
 
-A recuperação no painel foi exercitada com o vínculo de administração
-vigente. A retomada pela interface após uma decisão retirar o próprio
-acesso de quem confirmou ainda precisa de verificação específica.
+A verificação posterior reproduziu uma lacuna quando a aprovação revogou o
+vínculo da própria pessoa e a resposta se perdeu. A tela retirou os dados
+administrativos, mas o caminho de consulta da decisão desapareceu.
+
+O diálogo de confirmação avisa quando aprovar pode retirar a própria
+permissão de administrar. Nessa situação, a aba guarda somente a referência
+da tentativa e a contagem de consultas. A página de acesso encerrado oferece
+o atalho para Minha conta. Ali, a pessoa pode consultar a mesma decisão em
+um diálogo compartilhado. A recuperação utiliza a autorização da sessão
+original prevista no contrato. Propostas comuns continuam no próprio painel.
+
+Seis execuções em Chromium e WebKit de iPhone passaram sem retentativa.
+O teste da própria revogação confirmou o bloqueio da listagem e da consulta
+por outra sessão da mesma conta. Na sessão de origem, a consulta da chave
+original retornou a decisão aplicada, conservou a revogação e não reenviou
+a aprovação. Depois de concluir e atualizar a página, a oferta de nova
+consulta desapareceu. Também passaram o build de produção, TypeScript e o
+ESLint dirigido. O ajuste usa o contrato existente e dispensa migration.
+
+Os cenários anteriores de desligamento direto e de resposta tardia de
+ficha passaram em quatro execuções nos mesmos navegadores, sem reexecutar
+casos. Na primeira rodada, as contas compartilhadas não concluíram a
+seleção do vínculo em iPhone. Em Chromium, houve um `ECONNRESET` antes
+de capturar a leitura autorizada. O reteste usou contas isoladas e uma
+única nova conexão permitida na leitura GET de teste. Preservou as
+verificações de autorização, conteúdo reservado e retorno do foco.
+
+As capturas de 360 e 412 px desta rodada mostram o mesmo fluxo de revisão
+com propostas de tipos diferentes. No laboratório, a proposta concede
+contagem a uma pessoa. No produto, ela altera o prazo de arquivamento.
+O cabeçalho da aplicação permanece visível na referência. O produto usa
+o painel compartilhado em tela cheia nessas larguras. Em 412 px, o rodapé
+do produto põe as três ações na mesma linha. A referência mantém a ação
+principal em uma segunda linha. Resta comparar a concessão de contagem com
+dados correspondentes para conferir a composição do comparador.
 
 ### E10-06 — Regras, avisos e limites de estoque
 
