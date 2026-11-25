@@ -5565,3 +5565,24 @@ sem leitura da agenda, a recusa de recibo divergente, a resposta
 atrasada e o reenvio somente após ação explícita. Passaram também dez
 testes do contrato, build, TypeScript e lints dirigidos.
 O incremento dispensa migration.
+
+### Ciência do cancelamento — Ação visível durante a consulta
+
+O artefato de iOS-1 de `cf840b8b` mostrou o botão de confirmação da
+COM focado sob a navegação inferior. A verificação dirigida reproduziu
+no WebKit de iPhone, a 320 px, o deslocamento do botão enquanto uma
+consulta de ciência estava em andamento.
+
+A tela reposiciona o botão quando ele está focado e encoberto pela
+navegação. Durante a consulta, nenhuma confirmação é enviada. Quando
+a pessoa rola para outra parte da ficha, a atualização em segundo
+plano preserva a posição de leitura.
+
+Seis execuções em Chromium e WebKit de iPhone passaram sem retentativa
+com contas isoladas e Auth local. Os cenários de REQ e COM verificaram
+a recusa de escrita, a recuperação após perda da resposta, a ausência
+de confirmação duplicada, os registros anteriores e o PDF emitido.
+Também passaram seis testes unitários, o build de produção, TypeScript
+e os lints dirigidos. Houve uma ocorrência local de `DATABASE_UNAVAILABLE`
+no painel durante a rodada, sem interrupção das jornadas. O ajuste
+dispensa migration.
