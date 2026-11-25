@@ -15,7 +15,7 @@ import {
 } from "../../scripts/test-environment.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { selectContext } from "./auth-context";
-import { audit } from "./accessibility-audit";
+import { audit, auditFromTop } from "./accessibility-audit";
 
 async function login(
   page: Page,
@@ -570,11 +570,11 @@ test("consumo textual recebe complemento próprio, revisão em leitura e confirm
         `select count(*) from public.consumption_report_decisions where report_id=${sqlLiteral(id)};`,
       ),
     ).toBe("1");
-    await audit(page, "consumption confirmed detail 320");
     await page.screenshot({
       path: `output/playwright/phase-d/consumption-confirmed-${info.project.name}.png`,
       animations: "disabled",
     });
+    await auditFromTop(page, "consumption confirmed detail 320");
   } finally {
     await adminContext.close();
   }
@@ -942,8 +942,11 @@ test("relato anterior ao centésimo é acessível por referência e por todas as
   const filterPanel = page.getByRole("dialog", { name: "Filtrar registros", exact: true });
   const openFilters = async () => {
     await expect(page.locator(".hca-activity-overlay")).toBeHidden();
-    await filters.scrollIntoViewIfNeeded();
-    await page.evaluate(() => new Promise<void>(done => requestAnimationFrame(() => requestAnimationFrame(() => done()))));
+    await filters.evaluate(button => button.scrollIntoView({ block: "center", behavior: "instant" }));
+    await expect.poll(() => filters.evaluate(button => {
+      const { left, top, width, height } = button.getBoundingClientRect();
+      return button.contains(document.elementFromPoint(left + width / 2, top + height / 2));
+    })).toBe(true);
     if (info.project.use.hasTouch) await filters.tap();
     else await filters.click();
     await expect(filterPanel).toBeVisible();

@@ -5822,9 +5822,40 @@ A reconferência por versão confirmou as 362 migrations remotas na árvore
 Git e encontrou somente as 23 migrations de L4 no local. O Preview
 consultado na mesma rodada continuava `READY` em `77fdce48`.
 
+Na [CI de 893474d8][ci-893474d8], passaram as validações de Linux, Windows,
+banco e o segmento Android 2. Seis segmentos de navegador reprovaram.
+Sete cenários distintos continuaram falhando após a segunda tentativa.
+Quatro outros passaram somente na segunda tentativa. SonarCloud e Vercel
+aprovaram esse SHA. CodeRabbit pulou a revisão.
+
+- A entrada com resposta antiga retida, o seletor global de paciente único e
+  a recuperação do login passaram a exercitar a consulta de entrada e os
+  controles da interface atual.
+- A troca de perfil preserva o foco de quem já navegou entre as opções. O
+  teste do PDF da REQ e o de revogação de vínculo aguardam a confirmação
+  da troca pela API e a mudança do contexto exibido.
+- Andamentos e fichas vinculadas mantêm a consulta aberta durante a
+  atualização da mesma lista. Uma negativa do servidor retira o resultado.
+- Em telas estreitas, o rodapé da declaração reserva mais espaço para a
+  ação principal. A auditoria do relato confirmado começa no topo da página
+  de 320 px. O botão de filtros recupera o foco após a consulta, quando a
+  sobreposição já foi encerrada. O teste verifica o alvo do toque. A
+  validação da lista aguarda a consulta antes de retirar a interceptação.
+
+Os retestes locais aprovaram 15 combinações de cenário e navegador em
+Chromium, Android e iOS, após os ajustes, com retentativas desabilitadas.
+Os relatórios estão em `output/playwright/l4-ci-893-repairs-report` e
+`output/playwright/l4-ci-893-final-report`. A segunda rodada aprovou os
+quatro casos que ainda falharam na primeira, repetiu a confirmação de
+consumo em 320 px e verificou o submenu e a navegação pelos filtros.
+O build de produção, o lint dos fontes afetados e a proteção das 84
+migrations históricas passaram. As correções dispensam migration e
+dependem da CI da PR para validação do novo commit.
+
 [preview-9f6b247e]: https://vercel.com/rmzzfajs-projects/home-care-assistant/E8HKkexPmqtPL6jXUY5RTg2jgVjv
 [sonar-pr8-preview]: https://sonarcloud.io/dashboard?id=RMZZFAJ_home-care-assistant&pullRequest=8
 [rabbit-pr8-preview]: https://github.com/RMZZFAJ/home-care-assistant/pull/8#issuecomment-7084927300
 [ci-9f6b247e]: https://github.com/RMZZFAJ/home-care-assistant/actions/runs/45548755726
 [ci-77fdce48]: https://github.com/RMZZFAJ/home-care-assistant/actions/runs/45556810328
 [preview-77fdce48]: https://home-care-assistant-kxfvghku7-rmzzfajs-projects.vercel.app
+[ci-893474d8]: https://github.com/RMZZFAJ/home-care-assistant/actions/runs/45683741967

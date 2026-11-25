@@ -237,12 +237,12 @@ function ProgressContent({
     `${revision}:${readOnly ? "archived" : "open"}`,
     decode,
   );
-  const feed = !read.loading && !read.error ? read.data : null;
+  const feed = read.error ? null : read.data;
   useEffect(() => {
-    if (!anchor || !feed?.data.some(row => row.id === anchor)) return;
+    if (read.loading || !anchor || !feed?.data.some(row => row.id === anchor)) return;
     const frame = requestAnimationFrame(() => { const element = document.getElementById("andamento-" + anchor); element?.scrollIntoView({ block: "center" }); element?.focus({ preventScroll: true }); });
     return () => cancelAnimationFrame(frame);
-  }, [anchor, feed]);
+  }, [anchor, feed, read.loading]);
   const openerRef = useRef<HTMLButtonElement>(null);
   const command = useCommandIntent<StoredProgressPacket, unknown>(
     (value, packet) =>
@@ -251,7 +251,7 @@ function ProgressContent({
         : progressConfirmed(value, packet, id, context.userId),
   );
   const writable = Boolean(
-    !readOnly && feed?.canPublish &&
+    !readOnly && !read.loading && feed?.canPublish &&
     context.patient?.id === patientId &&
     context.activeContext?.mode === "patient" &&
     can(context, "document.progress.create"),
@@ -655,7 +655,7 @@ function ProgressContent({
       ) : null}
       <div className="doc-feed-toolbar"><div className="doc-segment" role="group" aria-label="Mostrar Andamentos">{([["all", "Todos"], ["automatic", "Automáticos"], ["manual", "Manuais"]] as const).map(([value, label]) => <button type="button" key={value} aria-pressed={filter === value} onClick={() => { setFilter(value); setPage(1); }}>{label}</button>)}</div><label className="doc-period-filter"><span className="sr-only">Período dos andamentos</span><Icon name="calendar" width={15} height={15} /><select aria-label="Período dos andamentos" value={period} onChange={event => { const value = event.currentTarget.value; setPeriod(value); setPeriodError(""); if (value !== "custom") { const day = new Intl.DateTimeFormat("sv-SE", { timeZone: "America/Sao_Paulo" }).format(new Date()); setRange(value === "today" ? { from: day, through: day } : { from: null, through: null }); setPage(1); } }}><option value="all">Todo o período</option><option value="today">Hoje</option><option value="custom">Escolher período</option></select></label></div>
       {period === "custom" ? <div className="doc-date-range"><FormField label="De"><TextInput type="date" value={from} onChange={event => setFrom(event.currentTarget.value)} /></FormField><FormField label="Até"><TextInput type="date" value={through} min={from} onChange={event => setThrough(event.currentTarget.value)} /></FormField><ActionButton onClick={() => { const parsed = z.object({ from: z.iso.date().nullable(), through: z.iso.date().nullable() }).refine(value => Boolean(value.from || value.through) && (!value.from || !value.through || value.from <= value.through)).safeParse({ from: from || null, through: through || null }); if (!parsed.success) { setPeriodError("Informe um período válido, com a data final igual ou posterior à inicial."); return; } setRange(parsed.data); setPeriodError(""); setPage(1); }}>Aplicar período</ActionButton>{periodError ? <p role="alert" className="hca-field-error">{periodError}</p> : null}</div> : null}
-      {read.loading ? (
+      {read.loading && !feed ? (
         <div className="doc-feed-skeleton" role="status"><span className="sr-only">Consultando Andamentos autorizados…</span><i /><i /></div>
       ) : read.error ? (
         <Notice error>

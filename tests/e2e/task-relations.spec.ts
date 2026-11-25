@@ -37,6 +37,7 @@ test("COM and BAL references in a real progress note stay readonly, recover read
   await login(page, f.patient, "family"); await page.goto("/fichas/" + source);
   await selectDocumentSection(page, "progress");
   const feed = page.getByRole("region", { name: "Andamentos da ficha", exact: true });
+  const feedState = page.locator(".hca-progress-feed");
   await expect(feed.getByText("Consulta de referências preservadas, sem editar as fichas emitidas.", { exact: true })).toBeVisible();
   const snapshot = () => sql(`select jsonb_build_object(
     'documents',(select jsonb_agg(to_jsonb(d) order by id) from public.operational_documents d where care_recipient_id in (${sqlLiteral(f.patient)},${sqlLiteral(other.patient)})),
@@ -52,6 +53,19 @@ test("COM and BAL references in a real progress note stay readonly, recover read
       await expect(dialog).toContainText(name); await expect(dialog).toContainText("unidade");
       await expect(dialog.locator("input,select,textarea")).toHaveCount(0);
       await expect(dialog.getByRole("button", { name: /Aprovar|Registrar aquisição|Registrar compra|Registrar contagem|Revisar balanço|Confirmar/ })).toHaveCount(0);
+      const progressEndpoint = new RegExp(`/api/documents/${source}/progress(?:\\?|$)`);
+      const refreshProgress = Promise.withResolvers<void>();
+      await page.route(progressEndpoint, async route => {
+        await refreshProgress.promise;
+        await route.continue();
+      }, { times: 1 });
+      try {
+        await page.evaluate(() => window.dispatchEvent(new Event("hca:data-changed")));
+        await expect(feedState).toHaveAttribute("aria-busy", "true");
+        await expect(dialog).toBeVisible();
+      } finally { refreshProgress.resolve(); }
+      await expect(feedState).toHaveAttribute("aria-busy", "false");
+      await expect(dialog).toBeVisible();
       const endpoint = "**/api/documents/" + ref.id;
       await page.route(endpoint, route => route.fulfill({ status: 503, json: { error: "Consulta controlada da referência indisponível." } }), { times: 1 });
       const retry = dialog.getByRole("button", { name: "Atualizar consulta", exact: true }); await retry.click();

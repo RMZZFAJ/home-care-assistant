@@ -3,6 +3,7 @@ import { Menu } from "@base-ui/react/menu";
 import { ActionButton, DefinitionGrid, SelectField, TextInput } from "@/components/ui/controls";
 import { MenuPopup } from "@/components/ui/floating";
 import { Icon } from "@/components/ui/icon";
+import { useWorkspaceState } from "@/components/layout/workspace-context";
 import { Dialog, Drawer } from "@/components/ui/overlays";
 import { useOperationActivity } from "@/components/ui/operation-activity";
 import { ScopedReadFailureDialog } from "@/components/documents/scoped-read-failure-dialog";
@@ -44,6 +45,14 @@ type Cursor = { at: string; id: string };
 type ReadFailure = { cause: unknown; denied: boolean; interactive: boolean; attempts: number };
 const emptyFilters = { q: "", kind: "", status: "", from: "", to: "" };
 const filterKeys = ["q", "kind", "status", "from", "to"] as const;
+function consumptionQuery(params: Pick<URLSearchParams, "get">) {
+  const query = new URLSearchParams();
+  for (const key of [...filterKeys, "sourceReminder"]) {
+    const value = params.get(key);
+    if (value) query.set(key, value);
+  }
+  return query.toString();
+}
 const reportKinds = [
   { value: "", label: "Todos" },
   { value: "consumption", label: "Consumos" },
@@ -74,11 +83,8 @@ function Reports({ context }: { context: WorkspaceContext }) {
     live = useLiveRevision(),
     patient = context.patient!.id;
   const selected = params.get("ref");
-  const query = new URLSearchParams(
-    [...filterKeys, "sourceReminder"]
-      .filter(key => Boolean(params.get(key)))
-      .map(key => [key, params.get(key)!]),
-  ).toString();
+  const query = consumptionQuery(params);
+  const { loading: contextLoading, selecting } = useWorkspaceState();
   const fields = { q: params.get("q") ?? "", kind: params.get("kind") ?? "", status: params.get("status") ?? "", from: params.get("from") ?? "", to: params.get("to") ?? "" };
   const [draft, setDraft] = useState(fields), [previousQuery, setPreviousQuery] = useState(query);
   if (previousQuery !== query) {
@@ -159,6 +165,16 @@ function Reports({ context }: { context: WorkspaceContext }) {
     triggerRef = useRef<HTMLElement | null>(null),
     generationRef = useRef(0),
     moreRequestRef = useRef<{ key: string } | null>(null);
+  const filterReturnRef = useRef<{ query: string; attempt: number } | null>(null);
+  useEffect(() => {
+    const pending = filterReturnRef.current;
+    if (!pending || pending.query !== query || pending.attempt !== attempt || reading || panel || contextLoading || selecting) return;
+    // The loading dialog can take focus from the trigger as the filter dialog closes.
+    filterReturnRef.current = null;
+    if (showFailure) return;
+    const frame = requestAnimationFrame(() => filterRef.current?.focus({ preventScroll: true }));
+    return () => cancelAnimationFrame(frame);
+  }, [attempt, contextLoading, panel, query, reading, selecting, showFailure]);
   useEffect(() => {
     const controller = new AbortController();
     const activity = readActivity();
@@ -246,7 +262,7 @@ function Reports({ context }: { context: WorkspaceContext }) {
     setManual({ query, attempt: nextAttempt, retries });
     setAttempt(nextAttempt);
   }
-  function applyFilters(filters: typeof emptyFilters) {
+  function applyFilters(filters: typeof emptyFilters, returnToFilter = false) {
     const values = new URLSearchParams(query);
     let changed = false;
     for (const key of filterKeys) {
@@ -256,6 +272,9 @@ function Reports({ context }: { context: WorkspaceContext }) {
       else values.delete(key);
     }
     setDraft(filters);
+    filterReturnRef.current = returnToFilter
+      ? { query: consumptionQuery(values), attempt: changed ? attempt : attempt + 1 }
+      : null;
     if (!changed) {
       refreshList();
       return;
@@ -461,12 +480,12 @@ function Reports({ context }: { context: WorkspaceContext }) {
       <Dialog open={panel === "filters"} title="Filtrar registros" headingIcon="filter"
         onClose={() => setPanel(null)} finalFocus={filterRef}
         footer={<>
-          <ActionButton onClick={() => { applyFilters(emptyFilters); setPanel(null); }}>Limpar</ActionButton>
+          <ActionButton onClick={() => { applyFilters(emptyFilters, true); setPanel(null); }}>Limpar</ActionButton>
           <ActionButton type="submit" variant="primary" form={filterFormId}>Aplicar</ActionButton>
         </>}>
         <form id={filterFormId} className="grid gap-4" onSubmit={event => {
           event.preventDefault();
-          applyFilters(draft);
+          applyFilters(draft, true);
           setPanel(null);
         }}>
           <label className="grid gap-1 text-sm">Situação

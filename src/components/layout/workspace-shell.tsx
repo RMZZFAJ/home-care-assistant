@@ -43,7 +43,8 @@ function ProfileMenu() {
     const frame = requestAnimationFrame(() => {
       // The menu may already have focus, and the user can navigate
       // before this frame runs. Initial focus must not undo that navigation.
-      if (!contexts && menuRef.current?.contains(document.activeElement)) return;
+      const focused = document.activeElement;
+      if (menuRef.current?.contains(focused) && (!contexts || focused?.matches('[role="menuitemradio"]'))) return;
       const target = contexts ? menuRef.current?.querySelector<HTMLElement>('[role="menuitemradio"][aria-checked="true"]') : null;
       (target ?? menuRef.current?.querySelector<HTMLElement>('[role="menuitem"]'))?.focus();
     });

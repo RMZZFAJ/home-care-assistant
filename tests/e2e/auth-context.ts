@@ -23,7 +23,7 @@ export async function selectContext(page: Page, patient: string | null) {
       const choice = chooser.getByRole("button", { name: label, exact: !patient });
       await expect(choice).toBeEnabled();
       await choice.focus(); await expect(choice).toBeFocused();
-      submit = () => choice.press("Enter");
+      submit = () => choice.click();
     } else {
       await page.getByLabel("Menu do usuário", { exact: true }).press("Enter");
       await page.getByRole("menuitem", { name: "Mudar paciente ou função", exact: true }).press("Enter");
@@ -36,7 +36,7 @@ export async function selectContext(page: Page, patient: string | null) {
         ? dialog.getByRole("button", { name: patient ? new RegExp("^" + name + "\\s") : label, exact: !patient })
         : submenu.getByRole("menuitemradio", { name: label, exact: !patient });
       await expect(choice).toBeEnabled();
-      submit = () => choice.press("Enter");
+      submit = () => choice.click();
     }
     const [result] = await Promise.all([
       page.waitForResponse(response => {

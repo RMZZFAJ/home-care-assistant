@@ -290,7 +290,7 @@ export function DocumentMaterialPanel({
             {linkSearch ? <ActionButton onClick={() => { setLinkText(""); filterLinks({ kind: linkKind, search: "" }); }}>Limpar</ActionButton> : null}
           </form> : null}
         </> : null}
-        {section === "document" ? contextFacts : loading ? <LoadingIndicator label="Consultando material" /> : error ? <div role="alert" className="hca-v7-material-read-error">
+        {section === "document" ? contextFacts : loading && !(section === "links" && data && !error) ? <LoadingIndicator label="Consultando material" /> : error ? <div role="alert" className="hca-v7-material-read-error">
           <p>{error}</p><ActionButton onClick={refresh}>Tentar novamente</ActionButton>
         </div> : data?.section === "stock" ? <>
           <MaterialStockFacts data={data} unit={row.unit} onTransfers={showRelatedKind}

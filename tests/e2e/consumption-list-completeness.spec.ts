@@ -76,7 +76,8 @@ test("consumption list rejects corrupt pages and clears previous content after a
   await expect(page.getByText("Última consulta confirmada; aguardando atualização.", { exact: false })).toHaveCount(0);
   await expect(page.getByText("Nenhum relato encontrado para estes filtros.", { exact: true })).toHaveCount(0);
   mode = "live"; await refresh(page); await expect(rows(page)).toHaveCount(20);
-  await page.unroute("**/api/consumption?*");
+  await expect(list).toHaveAttribute("aria-busy", "false");
+  await page.unrouteAll({ behavior: "wait" });
   sql(`insert into public.capability_overrides(care_recipient_id,subject_user,capability,enabled) values(${q(f.patient)},${q(f.reader.id)},'stock.family.read',false);`);
   await refresh(page); await expect(rows(page)).toHaveCount(1); await expect(rows(page)).toContainText("Relato da equipe para filtro");
   const allowed = await (await page.request.get(`/api/consumption?careRecipientId=${f.patient}`)).json();

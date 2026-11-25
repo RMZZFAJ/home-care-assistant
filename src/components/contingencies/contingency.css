@@ -92,3 +92,9 @@
   }
   .hca-contingency-dossier .hca-modal-footer > .hca-control--primary:nth-child(3) { grid-column: 1 / -1; }
 }
+@media (max-width: 500px) {
+  .hca-contingency-editor > .hca-modal-footer > .hca-control--primary {
+    flex: 1.28;
+    padding-inline: 10px;
+  }
+}

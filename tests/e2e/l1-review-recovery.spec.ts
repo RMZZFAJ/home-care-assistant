@@ -45,7 +45,7 @@ test("L1 resposta antiga não interrompe a continuação para um novo destino", 
   await login(page, f.patient, person.email);
   const origin = "/acesso/continuar";
   const destination = "/historico?careRecipientId=" + f.patient;
-  const target = (url: URL) => url.pathname === "/api/context" && !url.search;
+  const target = (url: URL) => url.pathname === "/api/context" && url.searchParams.get("view") === "entry";
   let releaseOld!: () => void;
   let releaseLatest!: () => void;
   const oldResponse = new Promise<void>(resolve => { releaseOld = resolve; });
@@ -89,7 +89,6 @@ test("L1 resposta antiga não interrompe a continuação para um novo destino", 
 test("L1 seletor permite escolher o único paciente disponível quando a seleção global está vazia", async ({ page }) => {
   const f = await setup(), person = await shiftWorker(f.patient, "family");
   sql(`update public.profiles set role='admin',global_scope=true where id=${q(person.id)};update public.care_recipient_memberships set status='revoked' where user_id=${q(person.id)};`);
-  await rpc(person.client, "select_active_context", { p_patient: null });
 
   // Keep only one authorized patient in the browser read without changing
   // the permissions returned by the real server.
@@ -106,18 +105,24 @@ test("L1 seletor permite escolher o único paciente disponível quando a seleç�
     await page.getByLabel("E-mail", { exact: true }).fill(person.email);
     await page.getByLabel("Senha", { exact: true }).fill(fixturePassword);
     await page.getByRole("button", { name: "Entrar", exact: true }).click();
-    const picker = page.getByRole("combobox", { name: "Pessoa assistida", exact: true });
-    await expect(picker.getByRole("option")).toHaveCount(2);
-    await expect(picker).toHaveValue("");
+    await selectContext(page, null);
+    const picker = page.getByRole("button", { name: "Paciente atual Selecione um paciente", exact: true });
     await expect(picker).toBeEnabled();
     const before = await page.request.get("/api/context");
     expect(before.ok()).toBe(true);
     const authority = (await before.json()).data;
     expect(authority.isGlobalAdmin).toBe(true);
-    expect(authority.activeContext?.mode).not.toBe("patient");
-    await picker.selectOption(f.patient);
-    await expect(picker).toHaveValue(f.patient);
-    await expect.poll(() => new URL(page.url()).searchParams.get("careRecipientId")).toBe(f.patient);
+    expect(authority.activeContext?.mode).toBe("global");
+    const patient = authority.patients.find((row: { id: string }) => row.id === f.patient);
+    expect(patient?.display_name).toBeTruthy();
+    await picker.click();
+    const directory = page.getByRole("dialog", { name: "Selecionar paciente", exact: true });
+    const results = directory.getByRole("region", { name: "Resultados da busca por paciente" });
+    await expect(results.getByRole("button")).toHaveCount(1);
+    await expect(results.getByRole("button")).not.toHaveAttribute("aria-current", "true");
+    await results.getByRole("button").click();
+    await expect(page).toHaveURL(url => url.pathname === "/admin" && url.searchParams.get("careRecipientId") === f.patient);
+    await expect(page.getByRole("button", { name: `Paciente atual ${patient.display_name}`, exact: true })).toBeVisible();
     await expect(page.locator(".hca-workspace")).toHaveAttribute("data-context-mode", authority.activeContext?.mode ?? "");
     const context = await page.request.get("/api/context");
     expect(context.ok()).toBe(true);

@@ -384,6 +384,7 @@ html:has(.hca-workspace) { scroll-padding-block-start: 65px; }
  .hca-workspace :is(button,input,select,textarea,a,summary,[tabindex]) { scroll-margin-block-end: calc(80px + env(safe-area-inset-bottom)); }
  .hca-record-detail:has(.hca-document-compact) .hca-document-tab-list { top: calc(var(--app-header-height) + 44px); }
  .hca-workspace .hca-document-panel :is(a,button,input,select,textarea,summary,[tabindex]) { scroll-margin-block-start: 90px; }
+ .hca-consumption-tools :is(button,input) { scroll-margin-block-start: 12px; }
  .hca-document-tab { scroll-margin-block-start: 60px; }
 }
 @media (max-width: 500px) { .hca-compact-badges { display: none; } }

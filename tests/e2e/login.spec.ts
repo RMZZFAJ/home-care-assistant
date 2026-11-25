@@ -55,9 +55,8 @@ test("login apresenta falha de credencial e de rede e permite recuperar a sessã
   await expect(page).toHaveURL(/\/login$/);
   await page.unroute("**/auth/v1/token?**");
   await page.getByRole("button", { name: "Entrar", exact: true }).click();
-  await expect(
-    page.getByRole("combobox", { name: "Pessoa assistida", exact: true }),
-  ).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Visão geral", exact: true })).toBeVisible();
+  await expect(page.getByRole("button", { name: /^Paciente atual/ })).toBeEnabled();
   await page.getByLabel("Menu do usuário", { exact: true }).click();
   await page.getByRole("menuitem", { name: "Sair", exact: true }).click();
   await expect(page).toHaveURL(/\/login$/);
