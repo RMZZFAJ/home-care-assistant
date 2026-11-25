@@ -1,6 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 import { randomUUID } from "node:crypto";
-import { fixtures, setup } from "../integration/v4-fixtures.mjs";
+import { setup } from "../integration/v4-fixtures.mjs";
+import { shiftWorker } from "../integration/shift-fixtures.mjs";
 import { sql, sqlLiteral as q } from "../../scripts/test-environment.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { selectContext } from "./auth-context";
@@ -9,8 +10,9 @@ import type { SchedulePacket } from "@/lib/schedules/confirmation";
 test.setTimeout(120_000);
 async function prepare(page: Page) {
   const f = await setup();
+  const administrator = await shiftWorker(f.patient, "admin");
   await page.goto("/login");
-  await page.getByLabel("E-mail", { exact: true }).fill(fixtures.adminA.email);
+  await page.getByLabel("E-mail", { exact: true }).fill(administrator.email);
   await page.getByLabel("Senha", { exact: true }).fill(fixturePassword);
   await page.getByRole("button", { name: "Entrar", exact: true }).click();
   await expect(
@@ -47,12 +49,12 @@ async function prepare(page: Page) {
     },
   };
   await page.goto("/escalas");
-  return { ...f, legacy };
+  return { ...f, legacy, ownerId: administrator.id };
 }
 // Explicit fixture of a packet produced by the earlier UI. Current editors use
 // private resource preparations. The native HTTP call and lost-response probes
 // stay real, and the current recovery panel must consume that older envelope.
-async function submitLegacy(page: Page, packet: SchedulePacket) {
+async function submitLegacy(page: Page, packet: SchedulePacket, userId: string) {
   await page.evaluate(
     async ({ packet, userId }) => {
       sessionStorage.setItem(
@@ -70,12 +72,16 @@ async function submitLegacy(page: Page, packet: SchedulePacket) {
         /* The fixture deliberately loses the native response. */
       }
     },
-    { packet, userId: fixtures.adminA.id },
+    { packet, userId },
   );
   await page.reload();
 }
 const panel = (page: Page) =>
   page.getByRole("region", { name: "Confirmação de escala", exact: true });
+const confirmationOf = (packet: SchedulePacket) => (url: URL) =>
+  url.pathname === "/api/schedules/confirmation" &&
+  url.searchParams.get("careRecipientId") === packet.careRecipientId &&
+  url.searchParams.get("idempotencyKey") === packet.idempotencyKey;
 const facts = (patient: string) =>
   Number(
     sql(
@@ -90,11 +96,11 @@ test("a confirmação do próprio plantão permanece acessível sem leitura da a
     expect(committed.ok()).toBe(true);
     return route.abort("failed");
   }, { times: 1 });
-  await submitLegacy(page, f.legacy);
+  await submitLegacy(page, f.legacy, f.ownerId);
   expect(facts(f.patient)).toBe(1);
   sql(`insert into public.capability_overrides(care_recipient_id,subject_user,capability,enabled)
-    values (${q(f.patient)},${q(fixtures.adminA.id)},'schedule.read.team',false),
-           (${q(f.patient)},${q(fixtures.adminA.id)},'schedule.read.own',false)`);
+    values (${q(f.patient)},${q(f.ownerId)},'schedule.read.team',false),
+           (${q(f.patient)},${q(f.ownerId)},'schedule.read.own',false)`);
   await page.reload();
   await expect(page.getByText(/^Seu vínculo não permite consultar a agenda/)).toBeVisible();
   await page.getByText("Meus preenchimentos privados da agenda", { exact: true }).click();
@@ -115,7 +121,7 @@ test("agenda recupera a confirmação após recarregar sem reenviar a alteraçã
     expect(response.ok()).toBe(true);
     await route.abort("failed");
   });
-  await submitLegacy(page, f.legacy);
+  await submitLegacy(page, f.legacy, f.ownerId);
   await expect(
     page.getByRole("button", {
       name: "Consultar confirmação da escala",
@@ -134,7 +140,7 @@ test("agenda recupera a confirmação após recarregar sem reenviar a alteraçã
     page.getByRole("button", { name: "Nova programação", exact: true }),
   ).toBeDisabled();
   expect(packets).toHaveLength(1);
-  const storageKey = `hca:schedule-confirmation:${fixtures.adminA.id}:${f.patient}`;
+  const storageKey = `hca:schedule-confirmation:${f.ownerId}:${f.patient}`;
   const original = await page.evaluate(
     (key) => sessionStorage.getItem(key),
     storageKey,
@@ -201,12 +207,20 @@ test("agenda recupera a confirmação após recarregar sem reenviar a alteraçã
     .getByRole("button", { name: "Tentar novamente", exact: true })
     .click();
   await expect(panel(page)).toContainText("Tentativa de escala preservada");
+  const recovered = page.waitForResponse(response =>
+    response.request().method() === "GET" && confirmationOf(f.legacy)(new URL(response.url())),
+  );
   await panel(page)
     .getByRole("button", {
       name: "Consultar confirmação da escala",
       exact: true,
     })
     .click();
+  const result = await recovered;
+  expect(result.status()).toBe(200);
+  expect(await result.json()).toMatchObject({
+    found: true, userId: f.ownerId, idempotencyKey: f.legacy.idempotencyKey,
+  });
   await expect(panel(page)).toContainText("Confirmação encontrada");
   expect(
     await page.evaluate((key) => sessionStorage.getItem(key), storageKey),
@@ -214,6 +228,68 @@ test("agenda recupera a confirmação após recarregar sem reenviar a alteraçã
   expect(packets).toHaveLength(1);
   expect(facts(f.patient)).toBe(1);
 });
+
+test("uma resposta antiga da agenda preserva a referência após uma falha de contexto", async ({ page }) => {
+  const f = await prepare(page);
+  let submissions = 0;
+  await page.route("**/api/schedules", async route => {
+    if (route.request().method() !== "POST") return route.continue();
+    submissions++;
+    const response = await route.fetch();
+    expect(response.ok()).toBe(true);
+    return route.abort("failed");
+  });
+  await submitLegacy(page, f.legacy, f.ownerId);
+  const key = `hca:schedule-confirmation:${f.ownerId}:${f.patient}`;
+  const readReference = () => page.evaluate(key => sessionStorage.getItem(key), key);
+  const original = await readReference();
+  expect(original).toBeTruthy();
+  const consult = panel(page).getByRole("button", { name: "Consultar confirmação da escala", exact: true });
+  const held = Promise.withResolvers<void>();
+  const confirmation = confirmationOf(f.legacy);
+  let received = false;
+  await page.route(confirmation, async route => {
+    const response = await route.fetch();
+    expect(response.ok()).toBe(true);
+    received = true;
+    await held.promise;
+    await route.fulfill({ response });
+  });
+  try {
+    const stale = page.waitForResponse(response => confirmation(new URL(response.url())));
+    await consult.click();
+    await expect.poll(() => received).toBe(true);
+    const context = (url: URL) => url.pathname === "/api/context";
+    await page.route(context, route => route.fulfill({
+      status: 503,
+      json: { code: "DATABASE_UNAVAILABLE", error: "Consulta de contexto indisponível no ensaio." },
+    }));
+    await page.evaluate(() => window.dispatchEvent(new Event("hca:data-changed")));
+    const reloadContext = page.getByRole("button", { name: "Tentar novamente", exact: true });
+    await expect(reloadContext).toBeVisible();
+    await expect(panel(page)).toHaveCount(0);
+    await page.unroute(context);
+    await reloadContext.click();
+    await expect(consult).toBeEnabled();
+
+    held.resolve();
+    expect(await (await stale).finished()).toBeNull();
+    await page.evaluate(() => new Promise<void>(done =>
+      requestAnimationFrame(() => requestAnimationFrame(() => done())),
+    ));
+    expect(await readReference()).toBe(original);
+    await page.unroute(confirmation);
+    await consult.click();
+    await expect(panel(page)).toContainText("Confirmação encontrada");
+    expect(await readReference()).toBeNull();
+    expect(submissions).toBe(1);
+    expect(facts(f.patient)).toBe(1);
+  } finally {
+    held.resolve();
+    await page.unrouteAll({ behavior: "wait" });
+  }
+});
+
 test("agenda só reenvia explicitamente a tentativa não encontrada e preserva envelope divergente", async ({
   page,
 }) => {
@@ -223,7 +299,7 @@ test("agenda só reenvia explicitamente a tentativa não encontrada e preserva e
     packets.push(route.request().postDataJSON());
     await route.abort("failed");
   });
-  await submitLegacy(page, f.legacy);
+  await submitLegacy(page, f.legacy, f.ownerId);
   await expect(
     page.getByRole("button", {
       name: "Consultar confirmação da escala",
@@ -248,7 +324,7 @@ test("agenda só reenvia explicitamente a tentativa não encontrada e preserva e
     }),
   ).toBeVisible();
   expect(packets).toHaveLength(1);
-  const storageKey = `hca:schedule-confirmation:${fixtures.adminA.id}:${f.patient}`;
+  const storageKey = `hca:schedule-confirmation:${f.ownerId}:${f.patient}`;
   const original = await page.evaluate(
     (key) => sessionStorage.getItem(key)!,
     storageKey,

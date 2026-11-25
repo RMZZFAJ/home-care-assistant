@@ -5538,3 +5538,30 @@ confirmaram o retorno de compras e entregas vinculadas e a preservação
 da quantidade em edição na COM. O build de produção, TypeScript e os
 lints dirigidos também passaram. O ajuste dispensa migration e a CI
 remota do candidato ainda depende da sua publicação.
+
+### Agenda — Confirmação durante uma falha de acesso
+
+Na CI publicada, a primeira execução do cenário de recuperação da
+agenda terminou com o painel pendente. A segunda passou. Com uma
+conta isolada e a verificação da resposta do GET pela chave da
+tentativa, o caso completo passou três vezes em WebKit local.
+
+O ensaio com atraso controlado encontrou uma corrida no mesmo fluxo.
+O banco respondeu à consulta no ensaio, e a entrega do resultado
+ao navegador ficou retida. Uma falha 503 na consulta de
+contexto fechou a tela. Ao voltar, a tela recuperou a referência local.
+Na versão anterior, a resposta do painel já encerrado apagava essa
+referência sem apresentar o resultado à tela reaberta.
+
+A leitura só altera a referência enquanto o painel que iniciou a
+consulta pertence ao contexto atual. A nova tela preserva a mesma
+chave e pode consultar o registro sem repetir o comando de alteração.
+O teste confirma a referência intacta após a resposta antiga, a
+consulta seguinte bem-sucedida e um único ato gravado.
+
+Passaram oito execuções locais em Chromium e WebKit de iPhone,
+sem retentativa. Elas cobriram a recuperação da própria confirmação
+sem leitura da agenda, a recusa de recibo divergente, a resposta
+atrasada e o reenvio somente após ação explícita. Passaram também dez
+testes do contrato, build, TypeScript e lints dirigidos.
+O incremento dispensa migration.
