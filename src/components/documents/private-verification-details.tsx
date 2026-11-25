@@ -6,6 +6,7 @@ import { z } from "zod";
 import { ActionButton, DefinitionGrid } from "@/components/ui/controls";
 import { Icon } from "@/components/ui/icon";
 import { Dialog, Drawer } from "@/components/ui/overlays";
+import { WorkspaceSync } from "@/components/workspace-sync";
 import { api } from "@/lib/client/api";
 import { formatBrazilDate } from "@/lib/receipt";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
@@ -86,6 +87,7 @@ export function PrivateVerificationDetails({ code, loginHref }: { code: string; 
   }
 
   return <section aria-label="Detalhes autorizados da emissão">
+    {actorId ? <WorkspaceSync key={actorId} userId={actorId} /> : null}
     <button type="button" ref={openerRef} className="hca-verify-private-link"
       onClick={() => { setError(""); setPanel(hasKnownDetails ? "details" : "access"); }}>
       <span><Icon name={hasKnownDetails ? "file" : "lock"} width={20} height={20} /></span>

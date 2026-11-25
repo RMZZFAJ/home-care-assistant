@@ -8,12 +8,13 @@ import { Menu } from "@base-ui/react/menu";
 import { MenuPopup } from "@/components/ui/floating";
 import { ProfileAvatar } from "@/components/ui/avatar";
 import { Icon } from "@/components/ui/primitives";
-import { Drawer } from "@/components/ui/overlays";
+import { Dialog, Drawer } from "@/components/ui/overlays";
 import { NotificationBell } from "@/components/notifications/notification-bell";
 import { LogoutButton } from "@/components/auth/logout-button";
 import { GuideOnboarding } from "@/components/guides/user-guide";
 import { BottomNavigation, WorkspaceNavigation } from "@/components/navigation/workspace-navigation";
 import { roleLabel, useWorkspaceState } from "./workspace-context";
+import { ResidenceDirectory, residenceDirectoryPageSize } from "./residence-directory";
 import { usePwa } from "@/components/pwa/pwa-provider";
 
 const subscribe = (callback: () => void) => {
@@ -29,11 +30,14 @@ function ProfileMenu() {
   const { data, value, selecting, selectProfile, selectionError } = useWorkspaceState();
   const [open, setOpen] = useState(false);
   const [contexts, setContexts] = useState(false);
+  const [contextDialog, setContextDialog] = useState(false);
   const [restoreAfterSelection, setRestoreAfterSelection] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const menuLabelId = useId();
   const triggerRef = useRef<HTMLButtonElement>(null);
-  const multipleContexts = (data?.patients.filter(patient => patient.hasMembership).length ?? 0) + (data?.isGlobalAdmin ? 1 : 0) > 1;
+  const memberships = data?.patients.filter(patient => patient.hasMembership) ?? [];
+  const multipleContexts = memberships.length + (data?.isGlobalAdmin ? 1 : 0) > 1;
+  const activeId = data?.activeContext?.care_recipient_id ?? undefined;
   useEffect(() => {
     if (!open) return;
     const frame = requestAnimationFrame(() => {
@@ -46,15 +50,23 @@ function ProfileMenu() {
     return () => cancelAnimationFrame(frame);
   }, [open, contexts]);
   useEffect(() => {
-    if (!restoreAfterSelection || open || selecting || !data) return;
+    if (!restoreAfterSelection || open || contextDialog || selecting || !data) return;
     const frame = requestAnimationFrame(() => {
       const target = triggerRef.current;
       if (target?.isConnected && !target.disabled) { target.focus({ preventScroll: true }); setRestoreAfterSelection(false); }
     });
     return () => cancelAnimationFrame(frame);
-  }, [restoreAfterSelection, open, selecting, data]);
-  const choose = async (id: string | null) => { if (await selectProfile(id)) { setOpen(false); setContexts(false); } setRestoreAfterSelection(true); };
-  return <Menu.Root open={open} onOpenChange={next => { setOpen(next); if (!next) setContexts(false); }}>
+  }, [restoreAfterSelection, open, contextDialog, selecting, data]);
+  const choose = async (id: string | null) => {
+    if (await selectProfile(id)) { setOpen(false); setContexts(false); setContextDialog(false); }
+    setRestoreAfterSelection(true);
+  };
+  const openContexts = () => {
+    if (!data?.isGlobalAdmin || memberships.length <= residenceDirectoryPageSize) { setContexts(true); return; }
+    setOpen(false);
+    setContextDialog(true);
+  };
+  return <><Menu.Root open={open} onOpenChange={next => { setOpen(next); if (!next) setContexts(false); }}>
     <Menu.Trigger render={<ActionButton ref={triggerRef} variant="quiet" className="hca-profile-trigger" aria-label="Menu do usuário" disabled={!data || selecting} />}>
       <ProfileAvatar name={data?.fullName} imageUrl={data?.avatarUrl} />
       <span className="hca-profile-identity"><strong>{data?.fullName}</strong><small>{data?.activeContext?.mode === "global" ? "Administração global" : roleLabel(value?.patient?.role)}</small></span>
@@ -67,24 +79,69 @@ function ProfileMenu() {
         <Menu.Item className="hca-menu-item" closeOnClick={false} onClick={() => setContexts(false)}>← Voltar ao menu</Menu.Item>
         <Menu.RadioGroup value={data?.activeContext?.mode === "global" ? "global" : data?.activeContext?.care_recipient_id ?? ""}>
           {data?.isGlobalAdmin ? <Menu.RadioItem className="hca-menu-item" closeOnClick={false} value="global" disabled={selecting} onClick={() => void choose(null)}>Administração global</Menu.RadioItem> : null}
-          {data?.patients.filter(patient => patient.hasMembership).map(patient => <Menu.RadioItem className="hca-menu-item" closeOnClick={false} key={patient.id} value={patient.id} disabled={selecting} onClick={() => void choose(patient.id)}>
+          {memberships.map(patient => <Menu.RadioItem className="hca-menu-item" closeOnClick={false} key={patient.id} value={patient.id} disabled={selecting} onClick={() => void choose(patient.id)}>
             {patient.display_name} · {roleLabel(patient.role)}
           </Menu.RadioItem>)}
         </Menu.RadioGroup>
       </> : <>
         <Menu.Item className="hca-menu-item" onClick={() => { setOpen(false); router.push("/perfil"); }}><Icon name="user" />Meu perfil e segurança</Menu.Item>
-        <Menu.Item className="hca-menu-item" closeOnClick={false} disabled={!multipleContexts} onClick={() => setContexts(true)}><Icon name="team" />Mudar paciente ou função</Menu.Item>
+        <Menu.Item className="hca-menu-item" closeOnClick={false} disabled={!multipleContexts} onClick={openContexts}><Icon name="team" />Mudar paciente ou função</Menu.Item>
         <Menu.Item className="hca-menu-item" onClick={() => { setOpen(false); router.push("/notificacoes"); }}><Icon name="bell" />Central de notificações</Menu.Item>
         <Menu.Separator className="hca-menu-separator" />
         <LogoutButton />
       </>}
     </MenuPopup>
-  </Menu.Root>;
+  </Menu.Root>
+    {contextDialog && data ? <Dialog open title="Contextos autorizados" headingIcon="team" finalFocus={triggerRef}
+      closeDisabled={selecting} onClose={() => setContextDialog(false)}>
+      {selectionError ? <p role="alert">{selectionError}</p> : null}
+      {data.isGlobalAdmin ? <ActionButton disabled={selecting} aria-current={data.activeContext?.mode === "global" ? true : undefined}
+        onClick={() => void choose(null)}><Icon name="shield" />Administração global</ActionButton> : null}
+      <ResidenceDirectory patients={memberships} showRoles currentId={activeId} disabled={selecting}
+        onSelect={id => void choose(id)} />
+    </Dialog> : null}
+  </>;
+}
+
+function PatientPicker() {
+  const { value, data, selecting, selectionError, selectPatient, selectProfile } = useWorkspaceState();
+  const [open, setOpen] = useState(false);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const global = data?.activeContext?.mode === "global" && data.globalAdministrationAllowed;
+  const patients = global ? data.patients : data?.patients.filter(patient => patient.hasMembership);
+  const openPatient = async (id: string) => {
+    if (global) { setOpen(false); await selectPatient(id); return; }
+    if (await selectProfile(id)) setOpen(false);
+  };
+  const name = value?.patient?.display_name ?? "Selecione um paciente";
+  const contents = <>
+    <span className="context-icon"><Icon name="home" /></span>
+    <span className="min-w-0"><small>Paciente atual</small><strong className="truncate">{name}</strong></span>
+    <Icon name="down" width={15} height={15} />
+  </>;
+
+  return <div className="patient-picker">
+    {!patients?.length ? <span className="text-sm text-(--muted)">Home Care Assistant</span>
+      : global || Boolean(data?.isGlobalAdmin) && patients.length > residenceDirectoryPageSize ? <>
+        <button type="button" ref={triggerRef} className="header-context hca-patient-selector" aria-haspopup="dialog" aria-expanded={open} disabled={selecting} onClick={() => setOpen(true)}>{contents}</button>
+        <Dialog open={open} title="Selecionar paciente" headingIcon="home" finalFocus={triggerRef} closeDisabled={selecting} onClose={() => setOpen(false)}>
+          {!global && selectionError ? <p role="alert">{selectionError}</p> : null}
+          {open ? <ResidenceDirectory patients={patients} showRoles={!global} currentId={value?.patient?.id}
+            disabled={selecting} onSelect={id => void openPatient(id)} /> : null}
+        </Dialog>
+      </> : <label className="header-context hca-patient-selector">
+        {contents}
+        <SelectField aria-label="Pessoa assistida" value={value?.patient?.id ?? ""} disabled={selecting || Boolean(value?.patient?.id) && patients.length < 2} onChange={event => void selectPatient(event.target.value)}>
+          <option value="" disabled>Selecione um paciente</option>
+          {patients.map(patient => <option key={patient.id} value={patient.id}>{patient.display_name}{patient.is_active === false ? " (inativo)" : ""}</option>)}
+        </SelectField>
+      </label>}
+  </div>;
 }
 
 export function WorkspaceShell({ children, showOnboarding = false }: { children: ReactNode; showOnboarding?: boolean; }) {
   const { blocked, notices } = usePwa();
-  const { value, data, loading, selecting, selectPatient } = useWorkspaceState();
+  const { value, loading, selecting } = useWorkspaceState();
   const desktop = useSyncExternalStore(subscribe, desktopSnapshot, serverSnapshot);
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -97,10 +154,7 @@ export function WorkspaceShell({ children, showOnboarding = false }: { children:
     <header className="app-header print:hidden" inert={blocked}>
       <ActionButton ref={navigationTriggerRef} className="hca-navigation-toggle" variant="quiet" aria-label={expanded ? "Recolher navegação" : "Abrir navegação"} aria-expanded={expanded} aria-controls="workspace-navigation" onClick={(event) => { event.currentTarget.focus(); if (desktop) setCollapsed((current) => !current); else setMobileOpen((current) => !current); }} >{<Icon name={desktop ? "home" : "menu"} />}</ActionButton>
       <Link href="/" prefetch={false} className="app-brand" aria-label="Home Care Assistant — início"><span className="hca-mobile-brand-symbol"><Icon name="home" /></span><strong>Home Care Assistant<small>Organização do cuidado em casa</small></strong></Link>
-      <div className="patient-picker">{data?.patients.length ? <label className="header-context hca-patient-selector"><span className="context-icon"><Icon name="home" /></span><span><small>Paciente atual</small><strong>{value?.patient?.display_name ?? "Selecione um paciente"}</strong></span><Icon name="down" width={15} height={15} /><SelectField aria-label="Pessoa assistida" value={value?.patient?.id ?? ""} disabled={selecting || Boolean(value?.patient?.id) && data.patients.filter(patient => data.activeContext?.mode !== "patient" || patient.hasMembership).length < 2} onChange={(event) => void selectPatient(event.target.value)}>
-        <option value="" disabled>Selecione um paciente</option>
-        {data.patients.filter((patient) => data.activeContext?.mode !== "patient" || patient.hasMembership).map((patient) => <option key={patient.id} value={patient.id}>{patient.display_name}{patient.is_active === false ? " (inativo)" : ""}</option>)}
-      </SelectField></label> : <span className="text-sm text-(--muted)">Home Care Assistant</span>}</div>
+      <PatientPicker key={`${value?.userId}:${value?.activeContext?.mode}:${value?.globalAdministrationAllowed}`} />
       {value ? <NotificationBell key={`${value.userId}:${value.activeContext?.mode}:${value.patient?.id ?? "none"}`} patientId={value.activeContext?.mode === "patient" ? value.patient?.id : undefined} patientName={value.patient?.display_name} disabled={selecting} /> : null}
       <ProfileMenu />
     </header>

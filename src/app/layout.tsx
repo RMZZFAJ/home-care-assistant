@@ -2,7 +2,6 @@ import type { Metadata, Viewport } from "next";
 import { Suspense } from "react";
 import "./globals.css";
 import "./design-system.css";
-import { LiveSession } from "@/components/live-session";
 import { OperationActivityHost, PageLoadingActivity } from "@/components/ui/operation-activity";
 import "@/theme/tokens.css";
 import "./canonical-ui.css";
@@ -34,7 +33,6 @@ export default function RootLayout({
           <Suspense fallback={<PageLoadingActivity title="Preparando seu espaço de cuidado" />}>
             <PwaProvider previewOrigin={stablePreviewOrigin(process.env.VERCEL_ENV, process.env.VERCEL_BRANCH_URL)}><WorkspaceProvider>{children}</WorkspaceProvider></PwaProvider>
           </Suspense>
-          <LiveSession />
           <OperationActivityHost />
         </div>
       </body>

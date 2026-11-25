@@ -43,9 +43,7 @@ async function signIn(page: Page, email: string, destination?: string) {
   await expect(
     page.getByRole("heading", { name: "Visão geral", exact: true }),
   ).toBeVisible();
-  await expect(
-    page.getByRole("combobox", { name: "Pessoa assistida", exact: true }),
-  ).toBeVisible();
+  await expect(page.getByLabel("Menu do usuário", { exact: true })).toBeEnabled();
 }
 async function login(page: Page, role = "global", preparedPatient?: string) {
   await signIn(page, fixtures()[role].email);

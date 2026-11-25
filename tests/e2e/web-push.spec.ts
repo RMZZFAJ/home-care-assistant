@@ -682,6 +682,7 @@ for (const account of ["professional", "family"] as const) test("Web Push refuse
   if (account === "family") await expect(rejected).toContainText("sessão");
   const legacy = await (await page.request.get("/api/push/devices")).json();
   expect(legacy).not.toHaveProperty("contextReference");
+  await page.bringToFront();
   await page.reload();
   await openPushPanel(page);
   await expect(activate(page)).toBeEnabled();

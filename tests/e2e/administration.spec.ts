@@ -42,13 +42,15 @@ test.describe("administração integrada no ambiente local", () => {
     await expect(
       page.getByRole("heading", { name: "Visão geral" }).first(),
     ).toBeVisible();
-    await expect(
-      page.getByRole("combobox", { name: "Pessoa assistida", exact: true }),
-    ).toBeVisible();
     await selectContext(
       page,
       name === "global" ? null : "20000000-0000-4000-8000-000000000001",
     );
+    if (name === "global") {
+      await expect(page.getByRole("button", { name: /^Paciente atual/ })).toBeEnabled();
+    } else {
+      await expect(page.getByRole("combobox", { name: "Pessoa assistida", exact: true })).toBeVisible();
+    }
   }
 
   async function createPatient(page: Page) {
@@ -351,7 +353,23 @@ test.describe("administração integrada no ambiente local", () => {
   });
 
   test("E10-02 recupera convite após perder a resposta sem gerar um segundo link", async ({ page }) => {
+    const syncDuringEntry: string[] = [];
+    const entry = page.waitForResponse(response => {
+      const url = new URL(response.url());
+      return url.pathname === "/api/context" && url.searchParams.get("view") === "entry";
+    });
+    page.on("request", request => {
+      const path = new URL(page.url()).pathname;
+      if (new URL(request.url()).pathname === "/api/sync" && ["/login", "/acesso/continuar"].includes(path)) syncDuringEntry.push(path);
+    });
     await login(page);
+    expect(syncDuringEntry).toEqual([]);
+    const entryResponse = await entry;
+    expect(entryResponse.status()).toBe(200);
+    const { data: entryContext } = await entryResponse.json();
+    expect(entryContext.isGlobalAdmin).toBe(true);
+    expect(entryContext.patients).toEqual([]);
+    expect(entryContext).not.toHaveProperty("avatarUrl");
     const patientId = await createPatient(page);
     const email = `residencia-${randomUUID()}@example.invalid`;
     await section(page, patientId, "Convites");

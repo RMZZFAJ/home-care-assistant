@@ -243,6 +243,84 @@ test("E10-01 recovers a lost identification response once and closes an unregist
   sql(`update public.care_recipients set is_active=false where id=${q(f.patient)};`);
 });
 
+test("E10-01 a large global directory stays searchable in the overview and patient picker", async ({ page }, info) => {
+  const f = await setup();
+  const name = `Residência de Íris ${f.patient.slice(0, 8)}`;
+  const searchTerm = `iris ${f.patient.slice(0, 8)}`;
+  sql(`update public.care_recipients set display_name=${q(name)} where id=${q(f.patient)};`);
+  const syntheticDirectory = Array.from({ length: 12_000 }, (_, index) => ({
+    id: `50000000-0000-4000-8000-${String(index).padStart(12, "0")}`,
+    display_name: `Cadastro de volume ${index + 1}`,
+    is_active: index % 2 === 0,
+    hasMembership: true,
+    role: "admin",
+  }));
+  await page.route("**/api/context", async route => {
+    if (route.request().method() !== "GET") { await route.continue(); return; }
+    const response = await route.fetch();
+    if (!response.ok()) { await route.fulfill({ response }); return; }
+    const body = await response.json();
+    if (body.data.globalAdministrationAllowed) {
+      body.data.patients = [...syntheticDirectory, ...body.data.patients];
+      await route.fulfill({ response, json: body });
+    } else await route.fulfill({ response });
+  });
+  try {
+    await login(page, null, "global");
+    const section = page.locator("section.hca-records").filter({ has: page.getByRole("heading", { name: "Pacientes autorizados", exact: true }) });
+    await expect(section.locator("a.hca-record")).toHaveCount(20);
+    const pagination = section.getByRole("navigation", { name: "Páginas de pacientes" });
+    await pagination.getByRole("button", { name: "Próxima", exact: true }).click();
+    await expect(section.getByRole("link", { name: /^Cadastro de volume 21\s/ })).toBeVisible();
+    await expect(section.locator("a.hca-record")).toHaveCount(20);
+    const overviewSearch = section.getByRole("searchbox", { name: "Buscar paciente" });
+    await overviewSearch.fill(searchTerm);
+    await expect(section.locator("a.hca-record")).toHaveCount(1);
+    await expect(section.getByRole("link", { name: new RegExp(name) })).toHaveAttribute("href", `/admin?section=patient&careRecipientId=${f.patient}`);
+    await overviewSearch.fill("cadastro que não existe");
+    await expect(section.getByRole("status")).toHaveText("Nenhum paciente corresponde à busca.");
+
+    const picker = page.getByRole("button", { name: /^Paciente atual/ });
+    await expect(page.locator(".patient-picker select option")).toHaveCount(0);
+    await picker.press("Enter");
+    const dialog = page.getByRole("dialog", { name: "Selecionar paciente", exact: true });
+    const results = dialog.getByRole("region", { name: "Resultados da busca por paciente" });
+    await expect(results.getByRole("button")).toHaveCount(20);
+    await dialog.press("Escape");
+    await expect(picker).toBeFocused();
+    await picker.press("Enter");
+    await dialog.getByRole("searchbox", { name: "Buscar paciente" }).fill(searchTerm);
+    await expect(results.getByRole("button")).toHaveCount(1);
+    for (const width of [360, 412]) {
+      await page.setViewportSize({ width, height: 900 });
+      await audit(page, `E10-01 global patient picker ${width}`);
+      await info.attach(`patient-picker-${width}`, { body: await page.screenshot(), contentType: "image/png" });
+    }
+    await results.getByRole("button", { name: new RegExp(name) }).press("Enter");
+    await expect(page).toHaveURL(new RegExp(`/admin\\?careRecipientId=${f.patient}$`));
+    await expect(page.getByText("Atuação administrativa", { exact: true })).toBeVisible();
+    await expect(page.getByRole("region", { name: "Residência selecionada" })).toContainText(name);
+    await expect(page.locator(".hca-workspace")).toHaveAttribute("data-context-mode", "global");
+    expect((await page.request.get(`/api/admin/residence?patientId=${f.patient}`)).status()).toBe(200);
+
+    const profile = page.getByRole("button", { name: "Menu do usuário", exact: true });
+    await profile.press("Enter");
+    await page.getByRole("menuitem", { name: "Mudar paciente ou função", exact: true }).press("Enter");
+    const contexts = page.getByRole("dialog", { name: "Contextos autorizados", exact: true });
+    const memberships = contexts.getByRole("region", { name: "Resultados da busca por paciente" });
+    await expect(contexts.getByRole("button", { name: "Administração global", exact: true })).toHaveAttribute("aria-current", "true");
+    await expect(memberships.getByRole("button")).toHaveCount(20);
+    await contexts.getByRole("searchbox", { name: "Buscar perfil autorizado" }).fill(searchTerm);
+    await expect(memberships.getByRole("button")).toHaveCount(1);
+    await expect(memberships.getByRole("button", { name: new RegExp(name) })).toBeVisible();
+    await contexts.getByRole("button", { name: "Fechar diálogo", exact: true }).press("Enter");
+    await expect(profile).toBeFocused();
+    await expect(page.locator(".hca-workspace")).toHaveAttribute("data-context-mode", "global");
+  } finally {
+    sql(`update public.care_recipients set is_active=false where id=${q(f.patient)};`);
+  }
+});
+
 test("E10-01 global identification remains a proposal and a reader receives no administrative data", async ({ page }, info) => {
   const f = await setup();
   const url = `/admin?careRecipientId=${f.patient}`;

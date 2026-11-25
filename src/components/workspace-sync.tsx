@@ -91,6 +91,7 @@ export function WorkspaceSync({
       if (event === "SIGNED_OUT") {
         void client.removeChannel(channel);
         setConnected(false);
+        window.dispatchEvent(new Event("hca:profile-updated"));
       }
     });
     return () => {

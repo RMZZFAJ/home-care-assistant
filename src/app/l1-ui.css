@@ -153,6 +153,7 @@ html:has(.hca-workspace) { scroll-padding-block-start: 65px; }
 .hca-l1 .hca-patient-selector { position: relative; cursor: pointer; }
 .hca-l1 .hca-patient-selector select { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
 .hca-l1 .hca-patient-selector:focus-within { outline: 2px solid #b9ddcf; outline-offset: 3px; }
+.hca-residence-directory-results > .hca-record + .hca-record { border-top: 1px solid var(--line); }
 .hca-l1 .app-header > .notification-bell { margin-left: auto; }
 .hca-l1 .week-day .shift-mark small { display: block; }
 .hca-l1 .hca-profile-trigger { color: #fff; }

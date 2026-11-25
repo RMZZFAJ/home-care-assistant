@@ -11,6 +11,7 @@ import { WorkspaceShell } from "./workspace-shell";
 import { WorkspaceAccessRevoked } from "./workspace-access-revoked";
 import { usePwa } from "@/components/pwa/pwa-provider";
 import { recentDestinationKey } from "@/lib/auth/recent-destination";
+import { WorkspaceSync } from "@/components/workspace-sync";
 
 export type ContextData = {
   documentContext?: { id: string; patientId: string; displayName: string; type: string; } | null;
@@ -188,9 +189,16 @@ export function WorkspaceProvider({ children }: { children: ReactNode; }) {
     } finally { if (!navigationScopeRef.current) setSelectionStage(null); }
   };
   const selectPatient = async (id: string) => {
-    if (data?.activeContext?.mode === "patient") { await selectProfile(id); return; }
-    setPatientId(id);
+    if (data?.activeContext?.mode !== "global" || !data.globalAdministrationAllowed) {
+      await selectProfile(id);
+      return;
+    }
     try { sessionStorage.setItem("hca:patient", id); } catch { /* No authority in storage. */ }
+    if (pathname !== "/admin" && pathname !== "/configuracoes") {
+      router.push("/admin?careRecipientId=" + encodeURIComponent(id));
+      return;
+    }
+    setPatientId(id);
     const url = new URL(window.location.href);
     url.searchParams.set("careRecipientId", id);
     window.history.replaceState(null, "", url);
@@ -212,7 +220,9 @@ export function WorkspaceProvider({ children }: { children: ReactNode; }) {
   useOperationActivity(!publicPage && !revoked && (loading || selecting), selectionStage === null
     ? issuing ?? { title: "Preparando seu espaço", detail: "Estamos conferindo sua sessão e os acessos autorizados." }
     : { title: "Mudando de paciente", stage: selectionStage, steps: selectionSteps, detail: "Aguarde a confirmação da operação." });
-  return <Context value={state}>{publicPage ? <>{publicVerification ? null : notices}<div inert={blocked}>{children}</div></>
+  return <Context value={state}>
+    {!publicPage && data ? <WorkspaceSync key={data.userId} userId={data.userId} /> : null}
+    {publicPage ? <>{publicVerification ? null : notices}<div inert={blocked}>{children}</div></>
     : revoked ? <WorkspaceAccessRevoked key={scope} userId={revocation.userId} patientId={revocation.patientId} />
     : <WorkspaceShell showOnboarding={pathname === "/"}>{children}</WorkspaceShell>}</Context>;
 }
