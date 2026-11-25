@@ -16,6 +16,15 @@ async function login(page:Page,role:string,patient:string|null){await page.goto(
 const target=(patient:string,id?:string)=>'/contingencias?careRecipientId='+patient+'&process=REQ'+(id?'&id='+id:'');
 const facts=(patient:string)=>sql("select jsonb_build_object('stock',(select jsonb_agg(to_jsonb(x) order by id) from public.stock_movements x where care_recipient_id="+q(patient)+"),'docs',(select jsonb_agg(to_jsonb(x) order by id) from public.operational_documents x where care_recipient_id="+q(patient)+"),'events',(select count(*) from public.document_events where care_recipient_id="+q(patient)+"),'science',(select count(*) from public.requisition_science_events where requisition_id in(select id from public.operational_documents where care_recipient_id="+q(patient)+")))");
 const count=(patient:string)=>Number(sql('select count(*) from private.contingency_cases where care_recipient_id='+q(patient)));
+async function captureContingency(page:Page,name:string){
+ const viewport=page.viewportSize();
+ try {
+  for(const width of [360,412]){
+   await page.setViewportSize({width,height:709});
+   await page.screenshot({path:`output/playwright/l4/${name}-${width}.png`,animations:'disabled'});
+  }
+ } finally {if(viewport)await page.setViewportSize(viewport);}
+}
 async function start(page:Page,text:string){
  await page.getByRole('button',{name:'Declarar fato',exact:true}).click();
  const drawer=page.getByRole('dialog',{name:'Declarar um fato',exact:true});
@@ -90,6 +99,7 @@ test('E12-04 filters the authorized dossiers and opens facts, materials and hist
    const size=await referenceFrame.boundingBox();if(!size)throw new Error('A referência visual do dossiê não foi exibida.');
    await page.setViewportSize({width,height:Math.round(size.height)});
    await auditFromTop(page,'E12-04 contingências '+width);
+   await page.evaluate(() => {if(document.activeElement instanceof HTMLElement)document.activeElement.blur();});
    await referenceFrame.screenshot({path:'output/playwright/l4/reference/contingency-'+width+'.png'});
    await page.screenshot({path:'output/playwright/l4/contingency-'+info.project.name+'-'+width+'.png'});
   }
@@ -98,8 +108,14 @@ test('E12-04 filters the authorized dossiers and opens facts, materials and hist
   await trigger.click();await expect(drawer.getByRole('tab',{name:'Fatos',exact:true})).toBeVisible();
   await referenceFrame.getByRole('button',{name:/^CTG-0012/}).click();
   await expect(referenceFrame.getByText('Fatos',{exact:true})).toBeVisible();
-  await referenceFrame.screenshot({path:'output/playwright/l4/reference/contingency-dossier-412.png',animations:'disabled'});
-  await page.screenshot({path:'output/playwright/l4/contingency-dossier-'+info.project.name+'-412.png',animations:'disabled'});
+  for(const width of [360,412]){
+   await model.getByRole('combobox',{name:'Visualização',exact:true}).selectOption(String(width));
+   const size=await referenceFrame.boundingBox();if(!size)throw new Error('A referência visual do dossiê não foi exibida.');
+   await page.setViewportSize({width,height:Math.round(size.height)});
+   await expect(drawer.getByRole('tab',{name:'Fatos',exact:true})).toBeVisible();
+   await referenceFrame.screenshot({path:`output/playwright/l4/reference/contingency-dossier-${width}.png`,animations:'disabled'});
+   await page.screenshot({path:`output/playwright/l4/contingency-dossier-${info.project.name}-${width}.png`,animations:'disabled'});
+  }
  } finally {await modelContext.close();}
  expect(writes).toEqual([]);expect(facts(f.patient)).toBe(before);
 });
@@ -195,18 +211,19 @@ test('E12-05 compares catalogue precision, preserves other facts and appends a c
  await editor.getByRole('checkbox',{name:'Não sei informar: Referência física',exact:true}).uncheck();
  await editor.getByRole('textbox',{name:'Referência física',exact:true}).fill('Armário · folha 4');
  await editor.getByText('Referência, data e pessoas',{exact:true}).click();
- await page.setViewportSize({width:390,height:709});
+ await page.setViewportSize({width:360,height:709});
  await editor.locator('.hca-modal-content').evaluate(element=>element.scrollTo(0,0));
- await page.screenshot({path:'output/playwright/l4/contingency-declaration-'+info.project.name+'.png',animations:'disabled'});
+ await expect(editor.getByRole('heading',{name:'Materiais declarados',exact:true})).toBeInViewport({ratio:1});
+ await captureContingency(page,`contingency-declaration-${info.project.name}`);
  const checked=await review(page);
- await page.screenshot({path:'output/playwright/l4/contingency-review-'+info.project.name+'.png',animations:'disabled'});
+ await captureContingency(page,`contingency-review-${info.project.name}`);
  sql('update public.care_recipient_products set quantity_decimals=2 where care_recipient_id='+q(f.patient)+' and product_id='+q(editableMaterial));
  await checked.getByRole('button',{name:'Confirmar declaração',exact:true}).click();
  await checked.getByRole('button',{name:'Conferir unidade',exact:true}).click();
  const comparison=page.getByRole('dialog',{name:'Confira a unidade atual',exact:true});
  await expect(comparison).toContainText('Casas decimais atuais');
  await expect(comparison.getByText('2',{exact:true})).toBeVisible();
- await page.screenshot({path:'output/playwright/l4/contingency-conflict-'+info.project.name+'.png',animations:'disabled'});
+ await captureContingency(page,`contingency-conflict-${info.project.name}`);
  expect(count(f.patient)).toBe(0);
  await comparison.getByRole('button',{name:'Usar unidade atual',exact:true}).click();
  await expect(editor.getByRole('textbox',{name:'O que aconteceu?',exact:true})).toHaveValue(fact);
@@ -337,11 +354,18 @@ test('E12-06 reselects the current digital revision and recovers a lost link con
  await chooseReference(page,start,code,1);
  const reason='Conferi o caderno e a requisição correspondente.';
  await decision.getByRole('textbox',{name:'Justificativa da vinculação',exact:true}).fill(reason);
- await page.setViewportSize({width:390,height:709});
- await page.screenshot({path:'output/playwright/l4/contingency-decision-'+info.project.name+'.png',animations:'disabled'});
+ await page.setViewportSize({width:360,height:709});
+ const tabs=decision.getByRole('tablist',{name:'Decisão de conferência',exact:true});
+ const lastTab=decision.getByRole('tab',{name:'Pedir esclarecimento',exact:true});
+ const tabsBox=await tabs.boundingBox(),lastTabBox=await lastTab.boundingBox();
+ if(!tabsBox||!lastTabBox)throw new Error('As abas de conferência não foram exibidas.');
+ expect(tabsBox.x+tabsBox.width-lastTabBox.x-lastTabBox.width).toBeGreaterThan(16);
+ await captureContingency(page,`contingency-decision-${info.project.name}`);
  const review=decision.getByRole('button',{name:'Revisar vinculação',exact:true});
  await review.click();
  const confirm=page.getByRole('dialog',{name:'Vincular esta referência?',exact:true}).getByRole('button',{name:'Confirmar vínculo',exact:true});
+ await expect(confirm).toBeVisible();
+ await captureContingency(page,`contingency-link-confirmation-${info.project.name}`);
  sql('update public.operational_documents set version = version + 1 where id='+q(req.id));
  const before=facts(f.patient);
  await confirm.click();
@@ -367,6 +391,7 @@ test('E12-06 reselects the current digital revision and recovers a lost link con
  expect((await recovery).postDataJSON().idempotencyKey).toBe(key);
  const result=page.getByRole('dialog',{name:'Referência vinculada',exact:true});
  await expect(result).toContainText('A mesma tentativa foi localizada');
+ await captureContingency(page,`contingency-link-result-${info.project.name}`);
  await result.getByRole('button',{name:'Voltar ao dossiê',exact:true}).click();
  await page.getByRole('tab',{name:'Histórico',exact:true}).click();
  await expect(page.getByRole('heading',{name:'Vínculo com registro existente',exact:true})).toBeVisible();

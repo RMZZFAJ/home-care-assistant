@@ -104,7 +104,9 @@
 .hca-overlay:has(.hca-governance-review) > .hca-modal-backdrop { position: fixed; inset: var(--app-header-height) 0 0; }
 .hca-governance-review .hca-modal-subtitle, .hca-proposal-change { overflow-wrap: anywhere; }
 .hca-proposal-change .hca-document-change-list { margin-bottom: 0; }
-.hca-proposal-change .hca-document-change-list dd { font-size: 14px; }
+.hca-proposal-change .hca-document-change-list dd { align-items: flex-start; flex-wrap: nowrap; gap: 8px; font-size: 14px; }
+.hca-proposal-change .hca-document-change-list dd > :is(del, strong) { min-width: 0; }
+.hca-proposal-change .hca-document-change-list dd > svg { margin-top: 3px; }
 .hca-proposal-scope { display: flex; align-items: flex-start; gap: 8px; padding: 0 16px 14px; color: var(--hca-muted); font-size: 12px; }
 .hca-proposal-scope > svg { flex: none; margin-top: 2px; }
 .hca-proposal-details { border-top: 1px solid var(--hca-line); }

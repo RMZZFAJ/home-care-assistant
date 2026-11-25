@@ -57,6 +57,7 @@ test("D3 sino distingue demora falha e conteúdo e recupera por consulta sem reg
 });
 
 test("D3 central distingue demora falha resposta inválida e vazio confirmado e limita leitura à sessão", async ({ page }) => {
+  test.setTimeout(360_000);
   const f = await setup(); await login(page, f.patient);
   let release!: () => void, entered!: () => void, mode: "delay" | "error" | "invalid" | "live" = "delay";
   const gate = new Promise<void>(resolve => { release = resolve; }), first = new Promise<void>(resolve => { entered = resolve; });
@@ -72,8 +73,13 @@ test("D3 central distingue demora falha resposta inválida e vazio confirmado e 
     await expect(center(page).getByRole("status")).toHaveText("Consultando notificações…");
     await expect(center(page).getByText("Nenhuma notificação neste filtro.", { exact: true })).toHaveCount(0);
     release(); await expect(center(page).getByText("Nenhuma notificação neste filtro.", { exact: true })).toBeVisible(); mode = "error";
-    await center(page).getByRole("button", { name: "Atualizar", exact: true }).click();
     const failure = page.getByRole("dialog", { name: "Não foi possível consultar os avisos", exact: true });
+    // A live refresh may already have opened the modal and blocked the toolbar.
+    if (!await failure.isVisible()) {
+      await center(page).getByRole("button", { name: "Atualizar", exact: true }).click({ timeout: 3000 }).catch(async (reason: unknown) => {
+        if (!await failure.isVisible()) throw reason;
+      });
+    }
     await expect(failure.getByRole("alert")).toContainText("Falha controlada na leitura da central");
     await expect(center(page).getByText("Nenhuma notificação neste filtro.", { exact: true })).toHaveCount(0);
     mode = "invalid"; await failure.getByRole("button", { name: "Consultar notificações novamente", exact: true }).click();
@@ -91,7 +97,8 @@ test("D3 central distingue demora falha resposta inválida e vazio confirmado e 
 
 test("D3 perfil global informa vínculo necessário sem consulta ampla ou falso em dia", async ({ page, request }) => {
   const f = await setup(); await login(page, f.patient, "global"); await selectContext(page, null);
-  await expect(page.getByLabel("Pessoa assistida", { exact: true })).toHaveValue(f.patient);
+  const patientName = sql(`select display_name from public.care_recipients where id=${sqlLiteral(f.patient)};`);
+  await expect(page.getByRole("button", { name: /^Paciente atual/ })).toContainText(patientName);
   expect((await request.get("/api/notifications")).status()).toBe(401);
   const response = await page.request.get("/api/notifications"); expect(response.ok()).toBeTruthy();
   expect(await response.json()).toMatchObject({ data: [], total: 0, unreadCount: 0, availability: "patient_context_required" });

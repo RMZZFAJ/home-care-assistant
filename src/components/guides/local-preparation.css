@@ -14,5 +14,11 @@
 .hca-local-preparation .hca-guide-actions > button { margin-inline-start: auto; }
 
 @media (max-width: 420px) {
+  .workspace-content:has(.hca-local-preparation) > .page-heading h1 {
+    font-size: clamp(20px, 6vw, 24px);
+  }
+  .hca-local-preparation .hca-preparation-intro { padding: 12px; gap: 10px; }
+  .hca-preparation-lead p, .hca-preparation-intro > .hca-preparation-hint { font-size: 12px; line-height: 1.5; }
+  .hca-preparation-intro .hca-definition-grid { grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 10px; }
   .hca-local-preparation .hca-guide-actions { flex-direction: column; align-items: flex-start; }
 }

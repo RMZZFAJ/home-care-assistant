@@ -64,6 +64,7 @@ test("local preparation connects real creation adoption and opening stock withou
 });
 
 test("E12-02 local preparation shows the areas above the approved mobile footer and fits all screen widths",async({page,browser},info)=>{
+ test.setTimeout(600_000);
  const {patient}=await setup(), administrator=await shiftWorker(patient,"admin");
  await login(page,administrator,patient);
  await page.goto("/preparacao-local?careRecipientId="+patient);

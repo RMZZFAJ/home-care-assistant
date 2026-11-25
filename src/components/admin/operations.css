@@ -95,5 +95,4 @@
 }
 @media (max-width: 850px) {
   .hca-drawer-viewport > .hca-technical-sheet.hca-guide-topic-sheet { max-height: calc(100dvh - var(--app-header-height)); }
-  .hca-technical-footer > button { width: 100%; }
 }

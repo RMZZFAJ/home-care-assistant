@@ -4639,6 +4639,28 @@ COM, regularização ENT, estoque familiar, administração de acesso, balanço
 e consumo. O aceite integrado continua sujeito à CI do candidato e à
 validação no Preview. As migrations locais aguardam a transição do banco
 compartilhado com a produção.
+
+Em 25/11, o Chromium passou nos três casos de contingência com Auth real.
+As capturas em 360 e 412 px incluem o dossiê aberto, o preenchimento, a
+revisão da declaração, a unidade alterada, a conferência com referência
+selecionada, a confirmação do vínculo e o resultado recuperado. O teste
+registrou um único vínculo na revisão atual e preservou os atos físicos.
+A comparação identificou dois ajustes de densidade. O editor começa
+abaixo do painel da v2 e encobre a lista de materiais na primeira tela
+de 360 px. As abas de conferência ocupam metades da largura, enquanto a
+referência as alinha pelo texto. O cabeçalho da aplicação, a revisão do
+registro digital e a justificativa na confirmação seguem os contratos
+do produto.
+
+O editor e o dossiê passaram a usar a mesma altura no celular. As abas
+do dossiê e da conferência acompanham a largura dos rótulos. As novas
+capturas mostram Materiais declarados na primeira tela de 360 px, a
+justificativa acima do rodapé e o comprovante oficial recuperado. O
+dossiê conserva a autoria e a revisão. Cinco casos passaram sem retentativa
+em Chromium e WebKit no relatório `output/playwright/l4-contingency-density-report`.
+O comprovante recuperado inclui horário e efeito operacional do registro
+real. O laboratório ilustra o retorno após a confirmação inicial.
+
 As seções E10-01 a E10-10 registram a execução e a validação dirigidas
 da administração e do catálogo. A confirmação do lote depende da
 verificação integrada do candidato, incluindo a CI e o banco do Preview.
@@ -4745,16 +4767,60 @@ de desenvolvimento fica recolhida na identificação global. Destinatários e
 alertas de estoque ficam acessíveis pelas regras da residência.
 
 O cabeçalho, o seletor e a navegação inferior seguem o workspace real dos
-lotes anteriores. O cartão de acesso indisponível oferece retorno à visão
-geral autorizada. No laboratório, a ação equivalente abre um diálogo de
-orientação. A equivalência desse retorno permanece na conferência conjunta
-de acesso e desligamento de E10-02.
+lotes anteriores. Na tela de acesso indisponível, **Ver acesso disponível**
+abre o diálogo **Acessos disponíveis** e oferece retorno à Visão geral
+autorizada. O teste conferiu a abertura, o retorno de foco e a recusa da
+consulta administrativa para o vínculo de leitura.
 
-Na validação local, o painel global manteve o contexto anterior durante uma
-troca de perfil no WebKit. O painel renderizava a lista de 11.903 cadastros
-da base local. A preparação do teste passou a selecionar o vínculo dentro
-de Administração, onde o cenário é exercitado. A causa da demora no painel
-global ainda precisa de confirmação.
+Na validação local anterior, o painel global manteve o contexto anterior
+durante uma troca de perfil no WebKit, com 11.903 cadastros na base. O código
+montava toda a lista na Visão geral e também no seletor do cabeçalho.
+
+A Visão geral e o diálogo do cabeçalho usam agora a mesma busca por nome,
+com 20 resultados por página. Cadastros ativos e inativos continuam
+encontráveis. Abrir uma residência pelo cabeçalho da Visão geral conduz
+à Administração em contexto global. Nos vínculos locais, a seleção
+continua passando pela validação do contexto. O incremento limita
+a montagem da interface e conserva a consulta de autoridade existente.
+
+A regressão acrescentou 12.000 entradas sintéticas à resposta autenticada
+em cada navegador e selecionou uma residência real da base local.
+Conferiu paginação, pesquisa sem acentos, resultado vazio, retorno de foco
+e acesso à mesma residência na API. As capturas do diálogo novo ficam
+em 360 e 412 px no relatório `output/playwright/l4-global-directory-report`.
+Quatro execuções com build de produção passaram em Chromium e WebKit
+de iPhone, incluindo a proposta global com revisão independente e a
+recusa de acesso administrativo pelo perfil de leitura.
+
+O Chrome local também interrompeu duas rodadas de recuperação de convite
+no fim do login, antes de abrir o formulário. Um rastreamento mostrou
+runtime indisponível. Outro mostrou o login confirmado, uma consulta ao
+diretório pendente e consultas de sincronização disparadas ainda no login.
+Uma leitura direta confirmou 12.437 cadastros e cerca de 3 MB no retorno
+do diretório global.
+
+A entrada passou a solicitar a indicação de vínculo único e, quando há
+um destino recente, apenas o vínculo correspondente. A resposta ainda
+inclui a confirmação do contexto e da autorização da ficha. O diretório
+completo continua disponível no workspace. A sincronização inicia depois da leitura
+autorizada, com atualização restrita aos detalhes de PDF quando houver
+uma conta autenticada na verificação pública. O runner aguarda o contrato
+de runtime do Supabase local. A recuperação do convite passou em Chromium
+e Android emulados com as novas verificações da sequência de entrada.
+
+O reteste mostrou que a conta global local também tinha milhares de
+vínculos efetivos. O WebKit travava ao abrir o menu com todos eles. Quando
+a conta global tem mais de 20 vínculos, o menu de perfil abre o diálogo
+de busca paginada, com Administração global em ação própria. A troca
+continua exigindo a resposta do servidor e a confirmação do contexto na
+tela. Volumes menores conservam o seletor existente.
+
+Chromium e WebKit de iPhone passaram com 12.000 entradas acrescentadas à
+resposta autenticada. A busca identificou um cadastro real, o seletor
+limitou a página a 20 resultados e o fechamento devolveu o foco ao menu.
+Também passaram a troca de perfil global no iPhone, a entrada com vínculo
+único e a recuperação de convite no Chromium. A leitura dos avisos no
+Android chegou à auditoria de 1440 px antes de exceder o limite do teste.
 
 A edição local usa o registro oficial de governança. A consulta de recuperação
 usa apenas a chave da tentativa confirmada. Sob a mesma trava da gravação,
@@ -5699,7 +5765,57 @@ as revisões automáticas habilitadas para rascunhos. O bot indicou a
 revisão completa sob pedido. As validações de Linux, Windows e banco
 da [CI][ci-9f6b247e] estavam em execução na conferência.
 
+Na conferência seguinte, passaram Linux, Windows, replay das migrations
+e as 911 integrações do job de banco. Os sete jobs de navegador foram
+iniciados. Três passaram, dois falharam e dois foram cancelados. No iOS,
+a comparação de concessão e o título das áreas da preparação falharam
+nas duas tentativas. No Android, o diálogo de erro da central de avisos
+já estava aberto quando o teste tentou acionar o botão atrás dele.
+No iOS houve uma repetição bem-sucedida de apresentações. No Android,
+verificação pública e escala também passaram na repetição.
+
+A [CI de 77fdce48][ci-77fdce48] terminou com Linux, Windows e banco
+aprovados. Cinco dos sete segmentos de navegador passaram. O Android 2
+falhou duas vezes porque o diálogo de erro da central de avisos já bloqueava
+o botão de atualização. O iOS 2 repetiu a falha da comparação da concessão
+e a do título das áreas da preparação. Dois testes passaram na segunda
+tentativa no iOS. Foram o descarte de edição do catálogo e a reabertura do
+painel de Push depois de recarregar a aba original numa sessão trocada.
+O SonarCloud aprovou o SHA. O CodeRabbit pulou a revisão e o
+[Preview de 77fdce48][preview-77fdce48] ficou pronto.
+
+No ajuste local, as comparações da concessão e da preparação passaram no
+WebKit. A Central técnica abriu com o perfil global de grande volume e
+capturou as duas larguras antes de exceder o orçamento na auditoria de
+acessibilidade. Para a nova rodada, o botão de atualização recebeu a
+largura compacta e o alinhamento à direita da v2. Os testes de avisos e
+Central mantiveram as mesmas verificações com tempo total ampliado. O
+teste de Push traz a aba original ao primeiro plano antes de recarregar.
+
+Os sete retestes passaram sem retentativa no relatório
+`output/playwright/l4-final-regressions-report`. O Android concluiu as
+quatro larguras e a leitura autorizada da central de avisos. O WebKit
+confirmou o descarte no catálogo, a reabertura do Push após troca de
+sessão e a Central técnica com comparação em 360 e 412 px, auditoria
+responsiva e ausência de gravações. O botão de atualização fica alinhado
+à direita. A Central mantém o acesso a Outras áreas e usa a navegação
+global do produto, sem atalhos operacionais de paciente no rodapé.
+Também passaram 39 testes unitários de autenticação, destino recente,
+contingência e monitoramento e o verificador das 84 migrations históricas.
+
+A conferência do ambiente mostrou 362 migrations no Supabase remoto e
+produção em `fab595c7`. O projeto ativo ainda não possui branch de banco
+para Preview. O teste completo precisa de um destino autorizado com as
+23 migrations da branch, incluindo a verificação da versão de referência
+de contingência.
+
+A reconferência por versão confirmou as 362 migrations remotas na árvore
+Git e encontrou somente as 23 migrations de L4 no local. O Preview
+consultado na mesma rodada continuava `READY` em `77fdce48`.
+
 [preview-9f6b247e]: https://vercel.com/rmzzfajs-projects/home-care-assistant/E8HKkexPmqtPL6jXUY5RTg2jgVjv
 [sonar-pr8-preview]: https://sonarcloud.io/dashboard?id=RMZZFAJ_home-care-assistant&pullRequest=8
 [rabbit-pr8-preview]: https://github.com/RMZZFAJ/home-care-assistant/pull/8#issuecomment-7084927300
 [ci-9f6b247e]: https://github.com/RMZZFAJ/home-care-assistant/actions/runs/45548755726
+[ci-77fdce48]: https://github.com/RMZZFAJ/home-care-assistant/actions/runs/45556810328
+[preview-77fdce48]: https://home-care-assistant-kxfvghku7-rmzzfajs-projects.vercel.app

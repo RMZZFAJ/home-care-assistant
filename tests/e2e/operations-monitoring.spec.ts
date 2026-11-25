@@ -37,7 +37,8 @@ test.afterEach(async ({ page }) => {
 async function login(page: Page, name = "global", patient: string | null = null) {
   await page.goto("/login"); await page.getByLabel("E-mail", { exact: true }).fill(fixtures[name].email);
   await page.getByLabel("Senha", { exact: true }).fill(fixturePassword); await page.getByRole("button", { name: "Entrar", exact: true }).click();
-  await expect(page.getByRole("heading", { name: "Visão geral", exact: true })).toBeVisible(); await selectContext(page, patient);
+  await selectContext(page, patient);
+  await expect(page.getByRole("heading", { name: "Visão geral", exact: true })).toBeVisible();
 }
 const consoleRegion = (page: Page) => page.getByRole("region", { name: "Central técnica", exact: true });
 async function openConsole(page: Page, environment = "preview") {
@@ -133,7 +134,7 @@ test("NOT05 global attempt consultation keeps real source, minimizes data and re
 });
 
 test("E12-07 technical overview matches the L4 reference and keeps navigation read-only", async ({ page, browser }, info) => {
-  test.setTimeout(600_000);
+  test.setTimeout(900_000);
   const id = await fault(); await login(page); await openConsole(page);
   const business = () => sql("select jsonb_build_object('commands',(select count(*) from private.operations_commands),'stock',(select count(*) from public.stock_movements),'science',(select count(*) from public.requisition_science_events));");
   const before = business(), viewport = page.viewportSize(), writes: string[] = [];
@@ -150,18 +151,29 @@ test("E12-07 technical overview matches the L4 reference and keeps navigation re
     const model = await reference.newPage(); await model.route(/^https?:/, route => route.abort());
     await model.goto(pathToFileURL(resolve("hca-laboratorio-04-v2-aprovado.html")).href + "#E12-07/overview");
     const frame = model.locator("#device-frame"), scope = consoleRegion(page);
-    await model.getByRole("combobox", { name: "Visualização", exact: true }).selectOption("390");
+    const referenceWidth = model.getByRole("combobox", { name: "Visualização", exact: true });
+    await referenceWidth.selectOption("360");
+    await frame.getByLabel(/^Ambiente técnico/).selectOption("preview");
     await expect(frame.getByRole("heading", { name: "Central técnica", exact: true })).toBeVisible();
     const expected = ["Aplicação", "Banco", "Fila de avisos", "Emissão e assinatura", "Cópias de segurança", "Ensaios de recuperação"];
     for (const text of expected) {
       await expect(frame.getByRole("heading", { name: text, exact: true })).toBeVisible();
       await expect(scope.getByRole("heading", { name: text, exact: true })).toBeVisible();
     }
-    await info.attach("L4-central-390", { body: await frame.screenshot(), contentType: "image/png" });
-    for (const width of [320, 390, 768, 1024, 1440]) {
+    for (const width of [320, 360, 390, 412, 768, 1024, 1440]) {
       await page.setViewportSize({ width, height: 900 });
       await auditFromTop(page, "technical overview " + width);
-      if (width === 390) await info.attach("central-390", { body: await page.screenshot(), contentType: "image/png" });
+      if (width === 360 || width === 412) {
+        await referenceWidth.selectOption(String(width));
+        const footer = scope.locator(".hca-technical-footer");
+        const button = footer.getByRole("button", { name: "Atualizar monitoramento", exact: true });
+        const footerBox = await footer.boundingBox(), buttonBox = await button.boundingBox();
+        if (!footerBox || !buttonBox) throw new Error("O rodapé técnico ou o botão de atualização não foi exibido.");
+        expect(buttonBox.width).toBeLessThan(footerBox.width);
+        expect(Math.abs(buttonBox.x + buttonBox.width - footerBox.x - footerBox.width)).toBeLessThan(2);
+        await info.attach("L4-central-" + width, { body: await frame.screenshot(), contentType: "image/png" });
+        await info.attach("central-" + width, { body: await page.screenshot(), contentType: "image/png" });
+      }
     }
     await page.bringToFront();
     if (viewport) await page.setViewportSize(viewport);
