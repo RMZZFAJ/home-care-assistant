@@ -9,7 +9,6 @@ import { selectContext } from "./auth-context";
 import { selectDeliveryRecipient } from "./delivery-recipient";
 import { selectDocumentSection } from "./document-sections";
 import { selectMaterialCategory } from "./material-category";
-import { selectProfileSection } from "./profile-sections";
 
 test.setTimeout(150_000);
 async function login(page:Page,patient:string,email=fixtures.family.email){
@@ -40,48 +39,49 @@ test("L1 continuidade exige MFA com Auth real e conserva o destino seguro",async
  }finally{expect((await person.client.auth.mfa.unenroll({factorId:factor})).error).toBeNull();}
 });
 
-test("L1 resultado de autenticação antigo não redireciona após sair da continuação", async ({ page }) => {
+test("L1 resposta antiga não interrompe a continuação para um novo destino", async ({ page }) => {
   const f = await setup();
   const person = await shiftWorker(f.patient, "family");
   await login(page, f.patient, person.email);
-  await page.goto("/perfil?next=/historico");
-  await selectProfileSection(page, "security");
-  const continuation = page.getByRole("link", { name: "Continuar sem configurar agora", exact: true });
-  await expect(continuation).toBeVisible();
-  const origin = page.url();
-  const timeOrigin = await page.evaluate(() => performance.timeOrigin);
-
-  // Keep the root session mounted, so its initial Auth read cannot compete
-  // with the continuation. Release the delayed reply in the same document.
-  let release!: () => void;
-  let entered!: () => void;
-  const gate = new Promise<void>(resolve => { release = resolve; });
-  const requested = new Promise<void>(resolve => { entered = resolve; });
-  const target = "**/auth/v1/user";
+  const origin = "/acesso/continuar";
+  const destination = "/historico?careRecipientId=" + f.patient;
+  const target = (url: URL) => url.pathname === "/api/context" && !url.search;
+  let releaseOld!: () => void;
+  let releaseLatest!: () => void;
+  const oldResponse = new Promise<void>(resolve => { releaseOld = resolve; });
+  const latestResponse = new Promise<void>(resolve => { releaseLatest = resolve; });
+  let requests = 0;
   await page.route(target, async route => {
     if (route.request().method() !== "GET") return route.continue();
-    entered();
-    await gate;
-    await route.fulfill({ status: 401, json: { message: "Sessão fictícia encerrada" } });
+    if (++requests === 1) {
+      await oldResponse;
+      return route.fulfill({ status: 503, json: { code: "UNAVAILABLE", error: "Consulta fictícia indisponível" } });
+    }
+    await latestResponse;
+    return route.continue();
   });
   try {
-    await continuation.click();
-    await expect(page).toHaveURL(/\/acesso\/continuar\?next=/);
-    await requested;
-    await page.goBack();
-    await expect(page).toHaveURL(origin);
-    await expect(page.getByRole("tab", { name: "Segurança", exact: true })).toBeVisible();
+    await page.goto(origin + "?next=%2Fperfil");
+    await expect.poll(() => requests).toBe(1);
+    const timeOrigin = await page.evaluate(() => performance.timeOrigin);
+    await page.evaluate(next => {
+      const url = new URL(window.location.href);
+      url.searchParams.set("next", next);
+      window.history.pushState(null, "", url);
+    }, destination);
+    await expect.poll(() => requests).toBe(2);
     expect(await page.evaluate(() => performance.timeOrigin)).toBe(timeOrigin);
-    const delayed = page.waitForResponse(response =>
-      new URL(response.url()).pathname === "/auth/v1/user" && response.status() === 401,
-    );
-    release();
+    const delayed = page.waitForResponse(response => target(new URL(response.url())) && response.status() === 503);
+    releaseOld();
     await (await delayed).finished();
     await page.evaluate(() => new Promise<void>(resolve => requestAnimationFrame(() => requestAnimationFrame(() => resolve()))));
-    await expect(page).toHaveURL(origin);
-    await expect(page.getByRole("tab", { name: "Segurança", exact: true })).toBeVisible();
+    await expect(page).toHaveURL(url => url.pathname === origin && url.searchParams.get("next") === destination);
+    await expect(page.getByRole("dialog", { name: "Preparando o destino autorizado", exact: true })).toBeVisible();
+    releaseLatest();
+    await expect(page).toHaveURL(url => url.pathname + url.search === destination);
   } finally {
-    release();
+    releaseOld();
+    releaseLatest();
     await page.unrouteAll({ behavior: "wait" });
   }
 });

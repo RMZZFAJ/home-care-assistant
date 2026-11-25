@@ -4,4 +4,10 @@
 .hca-preparation-lead p, .hca-preparation-intro > p { color: var(--hca-muted); font-size: 13px; }
 .hca-preparation-intro { display: grid; gap: 12px; }
 .hca-local-preparation h2 { font-size: 15px; font-weight: 700; }
-.hca-local-preparation .hca-guide-actions > :is(a, button) { min-width: 0; white-space: normal; }
+.hca-local-preparation .hca-guide-actions { justify-content: space-between; }
+.hca-local-preparation .hca-guide-actions > :is(a, button) { flex: none; min-width: 0; max-width: 100%; white-space: normal; }
+.hca-local-preparation .hca-guide-actions > button { margin-inline-start: auto; }
+
+@media (max-width: 420px) {
+  .hca-local-preparation .hca-guide-actions { flex-direction: column; align-items: flex-start; }
+}

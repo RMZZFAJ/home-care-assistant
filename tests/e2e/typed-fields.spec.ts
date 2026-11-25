@@ -2,9 +2,10 @@ import { openProfilePassword, selectProfileSection } from "./profile-sections";
 import { expect, test, type Page } from "@playwright/test";
 import { randomUUID } from "node:crypto";
 import { totp } from "./auth-totp";
-import { setup, actor, fixtures } from "../integration/v4-fixtures.mjs";
+import { setup, fixtures } from "../integration/v4-fixtures.mjs";
+import { shiftWorker } from "../integration/shift-fixtures.mjs";
 import { sql, sqlLiteral as q } from "../../scripts/test-environment.mjs";
-import { fixturePassword, patientA } from "../../scripts/test-constants.mjs";
+import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { selectContext } from "./auth-context";
 
 test.setTimeout(150_000);
@@ -12,21 +13,21 @@ test.setTimeout(150_000);
 test.use({ trace: "off", screenshot: "off", video: "off" });
 const owned = new Set<string>();
 test.afterEach(() => { for (const id of owned) sql(`update public.care_recipients set is_active=false where id=${q(id)};`); owned.clear(); });
-async function login(page: Page, role: "adminA" | "family", patient?: string, stepUp = false) {
+async function login(page: Page, email: string) {
   await page.goto("/login");
   const password = page.getByLabel("Senha", { exact: true });
   await expect(password).toHaveAttribute("autocomplete", "current-password");
   expect(await password.getAttribute("minlength")).toBeNull();
-  await page.getByLabel("E-mail", { exact: true }).fill(fixtures[role].email);
+  await page.getByLabel("E-mail", { exact: true }).fill(email);
   await password.fill(fixturePassword); await page.getByRole("button", { name: "Entrar", exact: true }).click();
-  await expect(page.getByRole("heading", { name: stepUp ? "Minha conta" : "Visão geral", exact: true })).toBeVisible();
-  if (patient) await selectContext(page, patient);
 }
 
 test("CFinal019 catálogo e unidade preservam inteiros, código textual e escopo com persistência real", async ({ page }, info) => {
   const f = await setup(); owned.add(f.patient);
   const ledger = sql(`select coalesce(jsonb_agg(to_jsonb(m) order by id),'[]') from public.stock_movements m where care_recipient_id=${q(f.patient)};`);
-  await login(page, "adminA", f.patient);
+  await login(page, fixtures.adminA.email);
+  await expect(page.getByRole("heading", { name: "Visão geral", exact: true })).toBeVisible();
+  await selectContext(page, f.patient);
   await page.goto(`/admin?careRecipientId=${f.patient}&section=catalog`);
   await page.getByRole("button", { name: "Novo item", exact: true }).click();
   const drawer = page.getByRole("dialog", { name: "Novo material", exact: true });
@@ -109,11 +110,16 @@ test("CFinal019 catálogo e unidade preservam inteiros, código textual e escopo
 });
 
 test("CFinal019 login, nova senha e OTP usam contratos distintos sem persistir desafio no navegador", async ({ page }) => {
-  const client = await actor("family", patientA), enrolled = await client.auth.mfa.enroll({ factorType: "totp", friendlyName: "Campo fictício " + randomUUID().slice(0, 8) });
+  const { patient } = await setup(); owned.add(patient);
+  const { client, email } = await shiftWorker(patient, "family");
+  const enrolled = await client.auth.mfa.enroll({ factorType: "totp", friendlyName: "Campo fictício " + randomUUID().slice(0, 8) });
   expect(enrolled.error).toBeNull(); const factor = enrolled.data!.id;
   try {
     expect((await client.auth.mfa.challengeAndVerify({ factorId: factor, code: totp(enrolled.data!.totp.secret) })).error).toBeNull();
-    await login(page, "family", undefined, true); await page.goto("/perfil");
+    await login(page, email);
+    await expect(page).toHaveURL(url => url.pathname === "/perfil" && url.searchParams.get("mfa") === "required");
+    await expect(page.getByRole("dialog", { name: "Verificação adicional", exact: true })).toBeVisible();
+    await page.goto("/perfil");
     await selectProfileSection(page, "security");
     const password = await openProfilePassword(page);
     const current = password.getByLabel(/Senha atual/), next = password.getByLabel("Nova senha", { exact: true });

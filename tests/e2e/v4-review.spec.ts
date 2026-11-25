@@ -26,8 +26,11 @@ async function login(page: Page, account: string | { email: string }, patient: s
   ).toBeVisible();
   await selectContext(page, patient);
 }
-async function post(page: Page, path: string, data: unknown) {
-  const response = await page.request.post(path, { data });
+async function post(actor: Pick<Page, "request">, path: string, data: unknown, timeout?: number) {
+  const response = await actor.request.post(path, { data, timeout }).catch((reason: unknown) => {
+    const name = reason instanceof Error ? reason.name : "RequestError";
+    throw new Error("POST " + path + " falhou antes da resposta (" + name + ").");
+  });
   expect(response.ok(), (await response.text()).slice(0, 500)).toBeTruthy();
   return response.json();
 }
@@ -387,14 +390,24 @@ test("V4 review: cartão de arquivamento abre exatamente as conclusões contadas
   page,
   browser,
 }) => {
-  const { patient, product } = await setup(page),
+  const { patient, products: [product] } = await seedPatient(),
+    subject = await shiftWorker(patient, "admin"),
+    permissionEditor = await shiftWorker(patient, "admin"),
+    familyUser = await shiftWorker(patient, "family"),
+    professional = await shiftWorker(patient),
     familyContext = await browser.newContext(),
-    proContext = await browser.newContext();
+    proContext = await browser.newContext(),
+    editorContext = await browser.newContext();
   try {
     const family = await familyContext.newPage(),
-      pro = await proContext.newPage();
-    await login(family, "family", patient);
-    await login(pro, "professional", patient);
+      pro = await proContext.newPage(),
+      editor = await editorContext.newPage();
+    await login(page, subject, patient);
+    await login(family, familyUser, patient);
+    await login(pro, professional, patient);
+    await login(editor, permissionEditor, patient);
+    await Promise.all([family.close(), pro.close(), editor.close()]);
+    await page.bringToFront();
     await post(page, "/api/stock/movements", {
       careRecipientId: patient,
       productId: product,
@@ -404,7 +417,7 @@ test("V4 review: cartão de arquivamento abre exatamente as conclusões contadas
       idempotencyKey: randomUUID(),
     });
     const req = (
-      await post(pro, "/api/requisitions", {
+      await post(proContext, "/api/requisitions", {
         careRecipientId: patient,
         idempotencyKey: randomUUID(),
         lines: [{ productId: product, currentStock: 0, urgent: false }],
@@ -414,27 +427,27 @@ test("V4 review: cartão de arquivamento abre exatamente as conclusões contadas
     ).receipt;
     const version = (
       await (
-        await family.request.get("/api/requisitions/" + req.requisitionId)
+        await familyContext.request.get("/api/requisitions/" + req.requisitionId)
       ).json()
     ).data.progress.version;
-    await post(family, "/api/requisitions/" + req.requisitionId + "/science", {
+    await post(familyContext, "/api/requisitions/" + req.requisitionId + "/science", {
       mode: "express",
       expectedVersion: version,
     });
     const item = (
       await (
-        await pro.request.get("/api/requisitions/" + req.requisitionId)
+        await proContext.request.get("/api/requisitions/" + req.requisitionId)
       ).json()
     ).data.requisition_items[0].id;
     const ent = (
-      await post(family, "/api/documents", {
+      await post(familyContext, "/api/documents", {
         careRecipientId: patient,
         type: "ENT",
         payload: {
           recipientReason: "Escolha manual fictícia para este recebimento",
           source: "FAMILY",
           destination: "CARE_TEAM",
-          recipientId: fixtures().professional.id,
+          recipientId: professional.id,
           lines: [
             { requestFulfillment: "complete", productId: product, quantity: "10", requisitionItemIds: [item] },
           ],
@@ -443,31 +456,31 @@ test("V4 review: cartão de arquivamento abre exatamente as conclusões contadas
         draft: false,
       })
     ).data;
-    await post(pro, "/api/documents/" + ent.id, {
+    await post(proContext, "/api/documents/" + ent.id, {
       action: "receive",
       body: { divergences: [] },
       idempotencyKey: randomUUID(),
       expectedVersion: ent.version,
     });
-    const archivePermission = async (enabled: boolean | null) =>
-      post(page, "/api/patient-settings", {
+    const archivePermission = async (actor: Pick<Page, "request">, enabled: boolean | null) =>
+      ({
         careRecipientId: patient,
         kind: "capability",
         change: {
           capability: "req.archive",
-          subjectUser: fixtures().global.id,
+          subjectUser: subject.id,
           enabled,
         },
         idempotencyKey: randomUUID(),
         expectedVersion: (
           await (
-            await page.request.get(
+            await actor.request.get(
               "/api/patient-settings?careRecipientId=" + patient,
             )
           ).json()
         ).data.version,
       });
-    await archivePermission(false);
+    await post(editorContext, "/api/patient-settings", await archivePermission(editorContext, false));
     await page.goto("/fichas/" + req.requisitionId);
     await expect(
       page.getByRole("heading", { name: req.code, exact: false }),
@@ -499,7 +512,11 @@ test("V4 review: cartão de arquivamento abre exatamente as conclusões contadas
         ).json()
       ).data.archivePending,
     ).toBe(0);
-    await archivePermission(null);
+    const deniedRestore = await page.request.post("/api/patient-settings", {
+      data: await archivePermission(page, null),
+    });
+    expect(deniedRestore.status()).toBe(403);
+    await post(editorContext, "/api/patient-settings", await archivePermission(editorContext, null));
     await page.goto("/?careRecipientId=" + patient);
     const card = page
       .getByRole("link")
@@ -542,7 +559,7 @@ test("V4 review: cartão de arquivamento abre exatamente as conclusões contadas
     expect(await unreviewed.json()).toMatchObject({ code: "INVALID_OPERATION" });
     const reference = await (await page.request.get(canonical)).json();
     const command = { action: "archive", key: randomUUID(), version: reference.version, referenceHash: reference.referenceHash, mode: "other", reason };
-    const result = await post(page, legacyEndpoint, command);
+    const result = await post(page, legacyEndpoint, command, 45_000);
     expect(result).toMatchObject({ documentId: req.requisitionId, issuanceId: expect.any(String), reason });
     expect(await post(page, canonical, command)).toEqual(result);
     expect((await post(page, legacyEndpoint, { reason })).data.archivedAt).toBe(result.archivedAt);
@@ -554,5 +571,6 @@ test("V4 review: cartão de arquivamento abre exatamente as conclusões contadas
     await proContext.unrouteAll({ behavior: "wait" });
     await familyContext.close();
     await proContext.close();
+    await editorContext.close();
   }
 });

@@ -169,8 +169,9 @@ function Policies({ context }: { context: WorkspaceContext }) {
       })
       .catch((reason) => {
         if (!controller.signal.aborted) {
-          if (reason instanceof ApiError && [401, 403, 404].includes(reason.status)) setData(null);
-          setError(reason.message);
+          const accessLost = reason instanceof ApiError && [401, 403, 404].includes(reason.status);
+          if (accessLost) setData(null);
+          setError(previous => accessLost ? reason.message : previous || reason.message);
         }
       });
     return () => controller.abort();

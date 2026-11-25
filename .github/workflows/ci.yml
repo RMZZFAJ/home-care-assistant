@@ -104,9 +104,9 @@ jobs:
             artifact: ios-3
     name: browser (${{ matrix.artifact }})
     runs-on: ubuntu-latest
-    # WebKit can hit its job deadline while still advancing through cases.
-    # Three WebKit shards leave room for the remaining cases and artifacts.
-    timeout-minutes: ${{ matrix.engine == 'webkit' && 70 || 55 }}
+    # The mobile suite can still be running at 55 minutes. Leave room to
+    # finish the cases and upload diagnostics on both phone profiles.
+    timeout-minutes: ${{ matrix.project == 'chromium' && 55 || 70 }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Reserve the local Supabase ports

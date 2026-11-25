@@ -5435,3 +5435,57 @@ permissão depois de revogá-la. A proteção de L4 recusa essa forma de
 autoelevação. A reprodução com um administrador distinto segue pendente.
 
 [ci-cf840b8b-ios3]: https://github.com/RMZZFAJ/home-care-assistant/actions/runs/45513184461/job/138881089378
+
+### Revisão da CI publicada e correções de recuperação
+
+A [CI de cf840b8b][ci-cf840b8b] terminou com as validações em Windows
+e Ubuntu e o job de banco aprovados. As seguintes contagens vêm do
+resumo do Playwright. O limite de tempo interrompeu o segundo job
+mobile antes do resumo final.
+
+| Job | Aprovados na primeira | Aprovados na segunda | Falhas nas duas |
+| --- | ---: | ---: | ---: |
+| Chromium 1 | 301 | 0 | 6 |
+| Chromium 2 | 301 | 0 | 6 |
+| Mobile 1 | 302 | 0 | 5 |
+| Mobile 2 | Incompleto | Incompleto | Incompleto |
+| iOS 1 | 204 | 1 | 0 |
+| iOS 2 | 198 | 0 | 8 |
+| iOS 3 | 197 | 2 | 4 |
+
+Os três casos intermitentes foram a área de clique do botão de ciência
+do cancelamento de COM, a recuperação da confirmação da agenda após
+recarregar e a preservação da justificativa de uma REQ concorrente.
+A aprovação na segunda tentativa deixa a primeira falha registrada.
+O limite dos dois jobs mobile passou de 55 para 70 minutos. A seleção
+de testes, as divisões por navegador e o limite de Chromium continuam
+sendo os da matriz verificada.
+
+No arquivamento, outro administrador local retira a exceção.
+O teste confirma a recusa da autoelevação, a contagem no painel, o
+resultado nas duas rotas e a mesma emissão na repetição da chave.
+O teste de senha checa a abertura do diálogo obrigatório após login
+de uma identidade isolada com fator real, bem como os campos de senha
+e OTP. O teste de continuação usa a rota vigente, altera o destino
+na mesma aba e libera a resposta antiga antes da leitura autorizada
+do novo destino.
+
+A consulta de configuração em segundo plano preserva o aviso de que
+a regra foi registrada quando só a leitura posterior falha. Uma
+perda de autorização ainda retira os dados. A preparação da residência
+alinha a orientação à esquerda e a atualização à direita, na linha
+seguinte nas larguras de celular da referência. O exercício visual
+foi separado da jornada de criação, adoção e estoque, que conserva
+a comprovação de que a atualização é somente leitura.
+
+O build de produção, o TypeScript e o ESLint dos arquivos conferidos
+passaram. O OTP, a continuação, o arquivamento e o erro de consulta
+após o registro passaram em Chromium e WebKit de iPhone sem retentativa.
+As quatro execuções de preparação passaram nos mesmos navegadores e
+conferiram acessibilidade, rolagem e ausência de estouro horizontal.
+As capturas de 360 e 412 px confirmam a posição dos dois controles.
+O cabeçalho compartilhado e os campos adicionais de cadastro fazem
+a seção Áreas da preparação começar abaixo do recorte inicial no
+produto. No laboratório, o título da seção já aparece nesse recorte.
+Estes ajustes não exigem migration. O resultado da CI e do Preview
+do SHA já publicado continua sendo o de `cf840b8b`.

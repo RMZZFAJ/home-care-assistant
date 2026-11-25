@@ -5,16 +5,24 @@ import {resolve} from "node:path";
 import {pathToFileURL} from "node:url";
 import {preparedPatient} from "../integration/local-preparation-fixtures.mjs";
 import {setup,fixtures} from "../integration/v4-fixtures.mjs";
+import {shiftWorker} from "../integration/shift-fixtures.mjs";
 import {sql,sqlLiteral as q} from "../../scripts/test-environment.mjs";
 import {fixturePassword} from "../../scripts/test-constants.mjs";
 import {selectContext} from "./auth-context";
 import {auditFromTop} from "./accessibility-audit";
 test.setTimeout(180_000);
-async function login(page:Page,role:string,patient:string|null){await page.goto("/login");await page.getByLabel("E-mail",{exact:true}).fill(fixtures[role].email);await page.getByLabel("Senha",{exact:true}).fill(fixturePassword);await page.getByRole("button",{name:"Entrar",exact:true}).click();await expect(page.getByRole("heading",{name:"Visão geral",exact:true})).toBeVisible();await selectContext(page,patient);}
+async function login(page: Page, account: string | { email: string }, patient: string | null) {
+  await page.goto("/login");
+  await page.getByLabel("E-mail", { exact: true }).fill(typeof account === "string" ? fixtures[account].email : account.email);
+  await page.getByLabel("Senha", { exact: true }).fill(fixturePassword);
+  await page.getByRole("button", { name: "Entrar", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Visão geral", exact: true })).toBeVisible();
+  await selectContext(page, patient);
+}
 const endpoint=(patient:string)=>"/api/guides/preparation?careRecipientId="+patient;
 const physical=(patient:string)=>sql("select jsonb_build_object('stock',(select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where care_recipient_id="+q(patient)+"),'documents',(select jsonb_agg(to_jsonb(d) order by id) from public.operational_documents d where care_recipient_id="+q(patient)+"));");
 
-test("local preparation connects real creation adoption and opening stock without turning metadata into physical approval",async({page,browser},info)=>{
+test("local preparation connects real creation adoption and opening stock without turning metadata into physical approval",async({page})=>{
  const f=await preparedPatient(),model="local-opening-"+randomUUID();
  sql("insert into public.products(id,name,category,unit,is_active) values("+[q(model),q("Material fictício de abertura guiada"),q("higiene"),q("unidade"),"true"].join(",")+")");
  await login(page,"family",f.patient);await page.goto("/guias");await page.getByRole("link",{name:/^Preparação da residência/}).click();
@@ -46,6 +54,20 @@ test("local preparation connects real creation adoption and opening stock withou
  const data=(await(await page.request.get(endpoint(f.patient))).json()).data;
  expect(data.catalogue.activeProducts).toBe(1);expect(data.stock.familyMovements).toBe(1);expect(data.stock.teamMovements).toBe(0);
  const continuity=page.getByRole("region",{name:"Conferência física e continuidade",exact:true});await expect(continuity).toContainText("não confirma estoque físico");
+ const refreshed=page.waitForResponse(response=>response.request().method()==="GET"&&response.url()===new URL(endpoint(f.patient),page.url()).href);
+ await page.getByRole("button",{name:"Atualizar situação",exact:true}).click();
+ expect((await refreshed).ok()).toBe(true);
+ await expect(page.getByRole("dialog",{name:"Consultando a preparação",exact:true})).toHaveCount(0);
+ expect(physical(f.patient)).toBe(before);expect(sql("select count(*) from public.stock_movements where care_recipient_id="+q(f.patient)+" and product_id="+q(model))).toBe("1");
+});
+
+test("E12-02 local preparation follows the approved mobile footer and fits all screen widths",async({page,browser},info)=>{
+ const {patient}=await setup(), administrator=await shiftWorker(patient,"admin");
+ await login(page,administrator,patient);
+ await page.goto("/preparacao-local?careRecipientId="+patient);
+ const contingency=page.getByRole("link",{name:"Orientação de contingência",exact:true});
+ const refresh=page.getByRole("button",{name:"Atualizar situação",exact:true});
+ await expect(page.getByRole("region",{name:"Áreas da preparação",exact:true})).toBeVisible();
  const reference=await browser.newContext({viewport:{width:1280,height:900}});
  mkdirSync("output/playwright/l4/reference",{recursive:true});
  try {
@@ -60,15 +82,14 @@ test("local preparation connects real creation adoption and opening stock withou
    if(!size)throw new Error("O laboratório não exibiu a área comparada.");
    await page.setViewportSize({width,height:Math.round(size.height)});
    await auditFromTop(page,"E12-02 local preparation "+width);
+   const left=await contingency.boundingBox(), right=await refresh.boundingBox();
+   expect(left && right ? right.y>=left.y+left.height && right.x>left.x && right.x+right.width<=width : false).toBe(true);
    await frame.screenshot({path:"output/playwright/l4/reference/local-preparation-"+width+".png"});
    await page.screenshot({path:"output/playwright/l4/local-preparation-"+info.project.name+"-"+width+".png"});
   }
  } finally {await reference.close();}
  for(const width of [320,390,768,1024,1440]){await page.setViewportSize({width,height:950});await auditFromTop(page,"local preparation "+width);}
  await page.setViewportSize({width:390,height:950});await page.evaluate(()=>window.scrollTo({top:0,behavior:"instant"}));await page.screenshot({path:"output/playwright/phase-d/local-preparation-"+info.project.name+".png",fullPage:true});
- await page.getByRole("button",{name:"Atualizar situação",exact:true}).click();
- await expect(page.getByRole("dialog",{name:"Consultando a preparação",exact:true})).toHaveCount(0);
- expect(physical(f.patient)).toBe(before);expect(sql("select count(*) from public.stock_movements where care_recipient_id="+q(f.patient)+" and product_id="+q(model))).toBe("1");
 });
 
 test("local preparation preserves restricted values and recovers read failures without commands or another patient's data",async({page})=>{
