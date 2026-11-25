@@ -8,6 +8,7 @@ import next from "@next/eslint-plugin-next";
 const eslintConfig = defineConfig([
   globalIgnores([
     ".next/**", ".next-e2e/**", "out/**", "build/**", "next-env.d.ts",
+    ".generated/**", "supabase/.temp/**",
     "playwright-report/**", "test-results/**", "output/**",
     ".private/**", ".venv/**", "docs/audits/**",
   ]),

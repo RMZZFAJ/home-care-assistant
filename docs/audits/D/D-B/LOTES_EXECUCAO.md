@@ -5803,6 +5803,15 @@ global do produto, sem atalhos operacionais de paciente no rodapé.
 Também passaram 39 testes unitários de autenticação, destino recente,
 contingência e monitoramento e o verificador das 84 migrations históricas.
 
+Na revisão local do candidato, TypeScript e Markdown passaram. A suíte
+unitária completa aprovou 1.129 casos e registrou 22 limites de tempo
+excedidos durante execução concorrente com as verificações estáticas. Os
+11 arquivos afetados foram repetidos com um worker e concluíram os 69
+casos dentro dos limites originais. A conferência do ESLint apontou
+artefatos gerados de `.generated` e `supabase/.temp`. A configuração
+passou a excluir esses dois diretórios, que já eram ignorados pelo Git.
+O comando completo de lint passou depois desse ajuste.
+
 A conferência do ambiente mostrou 362 migrations no Supabase remoto e
 produção em `fab595c7`. O projeto ativo ainda não possui branch de banco
 para Preview. O teste completo precisa de um destino autorizado com as
