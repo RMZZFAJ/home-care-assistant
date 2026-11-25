@@ -5673,3 +5673,33 @@ Também passaram seis testes unitários, o build de produção, TypeScript
 e os lints dirigidos. Houve uma ocorrência local de `DATABASE_UNAVAILABLE`
 no painel durante a rodada, sem interrupção das jornadas. O ajuste
 dispensa migration.
+
+### Publicação de L4 e verificação do Preview
+
+A [PR 8][pr-l4-history] continua em rascunho. O push de 11 commits levou
+a branch de `cf840b8b` a `9f6b247e`, sem incluir novas migrations.
+O [Preview de 9f6b247e][preview-9f6b247e] ficou `READY` nesse SHA.
+A configuração efetiva usa o alias da branch e o Supabase vinculado.
+As variáveis de aplicação, Supabase, serviço, assinatura e confiança de PDF,
+Web Push e worker estavam cadastradas. Web Push estava habilitado, com
+Google e envio pela Meta desativados. A conferência dispensou alteração
+de configuração.
+
+Login, verificação pública, manifesto, service worker e página offline
+retornaram HTTP 200 com o conteúdo esperado no deploy. A chave pública
+do Preview consultou com HTTP 200 o contrato base do banco, protocolo 1
+e esquema 2. A verificação cobriu o acesso às rotas públicas e o contrato
+base. O Preview e a produção usam o mesmo projeto Supabase, com 362 das
+385 migrations da branch. As jornadas que dependem das 23 versões
+restantes exigem um esquema compatível. O banco remoto foi apenas consultado.
+
+O [SonarCloud][sonar-pr8-preview] aprovou o Quality Gate de `9f6b247e`.
+O [CodeRabbit][rabbit-pr8-preview] pulou a revisão incremental mesmo com
+as revisões automáticas habilitadas para rascunhos. O bot indicou a
+revisão completa sob pedido. As validações de Linux, Windows e banco
+da [CI][ci-9f6b247e] estavam em execução na conferência.
+
+[preview-9f6b247e]: https://vercel.com/rmzzfajs-projects/home-care-assistant/E8HKkexPmqtPL6jXUY5RTg2jgVjv
+[sonar-pr8-preview]: https://sonarcloud.io/dashboard?id=RMZZFAJ_home-care-assistant&pullRequest=8
+[rabbit-pr8-preview]: https://github.com/RMZZFAJ/home-care-assistant/pull/8#issuecomment-7084927300
+[ci-9f6b247e]: https://github.com/RMZZFAJ/home-care-assistant/actions/runs/45548755726
