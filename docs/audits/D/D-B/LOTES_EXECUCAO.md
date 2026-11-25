@@ -5509,3 +5509,32 @@ estoque, a atualização somente de leitura, a recuperação de consulta,
 a recusa de acesso global e a comparação responsiva de 320 a 1440 px.
 O build de produção, TypeScript e os lints dirigidos passaram. O
 incremento não exige migration e ainda aguarda CI no SHA candidato.
+
+### Requisição — Foco ao voltar da ficha relacionada
+
+O artefato de iOS da CI publicada mostrou a justificativa vazia depois
+de outra sessão registrar ciência da REQ. O ensaio dirigido demonstrou
+uma falha de foco ao sair da ficha relacionada. O botão de origem já
+tinha recebido foco, mas um segundo retorno, agendado para o quadro
+seguinte, tirava o foco da justificativa depois de ela ser selecionada.
+
+O painel usa a restauração de foco do diálogo compartilhado, com o
+botão de origem como alvo. O teste de E04-03 pausa o relógio no
+fechamento, verifica o retorno ao botão, foca a justificativa e avança
+dois quadros. A verificação reproduziu a falha no build anterior e
+passou com a correção. Consultar e fechar a ficha preserva o estado
+do preenchimento e a revisão independente dos materiais solicitados.
+
+O teste com duas sessões usa contas isoladas com Auth local real.
+Ele verifica que a justificativa habilita a ação antes da ciência da
+família e permanece preenchida depois da atualização. A escolha da
+preferência de ciência ainda percorre a interface, agora pelo teclado.
+O mesmo preparo de dados serve à regressão da matriz móvel e da proposta
+global aprovada por um administrador local distinto.
+
+Os três cenários passaram em Chromium e WebKit de iPhone, em seis
+execuções sem retentativa. Duas verificações adicionais em Chromium
+confirmaram o retorno de compras e entregas vinculadas e a preservação
+da quantidade em edição na COM. O build de produção, TypeScript e os
+lints dirigidos também passaram. O ajuste dispensa migration e a CI
+remota do candidato ainda depende da sua publicação.

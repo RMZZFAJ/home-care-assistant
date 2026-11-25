@@ -66,10 +66,7 @@ export function RelatedDocument({
       window.removeEventListener("popstate", reopen);
     };
   }, [returnKey]);
-  const close = () => {
-    setOpen(false);
-    requestAnimationFrame(() => triggerRef.current?.focus());
-  };
+  const close = () => setOpen(false);
   const href = `/fichas/${id}`;
   return (
     <>
@@ -85,7 +82,7 @@ export function RelatedDocument({
         )}
       </button>
       {open ? <Drawer open title={label ?? relatedDocumentLabel(type)} kicker="Ficha relacionada"
-        popupClassName="hca-material-sheet" keyboardScrollable onClose={close}
+        popupClassName="hca-material-sheet" keyboardScrollable onClose={close} finalFocus={triggerRef}
         footer={<>
           <ActionButton onClick={close}><Icon name="back" />Voltar à origem</ActionButton>
           {returnKey && patientId ? <Link href={href} className={primaryClass} onClick={event => {

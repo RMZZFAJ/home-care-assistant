@@ -1,10 +1,9 @@
-import { selectProfileSection } from "./profile-sections";
 import { selectDocumentSection } from "./document-sections";
 import { test, expect, type Page } from "@playwright/test";
 import { generateStandardPdf } from "./generated-pdf";
-import { readFileSync } from "node:fs";
 import { randomUUID } from "node:crypto";
-import { fixtureFile, sql } from "../../scripts/test-environment.mjs";
+import { setup as seedPatient, fixtures } from "../integration/v4-fixtures.mjs";
+import { shiftWorker } from "../integration/shift-fixtures.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { selectContext } from "./auth-context";
 
@@ -12,10 +11,9 @@ test.setTimeout(180_000);
 test.afterEach(async ({ page }) => {
   await page.unrouteAll({ behavior: "wait" });
 });
-const fixtures = () => JSON.parse(readFileSync(fixtureFile, "utf8"));
-async function login(page: Page, role: string, patient: string | null) {
+async function login(page: Page, account: { email: string }, patient: string | null) {
   await page.goto("/login");
-  await page.getByLabel("E-mail", { exact: true }).fill(fixtures()[role].email);
+  await page.getByLabel("E-mail", { exact: true }).fill(account.email);
   await page.getByLabel("Senha", { exact: true }).fill(fixturePassword);
   await page.getByRole("button", { name: "Entrar", exact: true }).click();
   await expect(
@@ -29,43 +27,11 @@ async function post(page: Page, path: string, data: unknown) {
   return response.json();
 }
 async function setup(page: Page) {
-  await login(page, "global", null);
-  const patient = (
-    await post(page, "/api/admin", {
-      action: "recipient",
-      id: null,
-      displayName: "Paciente V4 visual " + randomUUID().slice(0, 8),
-      isActive: true,
-      isDevelopment: true,
-      initialAdministratorEmail: fixtures().adminA.email,
-    })
-  ).data.id as string;
-  for (const role of ["family", "professional", "reader"])
-    sql(
-      "insert into public.care_recipient_memberships(care_recipient_id,user_id,role) values('" +
-        patient +
-        "','" +
-        fixtures()[role].id +
-        "','" +
-        role +
-        "')",
-    );
-  await page.getByLabel("Menu do usuário", { exact: true }).click();
-  await page.getByRole("menuitem", { name: "Sair", exact: true }).click();
-  await expect(page).toHaveURL(/\/login$/);
-  await login(page, "adminA", patient);
-  const product = (
-    await post(page, "/api/admin", {
-      action: "product",
-      careRecipientId: patient,
-      id: null,
-      name: "Material V4 visual",
-      category: "higiene",
-      unit: "unidade",
-      aliases: [],
-      isActive: true,
-    })
-  ).data.product_id as string;
+  const { patient, products: [product] } = await seedPatient({
+    catalogue: [{ name: "Material V4 visual", category: "higiene", unit: "unidade", aliases: [] }],
+  });
+  const administrator = await shiftWorker(patient, "admin");
+  await login(page, administrator, patient);
   return { patient, product };
 }
 
@@ -74,6 +40,8 @@ test("V4: dois usuários ao vivo, duplicidade contextual, ciência dialogada e c
   browser,
 }) => {
   const { patient, product } = await setup(page);
+  const familyUser = await shiftWorker(patient, "family");
+  const professional = await shiftWorker(patient);
   const settings = (
     await (
       await page.request.get("/api/patient-settings?careRecipientId=" + patient)
@@ -124,9 +92,12 @@ test("V4: dois usuários ao vivo, duplicidade contextual, ciência dialogada e c
         },
       });
     });
-    await login(family, "family", patient);
+    await login(family, familyUser, patient);
     await family.goto("/perfil?careRecipientId=" + patient);
-    await selectProfileSection(family, "notices");
+    await family.bringToFront();
+    const noticesTab = family.getByRole("tab", { name: "Avisos e aplicativo", exact: true });
+    await noticesTab.press("Enter");
+    await expect(noticesTab).toHaveAttribute("aria-selected", "true");
     await family.getByRole("button", { name: "Editar preferência de ciência", exact: true }).click();
     const preference = family.getByRole("dialog", { name: "Ciência de requisições", exact: true });
     await preference.getByRole("radio", { name: /^Diálogo antes de abrir/ }).check();
@@ -136,7 +107,7 @@ test("V4: dois usuários ao vivo, duplicidade contextual, ciência dialogada e c
     await confirmation.getByRole("button", { name: "Confirmar preferência", exact: true }).click();
     await expect(family.getByRole("dialog", { name: "Preferência salva", exact: true })).toBeVisible();
     await family.goto("/historico?careRecipientId=" + patient);
-    await login(pro, "professional", patient);
+    await login(pro, professional, patient);
     const receipt = (
       await post(pro, "/api/requisitions", {
         careRecipientId: patient,
@@ -158,9 +129,8 @@ test("V4: dois usuários ao vivo, duplicidade contextual, ciência dialogada e c
       exact: true,
     });
     await expect(duplicate).toBeVisible();
-    await duplicate
-      .getByRole("button", { name: receipt.code, exact: true })
-      .click();
+    const consult = duplicate.getByRole("button", { name: receipt.code, exact: true });
+    await consult.click();
     const related = pro.getByRole("dialog", {
       name: receipt.code,
       exact: true,
@@ -171,22 +141,26 @@ test("V4: dois usuários ao vivo, duplicidade contextual, ciência dialogada e c
     await related
       .getByRole("button", { name: "Fechar diálogo", exact: true })
       .click();
+    await expect(related).toHaveCount(0);
+    await expect(consult).toBeFocused();
     const justification = duplicate.getByLabel(
       "Justificativa da nova requisição",
     );
-    await justification.fill("Necessidade revisada após consulta contextual");
+    const reason = "Necessidade revisada após consulta contextual";
+    const keep = duplicate.getByRole("button", { name: "Manter nova requisição", exact: true });
+    await justification.fill(reason);
+    await expect(keep).toBeEnabled();
+    await expect(justification).toHaveValue(reason);
+    await family.bringToFront();
     await family.getByRole("link").filter({ hasText: receipt.code }).click();
     await family.getByRole("dialog", { name: "Ciência antes de abrir a requisição", exact: true }).getByRole("button", { name: "Confirmar ciência e abrir", exact: true }).click();
     await selectDocumentSection(family, "overview");
     await expect(
       family.getByText("Confirmação em diálogo antes de abrir", { exact: false }),
     ).toBeVisible({ timeout: 15000 });
-    await expect(justification).toHaveValue(
-      "Necessidade revisada após consulta contextual",
-    );
-    await duplicate
-      .getByRole("button", { name: "Manter nova requisição", exact: true })
-      .click();
+    await pro.bringToFront();
+    await expect(justification).toHaveValue(reason);
+    await keep.click();
     await expect(
       pro.getByRole("checkbox", { name: /Material V4 visual/ }),
     ).toBeChecked();
@@ -341,7 +315,7 @@ test("V4: matrizes móveis, múltiplos canais no contrato visual e proposta glob
   const other = await browser.newContext();
   try {
     const global = await other.newPage();
-    await login(global, "global", null);
+    await login(global, fixtures.global, null);
     await global.goto("/configuracoes?careRecipientId=" + patient);
     await global.getByRole("button", { name: "Editar Arquivamento", exact: true }).click();
     await global.getByLabel("Arquivar após conclusão ou cancelamento (dias)").fill("9");
