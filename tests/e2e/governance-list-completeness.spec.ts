@@ -11,6 +11,11 @@ import { auditFromTop } from "./accessibility-audit";
 test.setTimeout(180_000);
 test.afterEach(async ({ page }) => page.unrouteAll({ behavior: "wait" }));
 const region = (page: Page) => page.getByRole("region", { name: "Propostas de configuração", exact: true });
+const filterTrigger = (page: Page) => region(page).getByRole("button", { name: "Filtrar propostas", exact: true });
+async function openFilters(page: Page) {
+  await filterTrigger(page).click();
+  return page.getByRole("dialog", { name: "Filtrar propostas", exact: true });
+}
 const ids = (page: Page) => region(page).locator("article[data-proposal-id]").evaluateAll(nodes => nodes.map(node => node.getAttribute("data-proposal-id")));
 async function populated() {
   const f = await setup(), global = await actor("global");
@@ -43,10 +48,10 @@ test("proposal history reaches101 pending requests behind resolved history and p
   await login(page, f.patient);
   const before = facts(f.patient);
   const writes: string[] = []; page.on("request", request => { if (new URL(request.url()).pathname.startsWith("/api/patient-settings") && request.method() === "POST") writes.push(request.url()); });
-  await page.goto(`/configuracoes?careRecipientId=${f.patient}&area=people`);
+  await page.goto(`/configuracoes?careRecipientId=${f.patient}&area=people#propostas`);
   await expect.poll(() => ids(page)).toEqual(open.slice(0, 20));
   const refreshed = page.waitForResponse(response => new URL(response.url()).pathname === "/api/patient-settings" && new URL(response.url()).searchParams.get("changesOnly") === "true");
-  await region(page).getByRole("button", { name: "Consultar propostas", exact: true }).click();
+  await (await openFilters(page)).getByRole("button", { name: "Consultar propostas", exact: true }).click();
   expect((await refreshed).status()).toBe(200);
   await expect(page).toHaveURL(/proposalStatus=open/);
   const traverse = async (oracle: string[]) => {
@@ -59,15 +64,28 @@ test("proposal history reaches101 pending requests behind resolved history and p
     expect(seen).toEqual(oracle);
   };
   await traverse(open);
-  await region(page).getByLabel("Situação da proposta", { exact: true }).selectOption("all"); await region(page).getByRole("button", { name: "Consultar propostas", exact: true }).click();
+  const filter = await openFilters(page);
+  await filter.getByLabel("Situação da proposta", { exact: true }).selectOption("all");
+  await filter.getByRole("button", { name: "Consultar propostas", exact: true }).click();
   await expect(page).toHaveURL(/proposalStatus=all/); await traverse(all);
-  const search = region(page).getByRole("searchbox", { name: "Buscar proposta por referência ou conteúdo", exact: true });
+  const search = (await openFilters(page)).getByRole("searchbox", { name: "Buscar proposta por referência ou conteúdo", exact: true });
   await search.fill(f.original.id); await search.press("Enter"); await expect(page).toHaveURL(/proposalQuery=/);
-  await expect(search).toBeFocused(); await expect.poll(() => ids(page)).toEqual([f.original.id]);
-  await page.reload(); await expect(search).toHaveValue(f.original.id); await expect.poll(() => ids(page)).toEqual([f.original.id]);
-  await page.goBack(); await expect(page).toHaveURL(/proposalPage=11/); await expect(search).toHaveValue(""); await expect.poll(() => ids(page)).toEqual(all.slice(200));
+  await expect(filterTrigger(page)).toBeFocused(); await expect.poll(() => ids(page)).toEqual([f.original.id]);
+  expect(new URL(page.url()).hash).toBe("#propostas");
+  await page.reload(); await openFilters(page); await expect(search).toHaveValue(f.original.id);
+  await search.fill("Edição descartada"); await filter.getByRole("button", { name: "Cancelar", exact: true }).click();
+  await openFilters(page); await expect(search).toHaveValue(f.original.id);
+  await filter.getByRole("button", { name: "Cancelar", exact: true }).click();
+  await expect.poll(() => ids(page)).toEqual([f.original.id]);
+  await page.goBack(); await expect(page).toHaveURL(/proposalPage=11/); await openFilters(page); await expect(search).toHaveValue("");
+  await filter.getByRole("button", { name: "Cancelar", exact: true }).click();
+  await expect.poll(() => ids(page)).toEqual(all.slice(200));
   await page.setViewportSize({ width: 320, height: 900 }); await auditFromTop(page, "proposal old history320");
   mkdirSync("output/playwright/phase-d", { recursive: true }); await region(page).screenshot({ path: `output/playwright/phase-d/proposal-oldest-${info.project.name}.png` });
+  await openFilters(page); await filter.getByLabel("Tipo de proposta", { exact: true }).selectOption("membership");
+  await filter.getByRole("button", { name: "Consultar propostas", exact: true }).click();
+  await expect(page).toHaveURL(/proposalKind=membership.*proposalPage=1|proposalPage=1.*proposalKind=membership/);
+  await expect(region(page).getByText("Nenhuma proposta corresponde aos filtros consultados.", { exact: true })).toBeVisible();
   expect(facts(f.patient)).toBe(before); expect(writes).toEqual([]);
 });
 
@@ -106,15 +124,16 @@ test("proposal history refuses wrong reads,retains only the current selection an
       await review.getByRole("button", { name: "Voltar", exact: true }).click();
       mode = "live"; await region(page).getByRole("button", { name: "Atualizar propostas", exact: true }).click(); await expect(region(page).getByRole("alert")).toHaveCount(0);
     }
-    const search = region(page).getByRole("searchbox", { name: "Buscar proposta por referência ou conteúdo", exact: true });
     mode = "delay"; await region(page).getByRole("button", { name: "Atualizar propostas", exact: true }).click(); await held;
+    const filter = await openFilters(page);
+    const search = filter.getByRole("searchbox", { name: "Buscar proposta por referência ou conteúdo", exact: true });
     mode = "live"; await search.fill(f.original.id); await search.press("Enter"); await expect(page).toHaveURL(/proposalQuery=/);
     await expect.poll(() => ids(page)).toEqual([f.original.id]); release(); await expect.poll(() => ids(page)).toEqual([f.original.id]);
-    mode = "unavailable"; await search.fill("Sem resultado fictício"); await search.press("Enter"); await expect(region(page).getByRole("alert")).toBeVisible();
+    mode = "unavailable"; await openFilters(page); await search.fill("Sem resultado fictício"); await search.press("Enter"); await expect(region(page).getByRole("alert")).toBeVisible();
     await expect.poll(() => ids(page)).toEqual([]); await expect(region(page).getByText("Nenhuma proposta corresponde aos filtros consultados.", { exact: true })).toHaveCount(0);
     mode = "live"; await region(page).getByRole("button", { name: "Atualizar propostas", exact: true }).click();
     await expect(region(page).getByText("Nenhuma proposta corresponde aos filtros consultados.", { exact: true })).toBeVisible();
-    await region(page).getByRole("button", { name: "Limpar filtros de propostas", exact: true }).click(); await expect.poll(() => ids(page)).toEqual(open.slice(0, 20));
+    await openFilters(page); await filter.getByRole("button", { name: "Limpar filtros de propostas", exact: true }).click(); await expect.poll(() => ids(page)).toEqual(open.slice(0, 20));
     mode = "denied"; await region(page).getByRole("button", { name: "Atualizar propostas", exact: true }).click(); await expect(region(page).getByRole("alert")).toBeVisible();
     await expect.poll(() => ids(page)).toEqual([]); expect(facts(f.patient)).toBe(before);
   } finally { release(); }

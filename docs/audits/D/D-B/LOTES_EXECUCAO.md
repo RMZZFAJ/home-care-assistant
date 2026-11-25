@@ -5005,12 +5005,19 @@ O modal final foi comparado com o cenário de conflito do laboratório em
 
 ### E10-05 — Propostas de alteração e decisão independente
 
-A área Pessoas e propostas mostra as propostas nas seções de decisão, aceite
-e histórico. Cada registro abre o painel de conferência com residência, autor,
-decisor quando disponível, situação e comparação entre valores vigentes e
-propostos. A lista mantém a busca, os filtros e a paginação por data e
-identificador usados pelo sistema. Esses controles complementam o cenário
-do laboratório, que mostra uma proposta por vez.
+A área Pessoas e propostas abre com as seções de decisão, aceite e histórico.
+O formulário Função no paciente vem depois da lista, na mesma aba. Cada
+registro abre o painel de conferência com residência, autor, decisor quando
+disponível, situação e comparação entre valores vigentes e propostos.
+
+Situação, tipo e busca por referência ou conteúdo ficam no diálogo Filtrar
+propostas. Os filtros em uso aparecem junto ao título e à contagem. A ação
+de atualização fica ao lado de Filtros. Aplicar ou limpar os filtros
+volta à primeira página e mantém a âncora Propostas. Cancelar descarta a
+edição do diálogo. A consulta ordena por data e identificador.
+A navegação entre páginas aparece quando há mais de uma página ou quando a
+página consultada é posterior à primeira. Esses controles complementam a
+lista do laboratório, que usa uma proposta por cenário.
 
 A aprovação ou rejeição exige confirmação no diálogo e autenticação local
 de um administrador distinto do autor. A aprovação exige a mesma referência
@@ -5105,6 +5112,24 @@ detalhes pelo teclado, o retorno do foco e a exceção pessoal efetiva após
 a decisão. As capturas estão em `output/playwright/l4-proposal-parity-final-report/`.
 Passaram 34 testes unitários da apresentação, build de produção,
 TypeScript e lint dirigido. O ajuste dispensa migration.
+
+A lista foi comparada em 360 e 412 px com a mesma concessão de contagem.
+O link direto posiciona o título e o filtro abaixo da barra de abas fixa.
+O teste conferiu que o botão recebe o clique e que a primeira proposta
+termina antes de 300 px a partir do início da seção. O sistema inclui
+a faixa horizontal de abas e a edição de função abaixo da lista. A
+legenda da aba ativa pode exigir rolagem horizontal em 360 px.
+
+Passaram três execuções visuais sem retentativa em Chromium, Android e
+iPhone emulados. As seis execuções dirigidas anteriores em Chromium e
+WebKit de iPhone percorreram o histórico de 202 propostas, verificaram o
+retorno por Voltar, a busca, os filtros de situação e tipo, o foco e o
+descarte ao cancelar. A interface apresentou o resultado da consulta mais
+recente mesmo com uma resposta anterior atrasada. As leituras preservaram
+propostas, configuração,
+vínculos, permissões e estoque. As capturas finais estão em
+`output/playwright/l4-proposal-list-viewport-report/`. Build de produção,
+TypeScript e lint dirigido passaram. A alteração dispensa migration.
 
 ### E10-06 — Regras, avisos e limites de estoque
 

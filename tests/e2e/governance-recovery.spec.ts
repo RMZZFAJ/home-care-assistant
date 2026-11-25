@@ -38,9 +38,10 @@ test("E10-05 compara a concessão pessoal de contagem com a referência visual",
     p_key: randomUUID(), p_version: current.data.version,
   });
   await login(page, reviewer, f.patient);
-  await page.goto(`/configuracoes?area=people&careRecipientId=${f.patient}`);
+  await page.goto(`/configuracoes?area=people&careRecipientId=${f.patient}#propostas`);
+  const list = page.getByRole("region", { name: "Propostas de configuração", exact: true });
   const opener = page.getByRole("article", { name: "Proposta " + proposal.id.slice(0, 8), exact: true }).getByRole("button");
-  await opener.click();
+  await expect(opener).toBeVisible();
   const review = page.getByRole("dialog", { name: "Conferir proposta", exact: true });
   const compare = review.getByRole("region", { name: "Compare a alteração", exact: true });
   const layout: { inset: number; backdropInset: number; actionRows: boolean; comparisonLine: boolean }[] = [];
@@ -50,6 +51,33 @@ test("E10-05 compara a concessão pessoal de contagem com a referência visual",
     if (model) {
       await model.route(/^https?:/, route => route.abort());
       await model.goto(pathToFileURL(resolve("hca-laboratorio-04-v2-aprovado.html")).href + "#E10-05/pending");
+    }
+    for (const width of [360, 412]) {
+      await page.setViewportSize({ width, height: 708 });
+      await list.evaluate(element => element.scrollIntoView({ block: "start", behavior: "instant" }));
+      const [section, card, header, tabs, roleEditor] = await Promise.all([list.boundingBox(), opener.boundingBox(),
+        page.locator(".app-header").boundingBox(),
+        page.getByRole("navigation", { name: "Áreas da configuração", exact: true }).boundingBox(),
+        page.getByRole("heading", { name: "Função no paciente", exact: true }).boundingBox()]);
+      expect(section && card && header && tabs && roleEditor).toBeTruthy();
+      const navigationGap = section!.y - Math.max(header!.y + header!.height, tabs!.y + tabs!.height);
+      expect(navigationGap).toBeGreaterThanOrEqual(0);
+      expect(navigationGap).toBeLessThan(30);
+      expect(card!.y + card!.height - section!.y).toBeLessThan(300);
+      expect(roleEditor!.y).toBeGreaterThan(card!.y + card!.height);
+      await expect(list.getByRole("searchbox")).toHaveCount(0);
+      const filters = list.getByRole("button", { name: "Filtrar propostas", exact: true });
+      await expect(filters).toBeInViewport();
+      await filters.click({ trial: true });
+      await expect(opener).toBeInViewport({ ratio: 1 });
+      await info.attach("produto-lista-propostas-" + width, { body: await page.screenshot({ animations: "disabled" }), contentType: "image/png" });
+      if (model) {
+        await model.getByRole("combobox", { name: "Visualização", exact: true }).selectOption(String(width));
+        await info.attach("laboratorio-lista-propostas-" + width, { body: await model.locator("#device-frame").screenshot(), contentType: "image/png" });
+      }
+    }
+    await opener.click();
+    if (model) {
       await model.getByRole("button", { name: /Permitir contagem para Joana Castro/ }).click();
       await expect(model.getByRole("heading", { name: "Conferir proposta", exact: true })).toBeVisible();
     }
@@ -556,15 +584,21 @@ test("D3 lista encontra proposta antiga e compara cinco tipos sem decidir por le
   await review.screenshot({ path: `output/playwright/phase-d/d3-proposal-comparisons-${info.project.name}.png` });
   await review.getByRole("button", { name: "Voltar", exact: true }).click();
   await administration.screenshot({ path: `output/playwright/phase-d/d3-proposal-card-${info.project.name}.png` });
-  await region.getByLabel("Situação da proposta", { exact: true }).selectOption("all"); await region.getByRole("button", { name: "Consultar propostas", exact: true }).click();
+  const filterTrigger = region.getByRole("button", { name: "Filtrar propostas", exact: true });
+  const filters = page.getByRole("dialog", { name: "Filtrar propostas", exact: true });
+  await filterTrigger.click();
+  await filters.getByLabel("Situação da proposta", { exact: true }).selectOption("all"); await filters.getByRole("button", { name: "Consultar propostas", exact: true }).click();
   await expect(region.getByText("55 propostas encontradas · página 1 de 3", { exact: true })).toBeVisible();
   await region.getByRole("button", { name: "Próxima página de propostas", exact: true }).click();
   await expect(region.getByText("55 propostas encontradas · página 2 de 3", { exact: true })).toBeVisible();
   await region.getByRole("button", { name: "Próxima página de propostas", exact: true }).click();
   await expect(region.getByRole("article", { name: "Proposta " + proposals[0].id.slice(0, 8), exact: true })).toBeVisible();
-  await region.getByLabel("Buscar proposta por referência ou conteúdo", { exact: true }).fill(proposals[0].id); await region.getByRole("button", { name: "Consultar propostas", exact: true }).click();
+  await filterTrigger.click();
+  await filters.getByLabel("Buscar proposta por referência ou conteúdo", { exact: true }).fill(proposals[0].id); await filters.getByRole("button", { name: "Consultar propostas", exact: true }).click();
   await expect(region.getByText("1 proposta encontrada · página 1 de 1", { exact: true })).toBeVisible();
-  await page.reload(); await expect(region.getByLabel("Buscar proposta por referência ou conteúdo", { exact: true })).toHaveValue(proposals[0].id);
+  await page.reload(); await filterTrigger.click();
+  await expect(filters.getByLabel("Buscar proposta por referência ou conteúdo", { exact: true })).toHaveValue(proposals[0].id);
+  await filters.getByRole("button", { name: "Cancelar", exact: true }).click();
   expect(count(f.patient)).toBe(55);
   await login(page, reviewer, f.patient); await page.goto(`/configuracoes?area=people&proposalStatus=all&proposalQuery=${proposals[0].id}`);
   await expect(region.getByText("1 proposta encontrada · página 1 de 1", { exact: true })).toBeVisible();
@@ -613,7 +647,7 @@ test("D3 lista encontra proposta antiga e compara cinco tipos sem decidir por le
   expect(sql(`select settings->>'archiveDays' from public.patient_settings where care_recipient_id=${sqlLiteral(f.patient)};`)).toBe("9");
   expect(count(f.patient)).toBe(55);
   await page.getByRole("dialog", { name: "Proposta aplicada", exact: true }).getByRole("button", { name: "Concluir", exact: true }).click();
-  await region.getByRole("button", { name: "Limpar filtros de propostas", exact: true }).click();
+  await filterTrigger.click(); await filters.getByRole("button", { name: "Limpar filtros de propostas", exact: true }).click();
   await expect(region.getByText("4 propostas encontradas · página 1 de 1", { exact: true })).toBeVisible();
   await region.getByRole("article", { name: "Proposta " + proposals[1].id.slice(0, 8), exact: true }).getByRole("button").click();
   await expect(review.getByRole("button", { name: "Aprovar proposta", exact: true })).toHaveCount(0);

@@ -393,6 +393,9 @@ function Policies({ context }: { context: WorkspaceContext }) {
       {rulesArea ? <Link className="hca-control hca-control--secondary" prefetch={false} href={`/admin?careRecipientId=${patientId}`}><Icon name="back" />Voltar à administração</Link> : null}
       {tab === "people" ? (
         <>
+          <GovernanceProposals key={context.userId + ":" + patientId} context={context} directory={data.directory}
+            version={data.data.version} revision={attempt + liveRevision} busy={locked}
+            refreshConfiguration={() => { setReadAttempt(value => value + 1); void context.refresh(); }} />
           <section className="ui-card">
             <h2 className="font-semibold">Função no paciente</h2>
             <form
@@ -431,9 +434,6 @@ function Policies({ context }: { context: WorkspaceContext }) {
               </button>
             </form>
           </section>
-          <GovernanceProposals key={context.userId + ":" + patientId} context={context} directory={data.directory}
-            version={data.data.version} revision={attempt + liveRevision} busy={locked}
-            refreshConfiguration={() => { setReadAttempt(value => value + 1); void context.refresh(); }} />
         </>
       ) : null}
       <ResidenceRuleFeedback operation={policyOperation} purpose="settings" onFinish={finishVersioned} onReview={reviewVersioned} />

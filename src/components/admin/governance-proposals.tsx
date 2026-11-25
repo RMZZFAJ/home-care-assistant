@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useId, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ChangeFacts } from "@/components/ui/change-facts";
 import { ActionButton, DefinitionGrid, FormField, LoadingIndicator, Pill, SelectField, TextInput } from "@/components/ui/controls";
@@ -25,6 +25,7 @@ const groups = [
   { name: "Aguardando aceite", statuses: ["awaiting_acceptance"] },
   { name: "Decisões registradas", statuses: ["applied", "rejected"] },
 ] as const;
+const defaultFilters = { status: "open", kind: "", query: "" };
 
 function statusLabel(status: string) {
   return Object.hasOwn(governanceStatusLabels, status) ? governanceStatusLabels[status] : "Situação não reconhecida";
@@ -201,11 +202,18 @@ export function GovernanceProposals({ context, directory, version, revision, bus
   refreshConfiguration: () => void;
 }) {
   const params = useSearchParams(), router = useRouter();
-  const status = params.get("proposalStatus") ?? "open", kind = params.get("proposalKind") ?? "";
+  const status = params.get("proposalStatus") ?? defaultFilters.status, kind = params.get("proposalKind") ?? "";
   const query = (params.get("proposalQuery") ?? "").trim(), page = Number(params.get("proposalPage") ?? "1");
   const queryKey = JSON.stringify([status, kind, query]);
-  const [filters, setFilters] = useState({ queryKey, status, kind, query });
-  if (filters.queryKey !== queryKey) setFilters({ queryKey, status, kind, query });
+  const [filters, setFilters] = useState<(typeof defaultFilters & { queryKey: string }) | null>(null);
+  if (filters && filters.queryKey !== queryKey) setFilters(null);
+  const filterFormId = useId();
+  const filterTriggerRef = useRef<HTMLButtonElement | null>(null);
+  const activeFilters = [
+    status !== defaultFilters.status && (status === "all" ? "Todas as situações" : statusLabel(status)),
+    kind && (Object.hasOwn(governanceKindLabels, kind) ? governanceKindLabels[kind] : "Tipo não reconhecido"),
+    query,
+  ].filter(Boolean).join(" · ");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [decision, setDecision] = useState<{ proposalId: string; reference: string; action: ProposalDecision } | null>(null);
   const focusRef = useRef<HTMLElement | null>(null);
@@ -241,12 +249,17 @@ export function GovernanceProposals({ context, directory, version, revision, bus
       (next.get("proposalKind") ?? "") === kind && (next.get("proposalQuery") ?? "").trim() === query &&
       Number(next.get("proposalPage") ?? "1") === page;
     if (sameSelection) read.refresh();
-    if (next.toString() !== params.toString()) router.push("/configuracoes?" + next, { scroll: false });
+    if (next.toString() !== params.toString()) router.push("/configuracoes?" + next + window.location.hash, { scroll: false });
   }
 
   function refresh() {
     read.refresh();
     refreshConfiguration();
+  }
+
+  function applyFilters(values: typeof defaultFilters) {
+    setFilters(null);
+    navigate({ proposalStatus: values.status, proposalKind: values.kind, proposalQuery: values.query.trim(), proposalPage: "1" });
   }
 
   function confirm() {
@@ -267,26 +280,36 @@ export function GovernanceProposals({ context, directory, version, revision, bus
 
   return <section id="propostas" className="hca-residence-admin hca-governance-proposals" aria-label="Propostas de configuração" aria-busy={loading}>
     <header>
-      <h2 ref={listHeadingRef} tabIndex={-1}>Propostas</h2>
+      <div className="hca-proposal-list-heading">
+        <h2 ref={listHeadingRef} tabIndex={-1}>Propostas</h2>
+        <ActionButton ref={filterTriggerRef} aria-label="Filtrar propostas" aria-haspopup="dialog"
+          onClick={() => setFilters({ queryKey, status, kind, query })}><Icon name="filter" />Filtros</ActionButton>
+        <ActionButton className="hca-control-icon" aria-label="Atualizar propostas" disabled={loading} onClick={read.refresh}><Icon name="refresh" /></ActionButton>
+      </div>
       <p className="hca-residence-admin-subtitle">Mudanças que aguardam decisão de um administrador local.</p>
+      {activeFilters ? <p className="hca-field-hint hca-proposal-filter-summary"><span className="sr-only">Filtros ativos. </span>{activeFilters}</p> : null}
+      {data ? <p className="hca-field-hint hca-proposal-list-count" role="status">{data.total} {data.total === 1 ? "proposta encontrada" : "propostas encontradas"} · página {data.page} de {Math.max(1, Math.ceil(data.total / data.pageSize))}</p> : null}
     </header>
-    <form className="hca-toolbar" aria-label="Filtros de propostas" onSubmit={event => {
-      event.preventDefault();
-      navigate({ proposalStatus: filters.status, proposalKind: filters.kind, proposalQuery: filters.query.trim(), proposalPage: "1" });
-    }}>
-      <FormField label="Situação da proposta"><SelectField value={filters.status} onChange={event => setFilters({ ...filters, status: event.currentTarget.value })}><option value="all">Todas</option>{Object.entries(governanceFilterLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</SelectField></FormField>
-      <FormField label="Tipo de proposta"><SelectField value={filters.kind} onChange={event => setFilters({ ...filters, kind: event.currentTarget.value })}><option value="">Todos os tipos</option>{Object.entries(governanceKindLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</SelectField></FormField>
-      <FormField label="Buscar proposta por referência ou conteúdo"><TextInput type="search" value={filters.query} onChange={event => setFilters({ ...filters, query: event.currentTarget.value })} maxLength={160} /></FormField>
-      <ActionButton type="submit">Consultar propostas</ActionButton>
-      <ActionButton onClick={() => navigate({ proposalStatus: "open", proposalKind: "", proposalQuery: "", proposalPage: "1" })}>Limpar filtros de propostas</ActionButton>
-      <ActionButton disabled={loading} onClick={read.refresh}>Atualizar propostas</ActionButton>
-    </form>
+    {filters ? <Dialog open title="Filtrar propostas" headingIcon="filter" finalFocus={filterTriggerRef}
+      onClose={() => setFilters(null)} footer={<>
+        <ActionButton onClick={() => setFilters(null)}>Cancelar</ActionButton>
+        <ActionButton aria-label="Limpar filtros de propostas" onClick={() => applyFilters(defaultFilters)}>Limpar filtros</ActionButton>
+        <ActionButton type="submit" form={filterFormId} variant="primary">Consultar propostas</ActionButton>
+      </>}>
+      <form id={filterFormId} className="hca-form-stack" aria-label="Filtros de propostas" onSubmit={event => {
+        event.preventDefault();
+        applyFilters(filters);
+      }}>
+        <FormField label="Situação da proposta"><SelectField value={filters.status} onChange={event => setFilters({ ...filters, status: event.currentTarget.value })}><option value="all">Todas</option>{Object.entries(governanceFilterLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</SelectField></FormField>
+        <FormField label="Tipo de proposta"><SelectField value={filters.kind} onChange={event => setFilters({ ...filters, kind: event.currentTarget.value })}><option value="">Todos os tipos</option>{Object.entries(governanceKindLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</SelectField></FormField>
+        <FormField label="Buscar proposta por referência ou conteúdo"><TextInput type="search" value={filters.query} onChange={event => setFilters({ ...filters, query: event.currentTarget.value })} maxLength={160} /></FormField>
+      </form>
+    </Dialog> : null}
     <GovernanceProposalFeedback operation={operation} onRefresh={refresh} focus={focusRef} />
     {error ? <FeedbackBanner tone="error">{error} <ActionButton onClick={read.refresh}>Consultar propostas novamente</ActionButton></FeedbackBanner> : null}
     {loading ? <LoadingIndicator label="Consultando propostas" /> : null}
     {data && !fresh ? <p className="hca-field-hint">Última consulta confirmada{read.queriedAt ? " em " + formatBrazilDate(read.queriedAt) : ""}. Decisões suspensas até nova consulta válida.</p> : null}
     {data ? <>
-      <p role="status">{data.total} {data.total === 1 ? "proposta encontrada" : "propostas encontradas"} · página {data.page} de {Math.max(1, Math.ceil(data.total / data.pageSize))}</p>
       {fresh && !data.changes.length ? <p>Nenhuma proposta corresponde aos filtros consultados.</p> : null}
       {orderedGroups.map(group => <section key={group.rows[0].id} className="hca-residence-admin-section">
         <header><h2>{group.title}</h2></header>
@@ -296,13 +319,13 @@ export function GovernanceProposals({ context, directory, version, revision, bus
             <span className="hca-guide-row-label">
               <strong>{proposalTitle(change, governanceComparison(change, directory))}</strong>
               <small>Proposta de {change.proposerName} · {formatBrazilDate(change.created_at)}</small>
-              <Pill tone={change.status === "applied" ? "success" : change.status === "pending" || change.status === "awaiting_acceptance" ? "warning" : "neutral"}>{statusLabel(change.status)}</Pill>
+              <Pill tone={change.status === "applied" ? "success" : change.status === "pending" || change.status === "awaiting_acceptance" ? "warning" : "neutral"}>{change.status === "pending" ? "Pendente" : statusLabel(change.status)}</Pill>
             </span>
             <Icon name="chevron" width={15} height={15} />
           </button>
         </article>)}</div>
       </section>)}
-      <nav className="hca-toolbar" aria-label="Páginas de propostas"><ActionButton disabled={!fresh || data.page === 1} onClick={() => navigate({ proposalPage: String(data.page - 1) })}>Propostas anteriores</ActionButton><ActionButton disabled={!fresh || data.page * data.pageSize >= data.total} onClick={() => navigate({ proposalPage: String(data.page + 1) })}>Próxima página de propostas</ActionButton></nav>
+      {data.page > 1 || data.total > data.pageSize ? <nav className="hca-toolbar" aria-label="Páginas de propostas"><ActionButton disabled={!fresh || data.page === 1} onClick={() => navigate({ proposalPage: String(data.page - 1) })}>Propostas anteriores</ActionButton><ActionButton disabled={!fresh || data.page * data.pageSize >= data.total} onClick={() => navigate({ proposalPage: String(data.page + 1) })}>Próxima página de propostas</ActionButton></nav> : null}
     </> : null}
     <p className="hca-residence-admin-note"><Icon name="shield" />O autor da proposta não decide a própria mudança. A aprovação depende da configuração vigente.</p>
     {proposal && comparison ? <ProposalReview key={proposal.id} proposal={proposal} comparison={comparison} patientName={patient.display_name}

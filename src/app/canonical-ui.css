@@ -363,6 +363,7 @@ html { scroll-padding-block-start: calc(var(--app-header-height) + 12px); }
   .hca-document-tab { padding: 12px; }
   /* Reserve the tab row as well as the header when bringing a field into view. */
   .hca-workspace .hca-document-panel,
+  .hca-workspace .hca-governance-proposals,
   .hca-workspace .hca-profile-panel .hca-settings-section,
   .hca-workspace :is(.hca-document-panel, .hca-profile-panel) :is(a,button,input,select,textarea,summary,[tabindex]) { scroll-margin-block-start: 68px; }
 }
