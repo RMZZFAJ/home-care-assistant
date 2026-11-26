@@ -4,6 +4,12 @@ O [fechamento A–D da PR 7](docs/audits/FECHAMENTO_PR7.md) reúne os critérios
 e as pendências para a próxima etapa. Este acompanhamento conserva o
 histórico dos incrementos de D-B.
 
+**26/11 — Resultado da CI da revisão.** A CI de `4fc30699` aprovou banco,
+Linux e Windows. Dois testes falharam nas duas tentativas em iOS, e quatro
+testes passaram em retentativa. SonarCloud e Preview passaram nesse mesmo
+commit. O [registro de fechamento](docs/audits/D/D-B/LOTES_EXECUCAO.md#ci-de-4fc30699-e-condições-de-fechamento)
+identifica os casos e as condições que ainda faltam para a etapa 19.
+
 **26/11 — Preparação final da PR 8.** A revisão da D-B reúne L3 e L4.
 O Supabase compartilhado de testes tem 385 migrations aplicadas. A CI de
 `138ad822` passou com seis retentativas registradas. A revisão do Codex

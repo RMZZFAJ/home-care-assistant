@@ -1,9 +1,10 @@
 # Execução dos lotes L1 a L4
 
-**Atualizado em 24/11/2026.** L4 em execução na branch
-`feat/phase-d-continuation`, avançada a partir de `master` em `fab595c7`.
-A [PR #7](https://github.com/RMZZFAJ/home-care-assistant/pull/7) reúne
-o histórico de L1 e L2.
+**Atualizado em 26/11/2026.** A [PR #8][pr-l4-history] reúne L3 e L4 na
+branch `feat/phase-d-continuation`, em revisão sobre `master` em `fab595c7`.
+A [PR #7](https://github.com/RMZZFAJ/home-care-assistant/pull/7) incorporou
+L1 e L2. A [etapa final](#ci-de-4fc30699-e-condições-de-fechamento) acompanha
+a CI, a validação do Preview e as pendências da D-B.
 Este registro acompanha o que entrou no produto, a comparação com cada
 laboratório e as pendências por lote. As evidências das entregas e a fila
 transversal ficam no [acompanhamento D-B](../../../../TEMP_D_B_ATUALIZACAO.md)
@@ -13,9 +14,9 @@ e nas [matrizes de execução](ACCEPTANCE_EXECUTION.csv) e
 | Lote | Situação | Referências vigentes |
 | --- | --- | --- |
 | L1 | Implementado e revisado, com evidência de cenários específicos | [Ordem E01–E03](../../../../HCA_L1_LOTE_CODEX_E01_E03.md), [laboratório v3](../../../../hca-laboratorio-01-v3-final.html) e [comentários v3](../../../../hca-l01-v3-comentarios.json) |
-| L2 | Escopo aprovado implementado, com verificação local dirigida e CI final pendente | [Comando mestre](../../../../HCA_L2_COMANDO_MESTRE_CODEX_V7.md) e [laboratório v7 aprovado](../../../../hca-laboratorio-02-v7.html) |
-| L3 | Implementação verificada no candidato em rascunho | [Comando mestre v4](../../../../HCA_L3_COMANDO_MESTRE_CODEX_V4.md) e [laboratório v4 aprovado](../../../../hca-laboratorio-03-v4-aprovado.html) |
-| L4 | Em execução | [Comando mestre v2](../../../../HCA_L4_COMANDO_MESTRE_CODEX_V2.md) e [laboratório v2 aprovado](../../../../hca-laboratorio-04-v2-aprovado.html) |
+| L2 | Escopo aprovado integrado, com reservas de produto documentadas | [Comando mestre](../../../../HCA_L2_COMANDO_MESTRE_CODEX_V7.md) e [laboratório v7 aprovado](../../../../hca-laboratorio-02-v7.html) |
+| L3 | Implementação em revisão na PR 8, com validação final pendente | [Comando mestre v4](../../../../HCA_L3_COMANDO_MESTRE_CODEX_V4.md) e [laboratório v4 aprovado](../../../../hca-laboratorio-03-v4-aprovado.html) |
+| L4 | Implementação em revisão na PR 8, com validação final pendente | [Comando mestre v2](../../../../HCA_L4_COMANDO_MESTRE_CODEX_V2.md) e [laboratório v2 aprovado](../../../../hca-laboratorio-04-v2-aprovado.html) |
 
 Em cada incremento, registre o commit, os cenários conferidos, o que foi
 criado para o produto real, as diferenças ainda visíveis, os contratos e as
@@ -5951,6 +5952,54 @@ e os gates de D-C/D6 permanecem rastreados. O piloto, a assistência em
 aparelhos reais, a impressão, a restauração operacional e os provedores
 externos exigem homologação própria.
 
+#### CI de 4fc30699 e condições de fechamento
+
+A [CI de 4fc30699][ci-4fc30699] passou em Linux, Windows e no banco. O
+SonarCloud e o Preview também passaram. Nos sete conjuntos de navegador,
+1.854 casos passaram na primeira tentativa, quatro passaram na segunda e
+dois falharam nas duas. As falhas persistentes ocorreram no iOS, ao abrir
+Materiais em uma COM com chegada corrigida e em uma ENT expedida. As
+retentativas que passaram foram atualização do PWA com duas abas no
+Chromium, paginação de relatos no Android e PDF de COM e rascunho de DEV no
+iOS.
+
+As capturas da COM e da ENT mostraram os controles sob a navegação fixa.
+O teste passa a rolar até um ponto que recebe toque e toca esse ponto
+com o navegador. A paginação confirma a resposta do cursor antes de
+inspecionar o aviso. O cenário PWA espera o Perfil carregar antes de
+navegar para a outra aba. No ensaio da COM, uma atualização adicional
+cancelou a consulta que o teste esperava. O cenário passou a controlar
+o momento das invalidações e mantém as leituras reais e a falha simulada.
+
+Na DEV, o rastro registrou um salvamento automático do vínculo durante
+o toque para avançar. A navegação entre etapas de ENT e DEV agora continua
+durante o salvamento em segundo plano. A revisão final espera o retorno
+da gravação. O teste retém a requisição real do rascunho e verifica a
+passagem para Materiais com o salvamento ainda em andamento.
+
+Passaram seis verificações dirigidas de COM, ENT, PDF, relatos e PWA.
+Depois do ajuste de salvamento, passaram as duas verificações de revisão
+e as quatro de consulta e descarte da ENT/DEV em Chromium e iOS. As
+últimas usaram contas restritas à residência do cenário e o build de
+produção já validado. Os recortes finais passaram sem retentativas.
+
+- A etapa 19 exige a CI, o Quality Gate e a verificação autenticada do
+  Preview no SHA final, além da reconciliação dos aceites e do relatório.
+  Conferir as conversas históricas de revisão que ainda têm impacto no
+  produto e reavaliar o alerta histórico de lentidão na autorização Realtime
+  com métricas recentes. A integração em `master` e sua verificação ficam
+  a cargo da PR 8.
+- O banco de testes já tem as 385 migrations da branch. Após integrar,
+  conferir versão e compatibilidade publicadas, incluindo a consulta e
+  o vínculo de referências de contingência.
+- As reservas de produto abrangem reversão de uma contagem REQ superada,
+  decisão sobre excedentes em ENT/DEV e expedição com extra não identificado.
+  O responsável também precisa decidir o versionamento dos anexos de L4.
+- DOC-C.1 e a expansão de rascunhos foram adiadas pelo responsável.
+  Piloto, aparelhos físicos, tecnologia assistiva, impressão, custódia
+  externa e restauração operacional ficam na etapa 20 e em D-C/D6. Os
+  provedores adiados seguem para homologação posterior.
+
 [preview-9f6b247e]: https://vercel.com/rmzzfajs-projects/home-care-assistant/E8HKkexPmqtPL6jXUY5RTg2jgVjv
 [sonar-pr8-preview]: https://sonarcloud.io/dashboard?id=RMZZFAJ_home-care-assistant&pullRequest=8
 [rabbit-pr8-preview]: https://github.com/RMZZFAJ/home-care-assistant/pull/8#issuecomment-7084927300
@@ -5962,4 +6011,5 @@ externos exigem homologação própria.
 [preview-e713cbdf]: https://vercel.com/rmzzfajs-projects/home-care-assistant/9MykUYeCEEdufR3RRbNR4u3EoEjF
 [ci-3c44a2ef]: https://github.com/RMZZFAJ/home-care-assistant/actions/runs/45732190737
 [ci-138ad822]: https://github.com/RMZZFAJ/home-care-assistant/actions/runs/45744697377
+[ci-4fc30699]: https://github.com/RMZZFAJ/home-care-assistant/actions/runs/45800866850
 [codex-pr8-email]: https://github.com/RMZZFAJ/home-care-assistant/pull/8#discussion_r4705621124

@@ -615,7 +615,7 @@ function TransferDeclarationEditor({
       needsRefresh ||
       referenceUnavailable ||
       privateDraft.blocked ||
-      privateDraft.backgroundBusy ||
+      (step === 3 && privateDraft.backgroundBusy) ||
       busy ||
       uncertain ||
       recoveryOnly
@@ -1527,7 +1527,7 @@ function TransferDeclarationEditor({
                     needsRefresh ||
                     referenceUnavailable ||
                     privateDraft.blocked ||
-                    privateDraft.backgroundBusy ||
+                    (step === 3 && privateDraft.backgroundBusy) ||
                     busy ||
                     !reference!.people.length ||
                     (step === 0 && !recipientId) ||

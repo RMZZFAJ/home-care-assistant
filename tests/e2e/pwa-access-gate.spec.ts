@@ -180,6 +180,7 @@ test("Preview estável atualiza por confirmação explícita e conserva a outra 
   application = true; legacyWorker = true; await authorize(context);
   await page.goto(origin + "/perfil?careRecipientId=" + f.patient);
   async function inspectApp(tab: Page) {
+    await expect(tab.getByRole("region", { name: "Identificação pessoal", exact: true })).toBeVisible();
     await selectProfileSection(tab, "notices");
     await tab.getByRole("button", { name: /^Aplicativo Instalação e preparação/ }).click();
     const app = tab.getByRole("dialog", { name: "Aplicativo neste aparelho", exact: true });

@@ -68,6 +68,18 @@ test("COM devolve a mesma chegada ao autor e credita só o que foi reenviado e a
 
 test("COM aberta compara a quantidade corrigida de uma chegada antes de atualizar", async ({ page }, info) => {
   test.setTimeout(150_000);
+  // This case drives the invalidation explicitly. A second broadcast must
+  // not abort the document response the test is waiting to inspect.
+  await page.addInitScript(() => {
+    window.addEventListener("hca:data-changed", event => {
+      if (!(event instanceof CustomEvent) || event.detail !== "arrival-review") {
+        event.stopImmediatePropagation();
+      }
+    }, { capture: true });
+  });
+  const invalidate = () => page.evaluate(() => {
+    window.dispatchEvent(new CustomEvent("hca:data-changed", { detail: "arrival-review" }));
+  });
   const f = await purchaseBalanceFixture(), [line, otherLine] = f.document.lines;
   const declaration = { lineId: line.id, quantity: "4", expectedQuantity: "6", remainingAction: "wait" };
   const pending = await purchaseBalanceCommand(f.family, f.document, "receive", { lines: [declaration] });
@@ -114,7 +126,7 @@ test("COM aberta compara a quantidade corrigida de uma chegada antes de atualiza
   blockReads = false;
   const backgroundRead = page.waitForResponse(response => new URL(response.url()).pathname === `/api/documents/${awaiting.id}`
     && response.request().method() === "GET" && response.ok());
-  await page.evaluate(() => window.dispatchEvent(new Event("hca:data-changed")));
+  await invalidate();
   expect(await (await backgroundRead).finished()).toBeNull();
   await expect(page.locator(".hca-record-detail > span[role='status']")).toBeEmpty();
   await expect(failure).toBeVisible();
@@ -133,7 +145,7 @@ test("COM aberta compara a quantidade corrigida de uma chegada antes de atualiza
   await expect(opener).toBeFocused();
   const liveRead = page.waitForResponse(response => new URL(response.url()).pathname === `/api/documents/${awaiting.id}`
     && response.request().method() === "GET");
-  await page.evaluate(() => window.dispatchEvent(new Event("hca:data-changed")));
+  await invalidate();
   expect((await liveRead).ok()).toBe(true);
   await expect(page.locator(".hca-record-detail > span[role='status']")).toBeEmpty();
   await expect(banner.getByRole("status")).toHaveText("A quantidade da chegada mudou.");
@@ -169,7 +181,7 @@ test("COM aberta compara a quantidade corrigida de uma chegada antes de atualiza
   blockReads = false;
   const recoveredAfterLimit = page.waitForResponse(response => new URL(response.url()).pathname === `/api/documents/${awaiting.id}`
     && response.request().method() === "GET" && response.ok());
-  await page.evaluate(() => window.dispatchEvent(new Event("hca:data-changed")));
+  await invalidate();
   expect(await (await recoveredAfterLimit).finished()).toBeNull();
   await expect(failure).toHaveCount(0);
   await expect(refreshButton).toBeEnabled();

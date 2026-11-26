@@ -6,6 +6,7 @@ import { sql, sqlLiteral as q } from "../../scripts/test-environment.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { selectContext } from "./auth-context";
 import { audit } from "./accessibility-audit";
+import { pressWorkspaceControl } from "./workspace-controls";
 
 test.setTimeout(150_000);
 test.afterEach(async ({ page }) => page.unrouteAll({ behavior: "wait" }));
@@ -26,6 +27,18 @@ async function prepare(page: Page) {
   return { ...f, reader };
 }
 const refresh = (page: Page) => page.getByRole("button", { name: "Atualizar lista", exact: true }).click();
+
+async function requestMoreReports(page: Page) {
+  const button = page.getByRole("button", { name: "Carregar mais relatos", exact: true });
+  const [response] = await Promise.all([
+    page.waitForResponse(candidate => {
+      const url = new URL(candidate.url());
+      return url.pathname === "/api/consumption" && url.searchParams.has("beforeAt");
+    }),
+    pressWorkspaceControl(page, button),
+  ]);
+  return response;
+}
 
 test("consumption list rejects corrupt pages and clears previous content after a denied continuation", async ({ page }, info) => {
   const f = await prepare(page), before = facts(f.patient), writes: string[] = [];
@@ -64,13 +77,15 @@ test("consumption list rejects corrupt pages and clears previous content after a
     await expect(page.getByRole("region", { name: "Relatos registrados", exact: true }).getByRole("alert").filter({ hasText: "resposta" })).toHaveCount(0);
   }
   for (const invalid of ["unavailable", "cursor"]) {
-    mode = invalid; await page.getByRole("button", { name: "Carregar mais relatos", exact: true }).click();
+    mode = invalid;
+    expect((await requestMoreReports(page)).status()).toBe(invalid === "unavailable" ? 503 : 200);
     await expect(page.getByRole("region", { name: "Relatos registrados", exact: true }).getByRole("alert")).toBeVisible(); await expect(rows(page)).toHaveCount(20);
     await expect(page.getByText("Nenhum relato encontrado para estes filtros.", { exact: true })).toHaveCount(0);
     mode = "live"; await refresh(page); await expect(list).toHaveAttribute("aria-busy", "false");
     await expect(page.getByRole("region", { name: "Relatos registrados", exact: true }).getByRole("alert")).toHaveCount(0);
   }
-  mode = "denied"; await page.getByRole("button", { name: "Carregar mais relatos", exact: true }).click();
+  mode = "denied";
+  expect((await requestMoreReports(page)).status()).toBe(403);
   await expect(page.getByRole("region", { name: "Relatos registrados", exact: true }).getByRole("alert").filter({ hasText: "Continuação dos relatos recusada" })).toBeVisible();
   await expect(rows(page)).toHaveCount(0);
   await expect(page.getByText("Última consulta confirmada; aguardando atualização.", { exact: false })).toHaveCount(0);

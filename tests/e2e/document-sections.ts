@@ -1,4 +1,5 @@
-import { expect, test, type Locator, type Page } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
+import { pressWorkspaceControl } from "./workspace-controls";
 
 export type DocumentSection =
   | "overview"
@@ -33,7 +34,7 @@ export async function selectDocumentSection(
   await page.bringToFront();
   if (section === "history") { await openDocumentMore(page); await page.getByRole("menuitem", {name:"Identificação e registros preservados",exact:true}).click(); await expect(page.getByRole("tab", { name: "Identificação e registros preservados", exact: true })).toHaveAttribute("aria-selected", "true"); return; }
   const tab = page.getByRole("tab", { name: labels[section], exact: true });
-  await pressSectionControl(page, tab);
+  await pressWorkspaceControl(page, tab);
   try {
     await expect(tab).toHaveAttribute("aria-selected", "true");
   } catch (error) {
@@ -58,30 +59,10 @@ export async function selectDocumentSection(
     const destination = page.getByRole("navigation", { name: "Arquivos da ficha", exact: true })
       .getByRole("button", { name: section === "files" ? "Gerados" : "Anexos", exact: true });
     if ((await destination.getAttribute("aria-pressed")) !== "true")
-      await pressSectionControl(page, destination);
+      await pressWorkspaceControl(page, destination);
     await expect(destination).toHaveAttribute("aria-pressed", "true");
   }
   await expect(page.getByRole("tabpanel")).toHaveCount(1);
-}
-
-async function pressSectionControl(page: Page, control: Locator) {
-  if (test.info().project.use.hasTouch) {
-    await expect(page.locator(".hca-activity-overlay")).toBeHidden();
-    await control.evaluate(element => element.scrollIntoView({ block: "nearest", inline: "nearest", behavior: "instant" }));
-    const receivesTouch = () => control.evaluate(element => {
-      const { left, top, width, height } = element.getBoundingClientRect();
-      return element.contains(document.elementFromPoint(left + width / 2, top + height / 2));
-    });
-    if (!await receivesTouch()) {
-      await control.evaluate(element => element.scrollIntoView({ block: "center", inline: "center", behavior: "instant" }));
-    }
-    await expect.poll(receivesTouch).toBe(true);
-    await control.tap();
-    return;
-  }
-  await control.scrollIntoViewIfNeeded();
-  await page.evaluate(() => new Promise<void>(done => requestAnimationFrame(() => requestAnimationFrame(() => done()))));
-  await control.click();
 }
 
 export async function openBalanceComparison(page: Page) {
