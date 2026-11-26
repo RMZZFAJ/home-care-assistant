@@ -4630,6 +4630,10 @@ passaram no Chromium após esse ajuste, sem retentativa.
 
 ### Pendências para o aceite de L4
 
+Este bloco registra a situação anterior à aplicação remota. A
+[preparação final da PR 8](#preparação-final-da-pr-8) reúne as condições
+atuais de integração e os limites da validação.
+
 A mensagem de encaminhamento pede que os anexos de L4 sejam ignorados pelo
 Git. A seção 2 do comando mestre pede o versionamento no arranjo de L1–L3.
 Os dois anexos foram versionados em `b95c3872`, e a CI lê o HTML para as
@@ -5911,6 +5915,42 @@ O cenário complementar de BAL concluiu no Chromium após atingir o limite
 de tempo local no WebKit, depois das verificações responsivas. O build
 de produção e o lint dos fontes alterados passaram.
 
+### Preparação final da PR 8
+
+A PR 8 integra os lotes L3 (E07–E09) e L4 (E10–E12) à D-B. O
+[fechamento anterior](../../FECHAMENTO_PR7.md) preserva a passagem de L1/L2,
+as reservas e os gates operacionais. Os registros deste arquivo mapeiam as
+jornadas, os complementos e as evidências dos quatro lotes.
+
+A [CI de 138ad822][ci-138ad822] aprovou Linux, Windows, 911 integrações de
+banco e 1.860 cenários de navegador, com seis aprovações em retentativa.
+As repetições ocorreram na revogação de vínculo e na devolução em Chromium,
+na emissão e na chegada da COM em Android, e nos filtros de relatos e na
+consulta da ENT em iOS. O SonarCloud e o Preview passaram nesse commit.
+
+Na revisão aberta do Codex, a [comparação de e-mails][codex-pr8-email]
+podia deixar uma alteração válida como incerta. O envio e as consultas do
+perfil passam a comparar os endereços em minúsculas, tanto o confirmado
+quanto o pendente. A confirmação preserva a exigência de sessão recente
+e a consulta de recuperação preserva a solicitação original. O ajuste
+dispensa migration e configuração de Auth.
+
+Passaram os 12 testes dirigidos de modelos de leitura e os três cenários
+de perfil em Chromium, Android e iOS, sem retentativas. O teste de navegador
+recuperou a solicitação real no Auth local sem reenviá-la e verificou os
+links de confirmação. O build de produção e a verificação de tipos passaram.
+
+O Supabase compartilhado de testes registra as 385 migrations do
+candidato. O domínio principal ainda serve `fab595c7` e será atualizado
+pelo merge. Conferir a CI e o Preview do novo commit, o estado da revisão
+e, após a integração, a versão publicada, a compatibilidade do banco e a
+consulta autenticada. A evidência do Preview cobre leitura autenticada.
+
+As decisões reservadas de L2, a avaliação dos anexos versionados de L4
+e os gates de D-C/D6 permanecem rastreados. O piloto, a assistência em
+aparelhos reais, a impressão, a restauração operacional e os provedores
+externos exigem homologação própria.
+
 [preview-9f6b247e]: https://vercel.com/rmzzfajs-projects/home-care-assistant/E8HKkexPmqtPL6jXUY5RTg2jgVjv
 [sonar-pr8-preview]: https://sonarcloud.io/dashboard?id=RMZZFAJ_home-care-assistant&pullRequest=8
 [rabbit-pr8-preview]: https://github.com/RMZZFAJ/home-care-assistant/pull/8#issuecomment-7084927300
@@ -5921,3 +5961,5 @@ de produção e o lint dos fontes alterados passaram.
 [ci-e713cbdf]: https://github.com/RMZZFAJ/home-care-assistant/actions/runs/45710026101
 [preview-e713cbdf]: https://vercel.com/rmzzfajs-projects/home-care-assistant/9MykUYeCEEdufR3RRbNR4u3EoEjF
 [ci-3c44a2ef]: https://github.com/RMZZFAJ/home-care-assistant/actions/runs/45732190737
+[ci-138ad822]: https://github.com/RMZZFAJ/home-care-assistant/actions/runs/45744697377
+[codex-pr8-email]: https://github.com/RMZZFAJ/home-care-assistant/pull/8#discussion_r4705621124

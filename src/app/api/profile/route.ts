@@ -296,8 +296,8 @@ export async function POST(request: Request) {
             "VALIDATION_ERROR",
             "Não foi possível iniciar a alteração de e-mail.",
           );
-        const confirmedEmail = data.user.email === input.email && Boolean(data.user.email_confirmed_at);
-        if (!confirmedEmail && data.user.new_email !== input.email)
+        const confirmedEmail = emailContact.safeParse(data.user.email).data === input.email && Boolean(data.user.email_confirmed_at);
+        if (!confirmedEmail && emailContact.safeParse(data.user.new_email).data !== input.email)
           throw new ApiError("PERSISTENCE_UNCONFIRMED", "Ainda não foi possível confirmar o estado do novo e-mail.");
         return NextResponse.json({ saved: true, confirmedEmail });
       }

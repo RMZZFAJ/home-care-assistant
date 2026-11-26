@@ -69,8 +69,9 @@ test("E11-02 confirma sessão recente e recupera pedido real de e-mail sem reenv
   sql(`update auth.sessions set created_at = now() - interval '20 minutes' where user_id=${q(account.id)} and id=${q(sid)};`);
   await contacts.getByRole("button", { name: "Alterar e-mail", exact: true }).click();
   const email = page.getByRole("dialog", { name: "Alterar e-mail", exact: true });
-  const pending = `contato-${randomUUID()}@example.invalid`;
-  await email.getByRole("textbox", { name: "Novo e-mail", exact: true }).fill(pending);
+  const requested = `Contato-${randomUUID()}@EXAMPLE.INVALID`;
+  const pending = requested.toLowerCase();
+  await email.getByRole("textbox", { name: "Novo e-mail", exact: true }).fill(requested);
   await email.getByRole("button", { name: "Solicitar alteração", exact: true }).click();
   const recent = page.getByRole("dialog", { name: "Confirme que é você", exact: true });
   const currentPassword = recent.getByLabel(/Senha atual/);
@@ -81,7 +82,7 @@ test("E11-02 confirma sessão recente e recupera pedido real de e-mail sem reenv
   expect((await (await page.request.get("/api/profile")).json()).data.contactStatus).toMatchObject({ recent: false, pendingEmail: null });
   await currentPassword.fill(fixturePassword);
   await recent.getByRole("button", { name: "Confirmar sessão", exact: true }).click();
-  await expect(email.getByRole("textbox", { name: "Novo e-mail", exact: true })).toHaveValue(pending);
+  await expect(email.getByRole("textbox", { name: "Novo e-mail", exact: true })).toHaveValue(requested);
   const after = await (await page.request.get("/api/context")).json();
   expect(after.data.activeContext.care_recipient_id).toBe(f.patient);
 
@@ -89,7 +90,11 @@ test("E11-02 confirma sessão recente e recupera pedido real de e-mail sem reenv
   await page.route("**/api/profile", async route => {
     if (route.request().method() !== "POST" || route.request().postDataJSON().action !== "email") return route.continue();
     emailPosts += 1;
-    expect((await route.fetch()).ok()).toBe(true);
+    // Exercise the API with a caller that has not normalized the form value.
+    const response = await route.fetch({ postData: { action: "email", email: requested } });
+    expect(response.ok()).toBe(true);
+    expect(await response.json()).toEqual({ saved: true, confirmedEmail: false });
+    expect(route.request().postDataJSON()).toEqual({ action: "email", email: pending });
     await route.abort("failed");
   });
   await email.getByRole("button", { name: "Solicitar alteração", exact: true }).click();

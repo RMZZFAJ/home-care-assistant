@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { parseProfileRead } from "@/lib/validation/profile";
+import { emailContact, parseProfileRead } from "@/lib/validation/profile";
 import { parseConsumptionPage } from "@/lib/validation/consumption";
 const patient = "10000000-0000-4000-8000-000000000001", other = "10000000-0000-4000-8000-000000000002";
 const profile = { data: { full_name: "Pessoa fictícia", professional_registration: null, professional_state: null, professional_category: null, notification_preferences: {}, avatar: null, email: "pessoa@example.test", phone: null, providers: [] }, memberships: [], sessions: [] };
@@ -13,6 +13,17 @@ describe("personal and consumption read states", () => {
   it("retains nullable device information without inventing a device or timestamp", () => {
     const session = { id: other, createdAt: "2026-11-07T02:47:19.123456+00:00", updatedAt: null, userAgent: null, current: true };
     expect(parseProfileRead({ ...profile, sessions: [session] }).sessions[0]).toEqual(session);
+  });
+  it("compares submitted, confirmed and pending contact addresses in the same case", () => {
+    const requested = emailContact.parse(" Novo.Contato@Example.Test ");
+    expect(requested).toBe("novo.contato@example.test");
+    const status = { emailConfirmed: true, pendingEmail: "Novo.Contato@EXAMPLE.TEST", pendingPhone: null, recent: true, repeatSignIn: false };
+    const pending = parseProfileRead({ ...profile, data: { ...profile.data, contactStatus: status } }).data;
+    expect(pending.contactStatus?.pendingEmail).toBe(requested);
+    const confirmed = parseProfileRead({ ...profile, data: { ...profile.data, email: status.pendingEmail, contactStatus: { ...status, pendingEmail: null } } }).data;
+    expect(confirmed.email).toBe(requested);
+    expect(confirmed.contactStatus?.pendingEmail).toBeNull();
+    expect(emailContact.safeParse(undefined).success).toBe(false);
   });
   it.each([null, {}, { data: null, next: null }, { data: [], next: "bad-cursor" }])("does not replace an invalid consumption read with an empty list", value => {
     expect(() => parseConsumptionPage(value, patient)).toThrow("A resposta da consulta dos relatos não pôde ser lida");

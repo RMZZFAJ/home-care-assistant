@@ -4,6 +4,14 @@ O [fechamento A–D da PR 7](docs/audits/FECHAMENTO_PR7.md) reúne os critérios
 e as pendências para a próxima etapa. Este acompanhamento conserva o
 histórico dos incrementos de D-B.
 
+**26/11 — Preparação final da PR 8.** A revisão da D-B reúne L3 e L4.
+O Supabase compartilhado de testes tem 385 migrations aplicadas. A CI de
+`138ad822` passou com seis retentativas registradas. A revisão do Codex
+identificou a comparação de maiúsculas em e-mails. O ajuste usa o mesmo
+formato na solicitação e na recuperação. A CI e o Preview do commit final
+continuam sendo condições da integração.
+[Estado da PR 8](docs/audits/D/D-B/LOTES_EXECUCAO.md#preparação-final-da-pr-8).
+
 **24/11 — Matriz de permissões.** As cinco funções e a consulta individual
 usam todas as capacidades vigentes. A lista pessoal identifica a origem no
 banco. A revisão exige confirmação para ampliar o acesso ou alterar
