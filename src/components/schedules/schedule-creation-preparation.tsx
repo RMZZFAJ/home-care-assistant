@@ -32,7 +32,6 @@ import {
   parseScheduleRecovery,
   schedulePreparationCommitSchema,
   scheduleReceiptMatches,
-  type SchedulePreparationPacket,
   type SchedulePreparationReceipt,
   type ScheduleRecovery,
 } from "@/lib/validation/schedule-preparations";
@@ -96,6 +95,7 @@ const stored = z.discriminatedUnion("mode", [
     .strict(),
 ]);
 type Stored = z.infer<typeof stored>;
+type PendingConfirmation = Extract<Stored, { mode: "pending" }>;
 function equal(a: unknown, b: unknown) {
   const orderedFields = (_key: string, value: unknown) =>
     value !== null && typeof value === "object" && !Array.isArray(value)
@@ -160,7 +160,7 @@ export function ScheduleCreationPreparation({
   const [integrityError, setIntegrityError] = useState(initial.error),
     [error, setError] = useState(""),
     [message, setMessage] = useState("");
-  const [packet, setPacket] = useState<SchedulePreparationPacket | null>(null),
+  const [reviewed, setReviewed] = useState<PendingConfirmation | null>(null),
     [reviewRejected, setReviewRejected] = useState(false),
     [publishing, setPublishing] = useState(false),
     [proof, setProof] = useState<ScheduleRecovery | null>(null);
@@ -218,6 +218,8 @@ export function ScheduleCreationPreparation({
   const canEditTiming = fields.form !== "series" || Boolean(fields.residence && !residenceMismatch);
   const timingReady = fields.form !== "series" ||
     (residenceReady && canEditTiming);
+  const reviewTimingReady = reviewed?.fields.form !== "series" ||
+    (residenceReady && reviewed.fields.residence?.version === residence?.version);
   const [datesMonth, setDatesMonth] = useState<string | null>(null);
   const [discardChoice, setDiscardChoice] = useState<{
     draftId: string;
@@ -264,7 +266,7 @@ export function ScheduleCreationPreparation({
           "O resultado não corresponde ao preenchimento preservado.",
         );
       writeLocal(null, original);
-      setPacket(null);
+      setReviewed(null);
       setProof(null);
       setMessage(
         "Resultado recuperado por consulta autorizada. Nenhum novo envio foi realizado.",
@@ -304,7 +306,7 @@ export function ScheduleCreationPreparation({
         setStoredFields(row.content.schedule);
         setDatesMonth(null);
         setWorking(true);
-        setPacket(null);
+        setReviewed(null);
         setError("");
         return true;
       } catch (e) {
@@ -317,7 +319,7 @@ export function ScheduleCreationPreparation({
     onDiscard(action) {
       if (!mountedRef.current) return;
       if (localRef.current?.mode === "pending" || integrityError) return;
-      setPacket(null);
+      setReviewed(null);
       setProof(null);
       if (action === "acknowledge" && localRef.current?.mode === "carry") {
         setStoredFields(localRef.current.fields);
@@ -353,7 +355,7 @@ export function ScheduleCreationPreparation({
     Boolean(draft.consumed) ||
     Boolean(draft.pending) ||
     Boolean(pending) ||
-    Boolean(packet) ||
+    Boolean(reviewed) ||
     Boolean(integrityError);
   const snapshot = { schedule: fields };
   const reviewHeadingRef = useRef<HTMLHeadingElement>(null),
@@ -362,7 +364,7 @@ export function ScheduleCreationPreparation({
   const showReview =
     !protectedView &&
     !pending &&
-    Boolean(packet) &&
+    Boolean(reviewed) &&
     !draft.consumed &&
     !draft.conflict &&
     !draft.offered &&
@@ -446,15 +448,18 @@ export function ScheduleCreationPreparation({
       if (localRef.current?.mode === "carry" && !saved.replayed)
         writeLocal(null);
       setReviewRejected(false);
-      setPacket(
-        schedulePreparationCommitSchema.parse({
+      setReviewed({
+        mode: "pending",
+        userId,
+        fields,
+        packet: schedulePreparationCommitSchema.parse({
           careRecipientId: patient.id,
           purpose,
           draftCommit: { id: saved.id, revision: saved.revision },
           command,
           idempotencyKey: crypto.randomUUID(),
         }),
-      );
+      });
       setProof(null);
       setError("");
     } catch (e) {
@@ -468,14 +473,14 @@ export function ScheduleCreationPreparation({
   }
   function confirm(
     receipt: SchedulePreparationReceipt,
-    original: Extract<Stored, { mode: "pending" }>,
+    original: PendingConfirmation,
   ) {
     if (!equal(receipt.fields, original.fields))
       throw new Error(
         "O resultado não corresponde aos campos preservados. A referência foi mantida.",
       );
     writeLocal(null, original);
-    setPacket(null);
+    setReviewed(null);
     setProof(null);
     setMessage(
       "Resultado da escala conferido. A preparação foi utilizada uma única vez.",
@@ -488,12 +493,10 @@ export function ScheduleCreationPreparation({
       busyRef.current ||
       protectedView ||
       integrityError ||
-      (!pending && reviewRejected)
+      (!pending && (reviewRejected || !reviewTimingReady))
     )
       return;
-    const original: Extract<Stored, { mode: "pending" }> | null =
-      pending ??
-      (packet ? { mode: "pending" as const, userId, packet, fields } : null);
+    const original = pending ?? reviewed;
     if (!original || original.resolutionKey || (pending && !pendingHasCurrentContract)) return;
     const recovering = Boolean(pending);
     busyRef.current = true;
@@ -525,7 +528,7 @@ export function ScheduleCreationPreparation({
             e.code === "DRAFT_VERSION_CONFLICT" ||
             [401, 403, 404].includes(e.status)
           )
-            setPacket(null);
+            setReviewed(null);
           else setReviewRejected(true);
         } catch (c) {
           setIntegrityError(
@@ -603,7 +606,7 @@ export function ScheduleCreationPreparation({
       writeLocal(next, pending);
       setStoredFields(next.fields);
       setWorking(true);
-      setPacket(null);
+      setReviewed(null);
       setProof(null);
       setMessage(
         "A tentativa não foi aplicada. Sua edição foi preservada por sua escolha; nenhuma nova programação foi enviada.",
@@ -621,7 +624,7 @@ export function ScheduleCreationPreparation({
     }
   }
   const dirty =
-    !packet &&
+    !reviewed &&
     !pending &&
     !draft.offered &&
     !draft.consumed &&
@@ -677,7 +680,7 @@ export function ScheduleCreationPreparation({
         title={
           pending
             ? "Recuperar confirmação da escala"
-            : packet
+            : reviewed
               ? "Revisar escala"
               : purpose === "shift_type_create"
                 ? "Tipo de plantão"
@@ -847,7 +850,7 @@ export function ScheduleCreationPreparation({
               ) : null}
             </section>
           ) : null}
-          {showReview && packet ? (
+          {showReview && reviewed ? (
             <section
               className="hca-form-stack"
               aria-label="Conferência da nova escala"
@@ -862,14 +865,14 @@ export function ScheduleCreationPreparation({
                 </Notice>
               ) : null}
               <ScheduleReviewDetails
-                review={{ command: packet.command, workspace: data ?? empty }}
+                review={{ command: reviewed.packet.command, workspace: data ?? empty }}
               />
               <div className="hca-toolbar">
                 <ActionButton
                   disabled={publishing}
                   onClick={(event) => {
                     holdDialogFocus(event.currentTarget);
-                    setPacket(null);
+                    setReviewed(null);
                     setReviewRejected(false);
                   }}
                 >
@@ -882,7 +885,7 @@ export function ScheduleCreationPreparation({
                     draft.blocked ||
                     !writable ||
                     reviewRejected ||
-                    !timingReady ||
+                    !reviewTimingReady ||
                     (purpose === "schedule_series_create" && !data) ||
                     Boolean(integrityError)
                   }
