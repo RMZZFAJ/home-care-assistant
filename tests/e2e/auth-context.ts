@@ -36,7 +36,12 @@ export async function selectContext(page: Page, patient: string | null) {
         ? dialog.getByRole("button", { name: patient ? new RegExp("^" + name + "\\s") : label, exact: !patient })
         : submenu.getByRole("menuitemradio", { name: label, exact: !patient });
       await expect(choice).toBeEnabled();
-      submit = () => choice.click();
+      if (paginated) submit = () => choice.click();
+      else {
+        await choice.focus();
+        await expect(choice).toBeFocused();
+        submit = () => choice.press("Enter");
+      }
     }
     const [result] = await Promise.all([
       page.waitForResponse(response => {

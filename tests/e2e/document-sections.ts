@@ -65,12 +65,19 @@ export async function selectDocumentSection(
 }
 
 async function pressSectionControl(page: Page, control: Locator) {
-  // Horizontal tab scrolling and sticky layout must settle before the press.
-  // Touch projects use their native gesture, rather than an emulated mouse.
+  if (test.info().project.use.hasTouch) {
+    await expect(page.locator(".hca-activity-overlay")).toBeHidden();
+    await control.evaluate(element => element.scrollIntoView({ block: "center", inline: "center", behavior: "instant" }));
+    await expect.poll(() => control.evaluate(element => {
+      const { left, top, width, height } = element.getBoundingClientRect();
+      return element.contains(document.elementFromPoint(left + width / 2, top + height / 2));
+    })).toBe(true);
+    await control.tap();
+    return;
+  }
   await control.scrollIntoViewIfNeeded();
   await page.evaluate(() => new Promise<void>(done => requestAnimationFrame(() => requestAnimationFrame(() => done()))));
-  if (test.info().project.use.hasTouch) await control.tap();
-  else await control.click();
+  await control.click();
 }
 
 export async function openBalanceComparison(page: Page) {

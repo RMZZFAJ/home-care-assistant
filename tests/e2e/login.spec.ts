@@ -1,6 +1,7 @@
 import { expect, test } from "@playwright/test";
 import { readFileSync } from "node:fs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
+import { selectContext } from "./auth-context";
 import {
   assertLocalProject,
   fixtureFile,
@@ -56,6 +57,7 @@ test("login apresenta falha de credencial e de rede e permite recuperar a sessã
   await page.unroute("**/auth/v1/token?**");
   await page.getByRole("button", { name: "Entrar", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Visão geral", exact: true })).toBeVisible();
+  await selectContext(page, null);
   await expect(page.getByRole("button", { name: /^Paciente atual/ })).toBeEnabled();
   await page.getByLabel("Menu do usuário", { exact: true }).click();
   await page.getByRole("menuitem", { name: "Sair", exact: true }).click();

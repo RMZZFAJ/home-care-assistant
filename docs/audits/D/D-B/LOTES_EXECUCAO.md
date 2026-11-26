@@ -1810,7 +1810,9 @@ tinham 333 versões.
 A fila vinculada ficou vazia. O RPC de filtro exige usuário autenticado
 e a função privada de consulta fica indisponível ao papel de aplicação.
 
-L4 aguarda definição.
+As 23 migrations de L4 estão no local e no remoto. O projeto vinculado
+tem 385 versões e nenhuma migration pendente. Consulte a
+[aplicação remota de L4](#aplicação-remota-de-l4-e-retestes-de-ci).
 
 ## Triagem dos avisos de 19/11/2026
 
@@ -5852,6 +5854,38 @@ O build de produção, o lint dos fontes afetados e a proteção das 84
 migrations históricas passaram. As correções dispensam migration e
 dependem da CI da PR para validação do novo commit.
 
+### Aplicação remota de L4 e retestes de CI
+
+A [CI de e713cbdf][ci-e713cbdf] aprovou Linux, Windows e banco. A recuperação
+do login falhou em Chromium e Android. A declaração de contingência cortou
+parte do título de materiais a 360 px no WebKit. Houve duas retentativas
+bem-sucedidas, na troca de paciente durante a retomada da REQ e na abertura
+dos arquivos de uma COM aprovada.
+
+Os ajustes exercitam a escolha global no teste de login, confirmam o foco
+antes de ativar por teclado a opção do submenu e mantêm a ação de revisão
+da declaração em uma linha no rodapé móvel. O teste de abas aguarda a
+liberação do alvo físico do toque. Os seis primeiros retestes passaram
+sem retentativa em Chromium, Android e iOS. A emissão da COM passou nas
+duas execuções dirigidas em Android, também sem retentativas.
+
+O responsável autorizou atualizar o Supabase compartilhado de testes e
+reservou a atualização do domínio principal para o merge. Foi verificado
+o backup SQL cifrado `697807e0-ee40-4746-b97e-6e277d75796c`, com esquema e
+dados de 211 tabelas, incluindo metadados de arquivos. A simulação listou
+somente as 23 migrations de L4, de `20261124042309` a `20261124232228`.
+O CLI aplicou as 23. A nova simulação confirmou 385 versões e fila vazia.
+O pós-check encontrou as mesmas 10 contas, um paciente, 46 fichas, 29
+linhas de catálogo, 92 movimentos de estoque e 42 objetos registrados.
+
+Após a aplicação, o [Preview de e713cbdf][preview-e713cbdf] autenticou uma
+conta fictícia existente. O contrato de execução, o histórico e a consulta
+de contingências responderam HTTP 200. As 22 referências REQ retornadas
+tinham revisão. O banco tinha zero dossiês, portanto a conferência remota
+cobriu leitura. Os testes locais cobrem a gravação e as recusas por revisão.
+Até o merge, a aplicação do domínio principal ainda usa `fab595c7` e a
+confirmação de novos vínculos de contingência pode ser recusada nesse deploy.
+
 [preview-9f6b247e]: https://vercel.com/rmzzfajs-projects/home-care-assistant/E8HKkexPmqtPL6jXUY5RTg2jgVjv
 [sonar-pr8-preview]: https://sonarcloud.io/dashboard?id=RMZZFAJ_home-care-assistant&pullRequest=8
 [rabbit-pr8-preview]: https://github.com/RMZZFAJ/home-care-assistant/pull/8#issuecomment-7084927300
@@ -5859,3 +5893,5 @@ dependem da CI da PR para validação do novo commit.
 [ci-77fdce48]: https://github.com/RMZZFAJ/home-care-assistant/actions/runs/45556810328
 [preview-77fdce48]: https://home-care-assistant-kxfvghku7-rmzzfajs-projects.vercel.app
 [ci-893474d8]: https://github.com/RMZZFAJ/home-care-assistant/actions/runs/45683741967
+[ci-e713cbdf]: https://github.com/RMZZFAJ/home-care-assistant/actions/runs/45710026101
+[preview-e713cbdf]: https://vercel.com/rmzzfajs-projects/home-care-assistant/9MykUYeCEEdufR3RRbNR4u3EoEjF
