@@ -43,11 +43,17 @@ function Preference({ userId, active }: { userId: string; active: boolean }) {
         <Icon name="check" />Aplicar apresentação
       </ActionButton></>}>
       <fieldset className="hca-preference-choices"><legend>Como você quer ver o início neste aparelho?</legend>
-        {choices.map(choice => <label key={choice.mode} className="hca-preference-option">
-          <input type="radio" name={groupId} value={choice.mode} checked={draft.selected === choice.mode}
-            onChange={() => setDraft({ baseline: draft.baseline, selected: choice.mode })} />
-          <span><strong>{choice.title}</strong><small>{choice.help}</small></span>
-        </label>)}
+        {choices.map(choice => {
+          const optionId = groupId + "-" + choice.mode;
+          const labelId = optionId + "-label";
+          const helpId = optionId + "-help";
+          return <label key={choice.mode} className="hca-preference-option" htmlFor={optionId}>
+            <input id={optionId} type="radio" name={groupId} value={choice.mode} checked={draft.selected === choice.mode}
+              aria-labelledby={labelId} aria-describedby={helpId}
+              onChange={() => setDraft({ baseline: draft.baseline, selected: choice.mode })} />
+            <span><strong id={labelId}>{choice.title}</strong><small id={helpId}>{choice.help}</small></span>
+          </label>;
+        })}
       </fieldset>
     </Dialog> : null}
     {active && outcome ? <Dialog open success={outcome === "saved"} failure={outcome === "saved" ? undefined : "rejected"}

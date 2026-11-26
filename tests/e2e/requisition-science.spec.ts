@@ -164,7 +164,9 @@ test("P02 preferência pessoal tem revisão em leitura e recupera a mesma escolh
     await edit.click();
     const editor = page.getByRole("dialog", { name: "Ciência de requisições", exact: true });
     await expect(editor.getByRole("radio", { name: /^Confirmação manual/ })).toBeChecked();
-    await editor.getByRole("radio", { name: /^Ciência na emissão/ }).check();
+    const tacit = editor.getByRole("radio", { name: "Ciência na emissão", exact: true });
+    await expect(tacit).toHaveAccessibleDescription("A ciência poderá ser registrada quando uma requisição elegível for emitida.");
+    await tacit.check();
     await editor.getByRole("button", { name: "Revisar consentimento", exact: true }).click();
     const review = page.getByRole("dialog", { name: "Confirmar minha preferência", exact: true }); await expect(review).toBeVisible();
     expect((await rpc(family, "my_requisition_science_preference")).version).toBe(before.version);

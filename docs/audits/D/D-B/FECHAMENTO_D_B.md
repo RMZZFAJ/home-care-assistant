@@ -129,6 +129,12 @@ revogação. As capturas ficaram em
 comparação anterior de avisos, matriz, preferências, dossiê e Central
 técnica também passaram sem retentativa.
 
+As jornadas de aviso e recuperação de agenda também passaram em quatro
+casos no perfil Android e quatro no perfil iOS/WebKit, sem retentativas.
+Os testes verificaram buscas e tarefas, revogação após listar o aviso,
+resposta perdida após publicar a programação e encerramento recuperável
+de uma tentativa. Relatório em `output/playwright/d-b-pr8-local-mobile/`.
+
 **Documentos.** DOC-A está implementado no escopo aprovado de aparência e
 geração. DOC-B tem os complementos de BAL, COM, DEV, cancelamento e vínculos.
 DOC-C.2–5 e o escopo técnico de DOC-D estão integrados. DOC-C.1 continua
@@ -213,18 +219,25 @@ cobertura real das revisões disponíveis. [Linha do tempo da PR][pr8].
   Conferir novos apontamentos do SHA final.
 
 - **CI do candidato.** A CI de `e783f6c5` aprovou Windows, Linux e banco.
-  Os sete jobs de navegador estavam em execução. Na CI anterior,
+  O job de banco passou na preparação, no replay de migrations e em 911
+  testes de integração, sem falhas ou casos omitidos. Os sete jobs de
+  navegador estavam em execução na consulta. Na CI anterior,
   1.854 casos passaram de primeira, quatro passaram em
   retentativa e dois falharam nas duas tentativas, ambos iOS. O SHA publicado
   tem reparos para alvo encoberto no celular, sincronização dos testes e avanço
   com autosave da transferência. Conferir log e relatório por projeto do
   candidato final, incluindo retentativas e cancelamentos.
-  [CI de e783f6c5][ci] e [CI anterior][prior-ci].
+  [CI de e783f6c5][ci], [job de banco][db-ci] e [CI anterior][prior-ci].
 
-- **Qualidade do código.** O SonarCloud aprovou o gate de `e783f6c5`. O
-  resultado deve ser renovado para o SHA final. O adiamento de uma revisão
-  abrangente de duplicação continua registrado. Preservar a diferença entre
-  alerta do editor, dívida prévia e defeito confirmado. [SonarCloud][sonar] e
+- **Qualidade do código.** O SonarCloud aprovou o gate de `e783f6c5`, com
+  0,9% de duplicação no código novo. A consulta encontrou três apontamentos
+  abertos. Os dois `S6853` motivaram a associação explícita do nome e do
+  texto de ajuda das opções de apresentação e ciência. O `S7773` foi
+  atendido no auxiliar de TOTP usado em testes. Uma amostra isolada
+  reproduziu o `S6853` no padrão anterior e passou com o novo padrão. Os
+  três testes de perfil, ciência e MFA passaram em Chromium sem retentativa.
+  O gate e a lista de apontamentos devem ser renovados para o SHA final.
+  A revisão abrangente da duplicação continua adiada. [SonarCloud][sonar] e
   [triagem Sonar][quality].
 
 - **Banco local e remoto.** 385 migrations no repositório, desenvolvimento local
@@ -317,6 +330,7 @@ escopo e critérios acordados para DC-01 a DC-07.
 [rabbit-fourth]: https://github.com/RMZZFAJ/home-care-assistant/pull/8#pullrequestreview-6015267320
 [rabbit-fifth]: https://github.com/RMZZFAJ/home-care-assistant/pull/8#pullrequestreview-6015574742
 [ci]: https://github.com/RMZZFAJ/home-care-assistant/actions/runs/45899139085
+[db-ci]: https://github.com/RMZZFAJ/home-care-assistant/actions/runs/45899139085/job/140180331562
 [prior-ci]: https://github.com/RMZZFAJ/home-care-assistant/actions/runs/45800866850
 [sonar]: https://sonarcloud.io/dashboard?id=RMZZFAJ_home-care-assistant&pullRequest=8
 [preview]: https://vercel.com/rmzzfajs-projects/home-care-assistant/8QdxGRvYgFCEjkUK4hH3bjSjSUhb

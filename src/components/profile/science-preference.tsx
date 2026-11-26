@@ -62,10 +62,16 @@ function ScienceEditor({ value, discard, save }: PreferenceEditorProps<{ mode: S
     </>}>
     <div className="hca-preference-body">
       <fieldset className="hca-preference-choices"><legend>Escolha como registrar sua ciência nas próximas requisições.</legend>
-        {choices.map(choice => <label key={choice.mode} className="hca-preference-option">
-          <input type="radio" name={groupId} value={choice.mode} checked={mode === choice.mode} onChange={() => setMode(choice.mode)} />
-          <span><strong>{choice.label}</strong><small>{choice.help}</small></span>
-        </label>)}
+        {choices.map(choice => {
+          const optionId = groupId + "-" + choice.mode;
+          const labelId = optionId + "-label";
+          const helpId = optionId + "-help";
+          return <label key={choice.mode} className="hca-preference-option" htmlFor={optionId}>
+            <input id={optionId} type="radio" name={groupId} value={choice.mode} checked={mode === choice.mode}
+              aria-labelledby={labelId} aria-describedby={helpId} onChange={() => setMode(choice.mode)} />
+            <span><strong id={labelId}>{choice.label}</strong><small id={helpId}>{choice.help}</small></span>
+          </label>;
+        })}
       </fieldset>
       <p className="hca-preference-hint"><Icon name="clock" width={17} height={17} />Vale para novas requisições, quando o paciente permitir. O histórico de ciências anteriores permanece.</p>
       <details className="hca-preference-details"><summary>O que esta ciência registra?</summary>

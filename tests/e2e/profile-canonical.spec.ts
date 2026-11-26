@@ -232,7 +232,9 @@ test("L4 canais descartam edição concorrente e conferem uma tentativa no máxi
   await selectProfileSection(page, "identity");
   await page.getByRole("button", { name: /^Apresentação do início/ }).click();
   const presentation = page.getByRole("dialog", { name: "Apresentação do início", exact: true });
-  await presentation.getByRole("radio", { name: /^Simples/ }).check();
+  const simple = presentation.getByRole("radio", { name: "Simples", exact: true });
+  await expect(simple).toHaveAccessibleDescription("Áreas complementares começam recolhidas e continuam disponíveis para abrir.");
+  await simple.check();
   await presentation.getByRole("button", { name: "Aplicar apresentação", exact: true }).click();
   await page.getByRole("dialog", { name: "Apresentação aplicada", exact: true }).getByRole("button", { name: "Concluir", exact: true }).click();
   await expect(page.getByRole("region", { name: "Apresentação do início", exact: true })).toContainText("Simples neste aparelho");
