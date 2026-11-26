@@ -47,8 +47,8 @@ a liberação operacional continuam pendentes.
   documentadas. Alguns cenários existem somente no produto.
 
   Aceitar as diferenças descritas no [registro dos lotes](LOTES_EXECUCAO.md) ou
-  indicar os casos a ajustar antes do merge. Uma diferença concreta de L4 está
-  descrita abaixo.
+  indicar os casos a ajustar antes do merge. O último recorte de L4 está
+  descrito abaixo.
 
 - **DB-06.** **DOC-C.1 e expansão de rascunhos.** O responsável adiou as
   modalidades e superfícies ainda fora do escopo.
@@ -114,14 +114,20 @@ e levar a mudança para a próxima etapa.
   recuperação foram exercitados localmente com Auth real. A homologação com
   pessoas, dispositivos e provedores permanece aberta.
 
-**Diferença visual observada em L4.** No painel do aviso ativo de uma REQ,
-o laboratório destaca “Sua ciência está pendente” e explica a tarefa no
-contexto da pessoa. No produto conferido, o título é “Requisição emitida”,
-com autor e ação em áreas próprias. O destino autorizado foi exercitado.
-Falta decidir se a linguagem de tarefa deve ocupar o título e o texto
-principal antes da integração. A comparação foi feita a 360 e 412 px, junto
-com matriz de permissões, preferências, dossiê e Central técnica. Os cinco
-casos dirigidos em Chromium passaram sem retentativa.
+**Painel de avisos de L4.** A comparação a 360 e 412 px mostrou que o
+laboratório dava destaque à tarefa, enquanto o painel publicado trazia o
+título do evento. O ajuste local mostra “Sua ciência está pendente” quando
+há tarefa de REQ e explica a emissão com dados autorizados do paciente e
+da autoria. Entrega, compra ou doação e balanço também recebem títulos
+próprios quando têm tarefa pendente. O painel usa o evento registrado nos
+avisos sem tarefa. O cabeçalho compartilhado, a exibição da data completa
+e a cor azul do marcador de leitura ainda diferem da simulação.
+Três casos em Chromium passaram sem retentativa, cobrindo busca, filtros,
+paginação, marcação como visto, foco, acessibilidade a 360 e 412 px e
+revogação. As capturas ficaram em
+`output/playwright/d-b-pr8-e11-notice-detail/`. Os cinco casos da
+comparação anterior de avisos, matriz, preferências, dossiê e Central
+técnica também passaram sem retentativa.
 
 **Documentos.** DOC-A está implementado no escopo aprovado de aparência e
 geração. DOC-B tem os complementos de BAL, COM, DEV, cancelamento e vínculos.
@@ -201,9 +207,10 @@ cobertura real das revisões disponíveis. [Linha do tempo da PR][pr8].
 ## Condições para o merge
 
 - **Revisão e decisões.** As discussões publicadas foram triadas. Publicar a
-  correção local da agenda após autorização expressa. Registrar quais decisões
-  DB-01 a DB-06 precisam entrar nesse candidato e quais podem seguir para D-C
-  ou escopo posterior. Conferir novos apontamentos do SHA final.
+  correção da agenda, o painel de avisos e o quadro de fechamento após
+  autorização expressa. Registrar quais decisões DB-01 a DB-06 precisam
+  entrar nesse candidato e quais podem seguir para D-C ou escopo posterior.
+  Conferir novos apontamentos do SHA final.
 
 - **CI do candidato.** A CI de `e783f6c5` aprovou Windows, Linux e banco.
   Os sete jobs de navegador estavam em execução. Na CI anterior,

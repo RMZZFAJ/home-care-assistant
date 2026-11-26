@@ -151,10 +151,14 @@ test("inbox combines label search, type and live tasks before pagination", async
       await info.attach(`avisos-${width}`, { body: await page.screenshot(), contentType: "image/png" });
       if (info.project.name === "chromium") {
         await model.locator(".e11-notice-open").first().click();
-        await expect(frame.getByRole("heading", { name: "Na ficha", exact: true })).toBeVisible();
+        const taskHeading = "Sua ciência está pendente";
+        await expect(frame.getByRole("heading", { name: taskHeading, exact: true })).toBeVisible();
         await open.click();
         const notice = page.getByRole("dialog", { name: code, exact: true });
         await expect(notice.getByRole("heading", { name: "Na ficha", exact: true })).toBeVisible();
+        await expect(notice.getByRole("heading", { name: taskHeading, exact: true })).toBeVisible();
+        await expect(notice.getByText("Não visto", { exact: true })).toBeVisible();
+        await expect(notice.getByText(/emitiu uma requisição de materiais para/)).toBeVisible();
         const panel = notice.getByRole("region", { name: "Conteúdo de " + code, exact: true });
         await expect.poll(() => panel.evaluate(node => node.scrollWidth <= node.clientWidth)).toBe(true);
         await auditFromTop(page, `E11-04 painel de aviso ${width}`);

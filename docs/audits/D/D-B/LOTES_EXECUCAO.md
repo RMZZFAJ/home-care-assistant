@@ -5570,6 +5570,14 @@ O painel exibe o evento e o instante registrados pelo sistema. O cabeçalho
 mantém o seletor de paciente de L1. O axe passou nas duas larguras na
 central e no painel, e a área rolável ficou dentro da largura do aparelho.
 
+Na conferência seguinte, o título do painel passou a identificar a tarefa
+pendente, como no laboratório. Para uma requisição emitida com autoria
+disponível, o texto identifica o paciente e quem a emitiu. A comparação
+a 360 e 412 px confirmou a hierarquia e a ação no rodapé. Três casos em
+Chromium passaram sem retentativa, incluindo leitura, filtros e revogação.
+As capturas e diferenças observadas constam no
+[quadro de fechamento](FECHAMENTO_D_B.md).
+
 O build de produção local e 41 testes unitários de navegação e consulta
 de avisos passaram. Sete cenários em Chromium passaram sem retentativa
 entre as rodadas. A compra verificou a segunda leitura de autorização,
