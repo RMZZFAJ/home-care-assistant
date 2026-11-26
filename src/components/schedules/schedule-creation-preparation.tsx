@@ -686,6 +686,7 @@ export function ScheduleCreationPreparation({
         onClose={close}
         restoreFocusTo={opener}
         restoreFocusFallbackRef={fallbackFocus}
+        restoreFocusToAriaDisabled={purpose === "schedule_series_create"}
         busy={publishing || draft.busy}
         preventClose={Boolean(pending) || Boolean(draft.pending)}
         hasUnsavedChanges={

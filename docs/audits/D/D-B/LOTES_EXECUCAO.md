@@ -5886,6 +5886,31 @@ cobriu leitura. Os testes locais cobrem a gravação e as recusas por revisão.
 Até o merge, a aplicação do domínio principal ainda usa `fab595c7` e a
 confirmação de novos vínculos de contingência pode ser recusada nesse deploy.
 
+### Revisão da CI de 3c44a2ef
+
+A [CI de 3c44a2ef][ci-3c44a2ef] aprovou Linux, Windows, as 911
+integrações de banco e seis dos sete grupos de navegador. A auditoria do
+BAL em 320 px falhou nas duas tentativas do iOS 1. A agenda passou na
+segunda tentativa do Chromium 2. Essa foi a única aprovação em
+retentativa encontrada nos logs da execução.
+
+A navegação touch por abas agora preserva a posição vertical quando o
+controle pode receber o toque. A auditoria do BAL começa no topo após a
+mudança de largura, com as mesmas regras de acessibilidade. O teste
+continua conferindo os recontos, suas referências e o conteúdo do PDF.
+
+Na agenda, fechar a edição devolve o foco a Nova programação durante uma
+consulta em segundo plano. A ação permanece bloqueada até a consulta
+terminar. O teste segura a resposta da consulta e tenta acionar o botão
+com Enter antes da liberação. Esta correção dispensa migrations.
+
+Os sete retestes dirigidos concluíram sem retentativa nas rodadas que
+validaram as correções. A agenda passou em Chromium e WebKit com a
+resposta pendente, e o BAL que falhava na CI passou no WebKit em 320 px.
+O cenário complementar de BAL concluiu no Chromium após atingir o limite
+de tempo local no WebKit, depois das verificações responsivas. O build
+de produção e o lint dos fontes alterados passaram.
+
 [preview-9f6b247e]: https://vercel.com/rmzzfajs-projects/home-care-assistant/E8HKkexPmqtPL6jXUY5RTg2jgVjv
 [sonar-pr8-preview]: https://sonarcloud.io/dashboard?id=RMZZFAJ_home-care-assistant&pullRequest=8
 [rabbit-pr8-preview]: https://github.com/RMZZFAJ/home-care-assistant/pull/8#issuecomment-7084927300
@@ -5895,3 +5920,4 @@ confirmação de novos vínculos de contingência pode ser recusada nesse deploy
 [ci-893474d8]: https://github.com/RMZZFAJ/home-care-assistant/actions/runs/45683741967
 [ci-e713cbdf]: https://github.com/RMZZFAJ/home-care-assistant/actions/runs/45710026101
 [preview-e713cbdf]: https://vercel.com/rmzzfajs-projects/home-care-assistant/9MykUYeCEEdufR3RRbNR4u3EoEjF
+[ci-3c44a2ef]: https://github.com/RMZZFAJ/home-care-assistant/actions/runs/45732190737

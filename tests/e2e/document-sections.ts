@@ -67,11 +67,15 @@ export async function selectDocumentSection(
 async function pressSectionControl(page: Page, control: Locator) {
   if (test.info().project.use.hasTouch) {
     await expect(page.locator(".hca-activity-overlay")).toBeHidden();
-    await control.evaluate(element => element.scrollIntoView({ block: "center", inline: "center", behavior: "instant" }));
-    await expect.poll(() => control.evaluate(element => {
+    await control.evaluate(element => element.scrollIntoView({ block: "nearest", inline: "nearest", behavior: "instant" }));
+    const receivesTouch = () => control.evaluate(element => {
       const { left, top, width, height } = element.getBoundingClientRect();
       return element.contains(document.elementFromPoint(left + width / 2, top + height / 2));
-    })).toBe(true);
+    });
+    if (!await receivesTouch()) {
+      await control.evaluate(element => element.scrollIntoView({ block: "center", inline: "center", behavior: "instant" }));
+    }
+    await expect.poll(receivesTouch).toBe(true);
     await control.tap();
     return;
   }

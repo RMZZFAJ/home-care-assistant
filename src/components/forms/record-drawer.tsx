@@ -4,9 +4,10 @@ import type { IconName } from "@/components/ui/icon";
 import { Dialog, Drawer } from "@/components/ui/overlays";
 
 /** Contextual editing keeps the list and its filters in place. */
-export function RecordDrawer({ title, children, recovery, onClose, busy = false, restoreFocusTo, restoreFocusFallbackRef, trackChanges = true, preventClose = false, hasUnsavedChanges, keyboardScrollable = false, uncertainOutcome = false, exitDialog = false, modal = false, kicker, subtitle, headingIcon, popupClassName, footer }: {
+export function RecordDrawer({ title, children, recovery, onClose, busy = false, restoreFocusTo, restoreFocusFallbackRef, restoreFocusToAriaDisabled = false, trackChanges = true, preventClose = false, hasUnsavedChanges, keyboardScrollable = false, uncertainOutcome = false, exitDialog = false, modal = false, kicker, subtitle, headingIcon, popupClassName, footer }: {
   title: string; children: ReactNode; onClose: () => void; busy?: boolean; restoreFocusTo?: HTMLElement | null; restoreFocusFallbackRef?: RefObject<HTMLElement | null>; trackChanges?: boolean; preventClose?: boolean;
   recovery?: ReactNode | ((requestClose: () => void) => ReactNode);
+  restoreFocusToAriaDisabled?: boolean;
   hasUnsavedChanges?: boolean;
   keyboardScrollable?: boolean;
   uncertainOutcome?: boolean;
@@ -27,11 +28,12 @@ export function RecordDrawer({ title, children, recovery, onClose, busy = false,
     // A replacement effect (including Strict Mode's probe) is not a close.
     if (restoreFrameRef.current !== undefined) cancelAnimationFrame(restoreFrameRef.current);
     const fallback = restoreFocusFallbackRef?.current;
+    const unavailable = restoreFocusToAriaDisabled ? ":disabled" : ':disabled,[aria-disabled="true"]';
     return () => { restoreFrameRef.current = requestAnimationFrame(() => {
-      if (restoreFocusTo?.isConnected && !restoreFocusTo.matches(':disabled,[aria-disabled="true"]')) restoreFocusTo.focus();
+      if (restoreFocusTo?.isConnected && !restoreFocusTo.matches(unavailable)) restoreFocusTo.focus();
       else if (fallback?.isConnected) fallback.focus();
     }); };
-  }, [restoreFocusTo,restoreFocusFallbackRef]);
+  }, [restoreFocusTo, restoreFocusFallbackRef, restoreFocusToAriaDisabled]);
   const requestClose = () => { if (!busy && !preventClose) { if (uncertainOutcome || (hasUnsavedChanges ?? dirty)) setDiscard(true); else onClose(); } };
   const continueEditing = () => {
     if (busy || preventClose) return;

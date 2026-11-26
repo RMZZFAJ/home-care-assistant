@@ -90,8 +90,26 @@ test("horários da residência governam plantão isolado, exceção noturna e re
   await create.click();
   const form = page.getByRole("dialog", { name: "Programação de plantões", exact: true });
   await expect(form.getByLabel("Data do plantão", { exact: true })).toHaveValue(day);
-  await form.getByRole("button", { name: "Fechar edição", exact: true }).click();
-  await expect(form).toHaveCount(0);
+  const scheduleRead = (url: URL) => url.pathname === "/api/schedules" && url.searchParams.get("careRecipientId") === fixture.patient;
+  const revalidation = Promise.withResolvers<void>();
+  await page.route(scheduleRead, async route => {
+    await revalidation.promise;
+    await route.continue();
+  });
+  try {
+    await page.evaluate(() => window.dispatchEvent(new Event("hca:data-changed")));
+    await expect(page.locator('button[aria-label="Nova programação"]')).toHaveAttribute("aria-disabled", "true");
+    await form.getByRole("button", { name: "Fechar edição", exact: true }).click();
+    await expect(form).toHaveCount(0);
+    await expect(create).toBeFocused();
+    await expect(create).toBeDisabled();
+    await page.keyboard.press("Enter");
+    await expect(form).toHaveCount(0);
+  } finally {
+    revalidation.resolve();
+    await page.unrouteAll({ behavior: "wait" });
+  }
+  await expect(create).toBeEnabled();
   await expect(create).toBeFocused();
   await create.click();
   await form.getByLabel("Profissional", { exact: true }).selectOption(worker.id);

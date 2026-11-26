@@ -249,7 +249,6 @@ function Agenda({
     publishOwn = can(context, "schedule.manage.own");
   const mayCreate = team || publishOwn || can(context, "schedule.propose");
   const residence = useResidenceHours(patient.id, true);
-  const residenceReady = !residence.loading && !residence.error && Boolean(residence.data?.hours);
   const params = useSearchParams(),
     reference = params.get("ref"),
     notice = useNotificationReference(
@@ -403,7 +402,10 @@ function Agenda({
       </section>
     );
   };
-  const createDisabled = busy || uncertain || !residenceReady || !data?.types.some(type => type.is_active);
+  const createUnavailable = uncertain || Boolean(read.error || residence.error)
+    || !residence.data?.hours || !data?.types.some(type => type.is_active);
+  // An existing action stays focusable during revalidation. Submission still waits for both reads.
+  const checkingCreation = !createUnavailable && (busy || residence.loading);
   const occupied = new Set(period.dates.filter(date => byDay.get(date)?.length));
   const dailyShifts = byDay.get(day) ?? [];
   const selectedShift = balanceSelection && dailyShifts.find(shift => shift.id === balanceSelection.shift.id);
@@ -455,8 +457,10 @@ function Agenda({
       {mode === "day" ? <ScheduleDayCalendar selected={day} days={period.dates} occupied={occupied} onSelect={setDay} /> : null}
       <div className="hca-agenda-roster-heading">
         <h2 ref={rosterRef} tabIndex={-1}>{mode === "day" ? "Plantões do dia" : mode === "week" ? "Plantões da semana" : "Plantões do mês"}</h2>
-        {mayCreate ? <ActionButton compact aria-label="Nova programação" disabled={createDisabled}
-          onClick={event => open({ kind: "series" }, event.currentTarget)}><Icon name="plus" /></ActionButton> : null}
+        {mayCreate ? <ActionButton compact aria-label="Nova programação" disabled={createUnavailable}
+          aria-disabled={checkingCreation || undefined} onClick={event => {
+            if (!createUnavailable && !checkingCreation) open({ kind: "series" }, event.currentTarget);
+          }}><Icon name="plus" /></ActionButton> : null}
       </div>
       {readTeam ? <CheckboxField className="hca-agenda-only-mine" role="switch" label="Só meus plantões" checked={onlyMine}
         onChange={event => setOnlyMine(event.target.checked)} /> : null}

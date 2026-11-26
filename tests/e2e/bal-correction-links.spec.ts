@@ -94,7 +94,7 @@ test("BAL shows the extra and its later catalogue count in the original review a
       .toHaveAttribute("href", "/documentos/" + f.document.id + "/arquivos?version=" + version);
 
   await page.setViewportSize({ width: 320, height: 940 });
-  await audit(page, "bal-extra-correction-links-320");
+  await auditFromTop(page, "bal-extra-correction-links-320");
   const response = await generatedPdf(page, "/api/documents/" + f.document.id + "/pdf");
   expect(response.status()).toBe(200);
   const pdf = await PDF.load(await response.body());
