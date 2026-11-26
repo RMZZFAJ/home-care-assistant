@@ -1,5 +1,9 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
+O [quadro de fechamento de D-B](docs/audits/D/D-B/FECHAMENTO_D_B.md) reúne
+as decisões em aberto, as lacunas de L1 a L4, a revisão da PR 8 e as
+condições para começar D-C.
+
 O [fechamento A–D da PR 7](docs/audits/FECHAMENTO_PR7.md) reúne os critérios
 e as pendências para a próxima etapa. Este acompanhamento conserva o
 histórico dos incrementos de D-B.

@@ -3,8 +3,8 @@
 **Atualizado em 26/11/2026.** A [PR #8][pr-l4-history] reúne L3 e L4 na
 branch `feat/phase-d-continuation`, em revisão sobre `master` em `fab595c7`.
 A [PR #7](https://github.com/RMZZFAJ/home-care-assistant/pull/7) incorporou
-L1 e L2. A [etapa final](#ci-de-4fc30699-e-condições-de-fechamento) acompanha
-a CI, a validação do Preview e as pendências da D-B.
+L1 e L2. O [quadro de fechamento de D-B](FECHAMENTO_D_B.md) reúne a triagem
+da PR 8, as decisões em aberto, o candidato mais recente e os gates de D-C.
 Este registro acompanha o que entrou no produto, a comparação com cada
 laboratório e as pendências por lote. As evidências das entregas e a fila
 transversal ficam no [acompanhamento D-B](../../../../TEMP_D_B_ATUALIZACAO.md)

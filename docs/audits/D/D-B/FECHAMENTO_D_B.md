@@ -1,0 +1,332 @@
+# Pendências para encerrar D-B e iniciar D-C
+
+Posição de 26/11/2026. A [PR 8][pr8] está aberta para revisão em
+`feat/phase-d-continuation`. O último candidato publicado conferido foi
+`e783f6c55c754eccb59529939bfa5141164ff663`. L1 e L2 chegaram à `master`
+pela [PR 7][pr7]. L3 e L4 fazem parte da PR 8.
+
+A decisão de integrar a PR, a aceitação visual dos lotes e a liberação para
+uso com uma residência real são três marcos. A integração ainda depende do
+candidato final e das decisões sobre o que entra nesse fechamento. O piloto e
+a liberação operacional continuam pendentes.
+
+## O que precisa de decisão
+
+- **DB-01.** **L2, reversão REQ.** Uma contagem oficial mais recente impede
+  reverter o ajuste antigo. O saldo posterior fica preservado.
+
+  Manter a proteção atual ou permitir cancelar a REQ antiga com explicação de
+  que a contagem posterior prevalece. Se aprovada a segunda opção, definir o
+  texto e provar que os movimentos posteriores também são preservados.
+
+- **DB-02.** **L2, excedente de ENT e DEV.** A divergência física é registrada.
+  O crédito inicial limita-se às unidades cobertas pela expedição. As unidades
+  acima dela ficam em apuração.
+
+  Definir quem comprova a origem, quem confirma eventual débito e crédito
+  adicional e como encerrar casos recusados ou inconclusivos. A regra vale nas
+  duas direções e tem efeito em estoque.
+
+- **DB-03.** **L2, extra ainda sem identificação em ENT e DEV.** O
+  preenchimento é preservado e a expedição aguarda a identificação.
+
+  Manter a espera ou expedir a parcela identificada, com o extra pendente
+  vinculado à mesma operação. Uma mudança exige definir reenvio, recebimento e
+  cancelamento da parcela pendente. A liberação da parcela identificada da COM
+  já foi aprovada.
+
+- **DB-04.** **L4, arquivos da referência.** O encaminhamento pede para ignorar
+  os anexos no Git. A seção 2 do comando mestre pede o versionamento no arranjo
+  de L1–L3. A CI usa o HTML aprovado.
+
+  Ratificar a presença dos anexos versionados ou indicar o local versionado ou
+  o insumo reproduzível que os substituirá. Até a decisão, o histórico e as
+  comparações continuam disponíveis.
+
+- **DB-05.** **L1 a L4, aceite visual.** Há comparações dirigidas e adaptações
+  documentadas. Alguns cenários existem somente no produto.
+
+  Aceitar as diferenças descritas no [registro dos lotes](LOTES_EXECUCAO.md) ou
+  indicar os casos a ajustar antes do merge. Uma diferença concreta de L4 está
+  descrita abaixo.
+
+- **DB-06.** **DOC-C.1 e expansão de rascunhos.** O responsável adiou as
+  modalidades e superfícies ainda fora do escopo.
+
+  Registrar o adiamento no aceite de D-B. Uma retomada precisa de escopo e
+  prioridade próprios.
+
+As perguntas DB-01 a DB-03 correspondem às
+[decisões vigentes de L2][l2-decisions] e ao [fechamento da PR 7][previous].
+O comportamento atual deve permanecer até a resposta. Se uma mudança for
+exigida para o merge, ela entra no candidato e passa pelas verificações
+correspondentes. O responsável também pode aceitar o comportamento atual
+e levar a mudança para a próxima etapa.
+
+## Execução e lacunas por lote
+
+- **L1, E01–E03.** Entrada e recuperação de
+  senha, troca de contexto, visão geral, fichas em abas, Materiais, Andamentos,
+  histórico, anexos e ações da ficha. Operações comuns usam sobreposição
+  simples. Operações longas usam sobreposição com etapas. A Revisão BAL
+  conserva autoria e independência. REQ com quantidade recebida menor exige
+  nova avaliação familiar antes de concluir. [V3 e alterações aprovadas][l1].
+
+  A comparação deve usar o HTML mais os comentários posteriores. Convém validar
+  em aparelho o acesso com um vínculo, a troca entre residências, os dois
+  carregamentos, o menu Mais e o retorno pelo histórico. Filas privadas e
+  operações oficiais recuperáveis têm controles próprios. A conferência deve
+  verificar que fechar uma decisão curta descarta suas alterações e que fechar
+  Andamentos conserva somente o último preenchimento.
+
+- **L2, E04–E06.** Preenchimentos de REQ, ENT, COM e DEV em
+  etapas, materiais em lista compacta, menu por item, autosave e diálogo de
+  retomada. Estoque atual na equipe, COM com aquisição definida no ato
+  correspondente e ENT/DEV em direções próprias. A leitura de código foi ligada
+  à conversão cadastrada, com validação de quantidade e recuperação.
+  [Comando e v7][l2].
+
+  Decisões DB-01 a DB-03. Conferir a consistência móvel entre listas, extras,
+  controles de quantidade, edição a partir da revisão e recuperação. A soma de
+  leituras de COM/ENT e a substituição validada na DEV complementam o exemplo
+  da v7. A rodada anterior registrou falhas de toque na aba Materiais de
+  COM/ENT em iOS e retentativas em DEV e PDF.
+
+- **L3, E07–E09.** Estoque por custódia, histórico e consumo
+  do plantão, faltas, agenda e BAL, acervo de fichas e conferência do PDF. O
+  produto liga operações a fatos oficiais, testa as negativas de acesso e
+  conserva recibos e versões. [Comando e v4][l3].
+
+  O laboratório usa dados simulados para arquivo, saldo, agendas e recibos. A
+  PR documenta as diferenças sem alterar o HTML aprovado. O ajuste de
+  recuperação da agenda preparado nesta revisão ainda precisa de publicação e
+  de aprovação no SHA final. Conferir calendário, mudança de horário, BAL e
+  download em aparelho, mantendo o contexto na ida e na volta.
+
+- **L4, E10–E12.** Administração da residência, convites,
+  credenciais, permissões, propostas, regras e catálogo. Central de avisos,
+  preferências, instalação e atualização. Guias, criação de residência, dossiê
+  e conferência independente, Central técnica e continuidade.
+  [Comando e v2][l4].
+
+  Decisões DB-04 e DB-05. O Preview confirmou leitura autenticada. O dossiê
+  remoto estava vazio nessa sessão. Declaração, conferência, vínculo e
+  recuperação foram exercitados localmente com Auth real. A homologação com
+  pessoas, dispositivos e provedores permanece aberta.
+
+**Diferença visual observada em L4.** No painel do aviso ativo de uma REQ,
+o laboratório destaca “Sua ciência está pendente” e explica a tarefa no
+contexto da pessoa. No produto conferido, o título é “Requisição emitida”,
+com autor e ação em áreas próprias. O destino autorizado foi exercitado.
+Falta decidir se a linguagem de tarefa deve ocupar o título e o texto
+principal antes da integração. A comparação foi feita a 360 e 412 px, junto
+com matriz de permissões, preferências, dossiê e Central técnica. Os cinco
+casos dirigidos em Chromium passaram sem retentativa.
+
+**Documentos.** DOC-A está implementado no escopo aprovado de aparência e
+geração. DOC-B tem os complementos de BAL, COM, DEV, cancelamento e vínculos.
+DOC-C.2–5 e o escopo técnico de DOC-D estão integrados. DOC-C.1 continua
+adiado. A amostra em aparelho, a impressão, a leitura do PDF com tecnologia
+assistiva e a conferência humana fazem parte da homologação. A assinatura
+técnica e a TSA interna aprovadas têm evidências próprias. A confiança de
+terceiro e a assinatura pessoal ficam em seus respectivos escopos.
+[Especificação documental][pdf] e [política de custódia][signing].
+
+## Revisão da PR 8
+
+Foram conferidas 45 discussões em linha, oito submissões de revisão e quatro
+publicações gerais de acompanhamento. Das 45 discussões, 20 já estavam
+resolvidas, 11 receberam resposta por tratarem de controles do laboratório
+L3 e 14 receberam resposta com a correção já presente no candidato. Essas
+25 discussões foram encerradas individualmente no GitHub. As publicações
+gerais registram execução ou disponibilidade dos serviços.
+[Resposta consolidada na PR][review-response].
+
+Entre os 20 encerramentos anteriores estão o filtro e a versão do
+arquivamento, a volta ao histórico e o foco, a recuperação da admissão BAL,
+o escopo do material, a proteção durante a troca de destino e a normalização
+do e-mail no perfil. A normalização de contato foi publicada em
+`4fc30699`. Entre os 14 confirmados nesta rodada estão a liberação de vagas
+de anexos, a origem do consumo direto, o destinatário do lembrete, o corte
+dos totais, a recuperação da agenda sem leitura comum, as admissões BAL,
+a duração do ciclo, séries vazias, horários especiais, horário de verão,
+referência BAL restrita e normalização da justificativa. Os motivos e as
+fontes correspondentes estão nas [discussões da PR][pr8-files].
+
+### Pontos registrados no corpo das revisões
+
+O CodeRabbit registrou mais 19 apontamentos nos resumos, sem discussão
+individual para resolver no GitHub.
+
+- Sete pontos do laboratório na primeira revisão. Corte da prévia
+  de agenda, chave de histórico filtrado, aviso da importação, foco da busca,
+  nomes dos botões compactos, consulta com acervo simulado vazio e retorno ao
+  botão Escopo. Pertencem à referência aprovada. O registro dos lotes conserva
+  a distinção entre simulação e fluxo real. [Primeira revisão][rabbit-first].
+
+- Dez pontos técnicos na primeira revisão. 1. Decisão de consumo
+  só no fluxo legado. 2. Quantidades normalizadas antes do hash. 3. Índice do
+  histórico com potencial de bloquear escritas durante a criação. 4. Agregado
+  de compras preservado na permissão de estoque familiar, com autorização
+  própria para a COM. 5. Trânsito vinculado pelo ID do material. 6. Resposta
+  definitiva de erro libera o reenvio de consumo para edição. 7. Consulta do
+  PDF respeita o fechamento da gaveta. 8. Conferência reconhece o arquivo mesmo
+  quando o código consultado é desconhecido. 9. UUIDs de consumo normalizados.
+  10. Teste de replay preserva rascunho posterior. Os itens 1–2 e 4–10 já
+  constam no código e na cobertura correspondente. O índice do item 3 já foi
+  aplicado. Considerar tempo de bloqueio e execução concorrente ou janela
+  controlada para futuros índices em tabelas ativas.
+  [Primeira revisão][rabbit-first].
+
+- Na recuperação de agenda, a consulta inicial
+  pode retornar resultado desconhecido. A opção de encerrar a tentativa confere
+  o recibo sob bloqueio na mesma chave. Sem recibo, avança a revisão privada e
+  comprova que a tentativa anterior ficou impedida de gravar. Com recibo,
+  retorna o resultado aplicado. A regressão de recuperação preserva os campos e
+  impede um envio tardio. O fluxo vigente cobre a recuperação sem criar uma
+  nova programação. [Quarta revisão][rabbit-fourth].
+
+- A confirmação anterior reunia o comando revisado com os campos do momento do
+  envio. A correção em `ffd266bb` mantém os campos e o comando da mesma
+  revisão. A confirmação inicial respeita a versão atual dos horários.
+  Uma tentativa já enviada continua recuperável pelo pacote original.
+  Build de produção e três casos de Chromium passaram localmente, sem
+  retentativas, incluindo resposta perdida com revogação, encerramento
+  recuperável e horários da residência. [Quinta revisão][rabbit-fifth].
+
+O último CodeRabbit pulou a nova análise automática pelo volume da PR.
+O Copilot informou indisponibilidade de cota. Esses estados estabelecem a
+cobertura real das revisões disponíveis. [Linha do tempo da PR][pr8].
+
+## Condições para o merge
+
+- **Revisão e decisões.** As discussões publicadas foram triadas. Publicar a
+  correção local da agenda após autorização expressa. Registrar quais decisões
+  DB-01 a DB-06 precisam entrar nesse candidato e quais podem seguir para D-C
+  ou escopo posterior. Conferir novos apontamentos do SHA final.
+
+- **CI do candidato.** A CI de `e783f6c5` aprovou Windows, Linux e banco.
+  Os sete jobs de navegador estavam em execução. Na CI anterior,
+  1.854 casos passaram de primeira, quatro passaram em
+  retentativa e dois falharam nas duas tentativas, ambos iOS. O SHA publicado
+  tem reparos para alvo encoberto no celular, sincronização dos testes e avanço
+  com autosave da transferência. Conferir log e relatório por projeto do
+  candidato final, incluindo retentativas e cancelamentos.
+  [CI de e783f6c5][ci] e [CI anterior][prior-ci].
+
+- **Qualidade do código.** O SonarCloud aprovou o gate de `e783f6c5`. O
+  resultado deve ser renovado para o SHA final. O adiamento de uma revisão
+  abrangente de duplicação continua registrado. Preservar a diferença entre
+  alerta do editor, dívida prévia e defeito confirmado. [SonarCloud][sonar] e
+  [triagem Sonar][quality].
+
+- **Banco local e remoto.** 385 migrations no repositório, desenvolvimento local
+  nesse baseline e as mesmas 385 versões registradas no Supabase compartilhado
+  de testes, até `20261124232228`. As 23 de L4 foram aplicadas. Nenhuma
+  pendência de versão foi identificada. A correção desta revisão usa o contrato
+  vigente. Reconciliar novamente caso entre migration depois desse
+  levantamento. [Registro dos ambientes][execution].
+
+- **Preview autenticado.** O Preview de `e783f6c5` ficou em estado Ready. A
+  conta sintética entrou, escolheu o vínculo e consultou runtime, perfil,
+  catálogo, histórico e contingência. A lista de referências trouxe 22 REQ com
+  versões positivas. A consulta sem sessão recebeu 401. Repetir no Preview do
+  SHA final. O dossiê consultado estava vazio e não houve escrita de negócio
+  nessa verificação remota. [Deploy conferido][preview].
+
+- **Saúde e desempenho.** O Advisor de saúde não apresentou lint na consulta. O
+  alerta histórico de autorização Realtime indicou p90 de cerca de seis
+  segundos em 24 h, sem causa isolada. Consultar o indicador recente e
+  reproduzir tráfego representativo de acesso e revogação antes de aceitar a
+  prontidão operacional. [Monitoramento][monitoring].
+
+- **Matriz e plano de integração.** A etapa 19 permanece em execução.
+  Reconciliar `D-B-AC-028` a `D-B-AC-030`, as evidências de DOC-A/B/C/D e as
+  reservas aceitas. Confirmar a decisão de merge e conferir o SHA da `master`,
+  o deploy publicado, a consulta autenticada e a compatibilidade do banco.
+
+O código de produção ainda era o da `master` em `fab595c7`, com o schema
+de teste já adiantado. Nesse intervalo, o vínculo de referência da contingência
+pode ser recusado porque o cliente anterior envia um contrato mais antigo.
+Após o merge, conferir a versão publicada e exercitar o vínculo com dados
+fictícios autorizados e a revisão vigente. Se o deploy falhar, avaliar a
+compatibilidade do código restaurado com as 385 migrations antes de decidir
+o caminho de recuperação.
+
+## Passagem para D-C e homologação
+
+- **DC-01. Piloto e responsáveis** Autorizar início, indicar residência,
+  participantes, papéis e substitutos. Definir responsáveis por regularização,
+  conferência independente e suporte. Planejar interrupção do piloto e
+  contingência quando a execução normal estiver indisponível.
+
+- **DC-02. Validação humana e física** Montar a lista de aparelhos, sistemas e
+  navegadores. Exercitar as tarefas dos papéis, leitor de tela, teclado, toque,
+  PWA e atualização. Conferir o PDF emitido, a impressão e a consulta pública.
+  O S24 já teve evidência pontual de PWA e Push. Os demais cruzamentos exigem
+  provas próprias.
+
+- **DC-03. Provedores e transportes** Definir os provedores a ativar e
+  autorizar contas, remetentes, destinatários e horários. Verificar Google
+  OAuth, entrega de e-mail, WhatsApp e Web Push real nos recortes aplicáveis.
+  Conferir sigilo, revogação, fallback e limites dos arquivos já recebidos.
+
+- **DC-04. Backup e restauração operacional** Nomear responsáveis pelo destino
+  independente e pela chave. A política aprovada prevê backup diário, cópia
+  antes de alteração crítica e retenção de sete diárias e quatro semanais.
+  Restaurar em quarentena, conferir banco, objetos, configurações e
+  agendadores. Medir RPO de até 24 h e RTO de até oito horas no ensaio
+  operacional.
+
+- **DC-05. Custódia e assinatura** Designar custodiante e substituto, validar
+  continuidade, rotação, expiração, revogação e recuperação da chave e da TSA.
+  Definir o procedimento de conferência externa. ICP-Brasil segue como evolução
+  futura.
+
+- **DC-06. Operação e suporte** Responsáveis, tempos de atendimento,
+  escalonamento, monitor externo quando autorizado, reconciliação de
+  agendadores legados e recuperação de períodos perdidos. Definir volume e
+  latência esperados e quem mede as jornadas.
+
+- **DC-07. Liberação e D7** Registrar SHA, schema, configuração, pilotos,
+  riscos aceitos, plano de recuperação e responsáveis antes do uso oficial.
+  Autorizar provedores adiados e evolução D7 em seus próprios marcos.
+
+O mapa de [etapas 19 e 20][stages] e a [matriz de execução][acceptance]
+mantêm os IDs dos aceites. O [plano de piloto][pilot], a
+[recuperação][recovery], o [backup][backup], a [custódia][signing] e os
+[agendadores][scheduler] detalham as provas da etapa 20. O
+[fechamento A–D da PR 7][previous] conserva a origem das decisões.
+
+Para decidir o encerramento, registrar as respostas DB-01 a DB-06, conferir
+o SHA final e aprovar o merge. A etapa seguinte começa com responsável,
+escopo e critérios acordados para DC-01 a DC-07.
+
+[pr8]: https://github.com/RMZZFAJ/home-care-assistant/pull/8
+[pr7]: https://github.com/RMZZFAJ/home-care-assistant/pull/7
+[pr8-files]: https://github.com/RMZZFAJ/home-care-assistant/pull/8/files
+[review-response]: https://github.com/RMZZFAJ/home-care-assistant/pull/8#issuecomment-7204332892
+[rabbit-first]: https://github.com/RMZZFAJ/home-care-assistant/pull/8#pullrequestreview-6014297364
+[rabbit-fourth]: https://github.com/RMZZFAJ/home-care-assistant/pull/8#pullrequestreview-6015267320
+[rabbit-fifth]: https://github.com/RMZZFAJ/home-care-assistant/pull/8#pullrequestreview-6015574742
+[ci]: https://github.com/RMZZFAJ/home-care-assistant/actions/runs/45899139085
+[prior-ci]: https://github.com/RMZZFAJ/home-care-assistant/actions/runs/45800866850
+[sonar]: https://sonarcloud.io/dashboard?id=RMZZFAJ_home-care-assistant&pullRequest=8
+[preview]: https://vercel.com/rmzzfajs-projects/home-care-assistant/8QdxGRvYgFCEjkUK4hH3bjSjSUhb
+[l1]: L1_IMPLEMENTATION.md
+[l2]: ../../../../HCA_L2_COMANDO_MESTRE_CODEX_V7.md
+[l2-decisions]: ../../../../HCA_L2_DECISOES_VIGENTES_E_PENDENCIAS.md#14-pendências-materiais-para-renato
+[l3]: ../../../../HCA_L3_COMANDO_MESTRE_CODEX_V4.md
+[l4]: ../../../../HCA_L4_COMANDO_MESTRE_CODEX_V2.md
+[previous]: ../../FECHAMENTO_PR7.md
+[pdf]: ../../../documents/03_ESPECIFICACAO_DOCUMENTAL_APROVADA.md
+[execution]: LOTES_EXECUCAO.md
+[stages]: EXECUTION_STAGES.csv
+[acceptance]: ACCEPTANCE_EXECUTION.csv
+[quality]: SONAR_TRIAGE.md
+[monitoring]: OBSERVABILITY.md
+[pilot]: PILOT_AND_CONTINGENCY.md
+[recovery]: RECOVERY_RUNBOOK.md
+[backup]: BACKUP_PIPELINE.md
+[signing]: SIGNING_CUSTODY.md
+[scheduler]: SCHEDULER_LEGACY.md
