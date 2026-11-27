@@ -143,6 +143,15 @@ técnica e a TSA interna aprovadas têm evidências próprias. A confiança de
 terceiro e a assinatura pessoal ficam em seus respectivos escopos.
 [Especificação documental][pdf] e [política de custódia][signing].
 
+**Confirmação de vínculo em E12-06.** A comparação a 360 e 412 px mostrou
+o painel de conferência legível atrás da confirmação. O diálogo usa a
+sobreposição compartilhada também quando está sobre o painel. A revisão do
+registro e a justificativa aparecem na confirmação. O teste passou de
+primeira em Chromium, Android e iOS/WebKit, incluindo a recusa da referência
+desatualizada e a recuperação do vínculo sem repetir o ato. Capturas em
+`output/playwright/l4/` e relatório em
+`output/playwright/l4-link-confirmation-final/`.
+
 ## Revisão da PR 8
 
 Foram conferidas 45 discussões em linha, oito submissões de revisão e quatro
@@ -152,6 +161,12 @@ L3 e 14 receberam resposta com a correção já presente no candidato. Essas
 25 discussões foram encerradas individualmente no GitHub. As publicações
 gerais registram execução ou disponibilidade dos serviços.
 [Resposta consolidada na PR][review-response].
+
+A discussão seguinte sobre a quantidade no resumo de rascunho foi
+respondida e resolvida. O componente usa a função local de formatação,
+que retorna “Quantidade pendente” para um valor ausente. A leitura de
+relatos oficiais tem outro contrato. As 46 discussões em linha estão
+resolvidas. [Resposta sobre a quantidade][review-draft-quantity].
 
 Entre os 20 encerramentos anteriores estão o filtro e a versão do
 arquivamento, a volta ao histórico e o foco, a recuperação da admissão BAL,
@@ -366,8 +381,8 @@ correções, com build de produção e lint dirigido aprovados. Relatório em
   tentativa do workflow do GitHub. As repetições foram do Playwright.
   [CI de ff786c9d][ci-ff786c9d], [CI de e783f6c5][ci] e
   [job de banco][db-ci]. `17739c93` passou com as quatro retentativas
-  descritas acima. O commit seguinte reúne as correções dos testes e
-  precisa ter o próprio resultado de CI conferido.
+  descritas acima. `01708749` reúne as correções dos testes.
+  [CI de 01708749][ci-017].
 
 - **Qualidade do código.** O SonarCloud aprovou o gate de `e783f6c5`, com
   0,9% de duplicação no código novo. A consulta encontrou três apontamentos
@@ -389,27 +404,29 @@ correções, com build de produção e lint dirigido aprovados. Relatório em
   vigente. Reconciliar novamente caso entre migration depois desse
   levantamento. [Registro dos ambientes][execution].
 
-- **Preview autenticado.** O Preview de `e783f6c5` ficou em estado Ready. A
-  conta sintética entrou, escolheu o vínculo e consultou runtime, perfil,
-  catálogo, histórico e contingência. A lista de referências trouxe 22 REQ com
-  versões positivas. A consulta sem sessão recebeu 401. Repetir no Preview do
-  SHA final. O dossiê consultado estava vazio e não houve escrita de negócio
-  nessa verificação remota. O deploy de `ff786c9d` também ficou pronto.
-  [Deploy consultado com sessão][preview] e [deploy de ff786c9d][preview-ff].
+- **Preview autenticado.** Em `01708749`, a Vercel confirmou Ready. A conta
+  sintética consultou runtime, participantes, catálogo, histórico, agenda,
+  preferências, sino, guias e contingências. O índice de contingências estava
+  vazio. A consulta retornou 22 referências de REQ com versões positivas e
+  respondeu 401 sem sessão. A conta encerrou a sessão ao final. Repetir a
+  verificação no SHA escolhido para merge. [Preview de 01708749][preview-017].
 
-- **Saúde e desempenho.** O Advisor de saúde não apresentou lint na consulta. O
-  alerta histórico de autorização Realtime indicou p90 de cerca de seis
-  segundos em 24 h, sem causa isolada. Consultar o indicador recente e
-  reproduzir tráfego representativo de acesso e revogação antes de aceitar a
-  prontidão operacional. [Monitoramento][monitoring].
+- **Saúde e desempenho.** Em 27/11, o Advisor de saúde retornou zero avisos.
+  Houve 12 eventos informativos do Realtime nos logs das últimas 24 h. Três
+  inscrições no canal privado da conta sintética terminaram em 861, 133 e
+  139 ms. O banco registrou média acumulada de 78,905 ms em 1.060 consultas
+  de autorização desde 20/10. A amostra mede o tempo de inscrição do cliente.
+  O p90 de seis segundos do alerta histórico continua sem série recente
+  equivalente. A prontidão operacional ainda depende da medição representativa
+  de acesso e revogação. [Monitoramento][monitoring].
 
 - **Matriz e plano de integração.** A etapa 19 permanece em execução.
   Reconciliar `D-B-AC-028` a `D-B-AC-030`, as evidências de DOC-A/B/C/D e as
   reservas aceitas. Confirmar a decisão de merge e conferir o SHA da `master`,
   o deploy publicado, a consulta autenticada e a compatibilidade do banco.
 
-O código de produção ainda era o da `master` em `fab595c7`, com o schema
-de teste já adiantado. Nesse intervalo, o vínculo de referência da contingência
+Em 27/11, o domínio de produção ainda servia a `master` em `fab595c7`,
+com o schema de teste já adiantado. Nesse intervalo, o vínculo da contingência
 pode ser recusado porque o cliente anterior envia um contrato mais antigo.
 Após o merge, conferir a versão publicada e exercitar o vínculo com dados
 fictícios autorizados e a revisão vigente. Se o deploy falhar, avaliar a
@@ -475,11 +492,12 @@ escopo e critérios acordados para DC-01 a DC-07.
 [ci]: https://github.com/RMZZFAJ/home-care-assistant/actions/runs/45899139085
 [ci-ff786c9d]: https://github.com/RMZZFAJ/home-care-assistant/actions/runs/45907009621
 [ci-17739c93]: https://github.com/RMZZFAJ/home-care-assistant/actions/runs/45918970734
+[ci-017]: https://github.com/RMZZFAJ/home-care-assistant/actions/runs/45931684378
 [preview-17739c93]: https://vercel.com/rmzzfajs-projects/home-care-assistant/14LQs6y27cgmRTjPELN9qonP4VZF
+[preview-017]: https://vercel.com/rmzzfajs-projects/home-care-assistant/BHZCJVtmmLULFxEDA7DSceS8XxRm
+[review-draft-quantity]: https://github.com/RMZZFAJ/home-care-assistant/pull/8#discussion_r4715288320
 [db-ci]: https://github.com/RMZZFAJ/home-care-assistant/actions/runs/45899139085/job/140180331562
 [sonar]: https://sonarcloud.io/dashboard?id=RMZZFAJ_home-care-assistant&pullRequest=8
-[preview]: https://vercel.com/rmzzfajs-projects/home-care-assistant/8QdxGRvYgFCEjkUK4hH3bjSjSUhb
-[preview-ff]: https://vercel.com/rmzzfajs-projects/home-care-assistant/32pcDuFD1igPCHMooHzM3BMreS22
 [l1]: L1_IMPLEMENTATION.md
 [l2]: ../../../../HCA_L2_COMANDO_MESTRE_CODEX_V7.md
 [l2-decisions]: ../../../../HCA_L2_DECISOES_VIGENTES_E_PENDENCIAS.md#14-pendências-materiais-para-renato

@@ -380,8 +380,13 @@ test('E12-06 reselects the current digital revision and recovers a lost link con
  await captureContingency(page,`contingency-decision-${info.project.name}`);
  const review=decision.getByRole('button',{name:'Revisar vinculação',exact:true});
  await review.click();
- const confirm=page.getByRole('dialog',{name:'Vincular esta referência?',exact:true}).getByRole('button',{name:'Confirmar vínculo',exact:true});
+ const confirmation=page.getByRole('dialog',{name:'Vincular esta referência?',exact:true});
+ const confirm=confirmation.getByRole('button',{name:'Confirmar vínculo',exact:true});
  await expect(confirm).toBeVisible();
+ const confirmationBackdrop=page.locator('.hca-overlay').filter({has:confirmation}).locator(':scope > .hca-modal-backdrop');
+ await expect(confirmationBackdrop).toBeVisible();
+ await expect(confirmationBackdrop).toHaveCSS('backdrop-filter','blur(3px)');
+ await expect(confirmationBackdrop).toHaveCSS('top','0px');
  await captureContingency(page,`contingency-link-confirmation-${info.project.name}`);
  sql('update public.operational_documents set version = version + 1 where id='+q(req.id));
  const before=facts(f.patient);

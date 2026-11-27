@@ -181,7 +181,7 @@ export function ContingencyDecision({
         <p className="hca-contingency-hint">Confira a justificativa e escolha novamente o registro digital com base nos fatos atuais.</p>
       </div>
     </Dialog>}
-    {confirmPanel && target && <Dialog open title="Vincular esta referência?" headingIcon="link" onClose={() => setPanel(null)}
+    {confirmPanel && target && <Dialog open title="Vincular esta referência?" headingIcon="info" showNestedBackdrop onClose={() => setPanel(null)}
       footer={<>
         <ActionButton onClick={() => setPanel(null)}>Voltar à conferência</ActionButton>
         <ActionButton variant="primary" disabled={locked} onClick={confirm}>Confirmar vínculo</ActionButton>
