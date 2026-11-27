@@ -1,9 +1,8 @@
 # Pendências para encerrar D-B e iniciar D-C
 
-Posição de 26/11/2026. A [PR 8][pr8] está aberta para revisão em
-`feat/phase-d-continuation`. O diagnóstico de CI desta revisão parte de
-`ff786c9d00db930bf9a33734f718d670cdb3b8d3`. L1 e L2 chegaram à `master`
-pela [PR 7][pr7]. L3 e L4 fazem parte da PR 8.
+Posição de 27/11/2026. A [PR 8][pr8] está aberta para revisão em
+`feat/phase-d-continuation`. L1 e L2 chegaram à `master` pela [PR 7][pr7].
+L3 e L4 fazem parte da PR 8.
 
 A decisão de integrar a PR, a aceitação visual dos lotes e a liberação para
 uso com uma residência real são três marcos. A integração ainda depende do
@@ -244,6 +243,40 @@ asserções e dispensaram retentativas automáticas. Os relatórios estão em
 `output/playwright/pr8-ci-45907009621-verify/` e
 `output/playwright/pr8-agenda-foreground-report/`.
 
+## CI de 17739c93 e retentativas no iOS
+
+A [CI de 17739c93][ci-17739c93] passou na primeira execução do GitHub.
+Banco, Windows, Linux e os sete jobs de navegador passaram. Dos 1.860
+casos de ponta a ponta, 1.856 passaram de primeira e quatro passaram na
+retentativa do Playwright em iOS. Os três casos que falharam na rodada
+anterior passaram na primeira tentativa.
+
+- **Perfil e Push.** O diagnóstico local registrou o toque na aba correta,
+  seguido de `mouseup` e `click` fora do botão. O teste do perfil estabiliza
+  o foco antes do toque. O caso de recuperação do Push entra pelo endereço
+  da aba com uma conta sintética vinculada à residência do cenário.
+- **Catálogo.** O teste de inativação espera o fechamento da edição antes
+  de abrir Situação e sucessor. A recuperação aguarda o catálogo carregar
+  após a recarga e abre a tentativa preservada. O teste de conflito comprova
+  o valor digitado antes da alteração concorrente.
+- **Consumo.** A verificação dos cursores percorre os 102 registros por
+  teclado. Durante essa leitura, o teste suspende a invalidação de fundo
+  que no WebKit local reiniciou a lista na primeira página. Depois reativa
+  os eventos e abre os filtros com toque nos perfis móveis.
+
+Os 15 casos dirigidos foram validados em Chromium, Android e iOS/WebKit
+em duas rodadas. Quatorze passaram na rodada inicial. A paginação teve
+uma falha em iOS e passou nos três perfis após o último ajuste, na
+primeira tentativa de cada execução. TypeScript, build de produção e lint
+passaram. Relatórios em `output/playwright/pr8-retry-fixes-local/` e
+`output/playwright/pr8-consumption-pagination-final/`.
+
+O SonarCloud aprovou `17739c93`, com zero apontamentos no código novo.
+As consultas autenticadas desse [Preview][preview-17739c93] confirmaram
+catálogo, histórico de material, agenda, sino e contingências. O índice de
+contingências estava vazio para a conta de homologação. A consulta trouxe
+22 referências de REQ com versão. Sem sessão, o endpoint respondeu 401.
+
 ## Condições para o merge
 
 - **Revisão e decisões.** As discussões publicadas foram triadas. A correção
@@ -260,7 +293,9 @@ asserções e dispensaram retentativas automáticas. Os relatórios estão em
   replay e em 911 testes de integração. As duas execuções usaram uma
   tentativa do workflow do GitHub. As repetições foram do Playwright.
   [CI de ff786c9d][ci-ff786c9d], [CI de e783f6c5][ci] e
-  [job de banco][db-ci].
+  [job de banco][db-ci]. `17739c93` passou com as quatro retentativas
+  descritas acima. O commit seguinte reúne as correções dos testes e
+  precisa ter o próprio resultado de CI conferido.
 
 - **Qualidade do código.** O SonarCloud aprovou o gate de `e783f6c5`, com
   0,9% de duplicação no código novo. A consulta encontrou três apontamentos
@@ -367,6 +402,8 @@ escopo e critérios acordados para DC-01 a DC-07.
 [rabbit-fifth]: https://github.com/RMZZFAJ/home-care-assistant/pull/8#pullrequestreview-6015574742
 [ci]: https://github.com/RMZZFAJ/home-care-assistant/actions/runs/45899139085
 [ci-ff786c9d]: https://github.com/RMZZFAJ/home-care-assistant/actions/runs/45907009621
+[ci-17739c93]: https://github.com/RMZZFAJ/home-care-assistant/actions/runs/45918970734
+[preview-17739c93]: https://vercel.com/rmzzfajs-projects/home-care-assistant/14LQs6y27cgmRTjPELN9qonP4VZF
 [db-ci]: https://github.com/RMZZFAJ/home-care-assistant/actions/runs/45899139085/job/140180331562
 [sonar]: https://sonarcloud.io/dashboard?id=RMZZFAJ_home-care-assistant&pullRequest=8
 [preview]: https://vercel.com/rmzzfajs-projects/home-care-assistant/8QdxGRvYgFCEjkUK4hH3bjSjSUhb

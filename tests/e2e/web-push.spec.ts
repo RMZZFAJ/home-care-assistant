@@ -10,6 +10,7 @@ import {
   fixtures,
   env,
 } from "../integration/v4-fixtures.mjs";
+import { shiftWorker } from "../integration/shift-fixtures.mjs";
 import { sql, sqlLiteral } from "../../scripts/test-environment.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { selectContext } from "./auth-context";
@@ -19,6 +20,7 @@ import { processWebPush } from "../../src/lib/server/web-push";
 test.setTimeout(180000);
 test.use({ serviceWorkers: "allow" });
 const owned = new Set<string>();
+const scopedAccounts = new Map<string, string>();
 const panel = (page: Page) =>
   page.getByRole("dialog", { name: "Avisos neste aparelho", exact: true });
 const devicesPanel = (page: Page) => page.getByRole("region", { name: "Aparelhos com avisos", exact: true });
@@ -45,8 +47,9 @@ test.afterEach(async () => {
     );
     if (!row) continue;
     const device = JSON.parse(row) as { id: string; userId: string };
-    const account = [fixtures.family, fixtures.professional].find(value => value.id === device.userId);
-    if (!account) throw new Error("Unexpected owner of the synthetic Push endpoint");
+    const email = scopedAccounts.get(device.userId)
+      ?? [fixtures.family, fixtures.professional].find(value => value.id === device.userId)?.email;
+    if (!email) throw new Error("Unexpected owner of the synthetic Push endpoint");
     const id = device.id;
     const client = createClient(env.url, env.anonKey, {
       auth: { persistSession: false, autoRefreshToken: false },
@@ -54,7 +57,7 @@ test.afterEach(async () => {
     expect(
       (
         await client.auth.signInWithPassword({
-          email: account.email,
+          email,
           password: fixturePassword,
         })
       ).error,
@@ -65,6 +68,7 @@ test.afterEach(async () => {
     });
   }
   owned.clear();
+  scopedAccounts.clear();
 });
 async function adapter(
   page: Page,
@@ -181,9 +185,12 @@ async function capturePushPanel(page: Page, info: TestInfo, name: string) {
   }
 }
 
-async function openProfile(page: Page, patient: string, openNoticesDirectly = false) {
+async function openProfile(page: Page, patient: string, {
+  email = fixtures.family.email,
+  openNoticesDirectly = false,
+} = {}) {
   await page.goto("/login");
-  await page.getByLabel("E-mail", { exact: true }).fill(fixtures.family.email);
+  await page.getByLabel("E-mail", { exact: true }).fill(email);
   await page.getByLabel("Senha", { exact: true }).fill(fixturePassword);
   await page.getByRole("button", { name: "Entrar", exact: true }).click();
   await expect(
@@ -231,7 +238,7 @@ async function openControlledPersonalTest(page: Page, reply: (request: Diagnosti
       return Response.json({ ...await response.json(), deliveryEnabled: true });
     };
   });
-  await openProfile(page, fixture.patient, true);
+  await openProfile(page, fixture.patient, { openNoticesDirectly: true });
   await acceptPush(page);
   await concludePush(page, "Inscrição confirmada");
   await openCurrentTest(page);
@@ -576,6 +583,8 @@ test("Web Push negado não repete pedido, não inscreve e mantém a central e o 
 
 test("preparação recusada explica a falha, bloqueia permissão Push e recupera o worker real sem reinstalar", async ({ page }) => {
   const f = await setup(), value = subscription();
+  const member = await shiftWorker(f.patient, "family");
+  scopedAccounts.set(member.id, member.email);
   await adapter(page, value, "granted");
   await page.addInitScript(() => {
     const state = { blocked: true, calls: 0 };
@@ -586,7 +595,7 @@ test("preparação recusada explica a falha, bloqueia permissão Push e recupera
       return state.blocked ? Promise.reject(new DOMException("Controlled Preview registration denial", "SecurityError")) : original.apply(this, args);
     };
   });
-  await openProfile(page, f.patient);
+  await openProfile(page, f.patient, { email: member.email, openNoticesDirectly: true });
   await expect(activate(page)).toBeDisabled();
   expect(await page.evaluate(() => (window as unknown as { hcaPushCapability: { requests: number; subscriptions: number } }).hcaPushCapability)).toMatchObject({ requests: 0, subscriptions: 0 });
   await panel(page).getByRole("button", { name: "Voltar", exact: true }).press("Enter");
@@ -632,7 +641,7 @@ test("preparação recusada explica a falha, bloqueia permissão Push e recupera
   await acceptPush(page);
   await concludePush(page, "Inscrição confirmada");
   expect(await page.evaluate(() => (window as unknown as { hcaPushCapability: { requests: number; subscriptions: number } }).hcaPushCapability)).toMatchObject({ requests: 1, subscriptions: 1 });
-  expect(sql(`select count(*) from private.web_push_devices where fingerprint=${sqlLiteral(createHash("sha256").update(value.endpoint).digest("hex"))} and user_id=${sqlLiteral(fixtures.family.id)} and state='active';`)).toBe("1");
+  expect(sql(`select count(*) from private.web_push_devices where fingerprint=${sqlLiteral(createHash("sha256").update(value.endpoint).digest("hex"))} and user_id=${sqlLiteral(member.id)} and state='active';`)).toBe("1");
 });
 
 

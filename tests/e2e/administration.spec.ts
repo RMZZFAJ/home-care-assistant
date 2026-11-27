@@ -1,4 +1,5 @@
 import { selectDocumentSection } from "./document-sections";
+import { pressWorkspaceControl } from "./workspace-controls";
 import { selectContext } from "./auth-context";
 import { expect, test, type Page } from "@playwright/test";
 import { mkdirSync, readFileSync } from "node:fs";
@@ -153,8 +154,10 @@ test.describe("administração integrada no ambiente local", () => {
       .fill("Material auxiliar revisado, Apoio operacional");
     await record("Salvar cadastro", "Cadastro atualizado");
     const material = page.getByRole("dialog", { name: finalName, exact: true });
-    await material.getByRole("button", { name: /^Situação e sucessor/ }).click();
+    await expect(page.getByRole("dialog", { name: "Editar material", exact: true })).toHaveCount(0);
+    await pressWorkspaceControl(page, material.getByRole("button", { name: /^Situação e sucessor/ }));
     const identity = page.getByRole("dialog", { name: "Situação do material", exact: true });
+    await expect(identity).toBeVisible();
     await identity.getByRole("button", { name: "Inativar material", exact: true }).click();
     const identityEditor = page.getByRole("dialog", { name: "Inativar material", exact: true });
     await identityEditor.getByLabel("Motivo da decisão", { exact: true }).fill("Identidade preservada durante a revisão do cadastro.");

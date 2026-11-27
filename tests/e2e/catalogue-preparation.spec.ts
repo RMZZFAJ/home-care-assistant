@@ -5,6 +5,7 @@ import { sql, sqlLiteral } from "../../scripts/test-environment.mjs";
 import { fixtures, rpc, setup } from "../integration/v4-fixtures.mjs";
 import { selectContext } from "./auth-context";
 import { audit } from "./accessibility-audit";
+import { pressWorkspaceControl } from "./workspace-controls";
 
 test("E10-07 organiza por tipo, compara duplicata e recupera cadastro sem retomar campos", async ({ page }, info) => {
   test.setTimeout(150_000);
@@ -99,7 +100,8 @@ test("E10-07 organiza por tipo, compara duplicata e recupera cadastro sem retoma
   expect(retained[0]).toEqual({ pointer: expect.objectContaining({ key: attempts[0].key }), lookups: 0 });
   expect(retained[0].pointer).not.toHaveProperty("intent");
   await page.reload();
-  await page.getByRole("button", { name: "Conferir resultado pendente", exact: true }).click();
+  await expect(listing.getByText(item, { exact: true })).toBeVisible();
+  await pressWorkspaceControl(page, page.getByRole("button", { name: "Conferir resultado pendente", exact: true }));
   await interrupted.getByRole("button", { name: "Conferir resultado", exact: true }).click();
   await page.getByRole("dialog", { name: "Material adicionado", exact: true }).getByRole("button", { name: "Concluir", exact: true }).click();
   await expect(listing.getByText(item, { exact: true })).toBeVisible();
@@ -114,7 +116,10 @@ test("E10-07 organiza por tipo, compara duplicata e recupera cadastro sem retoma
   await detail.getByRole("button", { name: /^Editar cadastro/ }).click();
   const editing = page.getByRole("dialog", { name: "Editar material", exact: true });
   const note = editing.getByLabel("Descrição operacional", { exact: true });
-  await note.fill("Edição preservada ao consultar a referência");
+  const localNote = "Edição preservada ao consultar a referência";
+  await expect(note).toBeEditable();
+  await note.fill(localNote);
+  await expect(note).toHaveValue(localNote);
   await expect(editing.getByLabel("Unidade de controle", { exact: true })).toBeDisabled();
   await rpc(admin, "admin_upsert_recipient_product", {
     p_care_recipient_id: patient, p_product_id: products[0], p_name: "Material fictício V4 0",
@@ -129,10 +134,10 @@ test("E10-07 organiza por tipo, compara duplicata e recupera cadastro sem retoma
   const current = page.getByRole("dialog", { name: "O cadastro foi atualizado", exact: true });
   await expect(current).toContainText("Descrição da outra sessão");
   await current.getByRole("button", { name: "Usar referência atual", exact: true }).click();
-  await expect(note).toHaveValue("Edição preservada ao consultar a referência");
+  await expect(note).toHaveValue(localNote);
   await reviewEdit.click(); await saveEdit.click();
   await page.getByRole("dialog", { name: "Cadastro atualizado", exact: true }).getByRole("button", { name: "Concluir", exact: true }).click();
-  await expect(detail).toContainText("Edição preservada ao consultar a referência");
+  await expect(detail).toContainText(localNote);
   expect(ledger()).toBe(stock);
   expect(drafts()).toBe(0);
 });

@@ -16,6 +16,7 @@ import {
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { selectContext } from "./auth-context";
 import { audit, auditFromTop } from "./accessibility-audit";
+import { pressWorkspaceControl } from "./workspace-controls";
 
 async function login(
   page: Page,
@@ -887,6 +888,13 @@ test("relato anterior ao centésimo é acessível por referência e por todas as
     }),
   ).toBeVisible();
   fail = false;
+  // The fixture is fixed during the cursor walk. A delayed Realtime join or
+  // refresh starts a new list at page one, independently of cursor correctness.
+  const resumeRefresh = await page.evaluateHandle(() => {
+    const deferRefresh = (event: Event) => event.stopImmediatePropagation();
+    window.addEventListener("hca:data-changed", deferRefresh, true);
+    return () => window.removeEventListener("hca:data-changed", deferRefresh, true);
+  });
   type Cursor = { at: string; id: string };
   const listResponse = (before: Cursor | null) => page.waitForResponse(response => {
     const url = new URL(response.url());
@@ -897,9 +905,7 @@ test("relato anterior ao centésimo é acessível por referência e por todas as
   });
   const visibleIds = () => page.getByRole("button", { name: /^Abrir relato / }).evaluateAll(nodes => nodes.map(node => node.querySelector(".sr-only")!.textContent));
   let pendingPage = listResponse(null);
-  await page
-    .getByRole("button", { name: "Atualizar lista", exact: true })
-    .click();
+  await pressWorkspaceControl(page, page.getByRole("button", { name: "Atualizar lista", exact: true }));
   const found = new Set<string>();
   for (let pageIndex = 0; pageIndex < Math.ceil(order.length / 20); pageIndex++) {
     const response = await pendingPage;
@@ -921,12 +927,16 @@ test("relato anterior ao centésimo é acessível por referência e por todas as
     const last = result.data.at(-1)!;
     expect(result.next).toEqual({ at: last.created_at, id: last.id });
     pendingPage = listResponse(result.next);
-    await page.getByRole("button", { name: "Carregar mais relatos", exact: true }).click();
+    const more = page.getByRole("button", { name: "Carregar mais relatos", exact: true });
+    await expect(more).toBeEnabled();
+    await more.press("Enter");
   }
   expect(found.size).toBe(102);
   expect(found.has(old)).toBe(true);
   expect([...found]).toEqual(order);
   await expect(page.getByRole("button", { name: "Carregar mais relatos", exact: true })).toHaveCount(0);
+  await resumeRefresh.evaluate(release => release());
+  await resumeRefresh.dispose();
   await page.unroute("**/api/consumption?*");
   await page.getByRole("button", { name: "Faltas", exact: true }).click();
   await expect(page).toHaveURL(/kind=shortage/);
@@ -937,18 +947,13 @@ test("relato anterior ao centésimo é acessível por referência e por todas as
   await expect(
     page.getByRole("button", { name: "Faltas", exact: true }),
   ).toHaveAttribute("aria-pressed", "true");
+  await expect.poll(visibleIds).toEqual(order.slice(0, 20));
   const day = sql(`select to_char(created_at at time zone 'America/Sao_Paulo','YYYY-MM-DD') from public.consumption_reports where id=${sqlLiteral(old)};`);
   const filters = page.getByRole("button", { name: "Filtrar relatos", exact: true });
   const filterPanel = page.getByRole("dialog", { name: "Filtrar registros", exact: true });
   const openFilters = async () => {
-    await expect(page.locator(".hca-activity-overlay")).toBeHidden();
-    await filters.evaluate(button => button.scrollIntoView({ block: "center", behavior: "instant" }));
-    await expect.poll(() => filters.evaluate(button => {
-      const { left, top, width, height } = button.getBoundingClientRect();
-      return button.contains(document.elementFromPoint(left + width / 2, top + height / 2));
-    })).toBe(true);
-    if (info.project.use.hasTouch) await filters.tap();
-    else await filters.click();
+    if (info.project.use.hasTouch) await filters.focus();
+    await pressWorkspaceControl(page, filters);
     await expect(filterPanel).toBeVisible();
   };
   const search = page.getByRole("textbox", { name: "Buscar relato ou material", exact: true });

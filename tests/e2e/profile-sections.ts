@@ -1,4 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
+import { pressWorkspaceControl } from "./workspace-controls";
 
 export type ProfileSection = "identity" | "security" | "notices" | "devices" | "help";
 const labels: Record<ProfileSection, string> = {
@@ -9,10 +10,12 @@ const labels: Record<ProfileSection, string> = {
 export async function selectProfileSection(page: Page, section: ProfileSection) {
   const tab = page.getByRole("tab", { name: labels[section], exact: true });
   await page.bringToFront();
-  await tab.scrollIntoViewIfNeeded();
-  await page.evaluate(() => new Promise<void>(ready => requestAnimationFrame(() => requestAnimationFrame(() => ready()))));
-  if (test.info().project.use.hasTouch) await tab.tap();
-  else await tab.click();
+  // Resolving the profile read removes the status above the tabs and moves their touch targets.
+  await expect(page.getByText(/^(Carregando perfil|Atualizando consulta do perfil)…$/)).toBeHidden();
+  // WebKit can reposition the scrolling tab strip on focus between mouse down
+  // and mouse up synthesized from a tap. Settle focus before measuring the tap.
+  if (test.info().project.use.hasTouch) await tab.focus();
+  await pressWorkspaceControl(page, tab);
   const selected = page.locator('[role="tab"][aria-selected="true"]');
   await expect(selected).toHaveText(labels[section]);
   await expect(page.locator('[role="tabpanel"]:not([hidden])')).toHaveCount(1);
