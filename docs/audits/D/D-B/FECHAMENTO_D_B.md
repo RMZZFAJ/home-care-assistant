@@ -36,7 +36,8 @@ a liberação operacional continuam pendentes.
 
 - **DB-04.** **L4, arquivos da referência.** O encaminhamento pede para ignorar
   os anexos no Git. A seção 2 do comando mestre pede o versionamento no arranjo
-  de L1–L3. A CI usa o HTML aprovado.
+  de L1–L3. Os quatro lotes têm anexos versionados. Treze arquivos de teste
+  leem diretamente o HTML aprovado de L4 no checkout.
 
   Ratificar a presença dos anexos versionados ou indicar o local versionado ou
   o insumo reproduzível que os substituirá. Até a decisão, o histórico e as
@@ -106,7 +107,7 @@ e levar a mudança para a próxima etapa.
   credenciais, permissões, propostas, regras e catálogo. Central de avisos,
   preferências, instalação e atualização. Guias, criação de residência, dossiê
   e conferência independente, Central técnica e continuidade.
-  [Comando e v2][l4].
+  [Comando e v2][l4] e [cenários e evidências](LOTES_EXECUCAO.md#cenários-de-l4-e-evidências).
 
   Decisões DB-04 e DB-05. O Preview confirmou leitura autenticada. O dossiê
   remoto estava vazio nessa sessão. Declaração, conferência, vínculo e

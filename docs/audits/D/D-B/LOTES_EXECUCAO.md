@@ -3884,6 +3884,50 @@ Os registros abaixo preservam as comparações por cenário e o estado de
 cada ambiente na data de cada incremento. A aplicação das 23 migrations
 de L4 consta no [registro do Supabase remoto](#aplicação-remota-de-l4-e-retestes-de-ci).
 
+### Cenários de L4 e evidências
+
+Cada cenário aponta para o registro de implementação e as comparações
+visuais correspondentes. Os 23 arquivos citados aparecem nos logs da
+[CI de b0fd4fbd](https://github.com/RMZZFAJ/home-care-assistant/actions/runs/45996460517),
+com 102 aprovações por perfil em Chromium, Android e iOS/WebKit.
+Esse total inclui os casos compartilhados com os lotes anteriores.
+
+| Cenário | Percursos verificados no sistema |
+| --- | --- |
+| [E10-01](#e10-01--administração-da-residência) | Diretório, proposta de identificação e recuperação de tentativa. [administration-canonical](../../../../tests/e2e/administration-canonical.spec.ts). |
+| [E10-02](#e10-02--convites-da-residência-e-retorno-de-acesso) | Conta correta, aceite, reemissão explícita e recuperação do mesmo convite. [identity-contracts](../../../../tests/e2e/identity-contracts.spec.ts) · [invitation-recovery](../../../../tests/e2e/invitation-recovery.spec.ts). |
+| [E10-03](#e10-03--declaração-e-conferência-da-credencial-profissional) | Declaração no perfil, conferência independente, conflito e histórico. [credentials](../../../../tests/e2e/credentials.spec.ts). |
+| [E10-04](#e10-04--matriz-de-perfis-e-consulta-individual) | Permissões pessoais, exceção além da função e registro da mudança. [administration-canonical](../../../../tests/e2e/administration-canonical.spec.ts) · [governance-recovery](../../../../tests/e2e/governance-recovery.spec.ts). |
+| [E10-05](#e10-05--propostas-de-alteração-e-decisão-independente) | Revisão, proposta superada e recuperação após perda do próprio acesso. [governance-recovery](../../../../tests/e2e/governance-recovery.spec.ts). |
+| [E10-06](#e10-06--regras-avisos-e-limites-de-estoque) | Leitura e recuperação de regras, destinatários e autoridade por custódia. [administration-canonical](../../../../tests/e2e/administration-canonical.spec.ts) · [governance-recovery](../../../../tests/e2e/governance-recovery.spec.ts). |
+| [E10-07](#e10-07--catálogo-por-tipo-e-confirmação-de-material) | Filtro por tipo, comparação de duplicata e cadastro recuperado. [catalogue-preparation](../../../../tests/e2e/catalogue-preparation.spec.ts). |
+| [E10-08](#e10-08--situação-e-sucessor) | Sucessor de outra unidade, saldo preservado e conflito de revisão. [catalogue-identities](../../../../tests/e2e/catalogue-identities.spec.ts). |
+| [E10-09](#e10-09--unidades-apresentações-e-leitura-de-código) | Código textual, fator de conversão, duplicata e estoque preservado. [typed-fields](../../../../tests/e2e/typed-fields.spec.ts) · [presentation-provenance](../../../../tests/e2e/presentation-provenance.spec.ts). |
+| [E10-10](#e10-10--histórico-oficial-e-conferência-da-edição) | Histórico do material e consulta da própria tentativa após revogação. [catalogue-receipt-discovery](../../../../tests/e2e/catalogue-receipt-discovery.spec.ts). |
+| [E11-01](#e11-01--identificação-e-foto-da-conta) | Edição de perfil, foto privada, revisão concorrente e recuperação do envio. [personal-workspace](../../../../tests/e2e/personal-workspace.spec.ts) · [avatar-recovery](../../../../tests/e2e/avatar-recovery.spec.ts). |
+| [E11-02](#e11-02--contatos-e-métodos-de-acesso) | Confirmação de e-mail, sessão recente e estados de SMS e Google. [profile-canonical](../../../../tests/e2e/profile-canonical.spec.ts). |
+| [E11-03](#e11-03--senha-autenticador-e-sessões-da-conta) | TOTP válido, critérios de senha e encerramento das outras sessões. [profile-security](../../../../tests/e2e/profile-security.spec.ts). |
+| [E11-04](#e11-04--central-com-busca-filtros-e-ações-da-ficha) | Busca, paginação, tarefa, visto e perda de autorização sobre o destino. [notification-list-completeness](../../../../tests/e2e/notification-list-completeness.spec.ts) · [notification-targets](../../../../tests/e2e/notification-targets.spec.ts). |
+| [E11-05](#e11-05--preferências-pessoais-consentimento-e-resultado) | Concorrência de preferências, limite de recuperação e ciência independente. [profile-canonical](../../../../tests/e2e/profile-canonical.spec.ts) · [personal-workspace](../../../../tests/e2e/personal-workspace.spec.ts). |
+| [E11-06](#e11-06-e-e11-07--ativação-aparelhos-e-teste-pessoal) | Permissão, inscrição, negativa e alternativa quando Push está indisponível. [web-push](../../../../tests/e2e/web-push.spec.ts). |
+| [E11-07](#e11-06-e-e11-07--ativação-aparelhos-e-teste-pessoal) | Prazo de 30 segundos, mesma chave, duas consultas e retorno do serviço. [web-push](../../../../tests/e2e/web-push.spec.ts). |
+| [E11-08](#e11-08-e-e11-09--instalação-conexão-e-atualização-da-aba) | Instalação por gesto, preparação e acesso quando o worker está indisponível. [pwa](../../../../tests/e2e/pwa.spec.ts) · [web-push](../../../../tests/e2e/web-push.spec.ts). |
+| [E11-09](#e11-08-e-e11-09--instalação-conexão-e-atualização-da-aba) | Atualização da aba, compatibilidade, funcionamento offline e reconexão. [pwa](../../../../tests/e2e/pwa.spec.ts). |
+| [E12-01](#e12-01--guias-e-ajuda-na-tarefa) | Seis perfis, progresso e isolamento de tarefas por papel. [guides-canonical](../../../../tests/e2e/guides-canonical.spec.ts). |
+| [E12-02](#e12-02--preparação-local-e-retorno-à-tarefa) | Áreas na tela móvel, consulta restrita e retorno após falha. [local-preparation](../../../../tests/e2e/local-preparation.spec.ts). |
+| [E12-03](#e12-03--criação-de-residência) | Revisão do cadastro, campos abandonados em memória e primeiro saldo. [residence-preparation-canonical](../../../../tests/e2e/residence-preparation-canonical.spec.ts) · [local-preparation](../../../../tests/e2e/local-preparation.spec.ts). |
+| [E12-04](#e12-04--consulta-do-dossiê-de-contingência) | Busca, fatos, materiais, histórico e isolamento por paciente. [contingency](../../../../tests/e2e/contingency.spec.ts). |
+| [E12-05](#e12-05--declaração-e-complemento) | Informação desconhecida, complemento e recuperação limitada. [contingency](../../../../tests/e2e/contingency.spec.ts). |
+| [E12-06](#e12-06--conferência-independente-e-vínculo) | Revisão da referência, recusa de versão antiga e vínculo recuperado uma vez. [contingency](../../../../tests/e2e/contingency.spec.ts). |
+| [E12-07](#e12-07--central-técnica-e-decisões) | Escopo global, incidente com revisão e política concorrente. [operations-monitoring](../../../../tests/e2e/operations-monitoring.spec.ts). |
+| [E12-08](#e12-08--continuidade-e-tentativas-de-envio) | Recorte de ambiente, evidência de cópia e ensaio e detalhes de transporte. [operations-monitoring](../../../../tests/e2e/operations-monitoring.spec.ts). |
+
+A revisão da apresentação da confirmação E12-06, posterior ao commit
+publicado, tem capturas locais em 360 e 412 px e verificações dirigidas
+nos três perfis. A decisão de publicação e o resultado de cada ambiente
+estão no [quadro de fechamento](FECHAMENTO_D_B.md). A homologação registra
+em separado as verificações em aparelhos e serviços reais.
+
 ### Publicação e ambientes no início de L4
 
 - A branch `feat/phase-d-continuation` inicia L4 em `1ba95e4c`, no
