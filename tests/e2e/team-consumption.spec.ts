@@ -7,6 +7,7 @@ import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { sql, sqlLiteral as q } from "../../scripts/test-environment.mjs";
 import { selectContext } from "./auth-context";
 import { openFlowSuggestions } from "./navigation";
+import { pressWorkspaceControl } from "./workspace-controls";
 import { audit } from "./accessibility-audit";
 
 test.setTimeout(180_000);
@@ -285,8 +286,12 @@ test("aviso reiterado confirma o material original sem alterar o saldo", async (
   await openConsumption(page, f);
   await page.goto(`/consumo?careRecipientId=${f.patient}&ref=${original.id}&refKind=report`);
   const detail = page.getByRole("region", { name: "Detalhe do relato", exact: true });
-  await detail.getByRole("button", { name: "Avisar novamente", exact: true }).click();
+  // Opening a linked report moves focus to its heading after the workspace transition.
+  await expect(detail.getByRole("heading", { name: "Aviso de falta", level: 2, exact: true })).toBeFocused();
+  const repeat = detail.getByRole("button", { name: "Avisar novamente", exact: true });
+  await pressWorkspaceControl(page, repeat);
   const dialog = page.getByRole("dialog", { name: "Avisar falta à família", exact: true });
+  await expect(dialog).toBeVisible();
   await dialog.getByText("Quantidade em falta · 2", { exact: true }).click();
   await expect(dialog.getByRole("textbox", { name: "Quantidade em falta · " + f.name, exact: true })).toHaveValue("2");
   await expect(dialog.getByRole("textbox", { name: "Mensagem para a família", exact: true })).toHaveValue(

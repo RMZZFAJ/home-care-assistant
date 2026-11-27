@@ -42,6 +42,12 @@ async function requestMoreReports(page: Page) {
 
 test("consumption list rejects corrupt pages and clears previous content after a denied continuation", async ({ page }, info) => {
   const f = await prepare(page), before = facts(f.patient), writes: string[] = [];
+  // Keep the injected responses tied to these explicit reads. A background
+  // refresh would supersede a continuation before its response is processed.
+  await page.addInitScript(() => {
+    if (window.location.pathname === "/consumo")
+      window.addEventListener("hca:data-changed", event => event.stopImmediatePropagation(), true);
+  });
   page.on("request", request => { if (new URL(request.url()).pathname === "/api/consumption" && request.method() !== "GET") writes.push(request.url()); });
   let mode = "live";
   await page.route("**/api/consumption?*", async route => {

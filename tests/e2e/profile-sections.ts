@@ -10,8 +10,8 @@ const labels: Record<ProfileSection, string> = {
 export async function selectProfileSection(page: Page, section: ProfileSection) {
   const tab = page.getByRole("tab", { name: labels[section], exact: true });
   await page.bringToFront();
-  // Resolving the profile read removes the status above the tabs and moves their touch targets.
-  await expect(page.getByText(/^(Carregando perfil|Atualizando consulta do perfil)…$/)).toBeHidden();
+  // The initial read can change the layout. Background updates keep the tab strip usable.
+  await expect(page.getByText("Carregando perfil…", { exact: true })).toBeHidden();
   // WebKit can reposition the scrolling tab strip on focus between mouse down
   // and mouse up synthesized from a tap. Settle focus before measuring the tap.
   if (test.info().project.use.hasTouch) await tab.focus();

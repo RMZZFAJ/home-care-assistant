@@ -159,7 +159,30 @@ test("P02 preferência pessoal tem revisão em leitura e recupera a mesma escolh
   const f = await setup(), family = await actor("family", f.patient), before = await prefer(family, "manual");
   try {
     await login(page, f.patient); await page.goto("/perfil");
-    await selectProfileSection(page, "notices");
+    const notices = page.getByRole("tab", { name: "Avisos e aplicativo", exact: true });
+    await expect(page.getByRole("heading", { name: "Identificação", exact: true })).toBeVisible();
+    const readTop = () => notices.evaluate(tab => tab.getBoundingClientRect().top);
+    const readyTop = await readTop();
+    const requestHeld = Promise.withResolvers<void>();
+    const releaseRead = Promise.withResolvers<void>();
+    await page.route("**/api/profile", async route => {
+      if (route.request().method() !== "GET") return route.continue();
+      const response = await route.fetch();
+      requestHeld.resolve();
+      await releaseRead.promise;
+      await route.fulfill({ response });
+    });
+    try {
+      await page.evaluate(() => window.dispatchEvent(new Event("hca:data-changed")));
+      await requestHeld.promise;
+      await expect(page.getByText("Atualizando consulta do perfil…", { exact: true })).toHaveCount(1);
+      expect(await readTop()).toBeCloseTo(readyTop, 0);
+      await selectProfileSection(page, "notices");
+    } finally {
+      releaseRead.resolve();
+      await page.unrouteAll({ behavior: "wait" });
+    }
+    await expect(page.getByText("Atualizando consulta do perfil…", { exact: true })).toHaveCount(0);
     const edit = page.getByRole("button", { name: "Editar preferência de ciência", exact: true });
     await edit.click();
     const editor = page.getByRole("dialog", { name: "Ciência de requisições", exact: true });

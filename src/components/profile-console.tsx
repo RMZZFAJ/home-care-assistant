@@ -84,7 +84,8 @@ function ProfileContent({ patientSelected }: { patientSelected: boolean }) {
   return (
     <section className="hca-profile space-y-5" aria-label="Perfil pessoal">
       {readFailure && !security ? <Notice error>{readFailure.message} <button type="button" className={buttonClass} onClick={() => setReadAttempt(value => value + 1)}>Consultar perfil novamente</button></Notice> : null}
-      {reading && !security ? <Notice>{profile ? "Atualizando consulta do perfil…" : "Carregando perfil…"}</Notice> : null}
+      {reading && !security && !profile ? <Notice>Carregando perfil…</Notice> : null}
+      {reading && !security && profile ? <p className="sr-only" role="status">Atualizando consulta do perfil…</p> : null}
       <PushSettings renderSections={push => (
         <ProfileTabs>
           {{
