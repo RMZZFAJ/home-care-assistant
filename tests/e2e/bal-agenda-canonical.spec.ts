@@ -4,7 +4,7 @@ import { randomUUID } from "node:crypto";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
-import { setup, rpc, fixtures } from "../integration/v4-fixtures.mjs";
+import { setup, rpc } from "../integration/v4-fixtures.mjs";
 import { shiftCommand, shiftWorker } from "../integration/shift-fixtures.mjs";
 import { sql, sqlLiteral as q } from "../../scripts/test-environment.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
@@ -15,8 +15,8 @@ import { expectMobileMaterialRow, mobileMaterialReference, openIssuedMaterials }
 
 test.setTimeout(180_000);
 const widths = [320, 390, 768, 1024, 1440];
-async function login(page: Page, patient: string) {
-  await page.goto("/login"); await page.getByLabel("E-mail", { exact: true }).fill(fixtures.adminA.email);
+async function login(page: Page, patient: string, email: string) {
+  await page.goto("/login"); await page.getByLabel("E-mail", { exact: true }).fill(email);
   await page.getByLabel("Senha", { exact: true }).fill(fixturePassword); await page.getByRole("button", { name: "Entrar", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Visão geral", exact: true })).toBeVisible(); await selectContext(page, patient);
 }
@@ -109,11 +109,14 @@ test("06.3 BAL canonical readonly materials preserve physical zero,original refe
 
 test("06.3 agenda canonical records retain overnight dates,timezone and native editing without operational writes", async ({ page, browser }, info) => {
   const f = await setup(), pro = await shiftWorker(f.patient), name = "Pessoa da programação " + "com nome extenso ".repeat(6);
+  // Other tests give the shared administrator memberships that do not belong
+  // to this agenda fixture and inflate every whole-page accessibility audit.
+  const viewer = await shiftWorker(f.patient, "admin");
   sql(`update public.profiles set full_name=${q(name.trim())} where id=${q(pro.id)};`);
   const type = await shiftCommand(f.admin, f.patient, "type", { name: "Plantão noturno da comparação canônica", startsLocal: "19:00", durationMinutes: 720 });
   await shiftCommand(f.admin, f.patient, "series", { professionalId: pro.id, shiftTypeId: type.id, timezone: "America/Sao_Paulo", recurrence: "once", weekdays: [], anchorDate: "2100-06-01", validUntil: "2100-06-01", notes: "Programação não comprova presença física." });
   const before = sql(`select jsonb_agg(to_jsonb(s) order by id) from public.scheduled_shifts s where care_recipient_id=${q(f.patient)};`);
-  await login(page, f.patient); await page.goto("/escalas"); await page.getByLabel("Data de referência", { exact: true }).fill("2100-06-01");
+  await login(page, f.patient, viewer.email); await page.goto("/escalas"); await page.getByLabel("Data de referência", { exact: true }).fill("2100-06-01");
   const sent = writes(page), row = page.getByRole("article", { name: type.name + " · " + name.trim(), exact: true }).filter({ visible: true });
   const calendar = page.getByRole("group", { name: "Calendário semanal de plantões", exact: true });
   await expect(calendar.getByRole("button", { name: /1 de junho de 2100, com plantões$/, pressed: true })).toBeVisible();
@@ -140,10 +143,27 @@ test("06.3 agenda canonical records retain overnight dates,timezone and native e
   const ref = await reference(browser, "pessoas/horarios");
   try {
     const model = ref.page.locator(".record").last(); await expect(model).toBeVisible();
+    const appearance = (card: Locator, iconSelector: string) => card.evaluate((node, selector) => {
+      const values = (element: Element, properties: string[]) => {
+        const style = getComputedStyle(element);
+        return properties.map(property => style.getPropertyValue(property));
+      };
+      const icon = node.querySelector(selector);
+      return {
+        card: values(node, ["gap", "padding-top", "padding-left", "border-bottom-color"]),
+        icon: icon ? values(icon, ["width", "height", "border-radius", "background-color"]) : null,
+      };
+    }, iconSelector);
     for (const width of widths) {
-      await page.setViewportSize({ width, height: 1000 }); await ref.page.setViewportSize({ width, height: 1000 });
-      for (const property of ["gap", "padding-top", "padding-left", "border-bottom-color"] as const) await expect(row).toHaveCSS(property, await model.evaluate((n,p) => getComputedStyle(n).getPropertyValue(p), property));
-      for (const property of ["width", "height", "border-radius", "background-color"] as const) await expect(row.locator(".hca-shift-icon")).toHaveCSS(property, await model.locator(".record-icon").evaluate((n,p) => getComputedStyle(n).getPropertyValue(p), property));
+      // Measure each surface in its own foreground frame. WebKit throttles
+      // repeated evaluations in the background page.
+      await ref.page.bringToFront();
+      await ref.page.setViewportSize({ width, height: 1000 });
+      const approved = await appearance(model, ".record-icon");
+      expect(approved.icon).not.toBeNull();
+      await page.bringToFront();
+      await page.setViewportSize({ width, height: 1000 });
+      await expect.poll(() => appearance(row, ".hca-shift-icon")).toEqual(approved);
       if (width > 850) {
         const calendar = page.getByRole("region", { name: "Calendário de plantões; rolagem horizontal quando necessária", exact: true });
         // The reference owns another page, and resize updates native tab entry.
@@ -171,8 +191,29 @@ test("06.3 agenda canonical records retain overnight dates,timezone and native e
     await expect(dialog.getByLabel("Novo profissional", { exact: true })).toHaveValue(pro.id);
     await expect(dialog.getByLabel("Início do plantão", { exact: true })).toHaveCount(0);
     await expect(dialog.getByRole("button", { name: "Revisar alteração", exact: true })).toBeDisabled();
-    await dialog.getByRole("button", { name: "Fechar edição", exact: true }).click();
-    await expect(dialog).toHaveCount(0); await expect(actions).toBeFocused();
+    const scheduleList = (url: URL) => url.pathname === "/api/schedules"
+      && url.searchParams.get("careRecipientId") === f.patient;
+    const refresh = Promise.withResolvers<void>();
+    await page.route(scheduleList, async route => {
+      await refresh.promise;
+      await route.continue();
+    });
+    try {
+      const revalidation = page.waitForRequest(request => scheduleList(new URL(request.url())));
+      await page.evaluate(() => window.dispatchEvent(new Event("hca:data-changed")));
+      await revalidation;
+      await dialog.getByRole("button", { name: "Fechar edição", exact: true }).click();
+      await expect(dialog).toHaveCount(0);
+      await expect(actions).toHaveAttribute("aria-disabled", "true");
+      await expect(actions).toBeFocused();
+      await page.keyboard.press("Enter");
+      await expect(picker).toHaveCount(0);
+    } finally {
+      refresh.resolve();
+      await page.unrouteAll({ behavior: "wait" });
+    }
+    await expect(actions).toBeEnabled();
+    await expect(actions).toBeFocused();
     expect(sql(`select jsonb_agg(to_jsonb(s) order by id) from public.scheduled_shifts s where care_recipient_id=${q(f.patient)};`)).toBe(before); expect(sent).toEqual([]);
   } finally { await ref.context.close(); }
 });

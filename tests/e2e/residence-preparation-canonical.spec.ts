@@ -31,8 +31,13 @@ test("E12-03 uses the approved mobile sections and leaves abandoned fields in me
       writes.push(request.postDataJSON().action);
   });
   const residenceName = panel.getByRole("textbox", { name: "Nome da residência", exact: true });
+  const administratorEmail = panel.getByRole("textbox", { name: "E-mail da conta administradora inicial", exact: true });
+  await expect(residenceName).toBeEditable();
+  await expect(page.locator(".hca-activity-overlay")).toBeHidden();
   await residenceName.fill(name);
-  await panel.getByRole("textbox", { name: "E-mail da conta administradora inicial", exact: true }).fill(fixtures.family.email);
+  await administratorEmail.fill(fixtures.family.email);
+  await expect(residenceName).toHaveValue(name);
+  await expect(administratorEmail).toHaveValue(fixtures.family.email);
   await expect(panel.getByRole("combobox", { name: "Titular da continuidade", exact: true })).toBeEnabled({ timeout: 90_000 });
   const reference = await browser.newContext({ viewport: { width: 1280, height: 900 } });
   mkdirSync("output/playwright/l4/reference", { recursive: true });
@@ -55,13 +60,16 @@ test("E12-03 uses the approved mobile sections and leaves abandoned fields in me
       await frame.screenshot({ path: "output/playwright/l4/reference/residence-create-" + width + ".png" });
       await page.screenshot({ path: "output/playwright/l4/residence-create-" + info.project.name + "-" + width + ".png" });
     }
-  } finally { await reference.close(); }
+  } finally { await reference.close(); await page.bringToFront(); }
+  await expect(residenceName).toHaveValue(name);
   await expect(panel.getByRole("switch", { name: "Mostrar guia no primeiro acesso" })).toBeChecked();
   await expect(panel.getByRole("switch", { name: "Cadastro de desenvolvimento" })).toBeChecked();
   await panel.getByRole("button", { name: "Cancelar", exact: true }).click();
   const leave = page.getByRole("dialog", { name: "Sair deste preenchimento?", exact: true });
   await leave.getByRole("button", { name: "Continuar", exact: true }).click();
+  await expect(leave).toHaveCount(0);
   await expect(residenceName).toHaveValue(name);
+  await expect(administratorEmail).toHaveValue(fixtures.family.email);
   await panel.getByRole("button", { name: "Cancelar", exact: true }).click();
   await leave.getByRole("button", { name: "Sair", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Guias e ajuda", exact: true })).toBeVisible();

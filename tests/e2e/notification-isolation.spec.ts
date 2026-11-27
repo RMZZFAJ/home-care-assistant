@@ -107,6 +107,7 @@ test("D3 sino mantém apresentação montada, isola foco e acessibilidade, fecha
       page.getByRole("button", { name: "Fechar por agora", exact: true }),
     ).toHaveCount(0);
     await expect(page.locator('[id="notification-panel"]')).toHaveCount(1);
+    await expect(trigger(page)).toHaveAttribute("aria-controls", "notification-panel");
     const close = popup(page).getByRole("button", {
       name: "Fechar notificações",
       exact: true,
@@ -150,6 +151,7 @@ test("D3 sino mantém apresentação montada, isola foco e acessibilidade, fecha
     });
     await page.keyboard.press("Escape");
     await expect(popup(page)).toHaveCount(0);
+    await expect(trigger(page)).not.toHaveAttribute("aria-controls");
     await expect(trigger(page)).toBeFocused();
     await expect(
       page.getByRole("button", { name: "Fechar por agora", exact: true }),

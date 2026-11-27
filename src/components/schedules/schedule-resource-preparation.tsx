@@ -931,6 +931,7 @@ export function ScheduleResourcePreparation({
         }
         restoreFocusTo={opener}
         restoreFocusFallbackRef={fallbackFocus}
+        restoreFocusToAriaDisabled
         busy={publishing || reviewing || draft.busy}
         preventClose={Boolean(pending) || Boolean(draft.pending)}
         hasUnsavedChanges={

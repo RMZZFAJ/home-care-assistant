@@ -1,8 +1,8 @@
 # Pendências para encerrar D-B e iniciar D-C
 
 Posição de 26/11/2026. A [PR 8][pr8] está aberta para revisão em
-`feat/phase-d-continuation`. O último candidato publicado conferido foi
-`e783f6c55c754eccb59529939bfa5141164ff663`. L1 e L2 chegaram à `master`
+`feat/phase-d-continuation`. O diagnóstico de CI desta revisão parte de
+`ff786c9d00db930bf9a33734f718d670cdb3b8d3`. L1 e L2 chegaram à `master`
 pela [PR 7][pr7]. L3 e L4 fazem parte da PR 8.
 
 A decisão de integrar a PR, a aceitação visual dos lotes e a liberação para
@@ -99,9 +99,9 @@ e levar a mudança para a próxima etapa.
 
   O laboratório usa dados simulados para arquivo, saldo, agendas e recibos. A
   PR documenta as diferenças sem alterar o HTML aprovado. O ajuste de
-  recuperação da agenda preparado nesta revisão ainda precisa de publicação e
-  de aprovação no SHA final. Conferir calendário, mudança de horário, BAL e
-  download em aparelho, mantendo o contexto na ida e na volta.
+  recuperação da agenda já está no candidato publicado. O SHA final precisa
+  passar pela CI. Conferir calendário, mudança de horário, BAL e download em
+  aparelho, mantendo o contexto na ida e na volta.
 
 - **L4, E10–E12.** Administração da residência, convites,
   credenciais, permissões, propostas, regras e catálogo. Central de avisos,
@@ -210,24 +210,57 @@ O último CodeRabbit pulou a nova análise automática pelo volume da PR.
 O Copilot informou indisponibilidade de cota. Esses estados estabelecem a
 cobertura real das revisões disponíveis. [Linha do tempo da PR][pr8].
 
+## Correções de CI após ff786c9d
+
+- O cenário de histórico de material abriu o modal de PDF durante a
+  seleção de Materiais no Android. O outro cenário que falhou ao selecionar
+  a aba, no iOS, preservou o foco em Materiais, mas a aba ativa continuou
+  em Visão geral. O teste continua usando toque nativo no celular. O ponto
+  agora é relativo ao controle, com verificações de estabilidade e de
+  destino no momento do toque. A correção também cobre as outras falhas
+  de seleção de aba observadas em ENT, COM e BAL.
+- A falha de retenção do nome da residência apareceu no primeiro teste
+  em iOS da CI e passou na retentativa. A execução local inicial passou
+  com a revisão anterior. O teste atualizado confere a disponibilidade
+  do formulário, os dois valores antes da comparação, a volta ao primeiro
+  plano e a preservação após Continuar. A causa original da perda do campo
+  não se reproduziu localmente.
+- A agenda conserva o foco ao voltar da edição durante a atualização da
+  lista. O botão anuncia que está indisponível e bloqueia a abertura
+  enquanto a leitura está pendente. A regressão controla a resposta real
+  da consulta e verifica que Enter durante a espera fica sem efeito.
+- O teste de consumo aguarda o destino do recibo antes de abrir outra
+  rota na mesma página. O sino agora associa o botão ao painel enquanto
+  está aberto, cobrindo o apontamento de acessibilidade observado no
+  relatório de residência.
+
+A verificação dirigida cobriu 33 casos em Chromium, Android e iOS/WebKit.
+O único timeout local foi na comparação visual da agenda em WebKit. O
+teste passou a usar um administrador vinculado apenas à residência do
+cenário e passou a comparar, em bloco e no primeiro plano, as mesmas oito
+propriedades de cada largura. A rodada dirigida de agenda passou nos
+três perfis, incluindo iOS/WebKit em 55,9 s. As verificações mantiveram as
+asserções e dispensaram retentativas automáticas. Os relatórios estão em
+`output/playwright/pr8-ci-45907009621-verify/` e
+`output/playwright/pr8-agenda-foreground-report/`.
+
 ## Condições para o merge
 
-- **Revisão e decisões.** As discussões publicadas foram triadas. Publicar a
-  correção da agenda, o painel de avisos e o quadro de fechamento após
-  autorização expressa. Registrar quais decisões DB-01 a DB-06 precisam
-  entrar nesse candidato e quais podem seguir para D-C ou escopo posterior.
-  Conferir novos apontamentos do SHA final.
+- **Revisão e decisões.** As discussões publicadas foram triadas. A correção
+  da agenda, o painel de avisos e a primeira versão deste quadro já foram
+  publicados. Registrar quais decisões DB-01 a DB-06 precisam entrar no
+  candidato e quais podem seguir para D-C ou escopo posterior. Conferir os
+  novos apontamentos do SHA final.
 
-- **CI do candidato.** A CI de `e783f6c5` aprovou Windows, Linux e banco.
-  O job de banco passou na preparação, no replay de migrations e em 911
-  testes de integração, sem falhas ou casos omitidos. Os sete jobs de
-  navegador estavam em execução na consulta. Na CI anterior,
-  1.854 casos passaram de primeira, quatro passaram em
-  retentativa e dois falharam nas duas tentativas, ambos iOS. O SHA publicado
-  tem reparos para alvo encoberto no celular, sincronização dos testes e avanço
-  com autosave da transferência. Conferir log e relatório por projeto do
-  candidato final, incluindo retentativas e cancelamentos.
-  [CI de e783f6c5][ci], [job de banco][db-ci] e [CI anterior][prior-ci].
+- **CI do candidato.** Em `ff786c9d`, Windows, Linux e banco passaram.
+  Dos 1.860 testes de navegador, 1.857 passaram de primeira, dois passaram
+  em retentativa no iOS e um falhou nas duas tentativas no Android. O
+  agregado falhou pelo resultado de Android. A CI de `e783f6c5` passou
+  com seis retentativas. O banco desse SHA passou na preparação, no
+  replay e em 911 testes de integração. As duas execuções usaram uma
+  tentativa do workflow do GitHub. As repetições foram do Playwright.
+  [CI de ff786c9d][ci-ff786c9d], [CI de e783f6c5][ci] e
+  [job de banco][db-ci].
 
 - **Qualidade do código.** O SonarCloud aprovou o gate de `e783f6c5`, com
   0,9% de duplicação no código novo. A consulta encontrou três apontamentos
@@ -236,6 +269,8 @@ cobertura real das revisões disponíveis. [Linha do tempo da PR][pr8].
   atendido no auxiliar de TOTP usado em testes. Uma amostra isolada
   reproduziu o `S6853` no padrão anterior e passou com o novo padrão. Os
   três testes de perfil, ciência e MFA passaram em Chromium sem retentativa.
+  A análise de `ff786c9d` passou e a consulta do código novo retornou zero
+  apontamentos em aberto.
   O gate e a lista de apontamentos devem ser renovados para o SHA final.
   A revisão abrangente da duplicação continua adiada. [SonarCloud][sonar] e
   [triagem Sonar][quality].
@@ -252,7 +287,8 @@ cobertura real das revisões disponíveis. [Linha do tempo da PR][pr8].
   catálogo, histórico e contingência. A lista de referências trouxe 22 REQ com
   versões positivas. A consulta sem sessão recebeu 401. Repetir no Preview do
   SHA final. O dossiê consultado estava vazio e não houve escrita de negócio
-  nessa verificação remota. [Deploy conferido][preview].
+  nessa verificação remota. O deploy de `ff786c9d` também ficou pronto.
+  [Deploy consultado com sessão][preview] e [deploy de ff786c9d][preview-ff].
 
 - **Saúde e desempenho.** O Advisor de saúde não apresentou lint na consulta. O
   alerta histórico de autorização Realtime indicou p90 de cerca de seis
@@ -330,10 +366,11 @@ escopo e critérios acordados para DC-01 a DC-07.
 [rabbit-fourth]: https://github.com/RMZZFAJ/home-care-assistant/pull/8#pullrequestreview-6015267320
 [rabbit-fifth]: https://github.com/RMZZFAJ/home-care-assistant/pull/8#pullrequestreview-6015574742
 [ci]: https://github.com/RMZZFAJ/home-care-assistant/actions/runs/45899139085
+[ci-ff786c9d]: https://github.com/RMZZFAJ/home-care-assistant/actions/runs/45907009621
 [db-ci]: https://github.com/RMZZFAJ/home-care-assistant/actions/runs/45899139085/job/140180331562
-[prior-ci]: https://github.com/RMZZFAJ/home-care-assistant/actions/runs/45800866850
 [sonar]: https://sonarcloud.io/dashboard?id=RMZZFAJ_home-care-assistant&pullRequest=8
 [preview]: https://vercel.com/rmzzfajs-projects/home-care-assistant/8QdxGRvYgFCEjkUK4hH3bjSjSUhb
+[preview-ff]: https://vercel.com/rmzzfajs-projects/home-care-assistant/32pcDuFD1igPCHMooHzM3BMreS22
 [l1]: L1_IMPLEMENTATION.md
 [l2]: ../../../../HCA_L2_COMANDO_MESTRE_CODEX_V7.md
 [l2-decisions]: ../../../../HCA_L2_DECISOES_VIGENTES_E_PENDENCIAS.md#14-pendências-materiais-para-renato

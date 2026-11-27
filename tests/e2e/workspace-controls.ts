@@ -17,13 +17,14 @@ export async function pressWorkspaceControl(page: Page, control: Locator) {
     }
   });
 
-  let point: { x: number; y: number } | null = null;
+  let position: { x: number; y: number } | null = null;
   await expect.poll(async () => {
-    point = await control.evaluate(element => {
+    position = await control.evaluate(element => {
       const { left, top, right, bottom } = element.getBoundingClientRect();
       const x = (Math.max(left, 0) + Math.min(right, innerWidth)) / 2;
       const y = (top + bottom) / 2;
-      if (element.contains(document.elementFromPoint(x, y))) return { x, y };
+      if (element.contains(document.elementFromPoint(x, y)))
+        return { x: x - left - element.clientLeft, y: y - top - element.clientTop };
 
       // WebKit can align a sticky control under the bottom bar when scrolling it into view.
       const header = document.querySelector(".app-header")?.getBoundingClientRect();
@@ -35,7 +36,9 @@ export async function pressWorkspaceControl(page: Page, control: Locator) {
       }
       return null;
     });
-    return point;
+    return position;
   }, { message: "The control must receive touch outside the fixed navigation" }).not.toBeNull();
-  await page.touchscreen.tap(point!.x, point!.y);
+  // Keep the point relative to its control so Playwright checks stability and
+  // verifies the hit target again before delivering the touch.
+  await control.tap({ position: position! });
 }

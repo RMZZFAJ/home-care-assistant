@@ -192,6 +192,8 @@ test("preenchimento de consumo retoma em outra sessão com quantidade incompleta
     expect(JSON.parse(facts(f.patient)).ledger).toEqual(
       JSON.parse(before).ledger,
     );
+    await expect(other).toHaveURL(url =>
+      url.pathname === "/consumo" && url.searchParams.get("ref") === reports[0].id);
     await other.goto(`/consumo?careRecipientId=${f.patient}`);
     await open(other);
     await expect(panel(other)).toContainText(

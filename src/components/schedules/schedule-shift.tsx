@@ -52,9 +52,13 @@ export function ScheduleShift({ shift, stateLabel, earlier, action, disabled, on
         </button> : null}
       </div>
       {entries.length ? <>
-        <ActionButton ref={openerRef} variant="quiet" compact disabled={disabled} aria-haspopup="dialog"
+        <ActionButton ref={openerRef} variant="quiet" compact aria-disabled={disabled || undefined} aria-haspopup="dialog"
           className="hca-agenda-icon" aria-label={`Ações do plantão de ${shift.professional_name}`}
-          onClick={() => { openingEditorRef.current = false; setActionsOpen(true); }}>
+          onClick={() => {
+            if (disabled) return;
+            openingEditorRef.current = false;
+            setActionsOpen(true);
+          }}>
           <Icon name="more" />
         </ActionButton>
         {actionsOpen ? <Dialog open

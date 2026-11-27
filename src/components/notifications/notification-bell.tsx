@@ -27,7 +27,7 @@ export function NotificationBell({ patientId, patientName, disabled = false }: {
           "Notificações" + (inbox.fresh && unread ? ", " + unread + " não vistas" : "")
         }
         aria-expanded={open}
-        aria-controls="notification-panel"
+        aria-controls={open ? "notification-panel" : undefined}
         onClick={event => event.currentTarget.focus()} />}>
         <Icon name="bell" />
         {inbox.fresh && unread ? (
