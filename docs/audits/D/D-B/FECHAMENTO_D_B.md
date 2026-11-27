@@ -299,6 +299,24 @@ Chromium, Android e iOS/WebKit, sem retentativas. Relatórios em
 `output/playwright/pr8-017-catalogue-ready/` e
 `output/playwright/pr8-017-presentation-direct/`.
 
+## CI de 392a815b e cabeçalho compacto das fichas
+
+Windows, Linux, instalação limpa, reaplicação das migrations e 911 testes
+de integração passaram. Em navegador, 1.859 casos passaram de primeira e
+um passou na retentativa do Playwright. O GitHub executou o workflow uma
+vez e o SonarCloud aprovou o commit.
+[CI de 392a815b](https://github.com/RMZZFAJ/home-care-assistant/actions/runs/45940876680).
+
+A captura do Android a 768 px mostrou a identificação compacta cobrindo o
+botão Mais enquanto o cabeçalho principal seguia visível. A faixa agora
+acompanha a posição do fim do cabeçalho em relação a sua área fixa. A
+regressão confere a faixa durante a rolagem, seu recolhimento após
+redimensionar e voltar ao topo, e a abertura do menu com ponteiro.
+O cenário dirigido e a consulta de origens do estoque passaram de primeira
+no Android. O teste completo de PDF atingiu o limite de 180 s nas auditorias
+de acessibilidade locais. O caso dirigido usa a mesma ficha histórica em
+sessão autenticada. Relatório em `output/playwright/pr8-392-sticky-focused/`.
+
 ## Condições para o merge
 
 - **Revisão e decisões.** As discussões publicadas foram triadas. A correção

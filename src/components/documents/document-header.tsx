@@ -108,13 +108,31 @@ export function DocumentHeader({
     return () => clearTimeout(timer);
   }, [copyMessage, sharingOpen]);
   const [compact, setCompact] = useState(false);
+  const compactSlotRef = useRef<HTMLDivElement>(null);
   const markerRef = useRef<HTMLSpanElement>(null);
   useEffect(() => {
+    const slot = compactSlotRef.current;
     const marker = markerRef.current;
-    if (!marker) return;
-    const observer = new IntersectionObserver(([entry]) => setCompact(!entry.isIntersecting && entry.boundingClientRect.top < 115), { rootMargin: "-115px 0px 0px", threshold: 0 });
-    observer.observe(marker);
-    return () => observer.disconnect();
+    const header = marker?.parentElement;
+    if (!slot || !marker || !header) return;
+
+    const updateCompact = () => {
+      const markerBounds = marker.getBoundingClientRect();
+      setCompact(markerBounds.height > 0 && markerBounds.bottom <= slot.getBoundingClientRect().top);
+    };
+
+    // Read the current sticky offset after scroll and resize, including focus
+    // jumps. A cached intersection can outlive a responsive layout change.
+    const observer = new ResizeObserver(updateCompact);
+    observer.observe(header);
+    window.addEventListener("scroll", updateCompact, { capture: true, passive: true });
+    window.addEventListener("resize", updateCompact);
+    updateCompact();
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("scroll", updateCompact, { capture: true });
+      window.removeEventListener("resize", updateCompact);
+    };
   }, [id]);
   const actionClosedRef = useRef(false);
   const moreButtonRef = useRef<HTMLButtonElement>(null);
@@ -152,7 +170,7 @@ export function DocumentHeader({
   );
   return (
     <>
-      <div className="hca-document-compact-slot">{compact ? <div className="hca-document-compact" aria-label="Identificação da ficha durante rolagem"><span className="hca-document-type">{code.startsWith("DEV-") ? "DEV" : type}</span><strong>{code}</strong>{statusBadge}<span className="hca-compact-badges">{badges}</span></div> : null}</div>
+      <div className="hca-document-compact-slot" ref={compactSlotRef}>{compact ? <div className="hca-document-compact" aria-label="Identificação da ficha durante rolagem"><span className="hca-document-type">{code.startsWith("DEV-") ? "DEV" : type}</span><strong>{code}</strong>{statusBadge}<span className="hca-compact-badges">{badges}</span></div> : null}</div>
       <section
         className="hca-document-header"
         data-type={code.startsWith("DEV-") ? "DEV" : type}

@@ -197,6 +197,27 @@ test("PDF atual preserva a origem congelada e distingue emissão sem expor a pre
     );
   }
 });
+test("faixa compacta da ficha histórica recolhe ao voltar ao topo após redimensionar", async ({ page }) => {
+  const f = await historicalSourceFixture();
+  await login(page, f.patient);
+  await page.goto(`/historico/${f.doc.id}?documentTab=files`);
+  await page.setViewportSize({ width: 768, height: 640 });
+
+  const more = page.getByRole("button", { name: "Mais opções da ficha", exact: true });
+  const compactHeader = page.locator(".hca-document-compact");
+  const files = page.getByRole("region", { name: "Arquivos gerados", exact: true });
+  await expect(files).toBeVisible();
+  await expect(compactHeader).toBeHidden();
+  await files.evaluate(region => region.scrollIntoView({ block: "start", behavior: "instant" }));
+  await expect(compactHeader).toBeVisible();
+
+  await page.setViewportSize({ width: 768, height: 950 });
+  await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
+  await expect(compactHeader).toBeHidden();
+  await more.click();
+  await expect(page.getByRole("menu", { name: "Ações da ficha", exact: true })).toBeVisible();
+});
+
 test("PDF atual recusa caractere sem representação antes de assinar ou persistir arquivo", async ({
   page,
 }) => {
