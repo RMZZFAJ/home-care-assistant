@@ -154,7 +154,24 @@ test('contingency real declaration evidence and independent link preserve physic
  expect(body.receiver).toBeNull();expect(body.occurredOn).toBeNull();expect(body.materials[0].quantity).toBe('0');expect(body.materials[0].unit).toBe('unidade');expect(body.communications[0].state).toBe('pending');expect(count(f.patient)).toBe(1);
  await page.getByRole('tab',{name:'Materiais',exact:true}).click();await expect(page.getByRole('tabpanel',{name:'Materiais',exact:true})).toContainText('0 unidade');
  await page.getByRole('tab',{name:'Fatos',exact:true}).click();
- const detail=page.getByRole('region',{name:'Dossiê selecionado',exact:true});await detail.getByRole('button',{name:'Adicionar anexo',exact:true}).click();const attachment=page.getByRole('dialog',{name:'Adicionar anexo',exact:true});const png=await sharp({create:{width:16,height:16,channels:3,background:'white'}}).png().toBuffer();await attachment.getByLabel('Adicionar foto ou PDF',{exact:true}).setInputFiles({name:'registro-fisico-ficticio.png',mimeType:'image/png',buffer:png});await attachment.getByRole('button',{name:'Enviar anexo',exact:true}).click();await expect(detail.getByRole('link',{name:'registro-fisico-ficticio.png',exact:true})).toBeVisible();
+ const fileName='registro-fisico-ficticio.png';
+ const png=await sharp({create:{width:16,height:16,channels:3,background:'white'}}).png().toBuffer();
+ const detail=page.getByRole('region',{name:'Dossiê selecionado',exact:true});
+ await detail.getByRole('button',{name:'Adicionar anexo',exact:true}).click();
+ const attachment=page.getByRole('dialog',{name:'Adicionar anexo',exact:true});
+ const fileInput=attachment.getByLabel('Adicionar foto ou PDF',{exact:true});
+ const [chooser]=await Promise.all([page.waitForEvent('filechooser'),fileInput.click()]);
+ await chooser.setFiles({name:fileName,mimeType:'image/png',buffer:png});
+ await expect(fileInput).toHaveValue(/registro-fisico-ficticio\.png$/);
+ const [upload]=await Promise.all([
+  page.waitForResponse(response=>{
+   const url=new URL(response.url());
+   return response.request().method()==='POST'&&url.pathname==='/api/attachments'&&!url.searchParams.has('prepare');
+  }),
+  attachment.getByRole('button',{name:'Enviar anexo',exact:true}).click(),
+ ]);
+ expect(upload.ok()).toBe(true);
+ await expect(detail.getByRole('link',{name:fileName,exact:true})).toBeVisible();
  await page.getByRole('tab',{name:'Histórico',exact:true}).click();await expect(detail.getByRole('heading',{name:'Evidência anexada',exact:true})).toBeVisible();
  await expect(detail.getByText(/registro-fisico-ficticio\.png/).filter({visible:true})).toHaveCount(1);
  const other=await browser.newContext();

@@ -73,21 +73,28 @@ test("notification history reaches every old notice,restores page and unread fil
 
 test("notification history rejects mismatched or incomplete reads and ignores late results after changing filters", async ({ page }) => {
   const f = await populated(), all = f.oracle(), before = facts(f.patient); await login(page, f.patient);
+  // Keep the injected responses tied to the test's reads. A late channel
+  // subscription can otherwise start a refresh before the intended click.
+  await page.addInitScript(() => {
+    if (window.location.pathname === "/notificacoes")
+      window.addEventListener("hca:data-changed", event => event.stopImmediatePropagation(), true);
+  });
   let mode = "live", release = () => {}, entered = () => {};
   const gate = new Promise<void>(resolve => { release = resolve; }), held = new Promise<void>(resolve => { entered = resolve; });
   await page.route("**/api/notifications?*", async route => {
     if (new URL(route.request().url()).searchParams.get("surface") !== "center") return route.continue();
-    if (mode === "unavailable") return route.fulfill({ status: 503, json: { code: "UNAVAILABLE", error: "Histórico de avisos temporariamente indisponível" } });
-    if (mode === "denied") return route.fulfill({ status: 403, json: { code: "FORBIDDEN", error: "Consulta de avisos recusada" } });
+    const responseMode = mode;
+    if (responseMode === "unavailable") return route.fulfill({ status: 503, json: { code: "UNAVAILABLE", error: "Histórico de avisos temporariamente indisponível" } });
+    if (responseMode === "denied") return route.fulfill({ status: 403, json: { code: "FORBIDDEN", error: "Consulta de avisos recusada" } });
     const response = await route.fetch(), body = await response.json();
-    if (mode === "delay") { entered(); await gate; return route.fulfill({ response }); }
-    if (mode === "page") body.page++;
-    if (mode === "size") body.pageSize++;
-    if (mode === "filter") body.unread = !body.unread;
-    if (mode === "surface") body.surface = "bell";
-    if (mode === "patient") body.careRecipientId = randomUUID();
-    if (mode === "short") body.data.pop();
-    if (mode === "duplicate") body.data[1] = body.data[0];
+    if (responseMode === "delay") { entered(); await gate; return route.fulfill({ response }); }
+    if (responseMode === "page") body.page++;
+    if (responseMode === "size") body.pageSize++;
+    if (responseMode === "filter") body.unread = !body.unread;
+    if (responseMode === "surface") body.surface = "bell";
+    if (responseMode === "patient") body.careRecipientId = randomUUID();
+    if (responseMode === "short") body.data.pop();
+    if (responseMode === "duplicate") body.data[1] = body.data[0];
     return route.fulfill({ response, json: body });
   });
   try {

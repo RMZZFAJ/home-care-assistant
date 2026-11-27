@@ -317,6 +317,38 @@ no Android. O teste completo de PDF atingiu o limite de 180 s nas auditorias
 de acessibilidade locais. O caso dirigido usa a mesma ficha histórica em
 sessão autenticada. Relatório em `output/playwright/pr8-392-sticky-focused/`.
 
+## CI de 8b6bf68b e correções de catálogo, avisos e contingência
+
+Windows, Linux, instalação limpa, reaplicação das migrations e os 911
+testes de integração passaram. Dos 1.863 casos de navegador, 1.860 passaram
+de primeira. Dois passaram na retentativa em iOS e um falhou nas duas
+tentativas em Chromium. O SonarCloud aprovou o commit.
+[CI de 8b6bf68b](https://github.com/RMZZFAJ/home-care-assistant/actions/runs/45949012097).
+
+- **Contingência.** A captura mostrou o formulário aberto com o campo de
+  arquivo vazio. O teste agora abre o seletor nativo, confirma o arquivo
+  selecionado e espera o resultado do envio antes de conferir o dossiê e
+  o vínculo.
+- **Catálogo.** O formulário aparecia depois da consulta de referência,
+  mas a saída da tela de espera solicitava foco de volta ao acionador.
+  A devolução de foco acompanha a abertura inteira do editor, até seu
+  fechamento efetivo.
+- **Avisos.** O cenário de resposta inválida passou a controlar a ordem
+  das consultas. A invalidação em segundo plano podia receber uma
+  resposta simulada antes do clique e abrir o diálogo de erro. O caso
+  mantém as respostas inválidas, a resposta atrasada e as contraprovas de
+  preservação dos dados.
+
+No Preview de `8b6bf68b`, os 48 códigos e indicadores de criticidade da
+matriz coincidiram com a consulta individual da família feita pelo
+administrador. A conta familiar recebeu 403 ao consultar outra pessoa.
+As sessões fictícias foram encerradas após as leituras.
+
+O teste de foco reproduziu a devolução prematura antes do ajuste. Os oito
+casos dirigidos passaram de primeira em Chromium e iOS/WebKit após as
+correções, com build de produção e lint dirigido aprovados. Relatório em
+`output/playwright/pr8-8b6-failure-repairs/`.
+
 ## Condições para o merge
 
 - **Revisão e decisões.** As discussões publicadas foram triadas. A correção

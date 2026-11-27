@@ -3,6 +3,26 @@ import { useEffect, useRef, useState, type ReactNode, type RefObject } from "rea
 import type { IconName } from "@/components/ui/icon";
 import { Dialog, Drawer } from "@/components/ui/overlays";
 
+/** Return focus when the editor closes, including editors that swap their loading view. */
+export function useRecordDrawerReturnFocus(
+  restoreFocusTo?: HTMLElement | null,
+  restoreFocusFallbackRef?: RefObject<HTMLElement | null>,
+  restoreFocusToAriaDisabled = false,
+) {
+  const restoreFrameRef = useRef<number | undefined>(undefined);
+  useEffect(() => {
+    // A replacement effect (including Strict Mode's probe) is not a close.
+    if (restoreFrameRef.current !== undefined) cancelAnimationFrame(restoreFrameRef.current);
+    const fallback = restoreFocusFallbackRef?.current;
+    if (!restoreFocusTo && !fallback) return;
+    const unavailable = restoreFocusToAriaDisabled ? ":disabled" : ':disabled,[aria-disabled="true"]';
+    return () => { restoreFrameRef.current = requestAnimationFrame(() => {
+      if (restoreFocusTo?.isConnected && !restoreFocusTo.matches(unavailable)) restoreFocusTo.focus();
+      else if (fallback?.isConnected) fallback.focus();
+    }); };
+  }, [restoreFocusTo, restoreFocusFallbackRef, restoreFocusToAriaDisabled]);
+}
+
 /** Contextual editing keeps the list and its filters in place. */
 export function RecordDrawer({ title, children, recovery, onClose, busy = false, restoreFocusTo, restoreFocusFallbackRef, restoreFocusToAriaDisabled = false, trackChanges = true, preventClose = false, hasUnsavedChanges, keyboardScrollable = false, uncertainOutcome = false, exitDialog = false, modal = false, kicker, subtitle, headingIcon, popupClassName, footer }: {
   title: string; children: ReactNode; onClose: () => void; busy?: boolean; restoreFocusTo?: HTMLElement | null; restoreFocusFallbackRef?: RefObject<HTMLElement | null>; trackChanges?: boolean; preventClose?: boolean;
@@ -23,17 +43,7 @@ export function RecordDrawer({ title, children, recovery, onClose, busy = false,
   const [discard, setDiscard] = useState(false);
   const formRef = useRef<HTMLFieldSetElement>(null);
   const editFocusRef = useRef<HTMLElement | null>(null);
-  const restoreFrameRef = useRef<number | undefined>(undefined);
-  useEffect(() => {
-    // A replacement effect (including Strict Mode's probe) is not a close.
-    if (restoreFrameRef.current !== undefined) cancelAnimationFrame(restoreFrameRef.current);
-    const fallback = restoreFocusFallbackRef?.current;
-    const unavailable = restoreFocusToAriaDisabled ? ":disabled" : ':disabled,[aria-disabled="true"]';
-    return () => { restoreFrameRef.current = requestAnimationFrame(() => {
-      if (restoreFocusTo?.isConnected && !restoreFocusTo.matches(unavailable)) restoreFocusTo.focus();
-      else if (fallback?.isConnected) fallback.focus();
-    }); };
-  }, [restoreFocusTo, restoreFocusFallbackRef, restoreFocusToAriaDisabled]);
+  useRecordDrawerReturnFocus(restoreFocusTo, restoreFocusFallbackRef, restoreFocusToAriaDisabled);
   const requestClose = () => { if (!busy && !preventClose) { if (uncertainOutcome || (hasUnsavedChanges ?? dirty)) setDiscard(true); else onClose(); } };
   const continueEditing = () => {
     if (busy || preventClose) return;

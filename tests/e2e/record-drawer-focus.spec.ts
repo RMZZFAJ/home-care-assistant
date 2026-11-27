@@ -62,7 +62,40 @@ for (const width of [390, 1440]) test(`RecordDrawer ${width}: continuar, descart
   }
   await expect(opener).toBeEnabled();
   await expect(opener).toBeFocused();
-  await keyboard(opener);
+  const referenceRoute = "**/api/admin/catalogue-actions?**purpose=create**";
+  let releaseReference!: () => void;
+  const referenceGate = new Promise<void>(resolve => { releaseReference = resolve; });
+  await page.route(referenceRoute, async route => {
+    await referenceGate;
+    await route.continue();
+  });
+  const focusReturns = await opener.evaluateHandle(node => {
+    const button = node as HTMLButtonElement;
+    const originalFocus = button.focus;
+    let calls = 0;
+    button.focus = function (options) {
+      calls++;
+      return originalFocus.call(this, options);
+    };
+    return {
+      count: () => calls,
+      restore: () => { button.focus = originalFocus; },
+    };
+  });
+  try {
+    await keyboard(opener);
+    await expect(drawer.getByText("Consultando o catálogo…", { exact: true })).toBeVisible();
+    const openings = await focusReturns.evaluate(probe => probe.count());
+    releaseReference();
+    await expect(name).toBeEditable();
+    await page.evaluate(() => new Promise<void>(resolve => requestAnimationFrame(() => requestAnimationFrame(() => resolve()))));
+    expect(await focusReturns.evaluate(probe => probe.count()), "Opening the editor must not return focus to its trigger").toBe(openings);
+  } finally {
+    releaseReference();
+    await page.unroute(referenceRoute);
+    await focusReturns.evaluate(probe => probe.restore());
+    await focusReturns.dispose();
+  }
   await name.fill(value);
   await page.keyboard.press("Escape");
   const warning = page.getByRole("dialog", { name: "Sair sem concluir?", exact: true });

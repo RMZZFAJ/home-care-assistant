@@ -1,7 +1,7 @@
 "use client";
 
 import { useId, useRef, useState, type FormEvent, type RefObject } from "react";
-import { RecordDrawer } from "@/components/forms/record-drawer";
+import { RecordDrawer, useRecordDrawerReturnFocus } from "@/components/forms/record-drawer";
 import { ActionButton, DefinitionGrid, FormField, LoadingIndicator, Pill, SelectField, TextAreaField, TextInput } from "@/components/ui/controls";
 import { FeedbackBanner } from "@/components/ui/feedback";
 import { Icon } from "@/components/ui/icon";
@@ -44,17 +44,17 @@ function hashFor(reference: ReviewedCatalogueProductReference, fields: Fields) {
 
 export function CatalogueProductEditor(props: EditorProps) {
   const { scope, readRevision, opener, fallback, onClose } = props;
+  useRecordDrawerReturnFocus(opener, fallback);
   const read = useScopedRead(reviewedCatalogueUrl(scope), String(readRevision), reviewedCatalogueProductReference.parse);
   const title = scope.purpose === "adopt" ? "Adotar modelo de material" : scope.purpose === "edit" ? "Editar material" : "Novo material";
   if (read.data) return <CatalogueProductForm {...props} reference={read.data} reading={read.loading} readError={read.error} refresh={read.refresh} title={title} />;
-  return <RecordDrawer title={title} subtitle="Catálogo da residência" headingIcon="box" restoreFocusTo={opener}
-    restoreFocusFallbackRef={fallback} onClose={onClose}>
+  return <RecordDrawer title={title} subtitle="Catálogo da residência" headingIcon="box" onClose={onClose}>
     {read.error ? <FeedbackBanner tone="error">{read.error} <ActionButton onClick={read.refresh}>Consultar novamente</ActionButton></FeedbackBanner>
       : <p role="status"><LoadingIndicator compact /> Consultando o catálogo…</p>}
   </RecordDrawer>;
 }
 
-function CatalogueProductForm({ scope, reference, reading, readError, refresh, title, operation, rows, opener, fallback, onClose, onInspect }: EditorProps & {
+function CatalogueProductForm({ scope, reference, reading, readError, refresh, title, operation, rows, onClose, onInspect }: EditorProps & {
   reference: ReviewedCatalogueProductReference; reading: boolean; readError: string; refresh: () => void; title: string;
 }) {
   const [reviewed, setReviewed] = useState(reference);
@@ -115,7 +115,7 @@ function CatalogueProductForm({ scope, reference, reading, readError, refresh, t
   return <>
     <RecordDrawer title={title} subtitle="Catálogo da residência" kicker="Organização da residência" headingIcon="box"
       popupClassName="hca-preference-sheet hca-residence-settings-sheet" busy={operation.busy}
-      restoreFocusTo={opener} restoreFocusFallbackRef={fallback} onClose={onClose} keyboardScrollable exitDialog
+      onClose={onClose} keyboardScrollable exitDialog
       footer={close => <><ActionButton onClick={close}>Cancelar</ActionButton>
         <ActionButton type="submit" form={formId} variant="primary" disabled={locked || stale || !currentHash}>
           <Icon name="check" />{globalMode && scope.purpose !== "adopt" ? "Propor material" : reviewLabel}</ActionButton></>}>
