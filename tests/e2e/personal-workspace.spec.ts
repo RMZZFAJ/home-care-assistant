@@ -1,4 +1,4 @@
-import { selectProfileSection } from "./profile-sections";
+import { openProfileIdentity, openProfilePhoto, selectProfileSection } from "./profile-sections";
 import { selectContext } from "./auth-context";
 import { test, expect } from "@playwright/test";
 import { readFileSync } from "node:fs";
@@ -40,6 +40,13 @@ test("perfil pessoal salva registro e foto privada e notificações distinguem c
   const receipt = (await issued.json()).receipt;
   await page.goto("/perfil?careRecipientId=" + patientA);
   await selectProfileSection(page, "identity");
+  const identity = await openProfileIdentity(page);
+  const name = identity.getByRole("textbox", { name: "Nome completo", exact: true });
+  const previousName = await name.inputValue();
+  await name.fill(" ");
+  await identity.getByRole("button", { name: "Salvar alterações", exact: true }).click();
+  await expect(identity.getByText("Informe seu nome entre 2 e 160 caracteres.", { exact: true })).toBeVisible();
+  await name.fill(previousName);
   await page
     .getByLabel("Categoria profissional", { exact: true })
     .fill("Profissional de homologação");
@@ -47,27 +54,46 @@ test("perfil pessoal salva registro e foto privada e notificações distinguem c
     .getByLabel("Registro profissional", { exact: true })
     .fill("REG-TESTE");
   await page.getByLabel("UF", { exact: false }).selectOption("SP");
+  await page.evaluate(() => {
+    const request = window.fetch.bind(window);
+    let loseResponse = true;
+    window.fetch = async (input, init) => {
+      const result = await request(input, init);
+      if (loseResponse && input === "/api/profile" && init?.method === "POST" && result.ok) {
+        loseResponse = false;
+        return new Response("{", { status: 200, headers: { "content-type": "application/json" } });
+      }
+      return result;
+    };
+  });
   await page
-    .getByRole("button", { name: "Salvar perfil", exact: true })
+    .getByRole("button", { name: "Salvar alterações", exact: true })
     .click();
-  await expect(
-    page.getByText("Perfil atualizado.", { exact: true }),
-  ).toBeVisible();
+  const failure = page.getByRole("dialog", { name: "Não foi possível salvar a identificação", exact: true });
+  await failure.getByRole("button", { name: "Conferir dados da conta", exact: true }).click();
+  await page.getByRole("dialog", { name: "Dados confirmados", exact: true }).getByRole("button", { name: "Concluir", exact: true }).click();
   const image = await sharp({
     create: { width: 8, height: 8, channels: 3, background: "#147b88" },
   })
     .png()
     .toBuffer();
   await selectProfileSection(page, "identity");
-  await page.getByLabel("Nova foto", { exact: false }).setInputFiles({
+  const photo = await openProfilePhoto(page);
+  const files = photo.getByLabel("Nova foto", { exact: true });
+  await files.setInputFiles({ name: "notas.txt", mimeType: "text/plain", buffer: Buffer.from("arquivo fictício") });
+  await page.getByRole("dialog", { name: "Imagem não aceita", exact: true }).getByRole("button", { name: "Voltar", exact: true }).click();
+  await files.setInputFiles({
     name: "perfil-ficticio.png",
     mimeType: "image/png",
     buffer: image,
   });
-  await page.getByRole("button", { name: "Salvar foto", exact: true }).click();
+  await expect(photo.getByRole("img", { name: "Prévia da nova foto", exact: true })).toBeVisible();
+  await photo.getByRole("button", { name: "Usar esta foto", exact: true }).click();
+  await page.getByRole("dialog", { name: "Foto atualizada", exact: true }).getByRole("button", { name: "Concluir", exact: true }).click();
   await expect(
     page.getByRole("img", { name: "Sua foto de perfil", exact: true }),
   ).toBeVisible();
+  await photo.getByRole("button", { name: "Voltar", exact: true }).click();
   await expect(
     page.getByLabel("Menu do usuário", { exact: true }).locator("img"),
   ).toBeVisible();
@@ -75,7 +101,7 @@ test("perfil pessoal salva registro e foto privada e notificações distinguem c
   expect(profile.professional_registration).toBe("REG-TESTE");
   expect(profile.professional_state).toBe("SP");
   await page.goto("/notificacoes?careRecipientId=" + patientA);
-  await page.getByLabel("Somente não vistas", { exact: true }).check();
+  await page.getByRole("button", { name: "Não vistos", exact: true }).click();
   const row = page
     .getByRole("listitem")
     .filter({ has: page.getByText(receipt.code, { exact: true }) });

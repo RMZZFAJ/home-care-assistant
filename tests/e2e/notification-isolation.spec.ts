@@ -107,6 +107,7 @@ test("D3 sino mantém apresentação montada, isola foco e acessibilidade, fecha
       page.getByRole("button", { name: "Fechar por agora", exact: true }),
     ).toHaveCount(0);
     await expect(page.locator('[id="notification-panel"]')).toHaveCount(1);
+    await expect(trigger(page)).toHaveAttribute("aria-controls", "notification-panel");
     const close = popup(page).getByRole("button", {
       name: "Fechar notificações",
       exact: true,
@@ -150,6 +151,7 @@ test("D3 sino mantém apresentação montada, isola foco e acessibilidade, fecha
     });
     await page.keyboard.press("Escape");
     await expect(popup(page)).toHaveCount(0);
+    await expect(trigger(page)).not.toHaveAttribute("aria-controls");
     await expect(trigger(page)).toBeFocused();
     await expect(
       page.getByRole("button", { name: "Fechar por agora", exact: true }),
@@ -175,12 +177,18 @@ test("D3 sino mantém apresentação montada, isola foco e acessibilidade, fecha
     await page.goto("/");
     await expect(guide(page)).toBeVisible();
     await trigger(page).click();
+    await popup(page).getByRole("button").filter({ hasText: doc.code }).click();
+    const details = page.getByRole("dialog", { name: doc.code, exact: true });
+    const destination = details.getByRole("button", { name: "Abrir compra ou doação", exact: true });
+    await expect(destination).toBeVisible();
+    expect(facts()).toBe(before);
+    expect(writes).toBe(0);
     const marked = page.waitForResponse(
       (response) =>
         new URL(response.url()).pathname === "/api/notifications" &&
         response.request().method() === "POST",
     );
-    await popup(page).getByRole("link").filter({ hasText: doc.code }).click();
+    await destination.click();
     expect((await marked).ok()).toBe(true);
     await expect(page).toHaveURL(new RegExp("/fichas/" + doc.id));
     expect(

@@ -12,13 +12,11 @@ const areas: { section: string; title: string; description: string; group: strin
   { section: "memberships", title: "Pessoas e vínculos", description: "Funções locais e situação dos vínculos.", group: "Organização", capability: "access.manage", icon: "team" },
   { section: "invitations", title: "Convites", description: "Convites, reemissão e aceite das contas.", group: "Organização", capability: "access.manage", icon: "plus" },
   { section: "catalog", title: "Catálogo", description: "Produtos e apresentações administrados pela família.", group: "Materiais", capability: "catalog.manage", icon: "stock" },
-  { section: "alerts", title: "Alertas de estoque", description: "Limites de saldo por custódia e produto.", group: "Materiais", capability: "access.manage", icon: "bell" },
-  { section: "notificationRecipients", title: "Destinatários", description: "Destinos pessoais e preferências de comunicação.", group: "Comunicação e controle", capability: "access.manage", icon: "team" },
   { section: "notifications", title: "Fila de notificações", description: "Acompanhar envios, falhas e reprocessamentos.", group: "Comunicação e controle", capability: "access.manage", icon: "bell" },
   { section: "audit", title: "Auditoria", description: "Eventos e responsáveis preservados no histórico.", group: "Comunicação e controle", capability: "audit.read", icon: "history" },
   { section: "import", title: "Importação histórica", description: "Pré-validar e incorporar fontes físicas revisadas.", group: "Comunicação e controle", capability: "access.manage", icon: "upload" },
   { section: "profiles", title: "Contas globais", description: "Identidades e privilégios globais, separados dos vínculos locais.", group: "Administração global", capability: "access.manage", icon: "settings", globalOnly: true },
-  { section: "operations", title: "Monitoramento e suporte", description: "Incidentes técnicos, observações e políticas por ambiente.", group: "Administração global", capability: "access.manage", icon: "history", globalOnly: true },
+  { section: "operations", title: "Central técnica", description: "Incidentes técnicos, observações e políticas por ambiente.", group: "Administração global", capability: "access.manage", icon: "history", globalOnly: true },
 ];
 export function administrationAreas(context: WorkspaceContext) {
   const global = context.activeContext?.mode === "global" && context.globalAdministrationAllowed;
@@ -27,6 +25,22 @@ export function administrationAreas(context: WorkspaceContext) {
 export function AdministrationNavigation({ context, section }: { context: WorkspaceContext; section?: string | null }) {
   const allowed = administrationAreas(context);
   const query = context.patient ? "&careRecipientId=" + context.patient.id : "";
-  if (section) return <div className="hca-toolbar hca-administration-toolbar"><Link href={context.patient ? "/admin?careRecipientId=" + context.patient.id : "/admin"} prefetch={false}>Administração</Link><span aria-hidden="true">/</span><strong>{allowed.find((area) => area.section === section)?.title ?? "Área indisponível"}</strong><Menu.Root><Menu.Trigger render={<ActionButton variant="quiet" />}>{<Icon name="more" />}Outras áreas</Menu.Trigger><MenuPopup>{allowed.map((area) => <Menu.LinkItem className="hca-menu-item" key={area.section} href={"/admin?section=" + area.section + query} >{<Icon name={area.icon} />}{area.title}</Menu.LinkItem>)}</MenuPopup></Menu.Root></div>;
+  const home = context.patient ? "/admin?careRecipientId=" + context.patient.id : "/admin";
+  if (section) {
+    const technical = section === "operations";
+    return <div className={"hca-toolbar hca-administration-toolbar" + (technical ? " hca-technical-navigation" : "")}>
+      {!technical && <><Link href={home} prefetch={false}>Administração</Link><span aria-hidden="true">/</span>
+        <strong>{allowed.find(area => area.section === section)?.title ?? "Área indisponível"}</strong></>}
+      <Menu.Root>
+        <Menu.Trigger render={<ActionButton variant="quiet" />}><Icon name="more" />Outras áreas</Menu.Trigger>
+        <MenuPopup>
+          {technical && <Menu.LinkItem className="hca-menu-item" href={home}><Icon name="back" />Administração</Menu.LinkItem>}
+          {allowed.map(area => <Menu.LinkItem className="hca-menu-item" key={area.section} href={"/admin?section=" + area.section + query}>
+            <Icon name={area.icon} />{area.title}
+          </Menu.LinkItem>)}
+        </MenuPopup>
+      </Menu.Root>
+    </div>;
+  }
   return <nav aria-label="Áreas administrativas" className="hca-administration-center">{[...new Set(allowed.map((area) => area.group))].map((group) => <section key={group}><div className="hca-section-heading"><h2>{group}</h2></div><div className="hca-compact-grid">{allowed.filter((area) => area.group === group).map((area) => <Link className="ui-card hca-admin-destination" key={area.section} href={"/admin?section=" + area.section + query} prefetch={false}><Icon name={area.icon} /><h3>{area.title}</h3><p>{area.description}</p></Link>)}</div></section>)}</nav>;
 }

@@ -1,4 +1,5 @@
 import { startFocusProbe, attachFocusProbe } from "./focus-diagnostics";
+import { finishBalanceMaterials } from "./balance-wizard-stages";
 import { test, expect, type Page, type Locator } from "@playwright/test";
 import { mkdirSync } from "node:fs";
 import {
@@ -94,6 +95,7 @@ async function begin(page: Page, patient: string) {
   await page
     .getByLabel("Data de referência", { exact: true })
     .fill("2100-01-15");
+  await page.getByLabel("Visualização", { exact: true }).selectOption("week");
 }
 async function chunks(page: Page, patient: string): Promise<ScheduledShift[]> {
   const results = await Promise.all(
@@ -118,6 +120,12 @@ test("doze datas em45 dias mantêm seleção entre meses e após conflito reserv
   await startFocusProbe(page);
   const f = await selectedDatesFixture();
   await conflictingOtherPatient(f);
+  await rpc(f.admin, "set_schedule_residence", {
+    p_patient: f.patient,
+    p_body: { timezone: "America/Sao_Paulo", dayStart: "07:00", nightStart: "19:00" },
+    p_version: null,
+    p_key: crypto.randomUUID(),
+  });
   const before = datesState(f);
   await begin(page, f.patient);
   await page
@@ -129,13 +137,15 @@ test("doze datas em45 dias mantêm seleção entre meses e após conflito reserv
   await edit(page)
     .getByLabel("Tipo de plantão", { exact: true })
     .selectOption(f.type.id);
+  await edit(page).getByRole("switch", { name: "Com repetição", exact: true }).check();
   await edit(page)
     .getByLabel("Repetição", { exact: true })
     .selectOption("dates");
   await edit(page)
-    .getByLabel("Primeiro dia / âncora", { exact: true })
+    .getByLabel("Primeiro dia", { exact: true })
     .fill("2100-01-15");
-  await edit(page).getByLabel("Válida até", { exact: true }).fill("2100-02-28");
+  await edit(page).getByLabel("Último dia", { exact: true }).fill("2100-02-28");
+  await edit(page).getByLabel("Período", { exact: true }).selectOption("night");
   const label = (date: string) => "Dia " + date.split("-").reverse().join("/");
   for (const date of chosenDates.filter((day) => day.startsWith("2100-01")))
     await edit(page)
@@ -161,7 +171,7 @@ test("doze datas em45 dias mantêm seleção entre meses e após conflito reserv
     edit(page).getByText("12 datas selecionadas", { exact: true }),
   ).toBeVisible();
   await edit(page)
-    .getByLabel("Observações", { exact: true })
+    .getByLabel("Informação adicional", { exact: true })
     .fill(
       "Datas preservadas entre meses e depois da recusa; nenhum dado de outro paciente",
     );
@@ -184,8 +194,14 @@ test("doze datas em45 dias mantêm seleção entre meses e após conflito reserv
   await expect(review(page).getByRole("textbox")).toHaveCount(0);
   await expect(review(page).locator("ol > li")).toHaveCount(12);
   await expect(review(page).locator("ol > li").first()).toContainText(
-    "15/01/2100, 19:00 → 16/01/2100, 07:00",
+    "15/01/2100 · 19:00 às 07:00 do dia seguinte",
   );
+  // Hold the next residence read until the review has returned to the form.
+  const hours = Promise.withResolvers<void>();
+  await page.route(`**/api/schedules/residence?careRecipientId=${f.patient}`, async route => {
+    await hours.promise;
+    await route.continue();
+  }, { times: 1 });
   const rejected = page.waitForResponse(
     (response) =>
       new URL(response.url()).pathname ===
@@ -205,21 +221,21 @@ test("doze datas em45 dias mantêm seleção entre meses e após conflito reserv
   await review(page)
     .getByRole("button", { name: "Voltar", exact: true })
     .click();
+  const reviewAgain = edit(page).getByRole("button", { name: "Revisar alteração", exact: true });
   try {
-    await expect(
-      edit(page).getByRole("button", {
-        name: "Revisar alteração",
-        exact: true,
-      }),
-    ).toBeFocused();
+    await expect(reviewAgain).toBeDisabled();
+    await page.evaluate(() => new Promise<void>(done => requestAnimationFrame(() => requestAnimationFrame(() => done()))));
+    hours.resolve();
+    await expect(reviewAgain).toBeFocused();
   } finally {
+    hours.resolve();
     await attachFocusProbe(page);
   }
   await expect(
     edit(page).getByText("12 datas selecionadas", { exact: true }),
   ).toBeVisible();
   await expect(
-    edit(page).getByLabel("Observações", { exact: true }),
+    edit(page).getByLabel("Informação adicional", { exact: true }),
   ).toHaveValue(
     "Datas preservadas entre meses e depois da recusa; nenhum dado de outro paciente",
   );
@@ -430,7 +446,7 @@ test("exceção altera um único plantão escolhido e o corte conserva todas as 
   ).toEqual(
     before.shifts.filter((row: ScheduledShift) => row.id !== original.id),
   );
-  const summary = page.locator("summary").filter({ hasText: "Tipos e programações" });
+  const summary = page.locator("summary").filter({ hasText: "Séries publicadas" });
   const disclosure = page.locator("details").filter({ has: summary });
   if (!(await disclosure.evaluate((element: HTMLDetailsElement) => element.open))) {
     await summary.scrollIntoViewIfNeeded();
@@ -553,17 +569,18 @@ test("BAL em janela nova mostra a contagem de Sheila17 e conserva Juliana18 e se
     before = JSON.parse(recountState(f));
   await login(page, f.patient, f.second.email);
   await page.goto(`/fichas/bal?documentId=${f.document.id}&recount=true`);
-  await expect(
-    page.getByText(f.target.type_name, { exact: false }),
-  ).toBeVisible();
+  await expect(page.getByText(f.target.type_name, { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Iniciar contagem", exact: true }).click();
   for (const [i] of f.products.entries())
     await page
       .getByLabel(`Material fictício V4 ${i} · unidade`, { exact: true })
       .fill(i ? "0" : "17");
+  await finishBalanceMaterials(page);
   await page
     .getByLabel("Observações da contagem", { exact: true })
     .fill("Contagem2 de Sheila, realizada em outra janela de plantão");
   await page.getByRole("button", { name: "Revisar", exact: true }).click();
+  await expect(page.getByText(f.target.type_name, { exact: false })).toBeVisible();
   await expect(page.getByRole("textbox")).toHaveCount(0);
   await expect(
     page.getByRole("table", { name: "Materiais da contagem", exact: true }).locator('td[data-label="Referência"]').filter({ hasText: /^20 unidade$/ }),

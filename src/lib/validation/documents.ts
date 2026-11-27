@@ -10,6 +10,7 @@ import { purchaseCommandBody } from "./purchase-command";
 import { purchaseArrivalBody } from "./purchase-arrival";
 import { issuedObservations } from "./issuance-observations";
 import { pendingPurchaseExtras } from "./pending-purchase-extras";
+import { issuedBalanceExtras } from "./balance-count-extras";
 import { countedDeliveryReceiptBody, deliveryResolutionBody, requestDeliveryNeedBody, supplyCancellationBody } from "./delivery-receipt";
 
 const identifier = z.string().uuid();
@@ -51,6 +52,7 @@ export const supplyPayload = z
   .object({
     lines: z.array(line).max(1000),
     pendingExtras: pendingPurchaseExtras.optional(),
+    balanceExtras: issuedBalanceExtras.optional(),
     notes: z.string().trim().max(2000).optional(),
     observations: issuedObservations.optional(),
     origin: z.enum(["purchase", "donation"]).optional(),
@@ -73,6 +75,7 @@ export const supplyPayload = z
         id: identifier,
         version: z.number().int().positive(),
         referenceRevision: z.string().regex(/^\d+$/).max(20),
+        admissionId: identifier.optional(),
       })
       .strict()
       .optional(),
@@ -103,6 +106,9 @@ export const reviseSupplySchema = z
   })
   .refine(value => value.draftKind === "COM" || value.payload.acquisitionMode === undefined, {
     path: ["payload", "acquisitionMode"], message: "O planejamento da aquisição pertence à COM.",
+  })
+  .refine(value => value.draftKind === "BAL" || value.payload.balanceExtras === undefined, {
+    path: ["payload", "balanceExtras"], message: "As contagens de itens extras pertencem ao BAL.",
   });
 export const createSupplySchema = z
   .object({
@@ -115,6 +121,8 @@ export const createSupplySchema = z
   })
   .strict()
   .superRefine((value, ctx) => {
+    if (value.type !== "BAL" && value.payload.balanceExtras !== undefined)
+      ctx.addIssue({ code: "custom", path: ["payload", "balanceExtras"], message: "As contagens de itens extras pertencem ao BAL." });
     if (value.type !== "COM" && value.payload.pendingExtras !== undefined)
       ctx.addIssue({
         code: "custom", path: ["payload", "pendingExtras"],

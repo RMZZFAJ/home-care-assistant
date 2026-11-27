@@ -1,15 +1,21 @@
 # D-B — execução de D3, D4 e D5
 
-O [fechamento da PR 7](../../FECHAMENTO_PR7.md) reúne o candidato atual,
-as pendências de L1/L2 e a continuidade de D-C/D6. Os relatórios por marcos
-abaixo registram a data e o ambiente de cada verificação.
+O [quadro de fechamento de D-B](FECHAMENTO_D_B.md) reúne as decisões em
+aberto, as lacunas dos quatro lotes e as condições para integrar a PR 8
+e iniciar D-C.
+
+A [preparação final da PR 8](LOTES_EXECUCAO.md#preparação-final-da-pr-8)
+reúne a entrega de L3/L4, a validação e os passos de integração. O
+[fechamento da PR 7](../../FECHAMENTO_PR7.md) preserva a passagem de L1/L2
+e os gates de D-C/D6. Os relatórios por marcos registram a data e o ambiente
+de cada verificação.
 
 Missão autorizada em 06/11/2026, America/Sao_Paulo. **EM EXECUÇÃO; produção
 NO-GO.** A ordem integral preservada em [OWNER_EXECUTION_ORDER.txt](OWNER_EXECUTION_ORDER.txt)
 atualiza as escolhas de retenção, assinatura interna, TSA, backup e monitoramento.
 Não altera os gates humanos, físicos e operacionais de D-C/D6.
 
-- [Acompanhamento principal e única fila vigente](../../../../TEMP_D_B_ATUALIZACAO.md).
+- [Acompanhamento principal](../../../../TEMP_D_B_ATUALIZACAO.md).
 - [Registro de execução dos lotes L1 a L4](LOTES_EXECUCAO.md), com paridade,
   complementos, pendências e aplicações de migrations por ambiente.
 - [Revisão L1 posterior](L1_IMPLEMENTATION.md): E01–E03, comentários v3,
@@ -148,6 +154,7 @@ Não altera os gates humanos, físicos e operacionais de D-C/D6.
 
 [Verificações de navegador após falhas da CI](BROWSER_CI_TIMING.md).
 
-Branch única `feat/phase-d-implementation`; [PR #7](https://github.com/RMZZFAJ/home-care-assistant/pull/7)
-permanece Draft, sem merge ou promoção operacional. Evidência local, CI,
-verificação remota e homologação externa têm estados distintos.
+A [PR 7](https://github.com/RMZZFAJ/home-care-assistant/pull/7) integrou
+L1 e L2. A [PR 8](https://github.com/RMZZFAJ/home-care-assistant/pull/8)
+está em revisão na branch `feat/phase-d-continuation`. A validação do
+candidato e a homologação operacional seguem no quadro de fechamento.

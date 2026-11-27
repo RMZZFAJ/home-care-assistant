@@ -23,7 +23,10 @@ it("rejects arbitrary versions, authority fields and stages from another purpose
  for(const bad of [null,{version:2,stage:"review"},{version:1,stage:"finished"},{version:1,stage:"review",ownerId:id}])expect(draftNavigationSchema.safeParse(bad).success).toBe(false);
  expect(navigationAllowed("REQ","create",{version:1,stage:"count"})).toBe(false);
  expect(navigationAllowed("BAL","create",{version:1,stage:"count"},{context:{mode:"scheduled"}})).toBe(true);
- expect(navigationAllowed("BAL","create",{version:1,stage:"count"},{context:{mode:"legacy"}})).toBe(false);
+ expect(navigationAllowed("BAL","create",{version:1,stage:"count"},{context:{mode:"legacy"}})).toBe(true);
+ expect(navigationAllowed("BAL","create",{version:1,stage:"bal_extras"},{context:{mode:"legacy"}})).toBe(true);
+ expect(navigationAllowed("BAL","create",{version:1,stage:"higiene"},{context:{mode:"legacy"}})).toBe(true);
+ expect(navigationAllowed("BAL","create",{version:1,stage:"higiene"},{context:{mode:"scheduled"}})).toBe(false);
  expect(navigationAllowed("ENT","receive",{version:1,stage:"divergence"})).toBe(false);
  expect(navigationAllowed("ENT","divergence",{version:1,stage:"divergence"})).toBe(true);
  expect(navigationAllowed("COM","create",{version:1,stage:"extras"})).toBe(true);

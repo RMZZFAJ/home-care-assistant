@@ -3,6 +3,8 @@ import type { WorkspaceContext } from "@/types/workspace";
 import { can } from "@/lib/client/capabilities";
 const count=z.number().int().nonnegative();
 export const localPreparationQuery=z.object({careRecipientId:z.uuid().transform(value=>value.toLowerCase())}).strict();
+export const localPreparationArea=z.enum(["people","catalogue","stock","schedules","balance","communication"]);
+export type LocalPreparationArea=z.infer<typeof localPreparationArea>;
 export const localPreparationSchema=z.object({
   patientId:z.uuid(),observedAt:z.iso.datetime({offset:true}),source:z.literal("registered_metadata"),
   patient:z.object({name:z.string(),active:z.boolean(),referenceTimeZone:z.string().min(1).nullable()}).strict(),

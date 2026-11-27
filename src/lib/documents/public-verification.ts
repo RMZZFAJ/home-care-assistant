@@ -58,7 +58,6 @@ export const publicPdfAnalysisSchema = z
 export type PublicPdfAnalysis = z.infer<typeof publicPdfAnalysisSchema>;
 const reference = z.object({
   found: z.literal(true),
-  issuanceId: z.uuid(),
   verificationCode: z.string().regex(/^[A-F0-9]{32}$/),
   registeredAt: z.iso.datetime({ offset: true }),
   sha256: z.string().regex(/^[a-f0-9]{64}$/),
@@ -68,7 +67,6 @@ const reference = z.object({
   recordedTimestamp: z.iso.datetime({ offset: true }),
   certificateFingerprint: z.string(),
   timestampCertificateFingerprint: z.string(),
-  trustRevision: z.string(),
   externalTimeIndependence: z.literal(false),
 });
 export const publicPdfResultSchema = z.object({

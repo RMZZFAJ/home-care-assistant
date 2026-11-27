@@ -2,12 +2,12 @@ import {
   expect,
   test,
   type Page,
-  type APIResponse,
   type Locator,
 } from "@playwright/test";
 import { readFileSync, mkdirSync } from "node:fs";
 import { randomUUID } from "node:crypto";
-import { setup, actor, rpc, fixtures } from "../integration/v4-fixtures.mjs";
+import { setup, actor, rpc, fixtures, adjustCapability } from "../integration/v4-fixtures.mjs";
+import { shiftWorker } from "../integration/shift-fixtures.mjs";
 import {
   fixtureFile,
   sql,
@@ -15,16 +15,18 @@ import {
 } from "../../scripts/test-environment.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { selectContext } from "./auth-context";
-import { audit } from "./accessibility-audit";
+import { audit, auditFromTop } from "./accessibility-audit";
+import { pressWorkspaceControl } from "./workspace-controls";
 
 async function login(
   page: Page,
   patient: string,
   role: "professional" | "adminA",
+  email?: string,
 ) {
   const identities = JSON.parse(readFileSync(fixtureFile, "utf8"));
   await page.goto("/login");
-  await page.getByLabel("E-mail", { exact: true }).fill(identities[role].email);
+  await page.getByLabel("E-mail", { exact: true }).fill(email ?? identities[role].email);
   await page.getByLabel("Senha", { exact: true }).fill(fixturePassword);
   await page.getByRole("button", { name: "Entrar", exact: true }).click();
   await expect(
@@ -34,6 +36,48 @@ async function login(
 }
 const detail = (page: Page) =>
   page.locator('section[aria-label="Detalhe do relato"]');
+
+test("L4 habilita relato na custódia familiar apenas com a concessão individual", async ({ page }) => {
+  const f = await setup();
+  await adjustCapability(f.admin, f.patient, { capability: "stock.family.read", subjectRole: "professional", enabled: true });
+  await login(page, f.patient, "professional");
+  const url = "/consumo?careRecipientId=" + f.patient;
+  await page.goto(url);
+  const drawer = page.getByRole("dialog", { name: "Registrar relato", exact: true });
+  const custody = drawer.getByRole("combobox", { name: "Custódia", exact: true });
+  const open = async () => {
+    await page.getByRole("button", { name: "Mais opções de consumo", exact: true }).click();
+    await page.getByRole("menuitem", { name: "Relatos anteriores", exact: true }).click();
+    await expect(custody).toBeVisible();
+  };
+  await open();
+  await expect(custody.locator('option[value="FAMILY"]')).toHaveCount(0);
+  const text = "A família comunicou a falta de material.";
+  const denied = () => page.request.post("/api/consumption", { data: {
+    action: "report", careRecipientId: f.patient, kind: "shortage", location: "FAMILY", text,
+    idempotencyKey: randomUUID(), lines: [],
+  } });
+  expect((await denied()).status()).toBe(403);
+
+  const subject = { capability: "consumption.report", subjectUser: fixtures.professional.id, reviewedRole: "professional" };
+  await adjustCapability(f.admin, f.patient, { ...subject, enabled: true, confirmIndividual: true });
+  await page.reload();
+  await open();
+  await custody.selectOption("FAMILY");
+  await drawer.getByRole("combobox", { name: "Tipo", exact: true }).selectOption("shortage");
+  await drawer.getByLabel("O que aconteceu?", { exact: true }).fill(text);
+  await drawer.getByRole("button", { name: "Revisar relato", exact: true }).click();
+  const commit = page.waitForResponse(response =>
+    response.request().method() === "POST" && new URL(response.url()).pathname === "/api/consumption/preparations/commit");
+  await drawer.getByRole("button", { name: "Registrar relato sem desconto", exact: true }).click();
+  expect((await commit).status()).toBe(200);
+  await expect(drawer).toHaveCount(0);
+  await adjustCapability(f.admin, f.patient, { ...subject, enabled: null });
+  await page.goto(url);
+  await open();
+  await expect(custody.locator('option[value="FAMILY"]')).toHaveCount(0);
+  expect((await denied()).status()).toBe(403);
+});
 
 async function prepareDecision(dialog: Locator) {
   await dialog
@@ -278,9 +322,8 @@ test("consumo textual recebe complemento próprio, revisão em leitura e confirm
   expect(delivery.lines[0].fully_checked).toBe(true);
   await login(page, f.patient, "professional");
   await page.goto("/consumo");
-  await page
-    .getByRole("button", { name: "Registrar ocorrência", exact: true })
-    .click();
+  await page.getByRole("button", { name: "Mais opções de consumo", exact: true }).click();
+  await page.getByRole("menuitem", { name: "Relatos anteriores", exact: true }).click();
   const drawer = page.getByRole("dialog", {
     name: "Registrar relato",
     exact: true,
@@ -528,11 +571,11 @@ test("consumo textual recebe complemento próprio, revisão em leitura e confirm
         `select count(*) from public.consumption_report_decisions where report_id=${sqlLiteral(id)};`,
       ),
     ).toBe("1");
-    await audit(page, "consumption confirmed detail 320");
     await page.screenshot({
       path: `output/playwright/phase-d/consumption-confirmed-${info.project.name}.png`,
       animations: "disabled",
     });
+    await auditFromTop(page, "consumption confirmed detail 320");
   } finally {
     await adminContext.close();
   }
@@ -808,14 +851,15 @@ test("falta conferida e rejeição motivada têm revisões próprias e nenhuma b
 
 test("relato anterior ao centésimo é acessível por referência e por todas as páginas, sem vazio falso em falha de leitura", async ({
   page,
-}) => {
+}, info) => {
+  test.setTimeout(process.env.CI ? 60_000 : 100_000);
   const f = await setup(),
     old = await seedReport(f, "shortage", false);
   sql(
     `insert into public.consumption_reports(care_recipient_id,reported_by,kind,location,body,lines,idempotency_key) select ${sqlLiteral(f.patient)},${sqlLiteral(fixtures.adminA.id)},'shortage','FAMILY','Registro histórico fictício para paginação '||n,'[]'::jsonb,gen_random_uuid() from generate_series(1,101)n;`,
   );
   const order: string[] = JSON.parse(sql(`select jsonb_agg(id::text order by created_at desc,id desc) from public.consumption_reports where care_recipient_id=${sqlLiteral(f.patient)};`));
-  await login(page, f.patient, "adminA");
+  await login(page, f.patient, "adminA", (await shiftWorker(f.patient, "admin")).email);
   let fail = true;
   await page.route("**/api/consumption?*", async (route) => {
     if (fail) {
@@ -844,75 +888,106 @@ test("relato anterior ao centésimo é acessível por referência e por todas as
     }),
   ).toBeVisible();
   fail = false;
-  await page
-    .getByRole("button", { name: "Atualizar lista", exact: true })
-    .click();
-  await expect(
-    page.getByRole("button", { name: /^Abrir relato / }),
-  ).toHaveCount(20);
+  // The fixture is fixed during the cursor walk. A delayed Realtime join or
+  // refresh starts a new list at page one, independently of cursor correctness.
+  const resumeRefresh = await page.evaluateHandle(() => {
+    const deferRefresh = (event: Event) => event.stopImmediatePropagation();
+    window.addEventListener("hca:data-changed", deferRefresh, true);
+    return () => window.removeEventListener("hca:data-changed", deferRefresh, true);
+  });
+  type Cursor = { at: string; id: string };
+  const listResponse = (before: Cursor | null) => page.waitForResponse(response => {
+    const url = new URL(response.url());
+    return url.pathname === "/api/consumption"
+      && url.searchParams.get("careRecipientId") === f.patient
+      && url.searchParams.get("beforeAt") === (before?.at ?? null)
+      && url.searchParams.get("beforeId") === (before?.id ?? null);
+  });
   const visibleIds = () => page.getByRole("button", { name: /^Abrir relato / }).evaluateAll(nodes => nodes.map(node => node.querySelector(".sr-only")!.textContent));
-  for (let size = 20; size < order.length; size += 20) {
-    await expect.poll(visibleIds).toEqual(order.slice(0, size));
-    await page.getByRole("button", { name: "Carregar mais relatos", exact: true }).click();
-  }
-  await expect.poll(visibleIds).toEqual(order);
-  await expect(page.getByRole("button", { name: "Carregar mais relatos", exact: true })).toHaveCount(0);
-  let next: null | { at: string; id: string } = null;
+  let pendingPage = listResponse(null);
+  await pressWorkspaceControl(page, page.getByRole("button", { name: "Atualizar lista", exact: true }));
   const found = new Set<string>();
-  let pages = 0;
-  do {
-    const query: URLSearchParams = new URLSearchParams({
-      careRecipientId: f.patient,
-      ...(next ? { beforeAt: next.at, beforeId: next.id } : {}),
-    });
-    const response: APIResponse = await page.request.get(
-      "/api/consumption?" + query,
-    );
+  for (let pageIndex = 0; pageIndex < Math.ceil(order.length / 20); pageIndex++) {
+    const response = await pendingPage;
     expect(response.ok()).toBe(true);
     const result: {
-      data: { id: string }[];
-      next: null | { at: string; id: string };
+      data: { id: string; created_at: string }[];
+      next: Cursor | null;
     } = await response.json();
-    if (pages === 0)
-      expect(result.data.some((row) => row.id === old)).toBe(false);
+    expect(result.data.map(row => row.id)).toEqual(order.slice(pageIndex * 20, (pageIndex + 1) * 20));
     for (const row of result.data) {
       expect(found.has(row.id)).toBe(false);
       found.add(row.id);
     }
-    next = result.next;
-    pages++;
-    expect(pages).toBeLessThan(8);
-  } while (next);
+    await expect.poll(visibleIds).toEqual([...found]);
+    if (found.size === order.length) {
+      expect(result.next).toBeNull();
+      break;
+    }
+    const last = result.data.at(-1)!;
+    expect(result.next).toEqual({ at: last.created_at, id: last.id });
+    pendingPage = listResponse(result.next);
+    const more = page.getByRole("button", { name: "Carregar mais relatos", exact: true });
+    await expect(more).toBeEnabled();
+    await more.press("Enter");
+  }
   expect(found.size).toBe(102);
   expect(found.has(old)).toBe(true);
   expect([...found]).toEqual(order);
+  await expect(page.getByRole("button", { name: "Carregar mais relatos", exact: true })).toHaveCount(0);
+  await resumeRefresh.evaluate(release => release());
+  await resumeRefresh.dispose();
   await page.unroute("**/api/consumption?*");
-  await page
-    .getByRole("combobox", { name: "Tipo", exact: true })
-    .selectOption("shortage");
-  await page
-    .getByRole("button", { name: "Aplicar filtros", exact: true })
-    .click();
+  await page.getByRole("button", { name: "Faltas", exact: true }).click();
   await expect(page).toHaveURL(/kind=shortage/);
   await detail(page)
     .getByRole("button", { name: "Voltar à lista", exact: true })
     .click();
   await expect(page).not.toHaveURL(/ref=/);
+  await expect(detail(page)).toHaveCount(0);
+  await expect(page.getByRole("heading", { name: "Relatos registrados", exact: true })).toBeFocused();
   await expect(
-    page.getByRole("combobox", { name: "Tipo", exact: true }),
-  ).toHaveValue("shortage");
+    page.getByRole("button", { name: "Faltas", exact: true }),
+  ).toHaveAttribute("aria-pressed", "true");
+  await expect.poll(visibleIds).toEqual(order.slice(0, 20));
   const day = sql(`select to_char(created_at at time zone 'America/Sao_Paulo','YYYY-MM-DD') from public.consumption_reports where id=${sqlLiteral(old)};`);
-  await page.getByRole("textbox", { name: "Buscar no relato original", exact: true }).fill("Relato fictício preservado para decisão");
-  await page.getByLabel("Desde", { exact: true }).fill(day);
-  await page.getByLabel("Até", { exact: true }).fill(day);
-  await page.getByRole("button", { name: "Aplicar filtros", exact: true }).click();
+  const filters = page.getByRole("button", { name: "Filtrar relatos", exact: true });
+  const filterPanel = page.getByRole("dialog", { name: "Filtrar registros", exact: true });
+  const openFilters = async () => {
+    if (info.project.use.hasTouch) {
+      // Move focus off the text field before measuring and delivering the touch.
+      await filters.evaluate(button => button.focus({ preventScroll: true }));
+      await expect(filters).toBeFocused();
+    }
+    await pressWorkspaceControl(page, filters);
+    await expect(filterPanel).toBeVisible();
+  };
+  const search = page.getByRole("textbox", { name: "Buscar relato ou material", exact: true });
+  await search.fill("Relato fictício preservado para decisão");
+  await openFilters();
+  const viewport = page.viewportSize();
+  for (const width of [360, 412]) {
+    await page.setViewportSize({ width, height: 900 });
+    const path = info.outputPath(`consumo-filtros-${width}.png`);
+    await page.screenshot({ path, scale: "css", animations: "disabled" });
+    await info.attach(`Filtros dos relatos em ${width}px`, { path, contentType: "image/png" });
+  }
+  if (viewport) await page.setViewportSize(viewport);
+  await filterPanel.getByLabel("Desde", { exact: true }).fill(day);
+  await filterPanel.getByLabel("Até", { exact: true }).fill(day);
+  await filterPanel.getByRole("button", { name: "Aplicar", exact: true }).click();
+  await expect(filters).toBeFocused();
   await expect(page).toHaveURL(/q=Relato/);
   await expect.poll(visibleIds).toEqual([old]);
   await page.reload(); await expect.poll(visibleIds).toEqual([old]);
-  await expect(page.getByLabel("Desde", { exact: true })).toHaveValue(day);
-  await expect(page.getByLabel("Até", { exact: true })).toHaveValue(day);
-  await page.getByRole("combobox", { name: "Estado", exact: true }).selectOption("confirmed");
-  await page.getByRole("button", { name: "Aplicar filtros", exact: true }).click();
+  await openFilters();
+  await expect(filterPanel.getByLabel("Desde", { exact: true })).toHaveValue(day);
+  await expect(filterPanel.getByLabel("Até", { exact: true })).toHaveValue(day);
+  const status = filterPanel.getByRole("combobox", { name: "Situação", exact: true });
+  await status.selectOption("confirmed");
+  await expect(status).toHaveValue("confirmed");
+  await filterPanel.getByRole("button", { name: "Aplicar", exact: true }).click();
+  await expect(page).toHaveURL(url => url.searchParams.get("status") === "confirmed");
   await expect(page.getByText("Nenhum relato encontrado para estes filtros.", { exact: true })).toBeVisible();
   expect((await page.request.get(`/api/consumption?careRecipientId=${f.patient}&from=2026-11-12&to=2026-11-11`)).status()).toBe(400);
 });

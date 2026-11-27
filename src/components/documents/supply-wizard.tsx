@@ -33,9 +33,12 @@ import { SimpleDraftPanel } from "@/components/forms/simple-draft-panel";
 import { SupplyWizardHeading } from "@/components/forms/supply-wizard-heading";
 import { useLongDraftAutosave } from "@/components/forms/use-long-draft-autosave";
 import { useCreationDraft } from "@/components/forms/use-creation-draft";
+import { useWizardMaterialReferences } from "@/components/forms/use-wizard-material-references";
 import { DocumentWriteAccessNotice, useDocumentWriteAccess } from "./document-write-access-notice";
 import { DocumentCatalogueEmpty, DocumentOpeningFailure, DocumentOpeningPending, type OpeningFailure } from "./document-opening-status";
 import { CatalogueOpeningError, readWizardCatalogue } from "@/lib/client/wizard-catalogue";
+import { scanBalancePresentation } from "@/lib/client/balance-scan";
+import { BarcodeScanner } from "@/components/catalog/barcode-scanner";
 import {
   draftFlowStages,
   navigationForStep,
@@ -46,7 +49,10 @@ import {
 } from "@/components/forms/creation-draft-panel";
 import type { BalanceCountReference } from "@/types/balances";
 import { parseBalanceCountReference } from "@/lib/validation/balances";
-import { BalanceReviewRows } from "@/components/balances/balance-count-fields";
+import { BalanceCountFields, BalanceExtraFields, BalanceReviewRows } from "@/components/balances/balance-count-fields";
+import { BalanceRecordedExtras } from "@/components/balances/balance-materials";
+import { confirmedBalanceExtras, priorBalanceMaterials } from "@/lib/balances/count-materials";
+import type { BalanceCountExtra } from "@/lib/validation/balance-count-extras";
 import { pendingExtraDispatchMessage } from "./supply-extra-items";
 import {
   balanceDraftContent,
@@ -63,10 +69,12 @@ import {
 import { supplyDraftContent, type SupplyDraftContent } from "@/lib/validation/supply-drafts";
 import { requireSupplyConfirmation } from "@/lib/validation/supply-confirmation";
 import { WizardActions } from "@/components/forms/wizard-actions";
-import { adjacentMaterialCategory, materialCategories, supplyExtrasStep, supplyStageSteps, supplyWizardCopy, supplyWizardReviewIntro, supplyWizardStages } from "@/components/forms/supply-wizard-stages";
+import { adjacentMaterialCategory, materialCategories, supplyExtrasStep, supplyStageSteps, supplyWizardCopy, supplyWizardReviewIntro, supplyWizardStages, WizardMaterialCategories } from "@/components/forms/supply-wizard-stages";
 import { issuanceObservationErrors } from "@/lib/documents/issuance-observations";
 import { StepNavigator, Icon } from "@/components/ui/primitives";
-import { ActionButton } from "@/components/ui/controls";
+import { ActionButton, DefinitionGrid, FormField, TextAreaField } from "@/components/ui/controls";
+import { ProgressMeter } from "@/components/ui/feedback";
+import { Dialog } from "@/components/ui/overlays";
 import { RelatedDocument } from "./related-document";
 import { SupplyWizardStep, type WizardState } from "./supply-wizard-step";
 import { HouseholdListSelection, type HouseholdListSelectionHandle } from "@/components/forms/household-list-selection";
@@ -96,11 +104,13 @@ function saveWizardCache(key: string, draft: {
   sourceSetup?: SupplySourcePreparation;
   editingId?: string;
   balanceContent?: BalanceDraftContent;
+  balanceStep?: number;
 }) {
   sessionStorage.setItem(key, JSON.stringify({ savedAt: Date.now(), ...draft }));
 }
 
-const balanceSteps = draftFlowStages.SUPPLY.map((stage) => stage.label);
+const balanceSteps = draftFlowStages.BAL.map((stage) => stage.label);
+const materialStep = (category: string | undefined) => materialCategories.findIndex(item => item.id === category) + 1;
 export function SupplyWizard({ type }: { type: SupplyType; }) {
   const params = useSearchParams();
   const kind = type === "BAL" ? null : type;
@@ -152,19 +162,17 @@ export function PatientSupplyWizard({
   recount: boolean;
 }) {
   const [step, setStep] = useState(0);
-  const [lastMaterialsStep, setLastMaterialsStep] = useState(supplyStageSteps[1]);
+  const [lastMaterialsStep, setLastMaterialsStep] = useState<number | null>(null);
   const isBalance = type === "BAL";
-  const draftFlow = isBalance ? "SUPPLY" : "SUPPLY_CREATE";
   const category = materialCategories[step - 1]?.id;
-  const stage = isBalance ? step : category ? 1 : supplyStageSteps.indexOf(step);
+  const stage = category ? 1 : supplyStageSteps.indexOf(step);
   const steps = isBalance ? balanceSteps : supplyWizardStages;
   function openStep(nextStep: number) {
-    if (!isBalance && materialCategories[nextStep - 1]) setLastMaterialsStep(nextStep);
+    if (materialCategories[nextStep - 1]) setLastMaterialsStep(nextStep);
     setStep(nextStep);
   }
   function openStage(nextStage: number) {
-    const nextStep = isBalance ? nextStage : supplyStageSteps[nextStage];
-    setStep(!isBalance && nextStage === 1 ? lastMaterialsStep : nextStep);
+    setStep(nextStage === 1 ? lastMaterialsStep ?? supplyStageSteps[1] : supplyStageSteps[nextStage]);
   }
   const [catalog, setCatalog] = useState<CatalogProduct[]>([]);
   const householdSelectionRef = useRef<HouseholdListSelectionHandle>(null);
@@ -296,6 +304,17 @@ export function PatientSupplyWizard({
     useState<BalanceCountReference | null>(null);
   const [staleLegacyReference, setStaleLegacyReference] = useState(false);
   const [legacyOpeningKey, setLegacyOpeningKey] = useState<string | null>(null);
+  const [draftTouched, setDraftTouched] = useState(false);
+  const [balanceExtras, setBalanceExtras] = useState<BalanceCountExtra[]>([]);
+  const [balancePicker, setBalancePicker] = useState(false);
+  const balancePickerRef = useRef<HTMLButtonElement>(null);
+  const wizardCardRef = useRef<HTMLElement>(null);
+  const continuingCount = isBalance && recount && editing?.status === "submitted";
+  const previousMaterials = useMemo(() => priorBalanceMaterials(continuingCount ? editing : null, catalog), [continuingCount, editing, catalog]);
+  const balanceProducts = catalog.filter(product => !continuingCount || previousMaterials.catalogued.has(product.id) || Object.hasOwn(form.quantities, product.id));
+  const countedBalanceProducts = isBalance ? balanceProducts.filter(product => validQuantity(form.quantities[product.id] ?? "", product.quantity_decimals ?? 0, true)) : [];
+  const { links: balanceLinks, setLinks: setBalanceLinks, open: openBalanceLink, remove: removeBalanceLink, count: balanceLinkCount, picker: balanceLinkPicker } =
+    useWizardMaterialReferences(patientId, "BAL", () => setDraftTouched(true), editing?.id ?? documentId);
   const [draftMaterials, setDraftMaterials] = useState<
     BalanceDraftContent["materials"]
   >([]);
@@ -325,6 +344,9 @@ export function PatientSupplyWizard({
       counts: form.quantities,
       observationTimes: form.observationTimes ?? {},
       notes: form.notes,
+      ...(isBalance && lastMaterialsStep ? { materialCategory: materialCategories[lastMaterialsStep - 1].id } : {}),
+      ...(balanceExtras.length ? { balanceExtras } : {}),
+      ...(balanceLinks.length ? { materialReferences: balanceLinks } : {}),
       materials: [
         ...draftMaterials,
         ...catalog
@@ -343,6 +365,10 @@ export function PatientSupplyWizard({
       form.quantities,
       form.observationTimes,
       form.notes,
+      isBalance,
+      lastMaterialsStep,
+      balanceExtras,
+      balanceLinks,
       draftMaterials,
       catalog,
       preservedBalanceContext,
@@ -354,7 +380,7 @@ export function PatientSupplyWizard({
     userId: context.userId,
     patientId,
     kind: type,
-    navigation: navigationForStep(draftFlow, step),
+    navigation: isBalance ? navigationForStep("BAL", stage) : navigationForStep("SUPPLY_CREATE", step),
     purpose:
       type === "BAL"
         ? "create"
@@ -390,7 +416,7 @@ export function PatientSupplyWizard({
           setSourceSetup({ ...emptySupplySources, sources: [{ documentId: requisitionId, general: true, productIds }] });
         }
         setDraftMaterials(content.materials);
-        openStep(stepForNavigation(draftFlow, draft.navigation));
+        openStep(stepForNavigation("SUPPLY_CREATE", draft.navigation));
         setError("");
         setFieldErrors({});
         return true;
@@ -409,7 +435,13 @@ export function PatientSupplyWizard({
         notes: content.notes,
       }));
       setDraftMaterials(content.materials);
-      setStep(stepForNavigation(draftFlow, draft.navigation));
+      setBalanceExtras(content.balanceExtras ?? []);
+      setBalanceLinks(content.materialReferences ?? []);
+      const restoredCategory = materialStep(content.materialCategory ?? draft.navigation?.stage);
+      if (restoredCategory) setLastMaterialsStep(restoredCategory);
+      const reviewStep = stepForNavigation("BAL", draft.navigation);
+      openStep(reviewStep === 1 || materialStep(draft.navigation?.stage) ? restoredCategory || 1
+        : draft.navigation?.stage === "notes" ? 4 : supplyStageSteps[reviewStep]);
       setError("");
       setFieldErrors({});
       return true;
@@ -426,7 +458,7 @@ export function PatientSupplyWizard({
       setForm((current) => ({
         ...current,
         quantities: type === "BAL"
-          ? Object.fromEntries(catalog.map((product) => [product.id, ""]))
+          ? Object.fromEntries(catalog.filter(product => !continuingCount || previousMaterials.catalogued.has(product.id)).map((product) => [product.id, ""]))
           : defaults?.quantities ?? {},
         ...(type !== "BAL"
           ? {
@@ -449,8 +481,10 @@ export function PatientSupplyWizard({
       setDraftMaterials([]);
       setPreservedBalanceContext(null);
       setPreviousObservations(undefined);
+      setBalanceExtras(previousMaterials.extras.map(extra => ({ ...extra, quantity: "" })));
+      setBalanceLinks([]);
       setStaleLegacyReference(false);
-      setLastMaterialsStep(supplyStageSteps[1]);
+      setLastMaterialsStep(null);
       setStep(0);
       setError("");
       setFieldErrors({});
@@ -488,7 +522,6 @@ export function PatientSupplyWizard({
   };
   const privateContent = type === "BAL" ? balanceContent : supplyContent;
 
-  const [draftTouched, setDraftTouched] = useState(false);
   useLongDraftAutosave(privateDraft, privateContent, allowed && draftTouched && !(busy || uncertain || saved || recoveredId || navigating));
   const offeredContent = privateDraft.offered?.content;
   const originalSource =
@@ -502,7 +535,7 @@ export function PatientSupplyWizard({
       "form" in offeredContent
       ? `/fichas/${type.toLowerCase()}?careRecipientId=${patientId}${originalSource ? "&requisitionId=" + originalSource : originalPurchase ? "&purchaseId=" + originalPurchase : ""}`
       : undefined;
-  const missingBalanceMaterials = Object.keys(form.quantities).filter(
+  const missingBalanceMaterials = [...new Set([...Object.keys(form.quantities), ...balanceLinks.map(link => link.productId)])].filter(
     (id) => !catalog.some((product) => product.id === id),
   );
   function updateForm(value: SetStateAction<WizardState>) {
@@ -516,6 +549,14 @@ export function PatientSupplyWizard({
           times[id] = new Date().toISOString();
       return { ...next, observationTimes: times };
     });
+  }
+  function includeBalanceProduct(product: CatalogProduct, extraId?: string) {
+    if (extraId) setBalanceExtras(current => current.filter(extra => extra.id !== extraId));
+    updateForm(current => Object.hasOwn(current.quantities, product.id) ? current : {
+      ...current, quantities: { ...current.quantities, [product.id]: "" },
+    });
+    setBalancePicker(false);
+    openStep(materialStep(product.category));
   }
   function closeSourcePicker() {
     const returnFocus = sourcePicker?.returnFocus;
@@ -606,6 +647,7 @@ export function PatientSupplyWizard({
         let restored: WizardState | undefined;
         let restoredSources: SupplySourcePreparation | undefined;
         let restoredBalance: BalanceDraftContent | undefined;
+        let restoredBalanceStep: number | undefined;
         let preserved: typeof frozenRef.current = null;
         let recoveredId: string | undefined;
         try {
@@ -640,6 +682,7 @@ export function PatientSupplyWizard({
               } else {
                 restored = envelope.form;
                 if (type === "BAL") {
+                  if ([...supplyStageSteps, 2, 3].includes(envelope.balanceStep)) restoredBalanceStep = envelope.balanceStep;
                   restoredBalance = balanceDraftContent.parse(
                     envelope.balanceContent ?? {
                       counts: restored!.quantities,
@@ -691,6 +734,11 @@ export function PatientSupplyWizard({
           )
             throw new Error("Esta ficha não permite edição neste contexto.");
           setEditing(existing);
+          const preceding = type === "BAL" && recount && existing.status === "submitted"
+            ? priorBalanceMaterials(existing, products.data) : null;
+          if (type === "BAL") setBalanceExtras(preceding
+            ? preceding.extras.map(extra => ({ ...extra, quantity: "" }))
+            : existing.payload.balanceExtras ?? []);
           if (existing.originDocuments) setSourceSetup({
             ...emptySupplySources,
             sources: existing.originDocuments.map(({ documentId, general, productIds }) => ({ documentId, general, productIds })),
@@ -718,7 +766,9 @@ export function PatientSupplyWizard({
           );
           setForm({
             requestFulfillments: Object.fromEntries(existing.lines.map(line => [line.product_id, line.family_fulfillment ?? ""])),
-            quantities: Object.fromEntries(
+            quantities: preceding ? Object.fromEntries(
+              products.data.filter(product => preceding.catalogued.has(product.id)).map(product => [product.id, ""]),
+            ) : Object.fromEntries(
               existing.lines.map((line) => [
                 line.product_id,
                 recount ? "" : String(line.quantity),
@@ -792,6 +842,11 @@ export function PatientSupplyWizard({
           setPreservedBalanceContext(restoredBalance.context);
           setPreviousObservations(restoredBalance.previousObservations);
           setDraftMaterials(restoredBalance.materials);
+          setBalanceExtras(restoredBalance.balanceExtras ?? []);
+          setBalanceLinks(restoredBalance.materialReferences ?? []);
+          const restoredCategory = materialStep(restoredBalance.materialCategory);
+          if (restoredCategory) setLastMaterialsStep(restoredCategory);
+          if (!preserved && restoredBalanceStep !== undefined) setStep(restoredBalanceStep);
         }
         setLoading(false);
         setLoadError("");
@@ -827,6 +882,7 @@ export function PatientSupplyWizard({
     purchaseId,
     recount,
     canReadRequests,
+    setBalanceLinks,
   ]);
   useEffect(() => {
     if (type !== "ENT" || loading || loadError || uncertain || saved) return;
@@ -898,7 +954,7 @@ export function PatientSupplyWizard({
           links,
           sourceSetup,
           editingId: editing?.id,
-          ...(type === "BAL" ? { balanceContent } : {}),
+          ...(type === "BAL" ? { balanceContent, balanceStep: step } : {}),
         });
       } catch {
         /* The form remains in memory. */
@@ -918,6 +974,7 @@ export function PatientSupplyWizard({
     busy,
     type,
     balanceContent,
+    step,
   ]);
   function validate(all = false) {
     const errors: Record<string, string> = {};
@@ -954,9 +1011,13 @@ export function PatientSupplyWizard({
           "Explique a escolha manual ou troca do recebedor com 3 a 1000 caracteres.";
     }
     const extras = new Set(form.extraProductIds);
-    const lastCategory = category && !adjacentMaterialCategory(category, catalog, "next");
-    const relevant = catalog.filter(product => {
-      if (isBalance) return all || product.category === category;
+    const lastCategory = category && !adjacentMaterialCategory(category, isBalance ? balanceProducts : catalog, "next");
+    if (isBalance && (all || step === supplyExtrasStep) && !confirmedBalanceExtras(balanceExtras, catalog))
+      errors.balanceExtras = "Confira o nome, a unidade e a quantidade dos extras. Se o item estiver no catálogo, conte-o em Materiais.";
+    if (isBalance && (all || lastCategory) && previousMaterials.unresolved.some(({ matches }) => !matches.some(product => Object.hasOwn(form.quantities, product.id))))
+      errors.balanceMaterials = "Selecione a identificação de catálogo de cada extra incorporado.";
+    const relevant = (isBalance ? balanceProducts : catalog).filter(product => {
+      if (isBalance) return all || Boolean(category && (lastCategory || product.category === category));
       if (!Object.hasOwn(form.quantities, product.id)) return false;
       return all || (category && (lastCategory || product.category === category) && !extras.has(product.id)) ||
         (step === supplyExtrasStep && extras.has(product.id));
@@ -975,7 +1036,7 @@ export function PatientSupplyWizard({
             ? "quantidade válida"
             : "unidades inteiras") +
           (type === "BAL" ? ", inclusive zero." : " acima de zero.");
-    if (all && !Object.keys(form.quantities).length && !form.pendingExtras?.length)
+    if (all && (isBalance ? !balanceProducts.length : !Object.keys(form.quantities).length && !form.pendingExtras?.length))
       errors.lines = "Selecione ou informe ao menos um material.";
     if (all || (type === "COM" && step === 0) || (type === "ENT" && (category || step === supplyExtrasStep || step === 4)))
       for (const [productId, ids] of Object.entries(links)) {
@@ -994,7 +1055,12 @@ export function PatientSupplyWizard({
     setFieldErrors(errors);
     if (Object.keys(errors).length) {
       setError("Confira os campos destacados.");
-      if (!isBalance) {
+      if (isBalance) {
+        const product = balanceProducts.find(item => Object.hasOwn(errors, item.id));
+        if (product) openStep(materialStep(product.category));
+        else if (errors.balanceMaterials || errors.lines) openStage(1);
+        else if (errors.balanceExtras) openStep(supplyExtrasStep);
+      } else {
         const first = Object.keys(errors)[0];
         const product = catalog.find(item => item.id === first ||
           (type === "ENT" && first === item.id + ":shared"));
@@ -1104,14 +1170,14 @@ export function PatientSupplyWizard({
         setBusy(false);
       }
     }
-    const nextCategory = !isBalance && (step === 0 || category) && adjacentMaterialCategory(category, catalog, "next");
+    const nextCategory = (step === 0 || category) && adjacentMaterialCategory(category, isBalance ? balanceProducts : catalog, "next");
     if (nextCategory) openStep(materialCategories.findIndex(item => item.id === nextCategory) + 1);
     else openStage(Math.min(steps.length - 1, stage + 1));
     if (type === "BAL" && step === 4) {
       requestAnimationFrame(() => {
         const heading = document.getElementById("supply-wizard-heading");
         heading?.focus({ preventScroll: true });
-        heading?.scrollIntoView({ block: "start", behavior: "instant" });
+        wizardCardRef.current?.scrollIntoView({ block: "start", behavior: "instant" });
       });
     }
   }
@@ -1144,11 +1210,13 @@ export function PatientSupplyWizard({
     const recoveringSubmission = uncertain && editing !== null && frozenRef.current?.expectedVersion !== undefined
       && editing.version > frozenRef.current.expectedVersion;
     const isIssuance = type !== "BAL" && !frozenRef.current?.draft && (!editing?.protocol || recoveringSubmission);
-    setIssuing(isIssuance);
+    setIssuing(isBalance || isIssuance);
     setBusy(true);
     setError("");
     try {
       if (!frozenRef.current) {
+        const completedExtras = isBalance ? confirmedBalanceExtras(balanceExtras, catalog) : null;
+        if (isBalance && !completedExtras) return;
         const lines: DraftLine[] = catalog
           .filter((product) => Object.hasOwn(form.quantities, product.id))
           .map((product) => ({
@@ -1190,7 +1258,7 @@ export function PatientSupplyWizard({
           ...(type !== "BAL" && form.observations ? { observations: form.observations.map(note => note.trim()) } : {}),
           ...(sources.length ? { sources } : {}),
           ...(type === "BAL"
-            ? { balanceReferenceRevision: legacyReference!.revision }
+            ? { balanceReferenceRevision: legacyReference!.revision, ...(completedExtras?.length ? { balanceExtras: completedExtras } : {}) }
             : {}),
           ...(type === "COM"
             ? { acquisitionMode: "planned" as const }
@@ -1225,7 +1293,7 @@ export function PatientSupplyWizard({
             sourceSetup,
             editingId: editing?.id,
             intent: frozenRef.current,
-            ...(type === "BAL" ? { balanceContent } : {}),
+            ...(type === "BAL" ? { balanceContent, balanceStep: step } : {}),
           }),
         );
       } catch {
@@ -1400,7 +1468,8 @@ export function PatientSupplyWizard({
       );
       const nextForm = {
         ...form,
-        quantities: next.counts,
+        quantities: Object.fromEntries(products.data.filter(product => !continuingCount ||
+          Object.hasOwn(form.quantities, product.id) || previousMaterials.catalogued.has(product.id)).map(product => [product.id, ""])),
         notes: next.notes,
         observationTimes: next.observationTimes,
       };
@@ -1408,7 +1477,8 @@ export function PatientSupplyWizard({
         form: nextForm,
         links,
         editingId: target?.id,
-        balanceContent: next,
+        balanceContent: { ...next, counts: nextForm.quantities },
+        balanceStep: 0,
       });
       setCatalog(products.data);
       setEditing(target);
@@ -1417,6 +1487,7 @@ export function PatientSupplyWizard({
       setPreservedBalanceContext(next.context);
       setPreviousObservations(next.previousObservations);
       setDraftMaterials(next.materials);
+      setBalanceExtras(next.balanceExtras ?? []);
       setForm(nextForm);
       setFieldErrors({});
       setDraftTouched(true);
@@ -1543,14 +1614,14 @@ export function PatientSupplyWizard({
   const navigation = <StepNavigator
     steps={steps}
     active={stage}
-    compact={!isBalance}
+    compact
     onChange={nextStage => {
       if (nextStage === stage) return;
       issuanceFailure.clear();
       openStage(nextStage);
     }}
     disabled={busy || uncertain || loading || privateDraft.blocked}
-    label={"Etapas da " + type}
+    label={isBalance ? "Etapas da ficha" : "Etapas da " + type}
   />;
   return (
     <div onChangeCapture={event => {
@@ -1622,11 +1693,14 @@ export function PatientSupplyWizard({
                 className={buttonClass}
                 disabled={busy || uncertain || privateDraft.blocked || !allowed}
                 onClick={() =>
-                  setForm((current) => {
+                  {
+                    removeBalanceLink(id);
+                    updateForm((current) => {
                     const next = { ...current.quantities };
                     delete next[id];
                     return { ...current, quantities: next };
-                  })
+                    });
+                  }
                 }
               >
                 Remover material indisponível
@@ -1658,7 +1732,6 @@ export function PatientSupplyWizard({
         </div>
       ) : (
         <>
-          {isBalance ? navigation : null}
           {message ? <Notice>{message}</Notice> : null}
           {error ? (
             <Notice error>
@@ -1680,25 +1753,23 @@ export function PatientSupplyWizard({
           {loading ? (
             <Notice>Carregando catálogo e vínculos…</Notice>
           ) : (
-            <section className={isBalance ? "ui-card" : "hca-supply-wizard-card"}>
-              {isBalance ? null : navigation}
-              <div className={isBalance ? undefined : "hca-supply-wizard-body"}>
-              <div className="mb-6">
-                {isBalance ? <p className="eyebrow">
-                  {type} · {context.patient?.display_name}
-                </p> : null}
-                <h2
+            <section ref={wizardCardRef} className={isBalance ? "hca-supply-wizard-card hca-balance-count-card" : "hca-supply-wizard-card"}>
+              {navigation}
+              <div className="hca-supply-wizard-body">
+              <div className={isBalance ? "mb-3" : "mb-6"}>
+                {isBalance && step === supplyExtrasStep ? null : <h2
                   id="supply-wizard-heading"
                   tabIndex={-1}
                   className="mt-2 text-xl font-semibold"
                 >
-                  {step === supplyExtrasStep ? "Itens extras"
-                    : !isBalance && step === 0 ? "Confirme os dados da ficha"
-                      : type !== "BAL" && step === 5 ? supplyWizardCopy[type].reviewTitle
-                      : !isBalance && category ? type === "ENT" ? "Prepare os materiais da entrega"
+                  {isBalance ? ["Confirme os dados", "Conte os materiais", "Itens extras", "Observações da contagem", "Revisão da contagem"][stage]
+                    : step === supplyExtrasStep ? "Itens extras"
+                    : step === 0 ? "Confirme os dados da ficha"
+                      : step === 5 ? supplyWizardCopy[type].reviewTitle
+                      : category ? type === "ENT" ? "Prepare os materiais da entrega"
                         : "Selecione os materiais a adquirir"
                         : steps[stage]}
-                </h2>
+                </h2>}
                 {type !== "BAL" && step === 5 ? <p className="hca-wizard-intro">{supplyWizardReviewIntro}</p> : null}
                 {type === "ENT" && form.source === "FAMILY" && category ? <p className="hca-field-help mt-2">
                   A entrega usa o estoque disponível da família. A avaliação da necessidade acompanha cada item vinculado.
@@ -1714,7 +1785,57 @@ export function PatientSupplyWizard({
                 }
                 className="min-w-0 space-y-5"
               >
-                <SupplyWizardStep
+                {isBalance ? <>
+                  {step === 0 ? <DefinitionGrid items={[
+                    { label: "Paciente", value: context.patient!.display_name },
+                    { label: "Quem preenche", value: context.fullName },
+                    { label: "Estoque", value: "Equipe" },
+                    { label: "Contagem", value: continuingCount ? `Recontagem de ${editing?.code ?? "balanço"}` : "Balanço avulso" },
+                  ]} /> : null}
+                  {category ? <>
+                    <p className="hca-muted">Informe a quantidade física da equipe. Use zero quando o material estiver ausente.</p>
+                    <WizardMaterialCategories category={category} onChange={value => openStep(materialStep(value))}
+                      selected={countedBalanceProducts} />
+                    <div className="hca-toolbar">
+                      <strong>{countedBalanceProducts.length}/{balanceProducts.length} materiais contados</strong>
+                      {continuingCount ? <ActionButton ref={balancePickerRef} onClick={() => setBalancePicker(true)}>Incluir item não contado</ActionButton>
+                        : <ActionButton onClick={() => { if (validate()) openStep(supplyExtrasStep); }}>Item extra</ActionButton>}
+                    </div>
+                    <ProgressMeter value={countedBalanceProducts.length}
+                      max={Math.max(balanceProducts.length, 1)} aria-label="Progresso da contagem física" />
+                    {previousMaterials.unresolved.filter(({ matches }) => !matches.some(product => Object.hasOwn(form.quantities, product.id))).map(({ extra, matches }) =>
+                      <Notice key={extra.id}>Selecione a identificação de catálogo de {extra.name}.
+                        {matches.map(product => <ActionButton key={product.id} onClick={() => includeBalanceProduct(product)}>{product.name} · {product.unit}</ActionButton>)}
+                      </Notice>)}
+                    <details className="hca-count-scan">
+                      <summary className="ui-button ui-button-secondary">Contar por código de barras</summary>
+                      <BarcodeScanner onRead={async code => {
+                        const result = await scanBalancePresentation(patientId, code, catalog, form.quantities);
+                        updateForm(current => ({ ...current, quantities: { ...current.quantities, [result.product.id]: result.quantity } }));
+                        openStep(materialStep(result.product.category));
+                        setMessage(result.message);
+                        requestAnimationFrame(() => document.querySelector<HTMLElement>(`[data-product="${CSS.escape(result.product.id)}"] input`)?.focus());
+                      }} />
+                    </details>
+                    <BalanceCountFields context={context} products={balanceProducts.filter(product => product.category === category)}
+                      counts={form.quantities} errors={fieldErrors} reference={legacyReference?.quantities ?? {}}
+                      onCount={(id, value) => updateForm(current => ({ ...current, quantities: { ...current.quantities, [id]: value } }))}
+                      onLink={openBalanceLink} linkedCount={balanceLinkCount} />
+                    {!balanceProducts.some(product => product.category === category) ? <p className="hca-muted">Nenhum material nesta categoria.</p> : null}
+                  </> : null}
+                  {step === supplyExtrasStep ? <>
+                    {fieldErrors.balanceExtras ? <Notice error>{fieldErrors.balanceExtras}</Notice> : null}
+                    <BalanceExtraFields extras={balanceExtras} catalogue={catalog} preservedIds={new Set(previousMaterials.extras.map(extra => extra.id))}
+                      onChange={values => { setBalanceExtras(values); setDraftTouched(true); }}
+                      onUseCatalogue={(id, product) => includeBalanceProduct(product, id)} />
+                  </> : null}
+                  {step === 4 ? <FormField label="Observações da contagem">
+                    <TextAreaField value={form.notes} maxLength={2000} onChange={event => {
+                      const notes = event.currentTarget.value;
+                      updateForm(current => ({ ...current, notes }));
+                    }} />
+                  </FormField> : null}
+                </> : <SupplyWizardStep
                   step={step}
                   purchaseApproval={type === "COM" && !editing?.protocol
                     ? context.patient?.role === "admin" && can(context, "com.approve") ? "automatic" : "required"
@@ -1789,7 +1910,7 @@ export function PatientSupplyWizard({
                       setFieldErrors({});
                     }
                   }}
-                />
+                />}
                 {step === 0 && (type === "COM" || type === "ENT" && form.source === "FAMILY") ? (
                   <HouseholdListSelection ref={householdSelectionRef} key={context.userId + ":" + patientId + ":" + type}
                     userId={context.userId} patientId={patientId} kind={type} catalogue={catalog}
@@ -1821,14 +1942,26 @@ export function PatientSupplyWizard({
               </fieldset>
               {type === "BAL" && step === 5 ? (
                 <>
+                  <p className="hca-muted">{context.patient!.display_name} · {context.fullName} · estoque da equipe</p>
+                  <Notice>A confirmação registra a contagem. A conciliação segue a política de revisão do paciente.</Notice>
                   <BalanceReviewRows
-                    products={catalog}
+                    products={balanceProducts}
                     counts={form.quantities}
                     reference={legacyReference?.quantities ?? {}}
                   />
+                  <BalanceRecordedExtras extras={balanceExtras} />
                   <BalanceObservationTimes content={balanceContent} />
+                  {form.notes ? <p className="whitespace-pre-wrap">{form.notes}</p> : null}
                 </>
               ) : null}
+              {isBalance && balancePicker ? <Dialog open title="Incluir item não contado" onClose={() => setBalancePicker(false)} finalFocus={balancePickerRef}>
+                <p>Selecione um material desta categoria para incluir na recontagem.</p>
+                {catalog.some(product => product.category === category && !balanceProducts.some(item => item.id === product.id))
+                  ? catalog.filter(product => product.category === category && !balanceProducts.some(item => item.id === product.id)).map(product =>
+                    <ActionButton key={product.id} onClick={() => includeBalanceProduct(product)}>{product.name} · {product.unit}</ActionButton>)
+                  : <p>Todos os materiais desta categoria já estão na contagem.</p>}
+              </Dialog> : null}
+              {balanceLinkPicker}
               {uncertain ? (
                 <Notice>
                   A confirmação da gravação está pendente. Recupere a mesma
@@ -1862,8 +1995,8 @@ export function PatientSupplyWizard({
                 }
                 onBack={() => {
                   issuanceFailure.clear();
-                  const previous = !isBalance && (category || step === supplyExtrasStep) &&
-                    adjacentMaterialCategory(category, catalog, "previous");
+                  const previous = (category || step === supplyExtrasStep) &&
+                    adjacentMaterialCategory(category, isBalance ? balanceProducts : catalog, "previous");
                   if (previous) openStep(materialCategories.findIndex(item => item.id === previous) + 1);
                   else openStage(stage - 1);
                   setError("");

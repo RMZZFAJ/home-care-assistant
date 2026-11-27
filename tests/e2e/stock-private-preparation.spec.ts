@@ -2,12 +2,14 @@ import { expect, test, type Page } from "@playwright/test";
 import {
   stockPreparationFixture,
   stockPreparationFacts,
+  saveStockPreparation,
 } from "../integration/stock-preparation-fixtures.mjs";
-import { rpc, fixtures } from "../integration/v4-fixtures.mjs";
+import { actor, rpc, fixtures } from "../integration/v4-fixtures.mjs";
 import { sql, sqlLiteral as q } from "../../scripts/test-environment.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { selectContext } from "./auth-context";
 import { audit, auditFromTop } from "./accessibility-audit";
+import { stockMovement } from "./stock-operation";
 test.setTimeout(180_000);
 async function login(
   page: Page,
@@ -32,16 +34,18 @@ const dialog = (page: Page) =>
   page.getByRole("dialog", {
     name: /^(Movimentar estoque familiar|Confirmar movimentação familiar)$/,
   });
-async function open(page: Page, consult = false) {
+async function openPreservedPreparation(page: Page) {
   await page
     .getByRole("button", {
-      name: consult
-        ? "Consultar meu preenchimento familiar"
-        : "Movimentar estoque familiar",
+      name: "Consultar meu preenchimento familiar",
       exact: true,
     })
     .click();
   await expect(dialog(page)).toBeVisible();
+}
+async function resumePreservedPreparation(page: Page) {
+  await openPreservedPreparation(page);
+  await panel(page).getByRole("button", { name: "Continuar rascunho", exact: true }).click();
 }
 async function fill(page: Page, product: string, reason: string) {
   await dialog(page)
@@ -71,8 +75,9 @@ test("movimentação privada retoma em outra sessão,compara saldo e recupera um
     before = stockPreparationFacts(f),
     reason =
       "Entrada física própria preservada entre aparelhos,com motivo extenso e revisão explícita.";
+  await saveStockPreparation(f);
   await login(page, f.patient);
-  await open(page);
+  await resumePreservedPreparation(page);
   await fill(page, f.productId, reason);
   await dialog(page).getByLabel("Quantidade", { exact: true }).fill("0,5");
   await dialog(page)
@@ -154,7 +159,7 @@ test("movimentação privada retoma em outra sessão,compara saldo e recupera um
   try {
     const resumed = await next.newPage();
     await login(resumed, f.patient);
-    await open(resumed, true);
+    await openPreservedPreparation(resumed);
     await expect(panel(resumed)).toContainText(reason);
     await panel(resumed)
       .getByRole("button", { name: "Continuar rascunho", exact: true })
@@ -227,7 +232,7 @@ test("movimentação privada retoma em outra sessão,compara saldo e recupera um
     expect(packets).toHaveLength(2);
     expect(packets[0]).toEqual(packets[1]);
     expect(stockPreparationFacts(f)).toEqual(committed);
-    await open(resumed, true);
+    await openPreservedPreparation(resumed);
     await expect(panel(resumed)).toContainText(
       "Este preenchimento já registrou uma movimentação.",
     );
@@ -252,23 +257,10 @@ test("compensação privada preserva referência fora da página,retoma sem repl
     before = stockPreparationFacts(f),
     reason =
       "Compensação histórica privada da retirada original,com identidade preservada";
+  await saveStockPreparation(f, { ...f.content, movement: { ...f.content.movement, reason } });
   await login(page, f.patient);
-  const original = page
-    .getByRole("region", { name: "Histórico auditável", exact: true })
-    .locator("tbody tr[data-movement-id]")
-    .filter({ has: page.getByText(f.referenceId!, { exact: true }) });
-  await original
-    .getByRole("button", { name: "Corrigir este movimento", exact: true })
-    .click();
-  await dialog(page).getByLabel("Quantidade", { exact: true }).fill("1");
-  await dialog(page).getByLabel("Motivo", { exact: true }).fill(reason);
-  await expect(
-    dialog(page).getByRole("button", {
-      name: "Revisar movimentação",
-      exact: true,
-    }),
-  ).toBeEnabled();
-  await save(page);
+  const original = await stockMovement(page, f.referenceId!);
+  await expect(original.getByRole("button", { name: "Corrigir este movimento", exact: true })).toBeVisible();
   // Change the retained page rather than manufacturing a second private slot.
   for (let i = 0; i < 21; i++)
     await rpc(f.admin, "family_stock_movement", {
@@ -282,10 +274,7 @@ test("compensação privada preserva referência fora da página,retoma sem repl
     });
   const paginated = stockPreparationFacts(f);
   await page.reload();
-  await open(page, true);
-  await panel(page)
-    .getByRole("button", { name: "Continuar rascunho", exact: true })
-    .click();
+  await resumePreservedPreparation(page);
   await expect(dialog(page).locator('select[name="referenceId"]')).toHaveValue(
     f.referenceId!,
   );
@@ -325,8 +314,9 @@ test("resultado familiar privado sobrevive à perda de escrita e revalida leitur
 }) => {
   const f = await stockPreparationFixture("outbound"),
     reason = "Retirada privada cujo resultado precisa de recuperação pessoal";
+  await saveStockPreparation(f);
   await login(page, f.patient);
-  await open(page);
+  await resumePreservedPreparation(page);
   await fill(page, f.productId, reason);
   await dialog(page)
     .getByRole("combobox", { name: "Operação", exact: true })
@@ -357,7 +347,7 @@ test("resultado familiar privado sobrevive à perda de escrita e revalida leitur
   ).toBeVisible();
   const after = stockPreparationFacts(f);
   await page.reload();
-  await open(page, true);
+  await expect(page.getByRole("button", { name: "Consultar meu preenchimento familiar", exact: true })).toBeVisible();
   let denied = true;
   await page.route("**/api/stock/preparations?**", (route) =>
     denied
@@ -370,8 +360,7 @@ test("resultado familiar privado sobrevive à perda de escrita e revalida leitur
         })
       : route.continue(),
   );
-  await page.reload();
-  await open(page, true);
+  await openPreservedPreparation(page);
   await expect(dialog(page).getByText(reason, { exact: true })).toHaveCount(0);
   denied = false;
   await dialog(page)
@@ -396,7 +385,7 @@ test("resultado familiar privado sobrevive à perda de escrita e revalida leitur
       exact: true,
     }),
   ).toHaveCount(0);
-  await open(page, true);
+  await openPreservedPreparation(page);
   await expect(panel(page)).toContainText(reason);
   await expect(
     dialog(page).getByRole("button", {
@@ -411,6 +400,7 @@ test("salvar antes da referência conserva a ausência explícita e exige adoç�
 }) => {
   const f = await stockPreparationFixture(),
     before = stockPreparationFacts(f);
+  await saveStockPreparation(f, { movement: { action: "inbound" }, referenceHash: null });
   let release!: () => void,
     enter!: () => void,
     hold = true;
@@ -429,7 +419,7 @@ test("salvar antes da referência conserva a ausência explícita e exige adoç�
   });
   try {
     await login(page, f.patient);
-    await open(page);
+    await resumePreservedPreparation(page);
     await fill(
       page,
       f.productId,
@@ -457,10 +447,7 @@ test("salvar antes da referência conserva a ausência explícita e exige adoç�
         .content.referenceHash,
     ).toBeNull();
     await page.reload();
-    await open(page, true);
-    await panel(page)
-      .getByRole("button", { name: "Continuar rascunho", exact: true })
-      .click();
+    await resumePreservedPreparation(page);
     await expect(
       dialog(page).getByRole("button", {
         name: "Revisar movimentação",
@@ -493,8 +480,17 @@ test("gestão familiar sem leitura do saldo mantém preparação e ato nativo co
   sql(
     `insert into public.capability_overrides(care_recipient_id,subject_user,capability,enabled) values(${q(f.patient)},${q(fixtures.professional.id)},'stock.family.manage',true);`,
   );
+  const professional = await actor("professional", f.patient);
+  const restricted = await rpc(professional, "stock_movement_preparation_reference", {
+    p_patient: f.patient, p_product: f.productId, p_reference: null,
+  });
+  await saveStockPreparation(f, {
+    movement: { action: "inbound", productId: f.productId, productLabel: restricted.product.name,
+      unit: restricted.product.unit, quantity: "1" },
+    referenceHash: restricted.referenceHash,
+  }, null, undefined, professional);
   await login(page, f.patient, "professional");
-  await open(page);
+  await resumePreservedPreparation(page);
   await fill(
     page,
     f.productId,
@@ -544,7 +540,7 @@ test("gestão familiar sem leitura do saldo mantém preparação e ato nativo co
   expect(own.consumedResult.preparedMovement).not.toHaveProperty(
     "observedBalance",
   );
-  await open(page, true);
+  await openPreservedPreparation(page);
   await expect(panel(page)).toContainText(
     "Este preenchimento já registrou uma movimentação.",
   );

@@ -1,6 +1,7 @@
 import { expectNoOperationalDocumentAction } from "./document-sections";
 import { openOperationalDocumentAction } from "./document-sections";
 import { test, expect, type Page } from "@playwright/test";
+import { generateStandardPdf } from "./generated-pdf";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { setup, issue, fixtures } from "../integration/v4-fixtures.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
@@ -41,12 +42,12 @@ test("L1 laboratório: início e histórico usam as composições reais em deskt
   await page.goto("/verificar");
   for (const width of [1440, 390]) {
     await page.setViewportSize({ width, height: 940 });
-    await expect(page.getByRole("tab", { name: "Consultar código", exact: true })).toHaveAttribute("aria-selected", "true");
+    await expect(page.getByRole("tab", { name: "Tenho um código", exact: true })).toHaveAttribute("aria-selected", "true");
     await capture(page, `verificacao-codigo-${width}`);
-    await page.getByRole("tab", { name: "Conferir PDF", exact: true }).click();
+    await page.getByRole("tab", { name: "Tenho o PDF", exact: true }).click();
     await expect(page.getByLabel("Arquivo PDF para conferir", { exact: true })).toBeVisible();
     await capture(page, `verificacao-arquivo-${width}`);
-    await page.getByRole("tab", { name: "Consultar código", exact: true }).click();
+    await page.getByRole("tab", { name: "Tenho um código", exact: true }).click();
   }
   await login(page, f.patient);
   for (const width of [1440, 390]) {
@@ -112,23 +113,30 @@ test("L1 laboratório: ficha, ciência em etapas e exemplares preservam os atos 
   } finally { postRelease(); readRelease(); }
   await page.unroute(`**/api/requisitions/${req.id}/science*`);
   await selectDocumentSection(page, "files");
-  await page.getByRole("button", { name: "Gerar PDF", exact: true }).click();
+  await generateStandardPdf(page);
   await expect(page.getByRole("link", { name: "Visualizar", exact: true }).first()).toBeVisible({ timeout: 90_000 });
   for (const width of [1440, 390]) { await page.setViewportSize({ width, height: 940 }); await capture(page, `req-arquivos-${width}`); }
-  const summary = page.getByText("Identificação do exemplar", { exact: true }).first(); await summary.click();
-  expect(await summary.evaluate(element => getComputedStyle(element).listStyleType)).toBe("none");
+  const details = page.getByRole("button", { name: "Identificação do exemplar", exact: true }).first(); await details.click();
+  const identification = page.getByRole("dialog", { name: "Ficha", exact: true });
+  await identification.getByText("Código de verificação", { exact: true }).click();
+  await expect(identification.getByText(/^HCA-/)).toBeVisible();
   await capture(page, "req-identificacao-exemplar"); await auditFromTop(page, "Arquivos L1 reproduzidos");
+  await identification.getByRole("button", { name: "Voltar aos arquivos", exact: true }).click();
+  await expect(details).toBeFocused();
   const fileUrl = await page.getByRole("link", { name: "Visualizar", exact: true }).first().getAttribute("href");
   const pdf = await page.request.get(fileUrl!); expect(pdf.status()).toBe(200); const bytes = await pdf.body();
   await page.getByRole("link", { name: "Abrir validação pública", exact: true }).click();
   const result = page.getByRole("region", { name: "Resultado da verificação", exact: true });
   await expect(result.getByRole("heading", { name: "Emissão localizada", exact: true })).toBeVisible();
   await expect(page.getByRole("link", { name: "Voltar à ficha", exact: true })).toHaveAttribute("href", `/documentos/${req.id}?documentTab=files`);
-  await page.getByRole("tab", { name: "Conferir PDF", exact: true }).click();
+  await result.getByRole("button", { name: "Verificar o PDF recebido", exact: true }).click();
   await page.getByLabel("Arquivo PDF para conferir", { exact: true }).setInputFiles({ name: "exemplar-ficticio-l1.pdf", mimeType: "application/pdf", buffer: bytes });
-  await page.getByRole("button", { name: "Conferir PDF", exact: true }).click();
+  await page.getByRole("button", { name: "Verificar arquivo PDF", exact: true }).click();
   await expect(result).toContainText("Os bytes coincidem com o exemplar registrado");
-  await result.getByText("Detalhes da conferência", { exact: true }).click();
+  await result.getByRole("button", { name: "Ver detalhes da conferência", exact: true }).click();
+  const technical = page.getByRole("dialog", { name: "Detalhes da conferência", exact: true });
+  await expect(technical).toContainText("A assinatura cobre o arquivo inteiro.");
+  await technical.getByRole("button", { name: "Fechar", exact: true }).click();
   await expect(result.getByText("Os bytes coincidem com o exemplar registrado.", { exact: true })).toBeVisible();
   for (const width of [1440, 390]) { await page.setViewportSize({ width, height: 940 }); await capture(page, `verificacao-exemplar-real-${width}`); }
   await auditFromTop(page, "Verificação pública L1 reproduzida");

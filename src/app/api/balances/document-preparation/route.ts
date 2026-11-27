@@ -16,6 +16,7 @@ import {
 } from "@/lib/validation/balance-document-decisions";
 import type { SupplyDocument } from "@/types/documents";
 import type { BalanceRecountContext } from "@/types/balances";
+import { issuedBalanceExtras } from "@/lib/validation/balance-count-extras";
 
 export async function GET(request: Request) {
   return api("balances.document-preparation.read", async () => {
@@ -63,13 +64,21 @@ export async function GET(request: Request) {
         code: doc.code,
         documentVersion: doc.version,
         status: doc.status,
-        lines: doc.lines.map((row) => ({
-          id: row.id,
-          name: row.name_snapshot,
-          unit: row.unit_snapshot,
-          quantity: row.quantity,
-          expectedQuantity: row.metadata.expectedQuantity ?? null,
-        })),
+        lines: [
+          ...doc.lines.map((row) => ({
+            id: row.id,
+            name: row.name_snapshot,
+            unit: row.unit_snapshot,
+            category: row.category_snapshot,
+            quantity: row.quantity,
+            expectedQuantity: row.metadata.expectedQuantity ?? null,
+          })),
+          ...issuedBalanceExtras.parse(doc.payload.balanceExtras ?? []).map((row) => ({
+            ...row,
+            category: "extra",
+            expectedQuantity: null,
+          })),
+        ],
         review: doc.balanceReview ?? null,
         recount: null,
       });

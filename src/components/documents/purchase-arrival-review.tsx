@@ -91,7 +91,7 @@ export type OpenUnlinkedArrival = (arrivalId: string, focusAfterClose: () => HTM
 type ReviewScope = { receiptIds: readonly string[] } | { arrivalId: string };
 
 export function canReviewPurchaseArrivals(context: WorkspaceContext) {
-  return context.patient?.role === "admin" && can(context, "com.read") && can(context, "com.validate");
+  return can(context, "com.read") && can(context, "com.validate");
 }
 
 export function PurchaseArrivalReview({ context, documentId, hasPending, onReviewed, changedArrivalsRef, unlinkedArrivalRef, showTrigger }: {

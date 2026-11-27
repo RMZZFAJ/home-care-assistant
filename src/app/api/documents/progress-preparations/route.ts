@@ -9,5 +9,5 @@ const scope = z
   })
   .strict();
 export const { GET, POST } = createPrivatePreparationRoutes({
-  operation: "progress.preparation", rpcPrefix: "progress_preparation", scope, command: progressPreparationCommandSchema, cacheControl: "private, no-store",
+  operation: "progress.preparation", rpcPrefix: "record_progress_preparation", scope, command: progressPreparationCommandSchema, cacheControl: "private, no-store",
 });

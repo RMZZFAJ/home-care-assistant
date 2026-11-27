@@ -7,6 +7,19 @@ import { progressReferencePage } from "@/lib/validation/document-progress";
 import { useCallback } from "react";
 import { useScopedRead } from "@/lib/use-scoped-read";
 export function ProgressReference({ reference }: { reference: z.infer<typeof progressReferenceRow>; }) {
+  if (reference.type === "CON" || reference.type === "FAL") {
+    const linkedNote = reference.kind === "progress" && reference.documentId;
+    const params = new URLSearchParams({ ref: linkedNote || reference.id, refKind: "report" });
+    if (linkedNote) {
+      params.set("documentTab", "progress");
+      params.set("progressRecord", reference.id);
+    }
+    const label = reference.code ?? (reference.type === "FAL" ? "Aviso de falta" : "Consumo");
+    return <Link className="hca-progress-reference" prefetch={false} href={`/consumo?${params}${linkedNote ? "#andamento-" + reference.id : ""}`}>
+      <strong>{linkedNote ? "Andamento · " + label : label}</strong>
+      {linkedNote && reference.excerpt ? <span>{reference.excerpt}</span> : null}
+    </Link>;
+  }
   if (reference.kind !== "progress" || !reference.documentId) return <RelatedDocument id={reference.id} type={reference.type} label={reference.code ?? "Ficha vinculada"} />;
   return <Link className="hca-progress-reference" prefetch={false} href={"/documentos/" + reference.documentId + "?documentTab=progress&progressRecord=" + reference.id + "#andamento-" + reference.id}><strong>Andamento · {reference.code ?? "Ficha"}</strong><span>{reference.excerpt}</span></Link>;
 }

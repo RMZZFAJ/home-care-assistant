@@ -1,5 +1,6 @@
 "use client";
 import { IssuanceObservationList } from "@/components/forms/issuance-observations";
+import { TaskHelp } from "@/components/guides/guide-topic-panel";
 import { issuanceObservations } from "@/lib/documents/issuance-observations";
 
 import { useEffect, useId, useRef, useState, type FormEvent, type ReactNode, type RefObject } from "react";
@@ -122,7 +123,11 @@ export function CountedDeliveryReceipt(props: ReceiptEditorProps) {
 
   return <>
     <Dialog open title={title} subtitle={review ? undefined : "Confira as quantidades. Altere apenas o que chegou diferente."}
-      finalFocus={props.finalFocus} contentRef={contentRef} keyboardScrollable closeDisabled={busy} onClose={close} footer={<>
+      finalFocus={props.finalFocus} contentRef={contentRef} keyboardScrollable closeDisabled={busy} onClose={close}
+      navigation={!review && !family ? <div className="hca-guide-taskbar">
+        <TaskHelp topic="receiving" disabled={busy || blocked || uncertain} />
+      </div> : undefined}
+      footer={<>
         <ActionButton disabled={busy || uncertain} onClick={close}>{review ? "Voltar e editar" : "Voltar"}</ActionButton>
         {review || uncertain
           ? <ActionButton variant="primary" disabled={busy || blocked && !uncertain} onClick={props.onConfirm}>

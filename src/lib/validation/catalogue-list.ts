@@ -26,6 +26,8 @@ const collection = z.object({
   careRecipientId: z.uuid(), total: z.number().int().nonnegative(), includeInactive: z.boolean(),
   data: z.array(item.extend({ id: z.string().min(1) })),
 });
+export type CatalogueCollectionItem = z.infer<typeof collection>["data"][number];
+
 export function parseCatalogueCollectionRead(value: unknown, patient: string, includeInactive = true) {
   const parsed = collection.safeParse(value);
   if (!parsed.success) throw new Error("A resposta da consulta do catálogo não pôde ser lida. Atualize esta seção.");

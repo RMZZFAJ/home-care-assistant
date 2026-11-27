@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
 import { test } from "node:test";
 import { sql, sqlLiteral } from "../../scripts/test-environment.mjs";
-import { rpc } from "./v4-fixtures.mjs";
+import { actor, fixtures, rpc } from "./v4-fixtures.mjs";
 import { purchaseBalanceCommand, purchaseBalanceFixture } from "./purchase-entry-balance-fixtures.mjs";
 
 async function anotherPurchase(f) {
@@ -24,6 +24,44 @@ function decision(purchase, receipt, choice = "approve") {
   return { documentId: purchase.id, receiptId: receipt.id, version: purchase.version, decision: choice,
     ...(choice === "approve" ? {} : { reason: "Confira o registro da embalagem." }) };
 }
+
+test("an individual outside the purchase roles can review a real arrival only while authorized", async () => {
+  const f = await purchaseBalanceFixture();
+  const purchase = await pendingArrivals(f, f.document, 1);
+  const reviewer = await actor("professional", f.patient);
+  const subjectUser = fixtures.professional.id;
+  const query = { p_patient: f.patient, p_document: purchase.id };
+  const review = () => reviewer.rpc("com_arrival_review_queue", query);
+  const visibleDocument = async () => {
+    const result = await reviewer.from("operational_documents").select("id").eq("id", purchase.id).maybeSingle();
+    assert.ifError(result.error);
+    return result.data?.id;
+  };
+  const adjust = async (capability, enabled) => {
+    const policy = await rpc(f.admin, "patient_governance", { p_patient: f.patient });
+    return rpc(f.admin, "configure_patient_access", {
+      p_patient: f.patient, p_kind: "capability", p_key: randomUUID(), p_version: policy.data.version,
+      p_change: { capability, subjectUser, reviewedRole: "professional", enabled, ...(enabled ? { confirmIndividual: true } : {}) },
+    });
+  };
+  assert.equal(await visibleDocument(), undefined);
+  assert.equal((await review()).error?.code, "42501");
+  await adjust("com.read", true);
+  assert.equal(await visibleDocument(), purchase.id);
+  assert.equal((await review()).error?.code, "42501");
+  assert.ifError((await reviewer.rpc("read_unlinked_arrivals", { p_patient: f.patient })).error);
+  await adjust("com.validate", true);
+  const pending = await rpc(reviewer, "com_arrival_review_queue", query);
+  assert.equal(pending.arrivals[0].receiptId, purchase.receipts[0].id);
+  const applied = await rpc(reviewer, "execute_com_arrival_review", {
+    p_patient: f.patient, p_key: randomUUID(), p_entries: [decision(purchase, purchase.receipts[0])],
+  });
+  assert.equal(applied.results[0].status, "approved");
+  await adjust("com.validate", false);
+  assert.equal((await review()).error?.code, "42501");
+  await adjust("com.read", null);
+  assert.equal(await visibleDocument(), undefined);
+});
 
 test("COM review batches apply only selected pending arrivals and preserve one result per receipt", async () => {
   const f = await purchaseBalanceFixture();

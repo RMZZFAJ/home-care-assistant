@@ -45,16 +45,22 @@ import type {
   ReceiptDraftContent,
 } from "@/lib/validation/supply-drafts";
 import { formatZonedDate } from "@/lib/schedules/time";
-import { BalanceMaterials } from "./balance-materials";
+import { BalanceMaterials, BalanceRecordedExtras } from "./balance-materials";
 import { BalanceReviewItemFields, BalanceReviewPreparedFacts } from "./balance-review-items";
 import { balanceReviewItemFields, balanceReviewItemsFromFields } from "@/lib/validation/balance-review-items";
 
 export function BalancePreparationFacts({
   source,
+  collapseMaterials = false,
 }: {
   source: BalancePreparation;
+  collapseMaterials?: boolean;
 }) {
   const facts = source.review ?? source.recount!;
+  const materials = source.review ? <div className="hca-form-stack">
+    <BalanceMaterials rows={source.lines.filter(row => row.category !== "extra").map(row => ({ id: row.id, name: row.name, unit: row.unit, counted: row.quantity, reference: row.expectedQuantity }))} />
+    <BalanceRecordedExtras extras={source.lines.filter(row => row.category === "extra").map(row => ({ id: row.id, name: row.name, unit: row.unit, quantity: String(row.quantity) }))} />
+  </div> : null;
   return (
     <section className="hca-form-stack" aria-label="Contagem física consultada">
       <DefinitionGrid items={[
@@ -86,7 +92,10 @@ export function BalancePreparationFacts({
                     ? "Contagem já conciliada. A revisão facultativa não repete a movimentação."
                     : "A revisão não aplica a contagem ao estoque. A aplicação é um ato separado, após as revisões previstas e com referência válida."}
           </p>
-          <BalanceMaterials rows={source.lines.map(row => ({ id: row.id, name: row.name, unit: row.unit, counted: row.quantity, reference: row.expectedQuantity }))} />
+          {collapseMaterials ? <details>
+            <summary>Referência e contagem dos materiais</summary>
+            {materials}
+          </details> : materials}
         </>
       ) : null}
       {source.recount?.countWindow ? (
@@ -281,7 +290,7 @@ export function BalanceDocumentPreparation({
     if (!content || !allowed || busy || uncertain) return;
     try {
       if (purpose !== "assign_recount" && source && balanceReviewItemsFromFields(fields).some(item => !source.lines.some(line => line.id === item.lineId)))
-        throw new Error("Há um material de outra referência neste revisão. Remova a referência anterior explicitamente.");
+        throw new Error("Há um material de outra referência nesta revisão. Remova a referência anterior explicitamente.");
       if (purpose !== "assign_recount" && source) for (const [key, raw] of Object.entries(fields).filter(([key]) => key.startsWith("item:"))) {
         const item = balanceReviewItemFields.parse(JSON.parse(raw)), line = source.lines.find(row => row.id === key.slice(5));
         if (!line || (item.materialName !== undefined && item.materialName !== line.name) || (item.unit !== undefined && item.unit !== line.unit))
@@ -464,7 +473,7 @@ export function BalanceDocumentPreparation({
               </ActionButton>
             </div>
             {!unavailable && source ? (
-              <BalancePreparationFacts source={source} />
+              <BalancePreparationFacts source={source} collapseMaterials />
             ) : null}
             {needsReference ? (
               <Notice>

@@ -11,16 +11,21 @@ const stockNumber = z.union([
   z.number().finite(),
 ]).transform(value => quantity(value).toFixed());
 const instant = z.string().datetime({ offset: true });
-const custody = z.object({
+export const stockCustodyProjection = z.object({
   confirmed: stockNumber,
   incoming: stockNumber,
   minimum: stockNumber.nullable(),
+  updatedAt: instant.nullable().optional(),
+  disputed: stockNumber.optional(),
+  purchaseExpected: stockNumber.optional(),
+  purchaseAwaiting: stockNumber.optional(),
+  purchasePendingValidation: stockNumber.optional(),
 });
 const product = z.object({
   productId, name: z.string().min(1), unit: z.string().min(1),
   decimals: z.number().int().min(0).max(6), active: z.boolean(),
-  family: custody.extend({ purchasePending: stockNumber }).nullable(),
-  team: custody.extend({ purchasePending: stockNumber.optional() }).nullable(),
+  family: stockCustodyProjection.extend({ purchasePending: stockNumber }).nullable(),
+  team: stockCustodyProjection.extend({ purchasePending: stockNumber.optional() }).nullable(),
   disputed: stockNumber,
 });
 const metric = z.object({
@@ -28,16 +33,18 @@ const metric = z.object({
   quantity: stockNumber, averagePerDay: stockNumber,
 });
 const transitDocument = z.object({
-  id: z.uuid(), code: z.string().min(1),
+  id: z.uuid(), code: z.string().min(1), kind: z.enum(["ENT", "DEV"]),
   status: z.enum(["pending_receipt", "disputed", "cancellation_pending"]),
   source: z.enum(["FAMILY", "CARE_TEAM"]), destination: z.enum(["FAMILY", "CARE_TEAM"]),
-  createdAt: instant,
+  createdAt: instant, dispatchedAt: instant.nullable(),
   lines: z.array(z.object({
     productId, name: z.string().min(1), unit: z.string().min(1),
     dispatched: stockNumber, accepted: stockNumber, reconciled: stockNumber,
-    pending: stockNumber, disputed: z.boolean(),
+    pending: stockNumber, disputed: z.boolean(), reported: stockNumber.nullable(),
   })).min(1),
-}).refine(document => document.source !== document.destination);
+}).refine(document => document.source !== document.destination &&
+  document.kind === (document.source === "FAMILY" ? "ENT" : "DEV"));
+export type TransitDocument = z.infer<typeof transitDocument>;
 const balance = z.object({ product_id: productId, location: stockLocation, balance: stockNumber });
 const balancesRead = z.object({
   careRecipientId: z.uuid(), custody: stockCustodySelection,
@@ -67,6 +74,37 @@ export type StockHistoryScope = {
   productId: string; location: string; from: string; to: string;
 };
 
+export const stockOperationFilter = z.enum(["manual", "COM", "CON", "REQ", "ENT", "DEV", "BAL", "inventory", "other"]);
+export const stockOperationId = z.string().regex(/^[a-z_]{1,32}:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/);
+const operationMovement = movement.extend({
+  name: z.string().nullable(), unit: z.string().nullable(), custody: stockLocation,
+  before: stockNumber.nullable(), after: stockNumber.nullable(),
+  direction: z.enum(["inbound", "outbound"]),
+});
+const operationGroup = z.object({
+  id: stockOperationId,
+  recordedAt: instant, origin: stockOperationFilter, documentCode: z.string().nullable(),
+  actor: z.string().nullable(), rows: z.array(operationMovement).min(1),
+});
+const operationsRead = historyRead.omit({ data: true, balances: true }).extend({
+  data: z.array(operationGroup),
+  filters: historyFilters.extend({ origin: stockOperationFilter.nullable(), search: z.string().nullable() }),
+});
+export type StockOperationHistory = z.infer<typeof operationGroup>;
+export type StockOperationMovement = z.infer<typeof operationMovement>;
+export type StockOperationScope = StockHistoryScope & { origin: string; search: string };
+
+const operationDetail = z.object({ careRecipientId: z.uuid(), data: operationGroup });
+
+export function parseStockOperationDetail(value: unknown, careRecipientId: string, operationId: string) {
+  const parsed = operationDetail.safeParse(value);
+  if (!parsed.success || parsed.data.careRecipientId !== careRecipientId || parsed.data.data.id !== operationId
+    || !unique(parsed.data.data.rows.map(row => row.id))) {
+    throw new Error("A resposta recebida não corresponde à operação. Tente consultar novamente.");
+  }
+  return parsed.data.data;
+}
+
 function unique(values: string[]) {
   return new Set(values).size === values.length;
 }
@@ -94,5 +132,20 @@ export function parseStockHistory(value: unknown, expected: StockHistoryScope): 
     || result.data.length !== count || !unique(result.data.map(row => row.id))) {
     throw new Error("A resposta recebida não corresponde à consulta do histórico. Atualize o histórico novamente.");
   }
+  return result;
+}
+
+export function parseStockOperationHistory(value: unknown, expected: StockOperationScope) {
+  const parsed = operationsRead.safeParse(value);
+  if (!parsed.success) throw new Error("A resposta do histórico de operações não pôde ser conferida.");
+  const result = parsed.data;
+  const count = Math.min(result.pageSize, Math.max(0, result.total - (result.page - 1) * result.pageSize));
+  if (result.careRecipientId !== expected.careRecipientId || result.page !== expected.page || result.pageSize !== expected.pageSize
+    || Object.entries(result.filters).some(([key, field]) => field !== (expected[key as keyof StockOperationScope] || null))
+    || result.data.length !== count || !unique(result.data.map(group => group.id))
+    || !unique(result.data.flatMap(group => group.rows.map(row => row.id)))
+    || result.data.some(group => (expected.origin && expected.origin !== group.origin) || group.rows.some(row =>
+      (expected.location && expected.location !== row.custody) || (expected.productId && expected.productId !== row.product_id))))
+    throw new Error("A resposta recebida não corresponde à consulta do histórico de operações.");
   return result;
 }

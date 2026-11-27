@@ -1,26 +1,51 @@
 import type { ConsumptionReport } from "@/types/consumption";
+import { consumptionStatus } from "@/lib/validation/consumption";
+
+export const consumptionStateLabels = {
+  reported: "Aguardando conferência", confirmed: "Confirmado", rejected: "Rejeitado",
+  recorded: "Registrado", cancelled: "Cancelado", communicated: "Comunicado à família",
+} satisfies Record<ConsumptionReport["status"], string>;
 
 type ReadStamp = Pick<ConsumptionReport, "id" | "care_recipient_id" | "version" | "status">;
+
+export function consumptionRecordLabel(kind: ConsumptionReport["kind"], id: string) {
+  return (kind === "shortage" ? "FAL-" : "CON-") + id.slice(0, 8).toUpperCase();
+}
 
 export function consumptionReadStampMatches(value: ReadStamp | null | undefined, id: string, patient: string) {
   return Boolean(value && value.id === id && value.care_recipient_id === patient
     && Number.isInteger(value.version) && value.version > 0 && value.version <= 2147483647
-    && ["reported", "confirmed", "rejected"].includes(value.status));
+    && consumptionStatus.safeParse(value.status).success);
 }
 
 // A supplement advances the report version; a decision closes that version.
 // A delayed read cannot undo either authoritative fact already received.
 export function mergeConsumptionRead<T extends ReadStamp, U extends ReadStamp>(current: T | null, incoming: U): T | U {
   if (current && current.id === incoming.id && current.care_recipient_id === incoming.care_recipient_id
-    && (incoming.version < current.version || current.status !== "reported" && incoming.status !== current.status)) return current;
+    && (incoming.version < current.version || (
+      current.status !== "reported" && incoming.status !== current.status
+      && !(current.status === "recorded" && incoming.status === "cancelled" && incoming.version > current.version)
+    ))) return current;
   return incoming;
 }
 
-export function consumptionLocationLabel(location: string) {
+export function consumptionLocationLabel(location: string | null) {
   return location === "FAMILY" ? "Família" : location === "CARE_TEAM" ? "Equipe" : "Custódia não identificada";
 }
 
 export function consumptionFollowUp(report: Pick<ConsumptionReport, "kind" | "status" | "location" | "current_lines" | "movements">) {
+  if (report.status === "recorded") return {
+    heading: "Consumo registrado no plantão", pending: false,
+    description: "Os materiais registrados foram descontados do estoque da equipe. Correções ficam vinculadas a este registro.",
+  };
+  if (report.status === "cancelled") return {
+    heading: "Consumo cancelado", pending: false,
+    description: "A compensação ficou registrada no histórico de estoque da equipe.",
+  };
+  if (report.status === "communicated") return {
+    heading: "Aviso de falta", pending: false,
+    description: "A família pode acompanhar a necessidade. Este aviso não altera os saldos.",
+  };
   if (report.status === "rejected") return {
     heading: "Consultar a rejeição do relato", pending: false,
     description: "A rejeição tem decisão e motivo próprios, sem desconto de estoque. O relato original e seus complementos permanecem preservados; este acompanhamento não solicita nova confirmação.",

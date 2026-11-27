@@ -1,11 +1,33 @@
 "use client";
 import { useEffect, useRef, useState, type ReactNode, type RefObject } from "react";
+import type { IconName } from "@/components/ui/icon";
 import { Dialog, Drawer } from "@/components/ui/overlays";
 
+/** Return focus when the editor closes, including editors that swap their loading view. */
+export function useRecordDrawerReturnFocus(
+  restoreFocusTo?: HTMLElement | null,
+  restoreFocusFallbackRef?: RefObject<HTMLElement | null>,
+  restoreFocusToAriaDisabled = false,
+) {
+  const restoreFrameRef = useRef<number | undefined>(undefined);
+  useEffect(() => {
+    // A replacement effect (including Strict Mode's probe) is not a close.
+    if (restoreFrameRef.current !== undefined) cancelAnimationFrame(restoreFrameRef.current);
+    const fallback = restoreFocusFallbackRef?.current;
+    if (!restoreFocusTo && !fallback) return;
+    const unavailable = restoreFocusToAriaDisabled ? ":disabled" : ':disabled,[aria-disabled="true"]';
+    return () => { restoreFrameRef.current = requestAnimationFrame(() => {
+      if (restoreFocusTo?.isConnected && !restoreFocusTo.matches(unavailable)) restoreFocusTo.focus();
+      else if (fallback?.isConnected) fallback.focus();
+    }); };
+  }, [restoreFocusTo, restoreFocusFallbackRef, restoreFocusToAriaDisabled]);
+}
+
 /** Contextual editing keeps the list and its filters in place. */
-export function RecordDrawer({ title, children, recovery, onClose, busy = false, restoreFocusTo, restoreFocusFallbackRef, trackChanges = true, preventClose = false, hasUnsavedChanges, keyboardScrollable = false, uncertainOutcome = false, exitDialog = false, modal = false, kicker, subtitle, popupClassName, footer }: {
+export function RecordDrawer({ title, children, recovery, onClose, busy = false, restoreFocusTo, restoreFocusFallbackRef, restoreFocusToAriaDisabled = false, trackChanges = true, preventClose = false, hasUnsavedChanges, keyboardScrollable = false, uncertainOutcome = false, exitDialog = false, modal = false, kicker, subtitle, headingIcon, popupClassName, footer }: {
   title: string; children: ReactNode; onClose: () => void; busy?: boolean; restoreFocusTo?: HTMLElement | null; restoreFocusFallbackRef?: RefObject<HTMLElement | null>; trackChanges?: boolean; preventClose?: boolean;
   recovery?: ReactNode | ((requestClose: () => void) => ReactNode);
+  restoreFocusToAriaDisabled?: boolean;
   hasUnsavedChanges?: boolean;
   keyboardScrollable?: boolean;
   uncertainOutcome?: boolean;
@@ -13,6 +35,7 @@ export function RecordDrawer({ title, children, recovery, onClose, busy = false,
   modal?: boolean;
   kicker?: string;
   subtitle?: string;
+  headingIcon?: IconName;
   popupClassName?: string;
   footer?: (requestClose: () => void) => ReactNode;
 }) {
@@ -20,16 +43,7 @@ export function RecordDrawer({ title, children, recovery, onClose, busy = false,
   const [discard, setDiscard] = useState(false);
   const formRef = useRef<HTMLFieldSetElement>(null);
   const editFocusRef = useRef<HTMLElement | null>(null);
-  const restoreFrameRef = useRef<number | undefined>(undefined);
-  useEffect(() => {
-    // A replacement effect (including Strict Mode's probe) is not a close.
-    if (restoreFrameRef.current !== undefined) cancelAnimationFrame(restoreFrameRef.current);
-    const fallback = restoreFocusFallbackRef?.current;
-    return () => { restoreFrameRef.current = requestAnimationFrame(() => {
-      if (restoreFocusTo?.isConnected && !restoreFocusTo.matches(':disabled,[aria-disabled="true"]')) restoreFocusTo.focus();
-      else if (fallback?.isConnected) fallback.focus();
-    }); };
-  }, [restoreFocusTo,restoreFocusFallbackRef]);
+  useRecordDrawerReturnFocus(restoreFocusTo, restoreFocusFallbackRef, restoreFocusToAriaDisabled);
   const requestClose = () => { if (!busy && !preventClose) { if (uncertainOutcome || (hasUnsavedChanges ?? dirty)) setDiscard(true); else onClose(); } };
   const continueEditing = () => {
     if (busy || preventClose) return;
@@ -46,7 +60,7 @@ export function RecordDrawer({ title, children, recovery, onClose, busy = false,
     if (exitDialog) requestAnimationFrame(restoreEditing); else restoreEditing();
   };
   const Surface = modal ? Dialog : Drawer;
-  return <Surface open title={title} kicker={kicker} subtitle={subtitle} popupClassName={popupClassName} footer={footer?.(requestClose)} closeLabel="Fechar edição" onClose={requestClose} closeDisabled={busy || preventClose} finalFocus={false} keyboardScrollable={keyboardScrollable}>
+  return <Surface open title={title} kicker={kicker} subtitle={subtitle} headingIcon={headingIcon} popupClassName={popupClassName} footer={footer?.(requestClose)} closeLabel="Fechar edição" onClose={requestClose} closeDisabled={busy || preventClose} finalFocus={false} keyboardScrollable={keyboardScrollable}>
       {typeof recovery === "function" ? recovery(requestClose) : recovery}
       {exitDialog ? <Dialog open={discard} title={uncertainOutcome ? "Fechar sem resultado confirmado?" : "Sair sem concluir?"} onClose={continueEditing} finalFocus={false}>
         <p>{uncertainOutcome ? "O resultado da tentativa continua sem confirmação. Fechar descarta os campos desta tela. Procure a supervisão e confira o resultado antes de repetir a ação." : "O preenchimento desta ação será descartado. Fechar não confirma a alteração."}</p>

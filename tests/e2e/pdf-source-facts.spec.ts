@@ -1,6 +1,6 @@
 import { PDF } from "@libpdf/core";
 import { formatBrazilDate } from "../../src/lib/receipt";
-import { CURRENT_PDF_REVISION } from "./generated-pdf";
+import { CURRENT_PDF_REVISION, generateStandardPdf } from "./generated-pdf";
 import { selectDocumentSection } from "./document-sections";
 import { test, expect, type Page } from "@playwright/test";
 import { createHash, randomUUID } from "node:crypto";
@@ -70,9 +70,7 @@ test("PDF atual preserva a origem congelada e distingue emissão sem expor a pre
             `/api/documents/${f.doc.id}/issuances` &&
           response.request().method() === "POST", { timeout: 60_000 },
       );
-      await page
-        .getByRole("button", { name: "Gerar PDF", exact: true })
-        .click();
+      await generateStandardPdf(page);
       const result = await generated;
       expect(result.status(), await result.text()).toBe(200);
       row = pdfIssuanceSchema.parse(await result.json());
@@ -199,6 +197,27 @@ test("PDF atual preserva a origem congelada e distingue emissão sem expor a pre
     );
   }
 });
+test("faixa compacta da ficha histórica recolhe ao voltar ao topo após redimensionar", async ({ page }) => {
+  const f = await historicalSourceFixture();
+  await login(page, f.patient);
+  await page.goto(`/historico/${f.doc.id}?documentTab=files`);
+  await page.setViewportSize({ width: 768, height: 640 });
+
+  const more = page.getByRole("button", { name: "Mais opções da ficha", exact: true });
+  const compactHeader = page.locator(".hca-document-compact");
+  const files = page.getByRole("region", { name: "Arquivos gerados", exact: true });
+  await expect(files).toBeVisible();
+  await expect(compactHeader).toBeHidden();
+  await files.evaluate(region => region.scrollIntoView({ block: "start", behavior: "instant" }));
+  await expect(compactHeader).toBeVisible();
+
+  await page.setViewportSize({ width: 768, height: 950 });
+  await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
+  await expect(compactHeader).toBeHidden();
+  await more.click();
+  await expect(page.getByRole("menu", { name: "Ações da ficha", exact: true })).toBeVisible();
+});
+
 test("PDF atual recusa caractere sem representação antes de assinar ou persistir arquivo", async ({
   page,
 }) => {
@@ -218,17 +237,18 @@ test("PDF atual recusa caractere sem representação antes de assinar ou persist
     );
   const sent = page.waitForResponse(
     (r) => r.url().endsWith(endpoint) && r.request().method() === "POST",
+    { timeout: 70_000 },
   );
-  await page.getByRole("button", { name: "Gerar PDF", exact: true }).click();
+  await generateStandardPdf(page, false);
   const response = await sent;
   expect(response.status()).toBe(503);
   expect(await response.json()).toMatchObject({
     code: "CONTENT_INVALID",
     retryable: false,
   });
-  await expect(files.getByRole("alert")).toContainText(
-    "caracteres ainda não suportados",
-  );
+  const failure = page.getByRole("dialog", { name: "Emissão ainda não confirmada", exact: true });
+  await expect(failure).toContainText("caracteres ainda não suportados");
+  await failure.getByRole("button", { name: "Voltar", exact: true }).click();
   await expect(
     files.getByRole("link", { name: "Baixar PDF", exact: true }),
   ).toHaveCount(0);

@@ -332,7 +332,8 @@ documentais também exigem expectedVersion para detectar concorrência.
 - **Rota:** /api/profile/science
 
   **Contrato:** GET da preferência própria; POST versionado e idempotente,
-  com consentimento expresso para diálogo/tácita
+  com consentimento expresso para diálogo/tácita. GET com `attempt` consulta
+  o comprovante da tentativa do titular.
 
 - **Rota:** /api/requisitions/:id/archive
 
@@ -359,6 +360,10 @@ documentais também exigem expectedVersion para detectar concorrência.
   do mesmo filtro e a identifica quando a atualização falha. 401/403/404 retiram
   os dados anteriores. Busca e paginação não registram abertura, ciência ou
   operação de estoque. A ordenação nativa é created_at decrescente e id crescente.
+  A consulta explícita `type=BAL` inclui `balanceCounterName` com a autoria
+  preservada da contagem vigente. O valor é nulo quando esse nome não consta
+  do ato histórico. A data filtrada é a de criação da ficha. `submitted`
+  corresponde a Em revisão e `approved` corresponde a Aplicado no BAL.
 
 - **Rota:** /api/documents/:id
 
@@ -430,6 +435,12 @@ documentais também exigem expectedVersion para detectar concorrência.
 
   **Contrato:** Reserva, upload validado, vínculo e links privados
 
+  A lista de anexos da ficha informa o nome do autor e o instante da
+  confirmação quando disponíveis. `fileId` com `fileAction=view` ou
+  `fileAction=download` exige o identificador da ficha e a autorização atual
+  para consultá-la. A resposta libera um link temporário para o mesmo objeto
+  validado. A consulta e o download preservam os bytes e o vínculo do anexo.
+
 - **Rota:** /api/consumption
 
   **Contrato:** Relatos, complementos e decisões versionados; páginas e filtros
@@ -444,7 +455,26 @@ documentais também exigem expectedVersion para detectar concorrência.
 
 - **Rota:** /api/profile
 
-  **Contrato:** Perfil, foto, contatos, preferências e sessões
+  **Contrato:** Perfil, foto, contatos e sessões. Atualizar dados pessoais
+  preserva os canais quando a carga omite `preferences`. A leitura retorna
+  em `contactStatus` a confirmação do e-mail, os contatos pendentes e o estado
+  da autenticação recente. O e-mail e o telefone vigentes ficam em `data`.
+  GET com `contactAvailability=sms` consulta a configuração de confirmação
+  por SMS sem enviar código. POST `confirmSession` confirma a senha para uma
+  conta elegível e revalida o vínculo da sessão com o banco. POST
+  `confirmPhone` confere um número já confirmado pelo Auth e atualiza sua
+  associação na conta sem solicitar SMS nem repetir o código.
+  POST `password` confere a senha atual e aplica a alteração na sessão
+  original. `signoutOthers` exige sessão recente e solicita ao Auth o
+  encerramento das demais sessões. Quando há MFA configurado, os dois
+  comandos exigem sessão verificada.
+
+- **Rota:** /api/profile/notices
+
+  **Contrato:** GET dos canais e da versão da pessoa autenticada. O POST
+  salva `internal`, `email` e `whatsapp` com `expectedVersion` e
+  `idempotencyKey`. GET com `attempt` retorna a preferência atual e
+  `savedVersion` quando há comprovante próprio para a mesma tentativa.
 
 - **Rota:** /api/patient-settings
 
@@ -458,17 +488,25 @@ documentais também exigem expectedVersion para detectar concorrência.
 
 Na caixa pessoal, GET /api/notifications usa o paciente selecionado na sessão
 revogável do banco e filtra também a identidade destinatária. O parâmetro
-careRecipientId, quando informado, deve corresponder a essa seleção: divergência
-retorna409 CONTEXT_REQUIRED. Sem contexto de paciente, responde
+`careRecipientId`, quando informado, deve corresponder a essa seleção.
+Divergência retorna `409 CONTEXT_REQUIRED`. Sem contexto de paciente, responde
 availability=patient_context_required, sem consultar notificações de outros
 pacientes. A seleção é conferida novamente depois das leituras autorizadas.
-Resposta consultada inclui availability=ready, careRecipientId, data, total,
-unreadCount, page, pageSize, unread e surface. A central confere a seleção,
-o tamanho esperado da página e identidades únicas; resposta inconsistente
-não substitui a leitura válida. O sino exclui silenciosas antes da paginação;
-na central, o filtro de não vistas se aplica antes da página. Falha de leitura
-ou resultado inválido não vira caixa vazia. POST marca vista no aplicativo;
-não registra ciência, aceite documental ou leitura confirmada por provedor.
+O banco aplica a permissão atual de leitura do destino antes de paginar e
+contar. Lista, total e contagem do sino vêm da mesma consulta. O GET com
+`noticeId` consulta novamente a mesma autorização para um único aviso e retorna
+`404` se o aviso estiver fora do alcance da pessoa no vínculo selecionado.
+Na central, `kind` seleciona REQ, ENT (entregas e devoluções), COM ou BAL.
+`q` pesquisa referência, autoria e descrição do evento sem exigir acentos.
+`tasks=true` lista avisos que apontam para uma ação ainda elegível da pessoa.
+Os filtros se combinam antes da paginação. A resposta inclui `actionCount`,
+`unreadCount`, os filtros aplicados e o total de avisos que passam pelos
+filtros. A central confere a seleção, o tamanho esperado da página e as
+identidades únicas. Uma resposta inconsistente mantém a última leitura
+confirmada do mesmo recorte. O sino exclui silenciosas antes da paginação.
+Na central, o filtro de não vistas se aplica antes da página. O POST marca
+vista no aplicativo. Ciência, aceite documental e leitura confirmada pelo
+provedor são registros independentes.
 
 Em GET /api/patient-settings, a leitura de propostas mantém a RPC nativa e
 inclui careRecipientId, status, kind e query, além de changes, total, page e
@@ -907,6 +945,14 @@ A referência abre GET `/api/consumption/[id]` mesmo fora da página recente;
 filtros não comandam movimentos. URL, recarga e Voltar/Avançar restauram os
 filtros, sem rascunho de negócio ou nova persistência.
 
+Em `POST /api/consumption/records`, a ação `shortage` aceita a mensagem com
+ou sem materiais. Cada material pode omitir `quantity` ou informar `null`.
+Os dois formatos representam a mesma tentativa. Lista e detalhe retornam
+nome e unidade capturados, com `quantity: null` quando a equipe informa
+somente o material. Uma quantidade presente deve ser positiva e respeitar
+a precisão da unidade. A reiteração aponta para o aviso anterior e publica
+outro aviso, sem decisão de aprovação ou movimento de estoque.
+
 POST action=report conserva texto e linhas originais, autor e nome capturado
 no novo fato. Texto livre sem linhas é um relato válido, sem desconto.
 action=supplement exige id, text, lines, expectedVersion e idempotencyKey;
@@ -984,6 +1030,25 @@ pública para saldo negativo. Transferência entre custódias usa ENT.
 
 ## Administração, identidade e canais
 
+`GET /api/admin/residence?patientId=<uuid>` retorna a identificação atual, a
+versão das regras e os totais de vínculos ativos, convites pendentes dentro da
+validade e propostas pendentes. A autorização é a administração da residência
+selecionada ou a atuação global. A resposta omite os dados dos destinatários e
+o conteúdo das propostas.
+
+`POST /api/admin/residence` usa `action=save` com `patientId`, `key`, `version`,
+`before` e `identity` para confirmar a edição revisada. O comando reaproveita
+a governança e a auditoria do paciente. Uma alteração local autorizada retorna
+`applied`. A atuação global retorna uma proposta `pending` para decisão local
+independente. Uma referência desatualizada exige nova revisão. O cadastro de
+outra residência usa o fluxo de criação a partir da revisão.
+
+Em caso de resposta perdida, `action=recover` recebe o mesmo `patientId` e
+`key`. Sob a trava da governança, devolve o estado oficial ou encerra a
+tentativa sem alteração. Um envio atrasado com a chave encerrada não aplica a
+edição. A interface mantém apenas a referência da tentativa submetida, com
+até duas consultas de recuperação.
+
 GET /api/admin/membership-impact recebe careRecipientId/userId e exige gestão
 local ativa. O alvo precisa ter vínculo neste paciente. membership_impact retorna
 ENT pendentes com aceite/trânsito por material, regularizações designadas, BAL
@@ -992,20 +1057,54 @@ Cada grupo respeita a capacidade de leitura do processo: falta de acesso retorna
 available=false/total=null, nunca zero inventado. Totais antecedem o limite de
 20 registros por grupo e 20 linhas por ENT; a interface informa o recorte.
 
-A consulta não revoga, transfere, recebe, conta, aprova ou movimenta estoque.
-Revogar agora permanece disponível durante carregamento/erro da prévia, usando
-o comando de revogação existente com autorização vigente no servidor. Após a
-revogação, P05 e os processos de BAL/escala encaminham as tarefas futuras sem
-atribuir a outra pessoa a autoria do passado. Atualizar a prévia conserva a
-última consulta identificada e restaura foco após a resposta.
+A consulta é informativa. A pessoa autorizada pode confirmar a revogação
+durante o carregamento ou uma falha da consulta de pendências, desde que a
+referência do vínculo esteja disponível. Após a revogação, P05 e os processos
+de BAL e escala encaminham as tarefas futuras e preservam a autoria do passado.
+Atualizar a prévia conserva a última consulta identificada e restaura o foco
+após a resposta.
 
-Editar função mantém a identidade da conta em leitura; outra conta usa vínculo
-ou convite explícito. Vínculo revogado usa a ação própria de reativação.
+`GET /api/admin/memberships` recebe `patientId`, `mode`, `purpose` e
+`targetId` para editar, reativar ou revogar um vínculo. A inclusão de conta
+existente usa `selection` no lugar de `targetId`. A resposta contém a
+referência da revisão, a situação confirmada e a elegibilidade no contexto.
+Editar a função mantém a identidade da conta. Uma conta nova recebe convite.
+
+`POST /api/admin/memberships` recebe o mesmo escopo, `key` e `intent` com
+`fields` e `referenceHash`. A transação compara a referência sob a trava da
+governança, verifica a autorização vigente e aplica a alteração local ou cria
+uma proposta global para decisão independente. O formulário permanece em
+memória até a confirmação. O comando legado recusa novas gravações de rascunho
+de vínculo e conserva os comprovantes existentes.
+
+Com `intent: null`, o comando consulta a chave da operação submetida ou
+encerra a tentativa ausente. A chave encerrada impede um envio tardio da
+alteração. Quando a própria alteração retira a autoridade de quem executou,
+somente a sessão original pode recuperar seu comprovante. A interface guarda
+a referência da tentativa e oferece até duas consultas de recuperação.
 
 /api/admin administra recursos locais e contas globais conforme autorização.
 Convites são criados, reemitidos e revogados por administração local;
 registro e aceite usam /api/invitations/register e /api/invitations/accept.
 O administrador nunca recebe a senha de outra identidade.
+
+`GET /api/admin/invitations` recebe `careRecipientId` e devolve a lista
+da residência sob a capacidade efetiva `access.manage`. O estado de recusa
+vem da última decisão registrada. O hash e o segredo do link ficam fora da
+consulta.
+
+`POST /api/admin/invitations` recebe `careRecipientId`, `key` e `intent`.
+`intent.action` é `create`, `reissue` ou `revoke`. Reemissão e revogação
+conferem ID, situação e validade revisados. O servidor devolve o novo link
+somente após a primeira criação ou reemissão daquela chave. A operação
+gera o link para encaminhamento manual.
+
+Com `intent: null`, o comando consulta a mesma chave. Ele retorna a
+operação registrada e a situação atual ou encerra a tentativa ausente.
+Uma reexecução com chave encerrada fica sem efeito. Se a resposta com o link
+se perdeu, a geração de outro link exige reemissão explícita no convite
+confirmado. Revogar uma concessão individual de `access.manage` também
+impede cadastro, aceite e recusa pelos convites pendentes emitidos com ela.
 
 Administração local aplica alterações do próprio paciente imediatamente.
 Administração global propõe mudanças no paciente; a aprovação exige outra
@@ -1013,7 +1112,8 @@ identidade com administração local. Trocar o perfil ativo não permite aprovar
 a própria proposta. A proposta conserva a versão da política. Cadastro de
 paciente usa initialAdministratorEmail confirmado e atribuição inicial
 explícita.
-Administração de acesso de um administrador ativo não é removida por override.
+Administração de acesso por perfil continua reservada à função de administrador.
+Uma exceção individual pode conceder ou restringir esse acesso na residência.
 
 GET /api/patient-settings exige careRecipientId e retorna configuração,
 diretório e propostas autorizadas. changesOnly=true retorna somente changes,
@@ -1023,9 +1123,43 @@ pendente e aceite pendente. kind filtra os cinco tipos de governança; query
 busca referência/conteúdo no paciente autorizado. page inicia em1 e tem teto
 1000000; pageSize usa20 e aceita1–50. NULL explícito é inválido nas RPCs.
 Filtros precedem contagem/paginação, com ordem created_at/id determinística.
+Cada proposta inclui versão vigente, nome do decisor quando disponível e
+`reviewReference` enquanto estiver pendente. A referência vincula a proposta
+e os valores exibidos à configuração vigente no momento da leitura.
+
+`POST /api/patient-settings/proposals` recebe `careRecipientId`,
+`proposalId`, `attemptKey` e a intenção `{ decision, reference }`.
+A decisão usa os dados do registro oficial e exige administrador local
+distinto do autor. Mudança da referência devolve HTTP 409. A consulta
+da mesma tentativa envia `intent: null` e confirma `recorded` ou encerra
+com `closed`, impedindo o envio atrasado com a mesma chave. A resposta é
+privada, sem cache, e distingue aprovação com aceite pendente. O link
+é devolvido na gravação que criou o convite. Uma recuperação confirmada
+leva à reemissão explícita quando for preciso recuperar o link.
+
+Com `permissionPerson`, `GET /api/patient-settings` exige um único
+`careRecipientId` e um único `permissionPerson`. A resposta privada e sem cache
+contém pessoa, função, versão da política e todas as capacidades definidas.
+Cada linha indica resultado, herança do perfil e origem do cálculo vigente.
+A consulta exige administração local no paciente ou administração global ativa.
+A RPC `patient_permission_snapshot` revalida autoridade e vínculo atual.
+A decisão por capacidade continua dependente da sessão e do contexto de quem
+executa a operação.
 
 POST /api/patient-settings recebe careRecipientId, kind, change,
 idempotencyKey e expectedVersion; decisões incluem requestId e decision.
+Em `kind=capability`, `change.enabled` aceita `true`, `false` ou `null`
+para permitir, restringir ou herdar. A exceção usa `subjectUser`. Quando
+amplia o acesso herdado, ou altera `access.manage`, precisa de
+`confirmIndividual: true` e `reviewedRole` com a função conferida. A aplicação
+revalida versão, vínculo e função. O histórico guarda autor, alvo, capacidade
+e resultados efetivos anterior e posterior em `resolution.permission`.
+Para funções fora da família e da administração, a confirmação da exceção
+de `consumption.report` também é exigida quando a função já permite relatar
+na equipe. O relato na custódia familiar exige leitura do estoque familiar.
+`GET /api/context` projeta `canReportFamilyConsumption` no vínculo ativo.
+O histórico registra o resultado anterior e posterior desse acesso à
+custódia separadamente da capacidade geral de relatar.
 Propostas globais pelo alias /api/admin também exigem idempotencyKey e
 expectedVersion do cliente, preservados em cada reenvio. A rota não gera
 automaticamente outra chave nem busca uma versão nova para reaplicar o comando.
@@ -1123,6 +1257,17 @@ desligado, com sua própria autoria. O readmodel apresenta efeito BAL e todas
 as ocorrências da série para revisão, sem dispensar a decisão familiar que
 altera sua janela.
 
+A referência de alteração que afeta BAL informa `obligationStart` quando
+quem consulta pode decidir o encaminhamento. O plantão editado pode receber
+a contagem se o novo intervalo respeitar esse início e os demais limites.
+A justificativa do BAL conserva o texto digitado no rascunho. A revisão e o
+registro oficial usam o mesmo texto após remover espaços e quebras de linha
+das extremidades.
+
+Ao reenviar a mesma tentativa para `/api/schedules/residence`, um recibo
+confirmado é devolvido antes da verificação da versão. Um conflito de versão
+comprovado permite adotar a referência atual e revisar os valores mantidos.
+
 `/api/balances` consulta a atribuição, elegibilidade, obrigações, destinos e
 eventos. Comandos configuram o regime por paciente, solicitam/decidem
 adiamento,
@@ -1178,6 +1323,13 @@ Aceitar/recusar revalida os fatos e não recebe paciente ou papel editáveis.
 O envelope da prévia contém `data` e `actorId`, identidade Auth consultada
 no servidor, ou `null` no acesso anônimo. `ready` e `accepted` exigem sessão
 confirmada e prévia completa; os demais estados não incluem dados do paciente.
+Uma conta Auth confirmada pode consultar seu convite antes de ter um perfil
+no aplicativo. A prévia mantém a consulta somente para leitura. Se a primeira
+decisão for recusa, a transação registra a identidade necessária à autoria da
+auditoria e encerra o convite. O aceite é a ação que pode conceder vínculo.
+Somente `accepted` traz `patientId`, e apenas para o destinatário com vínculo
+ativo em residência ativa. A função exibida nesse estado é a do vínculo
+vigente. A resposta da prévia usa `private, no-store`.
 `POST /api/invitations/accept` admite `expectedActor` para vincular a intenção
 à conta que conferiu a prévia. Se a conta mudou, retorna `VERSION_CONFLICT`
 sem executar a decisão. O parâmetro é opcional por compatibilidade; toda
@@ -1186,7 +1338,11 @@ A interface confirma aceite ou recusa pela prévia atual do mesmo token,
 sem deduzir o vínculo de uma resposta HTTP bem-sucedida. Uma tentativa incerta
 conserva token, conta e decisão na aba; a recuperação consulta o resultado e
 só reenvia explicitamente a mesma intenção quando o convite ainda está pronto.
-Respostas atrasadas não substituem outro convite ou outra conta.
+São permitidas duas recuperações, inclusive após recarregar a aba. Respostas
+atrasadas ficam restritas ao convite e à conta da consulta de origem.
+A ação Selecionar residência revalida o aceite e chama `POST /api/context`
+com `careRecipientId` e `expectedActor`. O servidor verifica a identidade antes
+de selecionar o contexto local. A navegação aguarda a confirmação do destino.
 Retry de aprovação já confirmada retorna recuperação explícita por reemissão;
 o administrador local pode rotacionar o link existente, sem novo convite.
 
@@ -1391,13 +1547,28 @@ as anteriores e exigem motivo ao alterar a suficiência.
 
 ## Preparação de residência e guias
 
-GET /api/residence-preparations é exclusivo do modo global autorizado. Lista
-preparações próprias em páginas de20, com page/query; id consulta a preparação
-e seu resumo de metadados. POST aceita save/create/discard com revisão esperada
-e chave da mesma intenção. Salvar não cria paciente. Criar exige identidade,
-fuso explícito, administração inicial confirmada e responsáveis distintos;
-isActive=false é preservado. Não concede vínculo ao criador global. Resumo,
-contagens e progresso não aprovam estoque físico nem liberação operacional.
+O fluxo de residência exige o modo global autorizado. Em
+`POST /api/residence-preparations`, a ação `review` confere o e-mail
+da conta inicial ativa e confirmada, sem gravar o preenchimento. A ação
+`create` recebe os campos revisados, a identidade da conta conferida e a
+chave da tentativa. O banco revalida conta e autorização e grava, na mesma
+transação, a residência, o vínculo inicial explícito, a configuração do
+guia, a preparação oficial e o comprovante. O estado inativo e o fuso
+escolhidos são preservados. Os responsáveis pela continuidade são distintos.
+
+`GET /api/residence-preparations?attempt=<uuid>` consulta o resultado da
+própria tentativa. A ausência de comprovante ainda pode indicar uma
+requisição em andamento. Ao recuperar sem o formulário, a ação `resolve`
+consulta sob o mesmo bloqueio da criação e encerra uma chave ausente, de
+modo que uma requisição atrasada dessa tentativa seja recusada.
+O identificador e o número de tentativas de recuperação são suficientes
+para reabrir a consulta na mesma aba.
+
+A criação só concede o vínculo selecionado para a administração inicial.
+Pessoas planejadas seguem os fluxos de convite e aceite. As tarefas locais
+dependem do vínculo e das capacidades do paciente. Resumo, contagens e
+progresso descrevem registros e deixam as conferências físicas em seus
+fluxos próprios.
 
 GET /api/guides deriva papel/contexto vigentes no banco. POST progress recebe
 expectedScope, revisão, etapa, escolha e chave; troca de contexto rejeita o
@@ -1405,11 +1576,10 @@ comando sem gravar no paciente seguinte. Recuperação conserva a mesma intenç�
 POST configure exige administração local do paciente e revisão da configuração.
 Progresso próprio e apresentação opcional não alteram SCI ou permissões.
 O cliente confere paciente, papel e escopo da resposta antes de exibir tarefas;
-os links preservam o paciente consultado. A preparação usa o diretório global
-paginado de contas, com trinta pessoas por página e contagem conferida, sem
-tratar uma coleção parcial como lista completa. Alterar uma preparação não
-reconsulta esse diretório; falha de consulta tem recuperação própria e não
-apaga os campos já preenchidos.
+os links preservam o paciente consultado. A criação pesquisa responsáveis
+por nome no diretório global, com trinta pessoas por página e contagem
+conferida. Cada pesquisa só oferece opções após ler todas as suas páginas.
+A falha de uma página preserva os campos preenchidos e permite nova consulta.
 
 GET /api/guides/preparation exige careRecipientId único, UUID válido, sessão
 Auth, paciente selecionado e competência local de preparação. A RPC
@@ -1428,11 +1598,17 @@ reconsulta sem comandos.
 GET /api/contingencies exige careRecipientId e process, com filtros únicos e
 sessão/vínculo local vigentes. Processos: REQ, COM, ENT, RETURN, BAL,
 CONSUMPTION_FAMILY e CONSUMPTION_TEAM. A competência contingency.read e a
-leitura do domínio são revalidadas no banco. view=cases lista páginas de25;
-id consulta a declaração e seus atos imutáveis. view=references recebe
-query/page e consulta somente referências emitidas do mesmo paciente e
-processo, separando entrega e devolução. Respostas são privadas/no-store;
-identidade global sem vínculo local não concede acesso.
+leitura do domínio são revalidadas no banco. `view=cases` entrega páginas
+de 25 resumos. O filtro `query` pesquisa identificador do dossiê,
+referência física, descrição, complementos e código digital vinculado
+antes de paginar. A resposta identifica o filtro e o escopo consultados.
+Com `id`, a consulta traz os fatos, os atos imutáveis e as evidências
+confirmadas daquele dossiê. `pendingEvidence` indica a existência de
+um envio em quarentena, sem expor dados do arquivo ou da tentativa.
+A projeção de conferência também considera quem complementou o dossiê.
+`view=references` pesquisa referências
+emitidas do mesmo paciente e processo e distingue entrega de devolução.
+As respostas usam `private, no-store`. A leitura depende do vínculo local.
 
 POST recebe expectedActorId, careRecipientId, process, idempotencyKey e
 action. A API compara a conta esperada com Auth antes da RPC. record recebe
@@ -1440,23 +1616,35 @@ content; supplement também exige id e expectedRevision. Datas, fuso, pessoas,
 referência, quantidade e custódia desconhecidos são null explícito. Materiais
 selecionados levam reviewedUnit/reviewedDecimals; o banco confere e bloqueia
 a referência durante a gravação e preserva nome/unidade/precisão próprios.
+Uma referência de catálogo alterada retorna `CONTINGENCY_MATERIAL_CHANGED`
+(409). A interface consulta o catálogo e exige confirmação explícita da
+unidade e da precisão atuais. Quantidades conhecidas dos materiais afetados
+precisam ser informadas novamente. Quantidades desconhecidas continuam nulas.
 Zero não vira desconhecido. Autor, papel e instante digitais vêm do servidor,
 separados das pessoas e do instante físico declarados. Comunicações manuais
 registram estado declarado, sem enviar aviso ou produzir ciência.
 
 needs_clarification/link_existing exigem id, expectedRevision, reason e
-targetId (null no esclarecimento). A decisão exige contingency.review e
-outra identidade, que não tenha criado ou complementado a declaração.
+targetId (null no esclarecimento). link_existing exige também
+`targetVersion`, a revisão do registro digital escolhido. A decisão exige
+contingency.review e outra identidade, que não tenha criado ou complementado
+a declaração.
 Vínculo só alcança registro existente do mesmo processo/paciente e congela
 referência e evidências prontas; envio em quarentena impede concluir. Não
 cria documento, débito/crédito, ciência, recebimento ou assinatura pessoal.
-Histórico não é editado ou apagado; concorrência rejeita a revisão obsoleta.
+O banco compara as revisões do dossiê e do registro digital sob bloqueio.
+`CONTINGENCY_REFERENCE_CHANGED` (409) exige nova escolha após comparação.
+`CONTINGENCY_REFERENCE_UNAVAILABLE` (409) preserva o escopo da busca quando
+a referência escolhida está ausente ou é incompatível. O histórico é imutável.
 
 view=recovery e attemptKey consultam o resultado próprio; action=resolve
 confere a mesma intenção. Se ainda não há resultado, encerra aquela chave
 atomicamente, impedindo um comando tardio; resultado confirmado é recuperado.
 Somente a referência oficial, sem conteúdo do formulário, pode ficar em
-sessionStorage por conta/paciente. Esta recuperação não cria rascunho comum.
+sessionStorage por conta/paciente. A interface oferece até duas consultas
+de recuperação na declaração, no complemento e na conferência. Fornece os
+detalhes da tentativa para suporte ao atingir esse limite. O preenchimento
+fica na tela até sair ou receber a confirmação.
 
 /api/attachments também aceita contingencyId como pai exclusivo, em lugar
 de documentId/movementId. Usa a mesma reserva, quarentena, sanitização,
@@ -1563,13 +1751,33 @@ Auth e autorização nativos continuam obrigatórios. O GET original não muda
 sua forma. POST /api/push/session revoga somente as
 inscrições vinculadas à sessão corrente. Todos os comandos conferem origem/CSRF.
 
-`POST /api/push/test` recebe deviceId, idempotencyKey e contextReference. Exige
-conta/sessão atuais, inscrição do próprio aparelho e envio habilitado. O banco
-limita um novo teste por minuto/aparelho; repetição da mesma chave consulta o
-recibo sem duplicar transporte. Apenas RPCs de serviço obtêm a inscrição e
-concluem o resultado, após revalidar sessão, conta, pausa, revogação e chave.
-O teste é genérico e separado dos avisos operacionais. Aceite do serviço não
-comprova exibição no celular. Resultado incerto não causa reenvio automático.
+No fluxo L4, POST e PATCH enviam `idempotencyKey`. PATCH também envia a versão
+consultada em `expectedVersion` e aceita `rename` com `label` para a inscrição
+vinculada à sessão. Pausar, retomar e revogar continuam disponíveis para os
+aparelhos da própria conta. Uma versão divergente é recusada com
+`VERSION_CONFLICT`. Renomear mantém consentimento e fila de entrega.
+
+`GET /api/push/devices?attempt=<uuid>` consulta o comprovante da conta e sessão
+que iniciaram a ação. O resultado tem ID e ação, sem dados da inscrição, ou
+`data: null` quando não existe comprovante visível. Consultar mantém o nome,
+o consentimento e a duração da pausa registrados. O fluxo oferece até duas
+consultas antes de apresentar os detalhes para suporte.
+
+`POST /api/push/test` recebe `deviceId`, `idempotencyKey` e `contextReference`.
+Exige conta/sessão atuais, inscrição própria e envio habilitado. Apenas as
+RPCs de serviço obtêm a inscrição e concluem o resultado, após revalidar
+sessão, conta, pausa, revogação e chave. O banco impõe um minuto entre testes
+do aparelho e estende o intervalo conforme o `Retry-After` do provedor.
+Quando recusa um novo envio pelo intervalo, responde 429 e `Retry-After`.
+
+`GET /api/push/test?deviceId=…&idempotencyKey=…` consulta o comprovante da mesma
+sessão, inclusive com envio desabilitado. Retorna `data: null` para referência
+sem comprovante visível. O resultado inclui estado, horário, código seguro e
+próximo horário permitido, sem endpoint ou chaves de inscrição. Esta consulta
+dispensa a reserva e o envio. O limite de 30 segundos é da interface. O
+usuário pode fazer duas consultas de recuperação da mesma tentativa.
+Aceite do serviço confirma apenas a resposta do provedor. O teste é genérico
+e fica separado dos avisos operacionais.
 
 GET /api/push/open?id recebe UUID opaco, exige Auth e revalida destinatário,
 vínculo e recurso antes de construir um caminho interno. Não marca visto ou
@@ -1598,6 +1806,14 @@ POST aceita somente paciente, pessoa, expectedRevision textual bigint,
 outcome checked/not_confirmed, note e idempotencyKey. Auth/CSRF, limite8k e
 schema estrito; autor/instante não são entradas. Revisão/intenção obsoleta409;
 replay conserva registro. Nenhum papel ou validação externa é concedido.
+
+`POST /api/admin/credentials/result` recebe `careRecipientId`, `subjectId`,
+`expectedRevision` textual e `idempotencyKey`. A operação usa a mesma
+autorização da conferência e o mesmo lock por autor e chave. O estado
+`recorded` devolve o comprovante da conferência. O estado `closed` confirma
+que a tentativa foi encerrada sem registro e impede que um envio atrasado
+conclua a gravação com a mesma chave. Uma gravação com chave encerrada recebe
+HTTP 410. A consulta retorna `private, no-store` e usa limite de 2 KB.
 [Contrato e provas](../audits/D/D-B/PROFESSIONAL_CREDENTIALS.md).
 
 ## Preparações de programação e plantões BAL
@@ -1838,13 +2054,40 @@ global em páginas de 30 contas, com total e ordenação por nome e ID.
 Exige administração global ativa. A consulta sem profilePage preserva
 o contrato anterior. [Implementação](../audits/D/D-B/ADMINISTRATIVE_PREPARATIONS.md).
 
+## Central técnica e decisões
+
+`GET /api/operations` consulta observações, incidentes e a política do
+ambiente selecionado. Exige sessão atual em modo de administração global.
+Os filtros de ambiente, página e estado são explícitos. Com `incident`,
+a consulta por ID retorna a situação vigente no mesmo ambiente, inclusive
+depois de o incidente mudar de estado ou de página. `history=incident`
+com `incident`, ou `history=policy`, entrega o histórico paginado.
+As respostas são privadas e evitam cache.
+
+`POST /api/operations` aceita `acknowledge`, `resolve` e `configure`.
+O comando compara a revisão esperada e registra decisão e comprovante
+na mesma transação. A interface envia a conta esperada para impedir que uma
+troca de sessão atribua a decisão a outra pessoa. Um conflito 409 exige nova
+leitura e adoção da situação atual antes de confirmar.
+
+A ação `recover` recebe somente ambiente, conta esperada e chave da
+tentativa. No banco, a consulta usa o mesmo bloqueio do comando pelo autor
+e pela chave. Ela devolve o comprovante existente ou encerra uma chave
+sem registro para impedir chegada tardia. A chave é exclusiva do ambiente
+consultado. A interface oferece duas consultas de recuperação e guarda apenas
+metadados da tentativa oficial na aba. A decisão de acompanhamento ou política
+registra um ato técnico. As ações de infraestrutura continuam em suas
+entradas próprias.
+
 ## Consulta técnica de tentativas
 
-GET /api/operations/notifications exige sessão e modo global vigentes.
-source aceita notices ou web_push; page é inteiro de 1 a 100000. A página
-tem 20 registros. Parâmetros desconhecidos são recusados. A RPC autenticada
-operations_notification_attempts revalida a autoridade global no banco.
-Anon e service_role não recebem execute dessa consulta.
+`GET /api/operations/notifications` exige sessão e modo global vigentes.
+`source` aceita `notices` ou `web_push`. `page` é inteiro de 1 a 100000.
+A página tem 20 registros. Parâmetros repetidos ou desconhecidos são
+recusados. O servidor confere fonte e página da resposta, que é privada e
+sem cache. A RPC autenticada `operations_notification_attempts` revalida
+a autoridade global no banco. `anon` e `service_role` ficam sem permissão
+de execução.
 
 O envelope identifica environment=shared_database, fonte, página, total e
 instante. Cada registro tem referência técnica, canal, estado, criação,
@@ -1857,7 +2100,9 @@ conclusão, resultado e presença de erro. A fila legada informa
 historyCoverage=last_result_only e não fabrica tentativas anteriores.
 Referência ou instante ausente não comprova ausência de envio. O cliente
 confere fonte, página, cobertura e formato antes de apresentar o resultado.
-Falha de consulta não equivale a lista vazia ou entrega confirmada.
+O painel de detalhe usa o registro confirmado da página atual e expõe a
+referência técnica que o responsável pode usar na conciliação. Falhas de
+consulta bloqueiam a abertura de detalhes até uma nova resposta válida.
 
 A consulta não altera fila, inscrição, incidente, ciência ou estoque. Não há
 POST nessa entrada nem concessão implícita de poderes familiares ao suporte.
@@ -2023,3 +2268,84 @@ continua em `purchaseProgress.identificationPending`. A identificação por
 `resolve_purchase_extra` pode ocorrer depois da compra ou chegada de outras
 linhas. Ela conserva o ID da ficha e acrescenta a linha autorizada sem criar
 compra ou lançamento de estoque.
+
+## Regras e destinatários por residência
+
+`GET /api/admin/residence-rules` recebe `patientId`, `mode` e `purpose`.
+As finalidades `alertRule` e `notificationRecipient` retornam configurações
+e escolhas permitidas para o contexto ativo. `selection` e `option`,
+quando enviados juntos, selecionam material e custódia ou conta e canal.
+A resposta inclui a configuração atual e o hash exigido na confirmação.
+O estado `destinationVerified` confirma somente o destino cadastrado.
+Consentimento, autorização e disponibilidade do transporte são aplicados
+nas rotinas de aviso.
+
+`POST /api/admin/residence-rules` recebe `patientId`, `mode`, `purpose`
+e uma chave `key`. Para `alertRule` e `notificationRecipient`, `intent`
+contém `fields` e `referenceHash`. Para `settings` e `notification_rule`,
+`intent` contém `change` e `expectedVersion`. Essas duas finalidades usam
+o contrato versionado de governança. A atuação local registra a alteração
+oficial. A atuação global registra uma proposta para decisão local.
+
+Envie `intent: null` para consultar a mesma chave após perda da resposta.
+`recorded` devolve a referência oficial daquela tentativa, mesmo após
+outra atualização. `closed` confirma a ausência sob lock e impede que essa
+chave seja aplicada depois pela rota revisada. A consulta revalida autoria,
+residência, modo e finalidade. Limites por custódia disparam a avaliação
+de alertas e preservam todos os movimentos de estoque.
+
+## Confirmações do catálogo
+
+`GET /api/admin/catalogue-actions` recebe `patientId`, `mode`, `purpose`
+e `targetId` quando a ação seleciona um cadastro existente. Nesta etapa,
+o cadastro, a edição e a adoção consultam a referência vigente. A resposta
+inclui os modelos elegíveis ou o cadastro, as unidades disponíveis e a
+indicação de unidade preservada pelo histórico.
+
+`POST /api/admin/catalogue-actions` recebe esse escopo, `key` e
+`intent: { fields, referenceHash }`. O banco revalida a referência e a
+autorização antes de gravar o ato e seu resultado na mesma transação.
+Cada chave identifica a própria tentativa. A consulta com `intent: null`
+devolve `recorded` e o resultado original, ou `closed` quando a consulta
+confirma ausência e encerra a chave. A atuação global sobre material
+registra uma proposta sujeita a decisão local. Os campos ficam no formulário
+até a confirmação. A tentativa guarda o hash e a referência oficial.
+
+A finalidade `identity` usa `GET /api/catalog/identities` para consultar
+a situação, os saldos autorizados, o sucessor e os atos oficiais. O mesmo
+`POST /api/admin/catalogue-actions` confirma a decisão com o motivo e
+o hash retornado pela leitura. Uma mudança de referência exige nova
+conferência. O banco grava o ato e seu resultado de forma transacional e
+preserva a identidade, as custódias e o histórico. A consulta da tentativa
+própria continua autorizada enquanto houver leitura da residência. Novos
+atos exigem `catalog.manage`.
+
+Unidade, precisão e apresentação consultam o mesmo endpoint de referência.
+`selection` identifica o material em `unit_configure` e
+`presentation_create`. `presentation_edit` usa o ID da apresentação e a
+referência devolve seu material e a versão atual. O registro da alteração
+usa a intenção revisada, preservando as versões antigas de equivalência.
+Os endpoints de leitura de apresentações continuam recebendo o código
+textual, inclusive seus zeros iniciais, e fornecem as versões oficiais.
+Os endpoints anteriores de preparação continuam disponíveis aos
+consumidores do contrato anterior durante a transição do L4.
+
+### Histórico oficial do material
+
+`GET /api/catalog/history` recebe `careRecipientId`, `productId` e
+`page` opcional. API e banco exigem autorização de catálogo no vínculo
+local ativo. A resposta traz a identidade atual, até 20 eventos oficiais
+e a indicação de próxima página. Cada evento tem referência estável,
+autoria preservada quando disponível, instante e os campos registrados
+antes e depois da alteração.
+
+O histórico reúne cadastro, situação e versões de apresentação. A
+migration `20261124232228` começa a registrar os campos de cadastro.
+Atos de situação e versões de embalagem já preservados continuam
+consultáveis. Uma definição de embalagem capturada antes do versionamento
+pode aparecer como referência anterior de uma edição real.
+
+O histórico possui acesso próprio e dados de atos confirmados. A consulta
+técnica em `/api/admin/catalogue-preparations/receipts` e a recuperação
+por chave em `/api/admin/catalogue-actions` continuam com o escopo de
+titular, residência e modo definidos em seus contratos.

@@ -10,6 +10,10 @@ export const requisitionRelatedDocuments = z.array(z.object({
 }));
 export type RequisitionRelatedDocuments = z.infer<typeof requisitionRelatedDocuments>;
 
+export const relatedRequisitionOpening = z.object({
+  data: z.object({ requiresDialog: z.boolean() }),
+});
+
 const line = z.object({
   id: z.string().uuid(), product_id: z.string().min(1),
   name_snapshot: z.string(), unit_snapshot: z.string(), category_snapshot: z.string(),
@@ -47,6 +51,8 @@ const requisition = z.object({ data: z.object({
   progress: z.object({ version: z.number().int().positive(), materialIdentity: z.string().min(1) }).nullish(),
   requisition_items: z.array(z.object({
     id: z.uuid(), product_name_snapshot: z.string().nullable(), custom_name: z.string().nullable(),
+    product_id: z.string().nullable().optional(),
+    resolution: z.object({ product_id: z.string().min(1) }).nullish(),
     urgent: z.boolean(), unit_snapshot: z.string().nullable(),
     current_stock: z.union([z.string(), z.number()]).nullable(),
     stock_observation: z.enum(["observed", "unknown", "unfilled", "legacy_unclassified"]).nullable(),

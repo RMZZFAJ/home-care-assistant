@@ -12,7 +12,7 @@ import type { CreationDraftContent, DraftKind } from "@/types/creation-drafts";
 import type { StockObservation } from "@/types/requisition";
 import { CreationDraftPanel } from "./creation-draft-panel";
 
-const draftLabels: Partial<Record<DraftKind, string>> = { REQ: "Requisição", COM: "Compra", ENT: "Entrega", BAL: "Balanço" };
+const draftLabels: Partial<Record<DraftKind, string>> = { REQ: "Requisição", COM: "Compra", ENT: "Entrega", BAL: "Balanço", CONSUMPTION: "Consumo" };
 
 function draftStockText(value: string | number | null, mode?: StockObservation, unit?: string) {
   if (mode === "unknown") return "Não sei informar";
@@ -41,6 +41,10 @@ function DraftMaterials({ content }: { content: CreationDraftContent | null }) {
     listed = content.materials.filter(material => content.counts[material.id] || linked.has(material.id))
       .map(material => ({ id: material.id, name: material.name,
         details: quantity(content.counts[material.id], material.unit) }));
+  } else if ("consumption" in content) {
+    listed = content.consumption.lines.map(material => ({
+      id: material.productId, name: material.name, details: quantity(material.quantity, material.unit),
+    }));
   } else if ("fields" in content) {
     listed = content.materials.map(material => ({ id: material.id, name: material.name,
       details: quantity(content.fields[material.id + ":transferQuantity"], material.unit) }));

@@ -3,27 +3,64 @@ import { exactQuantity } from "./exact-quantity";
 import { quantity } from "@/lib/quantity";
 import {reminderReportReceipt} from "./notification-reference";
 
-const lines = z
-  .array(
-    z
-      .object({
-        productId: z.string().min(1).max(120),
-        quantity: exactQuantity.refine(
-          (value) => quantity(value).gt(0),
-          "Informe quantidade positiva.",
-        ),
-        unit: z.string().min(1).max(30).optional(),
-      })
-      .strict(),
-  )
-  .max(100)
-  .refine(
-    (value) =>
-      new Set(value.map((line) => line.productId)).size === value.length,
-    "Não repita materiais.",
-  );
+const material = z.object({
+  productId: z.string().min(1).max(120),
+  quantity: exactQuantity.refine(value => quantity(value).gt(0), "Informe quantidade positiva."),
+  unit: z.string().min(1).max(30).optional(),
+}).strict();
+const uniqueMaterials = (value: { productId: string }[]) =>
+  new Set(value.map(line => line.productId)).size === value.length;
+const lines = z.array(material).max(100).refine(uniqueMaterials, "Não repita materiais.");
+const shortageLines = z.array(material.extend({ quantity: material.shape.quantity.nullish() }))
+  .max(100).refine(uniqueMaterials, "Não repita materiais.");
 const text = z.string().trim().min(3).max(2000);
 const version = z.number().int().positive().max(2147483647);
+export const consumptionStatus = z.enum(["reported", "confirmed", "rejected", "recorded", "cancelled", "communicated"]);
+const teamId = z.uuid().transform(value => value.toLowerCase());
+const teamScope = { careRecipientId: teamId, idempotencyKey: teamId };
+export const teamConsumptionAttempt = z.object(teamScope).strict();
+const teamObservation = z.string().trim().max(2000).optional();
+const teamRevision = { reportId: teamId, expectedVersion: version, reason: z.string().trim().min(3).max(1000) };
+const requiredLines = lines.refine(value => value.length > 0, "Selecione pelo menos um material.");
+const teamAction = z.enum(["issue", "correct", "cancel", "shortage"]);
+const referenceHash = z.string().regex(/^[a-f0-9]{64}$/);
+export const teamConsumptionProducts = z.array(z.string().min(1).max(120)).min(1).max(100)
+  .refine(items => items.length === new Set(items).size, "Selecione cada material uma única vez.");
+const teamMaterialBalance = z.object({
+  productId: z.string().min(1), name: z.string().min(1), unit: z.string().min(1),
+  decimals: z.number().int().min(0).max(6), quantity: z.string().regex(/^-?\d+(?:\.\d+)?$/),
+  updatedAt: z.iso.datetime({ offset: true }).nullable(),
+});
+export const teamConsumptionReference = z.object({
+  careRecipientId: z.uuid(), referenceHash,
+  materials: z.array(teamMaterialBalance).min(1).max(100),
+}).strict();
+export const teamCorrectionReference = teamConsumptionReference.extend({
+  reportId: teamId, version, observation: z.string(),
+  materials: z.array(teamMaterialBalance).min(1).max(200),
+  original: z.array(z.object({
+    productId: z.string().min(1), name: z.string().min(1), unit: z.string().min(1),
+    quantity: exactQuantity,
+  })).min(1).max(100),
+}).strict();
+export const teamConsumptionCommand = z.discriminatedUnion("action", [
+  z.object({
+    ...teamScope, action: z.literal("issue"), observation: teamObservation, reminderId: teamId.optional(), flowSubmissionId: teamId.optional(),
+    lines: requiredLines, referenceHash, draft: z.object({ id: teamId, revision: version }).strict().optional(),
+  }).strict().refine(value => !value.flowSubmissionId || (!!value.draft && !value.reminderId),
+    "A sugestão do WhatsApp precisa do próprio preenchimento."),
+  z.object({ ...teamScope, ...teamRevision, action: z.literal("correct"), observation: teamObservation, lines: requiredLines,
+    // Older pending commands can still reconcile their original receipt. A new correction requires a reference in the RPC.
+    referenceHash: referenceHash.optional(),
+  }).strict(),
+  z.object({ ...teamScope, ...teamRevision, action: z.literal("cancel") }).strict(),
+  z.object({ ...teamScope, action: z.literal("shortage"), observation: text, repeatedReportId: teamId.optional(), reminderId: teamId.optional(), lines: shortageLines.optional() }).strict(),
+]);
+export const teamConsumptionReceipt = z.object({
+  id: z.uuid(), operationId: z.uuid(), careRecipientId: z.uuid(), idempotencyKey: z.uuid(),
+  action: teamAction, version, recordedAt: z.iso.datetime({ offset: true }),
+}).strict();
+export type TeamConsumptionCommand = z.infer<typeof teamConsumptionCommand>;
 export const consumptionCommand = z.discriminatedUnion("action", [
   z
     .object({
@@ -86,7 +123,7 @@ export function consumptionResultConfirmed(value:unknown,packet:Exclude<z.infer<
 export const consumptionFilters = z
   .object({
     kind: z.enum(["consumption", "shortage"]).optional(),
-    status: z.enum(["reported", "confirmed", "rejected"]).optional(),
+    status: consumptionStatus.optional(),
     search: z.string().trim().max(120).default(""),
     from: z.iso.date().optional(),
     to: z.iso.date().optional(),
@@ -100,10 +137,16 @@ export const consumptionFilters = z
 const consumptionPage = z.object({
   data: z.array(z.object({
     id: z.uuid(), care_recipient_id: z.uuid(), kind: z.enum(["consumption", "shortage"]),
-    location: z.enum(["FAMILY", "CARE_TEAM"]), status: z.enum(["reported", "confirmed", "rejected"]),
+    location: z.enum(["FAMILY", "CARE_TEAM"]), status: consumptionStatus,
+    workflow_mode: z.enum(["legacy", "direct", "shortage"]).optional(),
     body: z.string(), created_at: z.iso.datetime({ offset: true }), version: z.number().int().positive(),
     reported_by: z.uuid(), reported_name: z.string().nullable(),
-  })).max(20),
+    code: z.string().regex(/^(?:CON|FAL)-[A-F0-9]{8}$/).optional(),
+    materials: z.array(z.object({
+      productId: z.string().min(1), name: z.string().min(1),
+      quantity: z.string().max(64).regex(/^\d+(?:\.\d+)?$/).nullable(), unit: z.string().nullable(),
+    })).max(100).optional(),
+  }).refine(row => row.kind === "shortage" || !row.materials?.some(line => line.quantity === null))).max(20),
   next: consumptionCursor.nullable(),
 });
 export function parseConsumptionPage(value: unknown, patient: string) {

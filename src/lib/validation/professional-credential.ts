@@ -5,11 +5,13 @@ export const credentialRevision = z.string().regex(/^[1-9][0-9]{0,18}$/)
 const instant = z.string().datetime({ offset: true });
 const values = z.object({ fullName: z.string().nullable(), category: z.string().nullable(), registration: z.string().nullable(), state: z.string().nullable() }).strict();
 export const credentialOutcome = z.enum(["checked", "not_confirmed"]);
-export const credentialReviewInput = z.object({
+export const credentialReviewReference = z.object({
   careRecipientId: z.string().uuid(), subjectId: z.string().uuid(),
-  expectedRevision: credentialRevision, outcome: credentialOutcome,
-  note: z.string().trim().max(600), idempotencyKey: z.string().uuid(),
-}).strict().superRefine((value, context) => {
+  expectedRevision: credentialRevision, idempotencyKey: z.string().uuid(),
+}).strict();
+export const credentialReviewInput = credentialReviewReference.extend({
+  outcome: credentialOutcome, note: z.string().trim().max(600),
+}).superRefine((value, context) => {
   if (value.outcome === "not_confirmed" && value.note.length < 6)
     context.addIssue({ code: "custom", path: ["note"], message: "Informe o que ainda precisa ser conferido." });
 });
@@ -25,10 +27,13 @@ export const professionalCredentialRead = z.object({
   history: z.array(review).max(20), nextCursor: credentialCursor.nullable(),
 }).strict();
 export const credentialReviewResult = z.object({ id: z.string().uuid(), credentialRevision, recordedAt: instant, replayed: z.boolean() }).strict();
+export const credentialReviewRecovery = z.discriminatedUnion("state", [
+  credentialReviewReference.extend({ state: z.literal("recorded"), outcome: credentialReviewResult }),
+  credentialReviewReference.extend({ state: z.literal("closed"), outcome: z.null() }),
+]);
 export type CredentialReviewInput = z.infer<typeof credentialReviewInput>;
 export type ProfessionalCredential = z.infer<typeof professionalCredentialRead>;
 export type CredentialCursor = z.infer<typeof credentialCursor>;
-export type CredentialReviewResult = z.infer<typeof credentialReviewResult>;
 export function parseProfessionalCredential(value: unknown, patientId: string, subjectId: string): ProfessionalCredential {
   const result = professionalCredentialRead.safeParse(value);
   if (!result.success || result.data.patientId !== patientId || result.data.subjectId !== subjectId)

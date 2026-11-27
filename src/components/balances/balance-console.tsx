@@ -1,5 +1,6 @@
 "use client";
-import { ActionButton, DefinitionGrid, LoadingIndicator, Pill } from "@/components/ui/controls";
+import { ActionButton, LoadingIndicator, Pill, type PillTone } from "@/components/ui/controls";
+import { Icon } from "@/components/ui/icon";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
@@ -12,7 +13,6 @@ import {
   api,
   can,
   Notice,
-  Workspace,
   type WorkspaceContext,
 } from "@/components/workspace";
 import {
@@ -23,40 +23,27 @@ import { formatZonedDate } from "@/lib/schedules/time";
 import { documentEventLabel } from "@/lib/notifications/event-labels";
 import { weekDays, type BalanceEditor } from "./balance-forms";
 import { DeferralFacts } from "./balance-deferral-facts";
+import { BalanceCountPermissionAction, BalanceCountPermissionHistory } from "./balance-count-permissions";
 import { useBalanceWorkspace } from "./use-balance-workspace";
+import { balanceRegimeSettingsHref } from "@/lib/schedules/routes";
+import { balanceCountHref } from "@/lib/balances/routes";
 import type { DocumentSummary } from "@/types/documents";
-import { BalanceNotice } from "@/components/notifications/balance-notice";
+import { BalancePreviewCard } from "./balance-preview-card";
+import { BalanceHistoryRow } from "./balance-history";
+import { canManageBalanceRegime } from "./balance-regime-settings";
 
-export function BalanceConsole() {
-  return (
-    <Workspace title="Balanços e plantões">
-      {(context) =>
-        context.patient && can(context, "bal.read") ? (
-          <>
-            <BalanceNotice
-              key={"reference:" + context.patient.id}
-              context={context}
-            />
-            <FollowUp
-              key={"followup:" + context.patient.id}
-              context={context}
-            />
-          </>
-        ) : (
-          <Notice error>
-            Selecione um paciente com permissão para consultar balanços.
-          </Notice>
-        )
-      }
-    </Workspace>
-  );
+function balanceDateTitle(instant: string, timeZone?: string) {
+  return "Balanço de " + new Intl.DateTimeFormat("pt-BR", {
+    timeZone: timeZone ?? "America/Sao_Paulo", day: "numeric", month: "long",
+  }).format(new Date(instant));
 }
-function FollowUp({ context }: { context: WorkspaceContext; }) {
+
+export function BalanceFollowUp({ context }: { context: WorkspaceContext; }) {
   const router = useRouter(),
     params = useSearchParams(),
     recountDocumentId = params.get("recountDocumentId");
   const patient = context.patient!,
-    { data, error: loadError, reload } = useBalanceWorkspace(patient.id);
+    { data, checkedAt, error: loadError, reload } = useBalanceWorkspace(patient.id);
   const [editor, setEditor] = useState<BalancePreparationSelection | null>(
     null,
   ),
@@ -68,12 +55,10 @@ function FollowUp({ context }: { context: WorkspaceContext; }) {
     null,
   );
   const resultRef = useRef<HTMLHeadingElement>(null);
-  const [now] = useState(() => Date.now());
   const formatBrazilDate = (value: string | null) =>
     formatZonedDate(value, data?.regime?.timezone);
-  const family = ["family", "admin"].includes(patient.role),
-    approve = family && can(context, "bal.defer.approve"),
-    configure = family && can(context, "bal.schedule.manage");
+  const approve = can(context, "bal.defer.approve"),
+    configure = canManageBalanceRegime(context);
   const requestedDeferral = params.get("purpose") === "request_deferral";
   useEffect(() => {
     if (!requestedDeferral || !data) return;
@@ -113,9 +98,7 @@ function FollowUp({ context }: { context: WorkspaceContext; }) {
   }, [patient.id, data?.events.length]);
   const open = (value: BalanceEditor, target: HTMLElement) => {
     const purpose =
-      value.kind === "configure"
-        ? "configure"
-        : value.kind === "assign"
+      value.kind === "assign"
           ? "assign"
           : value.kind === "decide"
             ? value.approve
@@ -125,9 +108,7 @@ function FollowUp({ context }: { context: WorkspaceContext; }) {
               ? "defer"
               : "request_deferral";
     const targetResourceId =
-      value.kind === "configure"
-        ? patient.id
-        : value.kind === "assign"
+      value.kind === "assign"
           ? value.cycleId
           : value.kind === "decide"
             ? value.deferral.id
@@ -146,157 +127,120 @@ function FollowUp({ context }: { context: WorkspaceContext; }) {
     ) : (
       <LoadingIndicator label="Carregando balanços" />
     );
-  const a = data.eligibility.assignment,
-    current = data.assignments.find((s) => s.id === a?.id),
-    cycle = data.obligations.find((o) => o.state === "pending")?.cycle_id;
+  const { assignment: a, admission, available, documentId, dueAt } = data.eligibility;
+  const current = data.assignments.find((row) => row.id === a?.id);
+  const pending = data.obligations.find((row) => row.state === "pending");
+  const timezone = data.regime?.timezone;
+  const request = data.countPermissions?.request;
+  const deferral = a && data.deferrals.find(row => row.assignment_id === a.id && row.status === "pending" && row.decisionContext?.sourceCurrent);
+  const assignmentEvent = pending && data.events.find(event => event.cycle_id === pending.cycle_id
+    && ["bal.cycle.unassigned", "bal.cycle.assigned", "bal.cycle.invalidated", "bal.cycle.missed"].includes(event.action));
+  const requiresChoice = assignmentEvent?.action === "bal.cycle.unassigned" && assignmentEvent.details.ambiguous === true;
+  const scheduledType = data.types.find(type => type.id === data.regime?.shift_type_id);
+  const optionalCount = !data.regime?.activated_at && !a && !pending && can(context, "bal.count");
+  let state = "Responsável definido", tone: PillTone = "neutral", note: string | undefined;
+  if (admission) {
+    state = "Contagem em andamento";
+    tone = "success";
+    note = "A contagem iniciada no plantão pode ser concluída no mesmo preenchimento.";
+  } else if (request?.alreadyPending) {
+    state = "Autorização solicitada";
+    tone = "warning";
+    note = "Aguarde a decisão da administração para fazer a contagem.";
+  } else if (deferral) {
+    state = "Adiamento solicitado";
+    tone = "warning";
+    note = "O prazo atual permanece vigente até a aprovação do pedido.";
+  } else if (available) {
+    state = "Disponível para contar";
+    tone = "success";
+  } else if (a && Date.parse(a.ends_at) <= checkedAt) {
+    state = "Prazo encerrado";
+    tone = "danger";
+  } else if (a?.kind === "deferred") {
+    state = "Adiado";
+    tone = "info";
+  } else if (a && Date.parse(a.starts_at) > checkedAt) {
+    state = "Programado";
+    note = "O responsável pode iniciar a contagem quando a janela do plantão abrir.";
+  } else if (a && a.professional_id !== context.userId) {
+    state = "Outro responsável";
+  }
+  if (a?.kind === "recount" && !note) note = "A recontagem mantém a ficha e as contagens já registradas.";
   const canRequest =
     can(context, "bal.defer.request") &&
     (a?.professional_id === context.userId || patient.role === "supervisor");
+  const canDeferDirectly = approve && a?.professional_id !== context.userId;
+  const countAction = a && (available || admission) ? (
+    <Link href={balanceCountHref(patient.id, documentId, a)} className="ui-button ui-button-primary" prefetch={false}>
+      <Icon name="checklist" width={17} height={17} />{admission ? "Continuar contagem" : "Fazer balanço"}
+    </Link>
+  ) : request ? (
+    <>
+      {request.alreadyPending ? <a className="ui-button ui-button-secondary" href="#balance-count-permission-history">Ver pedido de autorização</a> : null}
+      <BalanceCountPermissionAction key={request.assignmentId} entry={{ request }} context={context} timezone={timezone} onChanged={reload} />
+    </>
+  ) : null;
   return (
     <div className="hca-form-stack hca-balance-console">
       {loadError ? <Notice error>{loadError}</Notice> : null}
       {error ? <Notice error>{error}</Notice> : null}
       {message ? <Notice>{message}</Notice> : null}
-      <section className="ui-card">
-        <div className="hca-section-heading">
-          <h2 ref={resultRef} tabIndex={-1}>
-            Programação do balanço
-          </h2>
-          <Pill tone={data.enabled ? "accent" : "neutral"}>
-            {data.enabled ? "Ativa neste paciente" : "Processamento desativado"}
-          </Pill>
-        </div>
-        {data.regime ? (
-          <DefinitionGrid items={[
-            { label: "Dia do balanço", value: weekDays[data.regime.weekday] },
-            { label: "Plantão configurado", value: data.types.find(t => t.id === data.regime?.shift_type_id)?.name ?? "Plantão configurado" },
-            { label: "Fuso", value: data.regime.timezone },
-          ]} />
-        ) : (
-          <p>O novo regime ainda não foi ativado neste paciente.</p>
-        )}
-        <div className="hca-toolbar">
+      <section className="hca-balance-previews" id="responsabilidade-balanco" aria-labelledby="balance-forecasts-heading">
+        <div className="hca-balance-list-heading">
+          <h2 id="balance-forecasts-heading" ref={resultRef} tabIndex={-1}>Previstos</h2>
           {configure ? (
-            <ActionButton
-              onClick={(e) => open({ kind: "configure" }, e.currentTarget)}
-              disabled={!data.types.some((t) => t.is_active)}
-            >
-              Configurar dia e plantão
-            </ActionButton>
-          ) : null}
-          {!data.regime?.activated_at &&
-            !data.eligibility.assignment &&
-            can(context, "bal.count") ? (
-            <Link
-              href="/fichas/bal"
-              className="ui-button ui-button-primary"
-              prefetch={false}
-            >
-              Nova contagem
+            <Link className="ui-button ui-button-secondary hca-balance-settings-link" href={balanceRegimeSettingsHref(patient.id)}
+              aria-label="Programação dos balanços" title="Programação dos balanços" prefetch={false}>
+              <Icon name="settings" width={18} height={18} />
             </Link>
           ) : null}
-          {can(context, "schedule.read.own") ||
-            can(context, "schedule.read.team") ? (
-            <Link
-              href="/escalas"
-              className="ui-button ui-button-secondary"
-              prefetch={false}
-            >
-              Consultar escala
-            </Link>
-          ) : null}
-          <Link
-            href="/historico?type=BAL"
-            className="ui-button ui-button-secondary"
-            prefetch={false}
-          >
-            Histórico de fichas BAL
-          </Link>
         </div>
-        {configure && !data.types.length ? (
-          <p>Cadastre os tipos de plantão na escala antes da ativação.</p>
-        ) : null}
-      </section>
-      <section className="ui-card">
-        <h2>Responsabilidade atual</h2>
         {a ? (
-          <>
-            <DefinitionGrid items={[
-              { label: "Profissional designado", value: current?.professional_name ?? "Profissional designado" },
-              { label: "Tipo de plantão", value: current?.type_name ?? "Tipo não disponível" },
-              { label: "Período da atribuição", value: formatBrazilDate(a.starts_at) + " → " + formatBrazilDate(a.ends_at), wide: true },
-            ]} />
-            <p>
-              {data.eligibility.available
-                ? "Contagem disponível para você durante este plantão."
-                : new Date(a.starts_at).getTime() > now
-                  ? "Contagem agendada; aguarde o início do plantão."
-                  : a.professional_id !== context.userId
-                    ? "A contagem é exclusiva da pessoa designada."
-                    : "O prazo ou a atribuição mudou. Aguarde a atualização formal."}
-            </p>
-            <div className="hca-toolbar">
-              {data.eligibility.available ? (
-                <Link
-                  href={
-                    "/fichas/bal" +
-                    (data.eligibility.documentId
-                      ? "?documentId=" +
-                      data.eligibility.documentId +
-                      (a.kind === "recount" ? "&recount=true" : "")
-                      : "")
-                  }
-                  className="ui-button ui-button-primary"
-                  prefetch={false}
-                >
-                  Fazer balanço
-                </Link>
-              ) : null}
-              {approve || canRequest ? (
-                <ActionButton
-                  onClick={(e) =>
-                    open({ kind: "defer", family: approve }, e.currentTarget)
-                  }
-                >
-                  {approve
-                    ? "Adiar com decisão familiar"
-                    : "Solicitar adiamento"}
-                </ActionButton>
-              ) : null}
-            </div>
-          </>
-        ) : cycle ? (
-          <>
-            <Notice error>
-              Pendência sem plantão único elegível. Nenhuma pessoa foi escolhida
-              automaticamente.
-            </Notice>
-            {configure ? (
-              <ActionButton
-                onClick={(e) =>
-                  open(
-                    { kind: "assign", cycleId: cycle, allowDeferral: approve },
-                    e.currentTarget,
-                  )
-                }
-              >
-                Resolver atribuição
+          <BalancePreviewCard key={a.id} title={balanceDateTitle(a.starts_at, timezone)} patientName={patient.display_name}
+            state={state} tone={tone} note={note} responsible={current?.professional_name ?? "Profissional designado"}
+            shiftType={current?.type_name} startsAt={a.starts_at} endsAt={a.ends_at} dueAt={dueAt ?? a.ends_at} timezone={timezone}
+            primary={countAction}>
+            {deferral ? (
+              <a className="ui-button ui-button-secondary" href={"#adiamento-" + deferral.id}>Ver pedido de adiamento</a>
+            ) : canDeferDirectly || canRequest ? (
+              <ActionButton onClick={event => open({ kind: "defer", family: canDeferDirectly }, event.currentTarget)}>
+                {canDeferDirectly ? "Adiar com decisão familiar" : "Solicitar adiamento"}
               </ActionButton>
             ) : null}
-          </>
+          </BalancePreviewCard>
+        ) : pending ? (
+          <BalancePreviewCard key={pending.cycle_id} title={balanceDateTitle(pending.original_start, timezone)} patientName={patient.display_name}
+            state={requiresChoice ? "Escolha necessária" : "Sem responsável"} tone="warning"
+            responsible={requiresChoice ? "Mais de um profissional elegível" : "Responsável a definir"}
+            dueAt={pending.effective_due} timezone={timezone}
+            note="Nenhuma pessoa foi escolhida automaticamente. Uma decisão autorizada é necessária."
+            primary={configure ? (
+              <ActionButton onClick={event => open({ kind: "assign", cycleId: pending.cycle_id, allowDeferral: approve }, event.currentTarget)}>
+                Resolver atribuição
+              </ActionButton>
+            ) : null} />
+        ) : optionalCount ? (
+          <BalancePreviewCard title="Balanço de estoque" patientName={patient.display_name} state="Facultativo" tone="info"
+            responsible="Sem programação semanal" note="A ficha registra o responsável quando a contagem é emitida."
+            primary={<Link href="/fichas/bal" className="ui-button ui-button-primary" prefetch={false}>Nova contagem</Link>} />
         ) : data.recountRecovery.total > 0 ? (
-          <Notice>
-            Há reconto aguardando nova designação autorizada. Consulte as
-            pendências abaixo.
-          </Notice>
+          <Notice>Há reconto aguardando nova designação autorizada. Consulte as pendências abaixo.</Notice>
         ) : (
-          <p>
-            {data.regime?.enabled
-              ? "Não há contagem pendente neste momento. A próxima obrigação será disponibilizada no plantão programado."
-              : "Não há contagem pendente neste momento. O regime semanal não está ativo; as contagens anteriores permanecem no histórico."}
-          </p>
+          <p className="hca-balance-empty">Não há contagem pendente neste momento.</p>
         )}
+        {data.regime?.enabled && scheduledType ? (
+          <div className="hca-balance-next">
+            <Icon name="calendar" width={20} height={20} />
+            <div>
+              <strong>Programação semanal</strong>
+              <small>{weekDays[data.regime.weekday]} · {scheduledType.name}</small>
+            </div>
+            <Pill>Ativa</Pill>
+          </div>
+        ) : null}
       </section>
+      <BalanceCountPermissionHistory rows={data.countPermissions?.history ?? []} context={context} timezone={data.regime?.timezone} onChanged={reload} />
       {data.recountRecovery.total > 0 ? (
         <section
           className="ui-card space-y-3"
@@ -351,6 +295,7 @@ function FollowUp({ context }: { context: WorkspaceContext; }) {
             <article
               key={d.id}
               className="hca-record"
+              id={"adiamento-" + d.id}
               aria-label="Pedido de adiamento"
             >
               <div className="hca-record-main">
@@ -402,6 +347,31 @@ function FollowUp({ context }: { context: WorkspaceContext; }) {
                 </div>
               ) : null}
             </article>
+          ))}
+        </section>
+      ) : null}
+      {documents.length ? (
+        <section className="hca-balance-previews" aria-label="Contagens em revisão">
+          <div className="hca-balance-list-heading"><h2>Em acompanhamento</h2></div>
+          {documents.map((d) => (
+            <div key={d.id} className="hca-balance-review">
+              <BalanceHistoryRow row={d} href={"/documentos/" + d.id} />
+              {data.obligations.some(
+                (o) =>
+                  o.count_document_id === d.id || o.regularized_by === d.id,
+              ) &&
+                !a &&
+                (can(context, "bal.approve.family") ||
+                  can(context, "bal.approve.supervisor")) ? (
+                <Link
+                  href={recountHref(patient.id, d.id)}
+                  className="ui-button ui-button-secondary"
+                  prefetch={false}
+                >
+                  Designar reconto
+                </Link>
+              ) : null}
+            </div>
           ))}
         </section>
       ) : null}
@@ -460,60 +430,6 @@ function FollowUp({ context }: { context: WorkspaceContext; }) {
           </p>
         )}
       </section>
-      {documents.length ? (
-        <section className="ui-card">
-          <h2>Contagens em revisão</h2>
-          {documents.map((d) => (
-            <div key={d.id} className="hca-record">
-              <Link href={"/documentos/" + d.id} prefetch={false}>
-                {d.code} · consultar revisão
-              </Link>
-              {data.obligations.some(
-                (o) =>
-                  o.count_document_id === d.id || o.regularized_by === d.id,
-              ) &&
-                !a &&
-                (can(context, "bal.approve.family") ||
-                  can(context, "bal.approve.supervisor")) ? (
-                <Link
-                  href={recountHref(patient.id, d.id)}
-                  className="ui-button ui-button-secondary"
-                  prefetch={false}
-                >
-                  Designar reconto
-                </Link>
-              ) : null}
-            </div>
-          ))}
-        </section>
-      ) : null}
-      <details className="ui-card">
-        <summary>Atribuições e atrasos históricos</summary>
-        {data.assignments.map((s) => (
-          <p key={s.id}>
-            {s.professional_name} · {formatBrazilDate(s.starts_at)} →{" "}
-            {formatBrazilDate(s.ends_at)} ·{" "}
-            {s.status === "missed"
-              ? "Não realizado no prazo"
-              : s.status === "deferred"
-                ? "Adiado por decisão familiar"
-                : s.status === "invalidated"
-                  ? "Escala alterada; atribuição preservada no histórico"
-                  : s.status === "counted"
-                    ? "Contagem registrada"
-                    : "Designado"}
-          </p>
-        ))}
-      </details>
-      <details className="ui-card">
-        <summary>Eventos auditáveis</summary>
-        {data.events.map((event) => (
-          <p key={event.id}>
-            {formatBrazilDate(event.created_at)} ·{" "}
-            {documentEventLabel(event.action)} · {event.reason}
-          </p>
-        ))}
-      </details>
       {recountDocumentId ? (
         <BalanceRecountAssignment
           context={context}
@@ -563,4 +479,33 @@ function FollowUp({ context }: { context: WorkspaceContext; }) {
       ) : null}
     </div>
   );
+}
+
+const assignmentStatus: Record<string, string> = {
+  missed: "Não realizado no prazo",
+  deferred: "Adiado por decisão familiar",
+  invalidated: "Escala alterada; atribuição preservada no histórico",
+  counted: "Contagem registrada",
+  active: "Designado",
+};
+
+export function BalanceAssignmentHistory({ patientId }: { patientId: string }) {
+  const { data, error, reload } = useBalanceWorkspace(patientId);
+  const format = (value: string) => formatZonedDate(value, data?.regime?.timezone);
+  if (error) return <Notice error>{error} <ActionButton onClick={reload}>Tentar novamente</ActionButton></Notice>;
+  if (!data) return <LoadingIndicator label="Consultando atribuições de balanço" />;
+  return <>
+    <details className="ui-card">
+      <summary>Atribuições e atrasos históricos</summary>
+      {data.assignments.length ? data.assignments.map(assignment => <p key={assignment.id}>
+        {assignment.professional_name} · {format(assignment.starts_at)} → {format(assignment.ends_at)} · {assignmentStatus[assignment.status] ?? "Atribuição registrada"}
+      </p>) : <p>Nenhuma atribuição registrada.</p>}
+    </details>
+    <details className="ui-card">
+      <summary>Eventos auditáveis</summary>
+      {data.events.length ? data.events.map(event => <p key={event.id}>
+        {format(event.created_at)} · {documentEventLabel(event.action)} · {event.reason}
+      </p>) : <p>Nenhum evento registrado.</p>}
+    </details>
+  </>;
 }

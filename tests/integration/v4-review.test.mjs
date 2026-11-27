@@ -262,8 +262,8 @@ test("V4 review: collective science and dashboard archive filters match authorit
     new Set(list.data.map((d) => d.status)),
     new Set(["completed", "completed_science_pending"]),
   );
-  async function archiveCapability(enabled) {
-    await rpc(admin, "configure_patient_access", {
+  async function archiveCapability(enabled, operator = admin) {
+    return operator.rpc("configure_patient_access", {
       p_patient: patient,
       p_kind: "capability",
       p_change: {
@@ -272,10 +272,10 @@ test("V4 review: collective science and dashboard archive filters match authorit
         enabled,
       },
       p_key: randomUUID(),
-      p_version: await settingsVersion(admin, patient),
+      p_version: await settingsVersion(operator, patient),
     });
   }
-  await archiveCapability(false);
+  assert.ifError((await archiveCapability(false)).error);
   assert.equal(
     (await rpc(admin, "operational_tasks", { p_patient: patient }))
       .archivePending,
@@ -303,7 +303,9 @@ test("V4 review: collective science and dashboard archive filters match authorit
     (await rpc(admin, "requisition_progress", { p_id: ids[0] })).archivedAt,
     null,
   );
-  await archiveCapability(null);
+  assert.equal((await archiveCapability(null)).error?.code, "42501");
+  const secondLocalAdministrator = await actor("global", patient);
+  assert.ifError((await archiveCapability(null, secondLocalAdministrator)).error);
   const review = await rpc(admin, "document_archive_reference", { p_document: ids[0] });
   const reason = "Arquivamento manual de cenário fictício revisado";
   assert.equal((await admin.rpc("archive_requisition", { p_id: ids[0], p_reason: reason })).error?.code, "PT409");

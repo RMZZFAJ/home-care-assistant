@@ -13,8 +13,10 @@ type DetectorConstructor = {
 };
 export function BarcodeScanner({
   onRead,
+  catalogue = false,
 }: {
   onRead: (code: string) => Promise<void> | void;
+  catalogue?: boolean;
 }) {
   const [active, setActive] = useState(false);
   const [error, setError] = useState("");
@@ -103,14 +105,17 @@ export function BarcodeScanner({
           if (cancelled) controls.stop();
         }
       } catch (reason) {
-        if (!cancelled)
+        if (!cancelled) {
+          if (catalogue) setActive(false);
           setError(
             reason instanceof DOMException && reason.name === "NotAllowedError"
-              ? "Acesso à câmera negado. Você pode permitir nas configurações ou digitar o código."
+              ? catalogue ? "Acesso à câmera negado. Use uma imagem da embalagem ou digite o código."
+                : "Acesso à câmera negado. Você pode permitir nas configurações ou digitar o código."
               : reason instanceof Error
                 ? reason.message
                 : "Não foi possível abrir a câmera.",
           );
+        }
       }
     }
     void start();
@@ -120,7 +125,7 @@ export function BarcodeScanner({
       stopDecoder?.();
       stream?.getTracks().forEach((track) => track.stop());
     };
-  }, [active, receive]);
+  }, [active, catalogue, receive]);
   async function readImage(file?: File) {
     if (!file) return;
     if (!file.type.startsWith("image/") || file.size > 10 * 1024 * 1024) {
@@ -156,16 +161,16 @@ export function BarcodeScanner({
           }}
         >
           <Icon name="camera" />
-          {active ? "Encerrar câmera" : "Ler código de barras"}
+          {active ? "Encerrar câmera" : catalogue ? "Usar câmera" : "Ler código de barras"}
         </button>
         <label className={buttonClass}>
           <Icon name="upload" />
-          Ler de uma foto
+          {catalogue ? "Selecionar imagem" : "Ler de uma foto"}
           <input
             className="sr-only"
             type="file"
             accept="image/*"
-            capture="environment"
+            capture={catalogue ? undefined : "environment"}
             onChange={(event) => void readImage(event.target.files?.[0])}
           />
         </label>
@@ -201,7 +206,7 @@ export function BarcodeScanner({
             onChange={(event) =>
               setManual(event.target.value.replace(/\D/g, ""))
             }
-            placeholder="EAN / GTIN / UPC"
+            placeholder={catalogue ? "8 a 14 dígitos" : "EAN / GTIN / UPC"}
           />
         </label>
         <button
@@ -213,7 +218,7 @@ export function BarcodeScanner({
             receive(manual);
           }}
         >
-          Identificar
+          {catalogue ? "Consultar código" : "Identificar"}
         </button>
       </div>
       {lastRead ? (

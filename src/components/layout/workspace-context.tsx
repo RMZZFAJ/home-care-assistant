@@ -11,6 +11,7 @@ import { WorkspaceShell } from "./workspace-shell";
 import { WorkspaceAccessRevoked } from "./workspace-access-revoked";
 import { usePwa } from "@/components/pwa/pwa-provider";
 import { recentDestinationKey } from "@/lib/auth/recent-destination";
+import { WorkspaceSync } from "@/components/workspace-sync";
 
 export type ContextData = {
   documentContext?: { id: string; patientId: string; displayName: string; type: string; } | null;
@@ -57,9 +58,10 @@ export function WorkspaceProvider({ children }: { children: ReactNode; }) {
   const requestedPatientId = searchParams.get("careRecipientId");
   const documentId = /^\/(?:historico|fichas|documentos)\/([0-9a-f-]{36})(?:\/arquivos)?$/.exec(pathname)?.[1];
   const segment = pathname.split("/")[2];
+  const publicVerification = pathname === "/verificar" || pathname.startsWith("/verificar/");
   const publicPage = ["/login", "/recuperar-senha", "/convites/aceitar"].includes(pathname)
     || pathname === "/acesso/continuar"
-    || pathname === "/verificar" || pathname.startsWith("/verificar/") || Boolean(segment && demoDocuments[segment]);
+    || publicVerification || Boolean(segment && demoDocuments[segment]);
   const [data, setData] = useState<ContextData | null>(null);
   const [patientId, setPatientId] = useState("");
   const [loadingRead, setLoadingRead] = useState(true);
@@ -98,12 +100,17 @@ export function WorkspaceProvider({ children }: { children: ReactNode; }) {
           if (sessionStorage.getItem("hca:patient") === lost.patientId) sessionStorage.removeItem("hca:patient");
         } catch { /* Stored destinations are optional. */ }
       }
-      setData((current) => ({
-        ...result.data, patients: result.data.patients.map((row) => {
-          const previous = current?.patients.find((item) => item.id === row.id);
-          return previous && JSON.stringify(previous) === JSON.stringify(row) ? previous : row;
-        })
-      }));
+      setData(current => {
+        if (!current) return workspace;
+        const previousPatients = new Map(current.patients.map(row => [row.id, row]));
+        return {
+          ...workspace,
+          patients: workspace.patients.map(row => {
+            const previous = previousPatients.get(row.id);
+            return previous && JSON.stringify(previous) === JSON.stringify(row) ? previous : row;
+          }),
+        };
+      });
       setPatientId((current) => {
         if (result.data.activeContext?.mode === "patient") return result.data.activeContext.care_recipient_id ?? "";
         let remembered = "";
@@ -141,11 +148,17 @@ export function WorkspaceProvider({ children }: { children: ReactNode; }) {
   useEffect(() => {
     if (publicPage) return;
     const refresh = () => { void load(); };
+    const revalidateAccess = (event: Event) => {
+      const { signal, waitFor } = (event as CustomEvent<{ signal: AbortSignal; waitFor: (read: Promise<void>) => void }>).detail;
+      waitFor(load(signal));
+    };
     window.addEventListener("hca:profile-updated", refresh);
     window.addEventListener("hca:data-changed", refresh);
+    window.addEventListener("hca:revalidate-access", revalidateAccess);
     return () => {
       window.removeEventListener("hca:profile-updated", refresh);
       window.removeEventListener("hca:data-changed", refresh);
+      window.removeEventListener("hca:revalidate-access", revalidateAccess);
     };
   }, [load, publicPage]);
   const selectProfile = async (id: string | null) => {
@@ -176,9 +189,16 @@ export function WorkspaceProvider({ children }: { children: ReactNode; }) {
     } finally { if (!navigationScopeRef.current) setSelectionStage(null); }
   };
   const selectPatient = async (id: string) => {
-    if (data?.activeContext?.mode === "patient") { await selectProfile(id); return; }
-    setPatientId(id);
+    if (data?.activeContext?.mode !== "global" || !data.globalAdministrationAllowed) {
+      await selectProfile(id);
+      return;
+    }
     try { sessionStorage.setItem("hca:patient", id); } catch { /* No authority in storage. */ }
+    if (pathname !== "/admin" && pathname !== "/configuracoes") {
+      router.push("/admin?careRecipientId=" + encodeURIComponent(id));
+      return;
+    }
+    setPatientId(id);
     const url = new URL(window.location.href);
     url.searchParams.set("careRecipientId", id);
     window.history.replaceState(null, "", url);
@@ -200,7 +220,9 @@ export function WorkspaceProvider({ children }: { children: ReactNode; }) {
   useOperationActivity(!publicPage && !revoked && (loading || selecting), selectionStage === null
     ? issuing ?? { title: "Preparando seu espaço", detail: "Estamos conferindo sua sessão e os acessos autorizados." }
     : { title: "Mudando de paciente", stage: selectionStage, steps: selectionSteps, detail: "Aguarde a confirmação da operação." });
-  return <Context value={state}>{publicPage ? <>{notices}<div inert={blocked}>{children}</div></>
-    : revoked ? <WorkspaceAccessRevoked key={scope} />
+  return <Context value={state}>
+    {!publicPage && data ? <WorkspaceSync key={data.userId} userId={data.userId} /> : null}
+    {publicPage ? <>{publicVerification ? null : notices}<div inert={blocked}>{children}</div></>
+    : revoked ? <WorkspaceAccessRevoked key={scope} userId={revocation.userId} patientId={revocation.patientId} />
     : <WorkspaceShell showOnboarding={pathname === "/"}>{children}</WorkspaceShell>}</Context>;
 }

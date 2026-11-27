@@ -2,17 +2,20 @@ import { randomUUID } from "node:crypto";
 import { setup, actor, rpc, fixtures } from "./v4-fixtures.mjs";
 import { sql, sqlLiteral } from "../../scripts/test-environment.mjs";
 
+/** @param {{ policy?: string, requirement?: string, quantity?: string, draft?: boolean, balanceExtras?: import('../../src/lib/validation/balance-count-extras').BalanceCountExtra[] }} [options] */
 export async function legacyBalance({
   policy = "required",
   requirement = "any",
   quantity = "0",
   draft = false,
+  balanceExtras,
 } = {}) {
   const f = await setup();
   sql(`insert into public.patient_settings(care_recipient_id) values(${sqlLiteral(f.patient)}) on conflict do nothing;
     update public.patient_settings set settings=settings||jsonb_build_object('balReview',${sqlLiteral(policy)},'balRequirement',${sqlLiteral(requirement)}) where care_recipient_id=${sqlLiteral(f.patient)};`);
   const payload = {
     lines: f.products.map((productId) => ({ productId, quantity })),
+    ...(balanceExtras === undefined ? {} : { balanceExtras }),
     notes:
       "Observação original da pessoa que contou; parecer do revisor tem autoria separada.",
   };

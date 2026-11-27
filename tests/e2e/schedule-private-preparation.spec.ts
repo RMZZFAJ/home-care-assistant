@@ -12,7 +12,9 @@ import {
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { selectContext } from "./auth-context";
 import { audit } from "./accessibility-audit";
-import { openSchedulePrivateArea } from "./schedule-private-area";
+import { openSchedulePrivateArea, openScheduleTypeSettings } from "./schedule-private-area";
+import { rpc } from "../integration/v4-fixtures.mjs";
+import { shiftWorker } from "../integration/shift-fixtures.mjs";
 test.setTimeout(150_000);
 async function peerContext(browser: Browser) {
   const use = test.info().project.use;
@@ -27,9 +29,9 @@ async function peerContext(browser: Browser) {
     serviceWorkers: "block",
   });
 }
-async function login(page: Page, patient: string) {
+async function login(page: Page, patient: string, email = fixtures.adminA.email) {
   await page.goto("/login");
-  await page.getByLabel("E-mail", { exact: true }).fill(fixtures.adminA.email);
+  await page.getByLabel("E-mail", { exact: true }).fill(email);
   await page.getByLabel("Senha", { exact: true }).fill(fixturePassword);
   await page.getByRole("button", { name: "Entrar", exact: true }).click();
   await expect(
@@ -38,7 +40,7 @@ async function login(page: Page, patient: string) {
   await selectContext(page, patient);
   await page.goto("/escalas");
   await expect(
-    page.getByRole("heading", { name: "Escalas e plantões", exact: true }),
+    page.getByRole("heading", { name: "Plantões e balanços", exact: true }),
   ).toBeVisible();
 }
 const dialog = (page: Page, name = "Tipo de plantão") =>
@@ -48,6 +50,7 @@ const panel = (page: Page) =>
 const button = (page: Page, name: string) =>
   page.getByRole("button", { name, exact: true });
 async function open(page: Page, series = false, own = false) {
+  if (!series) await openScheduleTypeSettings(page);
   if (own) {
     await openSchedulePrivateArea(page);
     await button(
@@ -70,13 +73,21 @@ async function open(page: Page, series = false, own = false) {
 }
 async function fillType(page: Page, name: string) {
   await dialog(page).getByLabel("Nome do plantão", { exact: true }).fill(name);
-  await dialog(page).getByLabel("Início local", { exact: true }).fill("07:00");
-  await dialog(page)
-    .getByLabel("Duração em minutos", { exact: true })
-    .fill("720");
+  await dialog(page).getByLabel("Horas de trabalho", { exact: true }).fill("12");
+  await dialog(page).getByLabel("Horas de descanso", { exact: true }).fill("36");
   await dialog(page)
     .getByLabel("Disponível para novas escalas", { exact: true })
     .uncheck();
+}
+async function configuredFixture(purpose?: "schedule_series_create") {
+  const f = await fixture(purpose);
+  await rpc(f.admin, "set_schedule_residence", {
+    p_patient: f.patient,
+    p_body: { timezone: purpose ? "UTC" : "America/Sao_Paulo", dayStart: "07:00", nightStart: "19:00" },
+    p_version: null,
+    p_key: crypto.randomUUID(),
+  });
+  return f;
 }
 async function review(page: Page) {
   await button(page, "Revisar alteração").click();
@@ -92,17 +103,18 @@ test("tipo privado retoma entre sessões,compara CAS e continua consultável sem
   page,
   browser,
 }, info) => {
-  const f = await fixture(),
+  const f = await configuredFixture(),
+    owner = await shiftWorker(f.patient, "admin"),
     before = scheduleNativeFacts(f),
     documents = scheduleDocumentFacts(f);
-  await login(page, f.patient);
+  await login(page, f.patient, owner.email);
   await open(page);
   await fillType(page, "Tipo inicial privado");
   await privateSaved(page, 1);
   const context = await peerContext(browser),
     peer = await context.newPage();
   try {
-    await login(peer, f.patient);
+    await login(peer, f.patient, owner.email);
     await open(peer);
     await expect(panel(peer)).toContainText("Tipo inicial privado");
     await expect(dialog(peer).locator("input,select,textarea")).toHaveCount(0);
@@ -143,12 +155,32 @@ test("tipo privado retoma entre sessões,compara CAS e continua consultável sem
     });
     expect(scheduleNativeFacts(f)).toBe(before);
     expect(scheduleDocumentFacts(f)).toBe(documents);
+    await peer.close();
+    await page.bringToFront();
     sql(
-      `insert into public.capability_overrides(care_recipient_id,subject_user,capability,enabled) values(${q(f.patient)},${q(fixtures.adminA.id)},'schedule.types.manage',false)`,
+      `insert into public.capability_overrides(care_recipient_id,subject_user,capability,enabled) values(${q(f.patient)},${q(owner.id)},'schedule.types.manage',false)`,
     );
     await page.reload();
+    await openScheduleTypeSettings(page);
+    // The drawer makes its background inert. Count the underlying headings after opening it too.
+    const typesHeading = page.locator("h2[id='schedule-types-heading']");
+    await expect(typesHeading).toHaveCount(1);
     await expect(button(page, "Novo tipo de plantão")).toHaveCount(0);
-    await open(page, false, true);
+    await openSchedulePrivateArea(page);
+    const resume = button(page, "Retomar meu tipo de plantão");
+    await expect(resume).toBeEnabled();
+    await resume.focus();
+    const ownRead = page.waitForResponse(response => {
+      const url = new URL(response.url());
+      return response.request().method() === "GET" && url.pathname === "/api/schedules/preparations" &&
+        url.searchParams.get("purpose") === "shift_type_create" && url.searchParams.get("careRecipientId") === f.patient;
+    }, { timeout: 35_000 });
+    await resume.press("Enter");
+    const response = await ownRead;
+    expect(response.status()).toBe(200);
+    expect((await response.json()).data.revision).toBe(3);
+    await expect(button(page, "Atualizar preenchimento privado")).toBeEnabled();
+    await expect(typesHeading).toHaveCount(1);
     await expect(panel(page)).toContainText("Minha edição antes do conflito");
     await expect(button(page, "Continuar rascunho")).toBeDisabled();
     await expect(dialog(page).locator("input,select,textarea")).toHaveCount(0);
@@ -170,15 +202,15 @@ test("tipo privado retoma entre sessões,compara CAS e continua consultável sem
 test("programação parcial sobrevive ao recarregamento e publicação perdida é consultada sem escrita nem exposição após revogação", async ({
   page,
 }) => {
-  const f = await fixture("schedule_series_create"),
+  const f = await configuredFixture("schedule_series_create"),
     before = scheduleDocumentFacts(f);
   await login(page, f.patient);
   await open(page, true);
   const form = dialog(page, "Programação de plantões");
   await form
-    .getByLabel("Observações", { exact: true })
+    .getByLabel("Informação adicional", { exact: true })
     .fill("Minha programação pessoal preservada");
-  await form.getByLabel("Primeiro dia / âncora", { exact: true }).fill("");
+  await form.getByLabel("Data do plantão", { exact: true }).fill("");
   await button(page, "Guardar rascunho e fechar").click();
   await expect(form).toHaveCount(0);
   await page.reload();
@@ -189,7 +221,7 @@ test("programação parcial sobrevive ao recarregamento e publicação perdida �
   await expect(form.locator("input,select,textarea")).toHaveCount(0);
   await button(page, "Continuar rascunho").click();
   await expect(
-    form.getByLabel("Primeiro dia / âncora", { exact: true }),
+    form.getByLabel("Data do plantão", { exact: true }),
   ).toHaveValue("");
   await form
     .getByLabel("Profissional", { exact: true })
@@ -197,11 +229,10 @@ test("programação parcial sobrevive ao recarregamento e publicação perdida �
   await form
     .getByLabel("Tipo de plantão", { exact: true })
     .selectOption(f.typ.id);
-  await form.getByLabel("Repetição", { exact: true }).selectOption("once");
   await form
-    .getByLabel("Primeiro dia / âncora", { exact: true })
+    .getByLabel("Data do plantão", { exact: true })
     .fill("2100-03-01");
-  await form.getByLabel("Fuso horário", { exact: true }).selectOption("UTC");
+  await expect(form.getByLabel("Fuso horário", { exact: true })).toHaveCount(0);
   let posts = 0;
   await page.route("**/api/schedules/preparations/commit", async (route) => {
     posts++;
@@ -258,7 +289,7 @@ test("conclusão em outra sessão preserva edição original após reconheciment
   page,
   browser,
 }) => {
-  const f = await fixture();
+  const f = await configuredFixture();
   await login(page, f.patient);
   await open(page);
   await fillType(page, "Minha edição ainda não publicada");
@@ -332,14 +363,74 @@ test("conclusão em outra sessão preserva edição original após reconheciment
     await context.close();
   }
 });
+test("encerra tentativa antiga sem recibo e recupera o encerramento após recarregar", async ({ page }) => {
+  const f = await configuredFixture("schedule_series_create");
+  const saved = await saveSchedulePreparation(f);
+  const original = {
+    careRecipientId: f.patient,
+    purpose: f.purpose,
+    draftCommit: { id: saved.id, revision: saved.revision },
+    command: f.command,
+    idempotencyKey: crypto.randomUUID(),
+  };
+  const storageKey = `hca:schedule-creation:${fixtures.adminA.id}:${f.patient}:${f.purpose}`;
+  await login(page, f.patient);
+  await page.evaluate(({ storageKey, value }) => {
+    sessionStorage.setItem(storageKey, JSON.stringify(value));
+  }, { storageKey, value: { mode: "pending", userId: fixtures.adminA.id, packet: original, fields: f.fields } });
+  await open(page, true, true);
+  await expect(button(page, "Recuperar a mesma confirmação")).toHaveCount(0);
+  await button(page, "Conferir tentativa sem reenviar").click();
+  const keys: string[] = [];
+  await page.route("**/api/schedules/preparations/recovery", async (route) => {
+    const { resolutionKey, packet } = route.request().postDataJSON();
+    expect(packet).toEqual(original);
+    keys.push(resolutionKey);
+    if (keys.length === 1) {
+      const result = await route.fetch();
+      expect(result.ok()).toBe(true);
+      expect((await result.json()).data.reason).toBe("advanced_revision");
+      await route.abort("failed");
+    } else await route.continue();
+  });
+  await button(page, "Encerrar esta tentativa e preservar meus campos").click();
+  await expect(button(page, "Recuperar encerramento da tentativa")).toBeEnabled();
+  const late = await f.admin.rpc("commit_schedule_preparation", {
+    ...f.scope,
+    p_id: saved.id,
+    p_expected: saved.revision,
+    p_key: original.idempotencyKey,
+    p_body: original.command,
+  });
+  expect(late.error?.code).toBe("PT409");
+  expect(JSON.parse(scheduleNativeFacts(f)).series).toHaveLength(0);
+
+  await page.reload();
+  await open(page, true, true);
+  await button(page, "Recuperar encerramento da tentativa").click();
+  await button(page, "Manter minha edição para novo preenchimento").click();
+  expect(keys).toEqual([keys[0], keys[0]]);
+  expect(keys[0]).toMatch(/^[a-f\d-]{36}$/i);
+  await button(page, "Adotar horários da residência").click();
+  const editor = dialog(page, "Programação de plantões");
+  await expect(editor.getByLabel("Informação adicional", { exact: true })).toHaveValue("Texto pessoal fictício");
+  await expect(editor.getByLabel("Data do plantão", { exact: true })).toHaveValue("2100-03-01");
+  await review(page);
+  await button(page, "Confirmar gravação").click();
+  await expect(page.getByText("Programação de plantões registrada.", { exact: true })).toBeVisible();
+  expect(JSON.parse(scheduleNativeFacts(f)).series).toHaveLength(1);
+});
+
 test("mudança do tipo prova tentativa não aplicada sem alterar revisão privada e exige adoção explícita", async ({
   page,
 }) => {
-  const f = await fixture("schedule_series_create");
+  const f = await configuredFixture("schedule_series_create");
   await saveSchedulePreparation(f);
   await login(page, f.patient);
   await open(page, true);
   await button(page, "Continuar rascunho").click();
+  await expect(dialog(page, "Programação de plantões").getByLabel("Fuso horário", { exact: true })).toHaveCount(0);
+  await button(page, "Adotar horários da residência").click();
   let posts = 0;
   await page.route("**/api/schedules/preparations/commit", async (route) => {
     posts++;
@@ -375,7 +466,7 @@ test("mudança do tipo prova tentativa não aplicada sem alterar revisão privad
     "Adotar versão atual do tipo, mantendo meu preenchimento",
   ).click();
   await expect(
-    dialog(page, "Programação de plantões").getByLabel("Observações", {
+    dialog(page, "Programação de plantões").getByLabel("Informação adicional", {
       exact: true,
     }),
   ).toHaveValue("Texto pessoal fictício");
@@ -386,6 +477,6 @@ test("mudança do tipo prova tentativa não aplicada sem alterar revisão privad
   const facts = JSON.parse(scheduleNativeFacts(f));
   expect(facts.series).toHaveLength(1);
   expect(facts.shifts).toHaveLength(1);
-  expect(facts.shifts[0].starts_at).toContain("09:00:00");
+  expect(facts.shifts[0].starts_at).toContain("07:00:00");
   expect(facts.series[0].notes).toBe("Texto pessoal fictício");
 });

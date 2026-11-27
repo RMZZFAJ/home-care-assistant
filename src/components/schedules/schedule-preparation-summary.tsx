@@ -20,11 +20,13 @@ export function SchedulePreparationSummary({
       <DefinitionGrid
         items={[
           { label: "Nome do plantão", value: f.name || "Ainda não preenchido" },
-          { label: "Início local", value: f.start || "Ainda não preenchido" },
-          {
-            label: "Duração em minutos",
-            value: f.duration || "Ainda não preenchido",
-          },
+          ...(f.restHours === undefined ? [
+            { label: "Início local", value: f.start || "Ainda não preenchido" },
+            { label: "Duração em minutos", value: f.duration || "Ainda não preenchido" },
+          ] : [
+            { label: "Horas de trabalho", value: f.duration ? Number(f.duration) / 60 : "Ainda não preenchido" },
+            { label: "Horas de descanso", value: f.restHours || "Ainda não preenchido" },
+          ]),
           {
             label: "Disponível para novas escalas",
             value: f.active ? "Sim" : "Não",
@@ -34,6 +36,8 @@ export function SchedulePreparationSummary({
     );
   const person = data?.professionals.find((p) => p.id === f.professionalId),
     type = data?.types.find((t) => t.id === f.shiftTypeId);
+  const timing = f.residence;
+  const timingLabel = timing?.period === "night" ? "Noturno" : "Diurno";
   return (
     <div className="hca-form-stack">
       <DefinitionGrid
@@ -68,20 +72,26 @@ export function SchedulePreparationSummary({
             }[f.recurrence],
           },
           {
-            label: "Primeiro dia / âncora",
+            label: timing && f.recurrence === "once" ? "Data do plantão" : "Primeiro dia / âncora",
             value: f.from || "Ainda não preenchido",
           },
-          {
+          ...(!timing || f.recurrence !== "once" ? [{
             label: "Válida até",
             value:
               f.recurrence === "once"
                 ? f.from || "Ainda não preenchido"
-                : f.until || "Ainda não preenchido",
-          },
+                : f.until || (timing && f.recurrence !== "dates" ? "Sem data de término" : "Ainda não preenchido"),
+          }] : []),
           {
             label: "Fuso horário",
             value: f.timezone || "Ainda não selecionado",
           },
+          ...(timing ? [{
+            label: timing.special ? "Horário especial" : "Horário da residência",
+            value: timing.special
+              ? `${timing.specialStart || "Início pendente"} às ${timing.specialEnd || "Término pendente"}`
+              : `${timingLabel} · início ${timing.period === "day" ? timing.dayStart : timing.nightStart}`,
+          }] : []),
           ...(f.recurrence === "weekly"
             ? [
                 {
@@ -100,7 +110,7 @@ export function SchedulePreparationSummary({
               ]
             : []),
           ...(f.recurrence === "cycle"
-            ? [{ label: "Regime", value: f.cycle }]
+            ? [{ label: "Regime", value: f.typeCycle ? f.typeCycle.workHours + "h × " + f.typeCycle.restHours + "h" : f.cycle }]
             : []),
           {
             label: "Observações",

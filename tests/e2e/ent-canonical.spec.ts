@@ -45,10 +45,10 @@ function watchWrites(page: Page, allowAccess = false, allowDrafts = false) {
 }
 async function captureVisible(locator: Locator, path: string) {
   await locator.evaluate(node => node.scrollIntoView({ block: "center", inline: "nearest", behavior: "instant" }));
-  expect(await locator.evaluate(node => {
+  await expect.poll(() => locator.evaluate(node => {
     const box = node.getBoundingClientRect(), x = (Math.max(0, box.left) + Math.min(innerWidth, box.right)) / 2;
     return [box.top + 12, box.bottom - 12].every(y => y > 0 && y < innerHeight && node.contains(document.elementFromPoint(x, y)));
-  }), "The actual scrolled content must be clear of fixed navigation").toBe(true);
+  }), { message: "The actual scrolled content must be clear of fixed navigation" }).toBe(true);
   await locator.screenshot({ path, animations: "disabled" });
 }
 

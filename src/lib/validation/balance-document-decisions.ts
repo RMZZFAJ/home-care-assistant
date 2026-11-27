@@ -123,6 +123,7 @@ const line = z.object({
   id,
   name: z.string(),
   unit: z.string(),
+  category: z.string().optional(),
   quantity,
   expectedQuantity: quantity.nullable(),
 });
@@ -190,7 +191,7 @@ export const balancePreparationSchema = z.object({
   code: z.string().nullable(),
   documentVersion: version,
   status: z.string(),
-  lines: z.array(line).max(1000),
+  lines: z.array(line).max(1020),
   review: review.nullable(),
   recount: recount.nullable(),
 });

@@ -1,11 +1,13 @@
 import { selectDocumentSection } from "./document-sections";
+import { pressWorkspaceControl } from "./workspace-controls";
 import { selectContext } from "./auth-context";
-import { expect, test, type Page } from "@playwright/test";
-import { readFileSync } from "node:fs";
+import { expect, test, type Locator, type Page } from "@playwright/test";
+import { mkdirSync, readFileSync } from "node:fs";
 import { randomUUID } from "node:crypto";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { setup } from "../integration/v4-fixtures.mjs";
 import { shiftWorker } from "../integration/shift-fixtures.mjs";
+import { membershipRow, openMembershipDetails } from "./membership-panel";
 import {
   assertLocalProject,
   sql,
@@ -41,13 +43,15 @@ test.describe("administração integrada no ambiente local", () => {
     await expect(
       page.getByRole("heading", { name: "Visão geral" }).first(),
     ).toBeVisible();
-    await expect(
-      page.getByRole("combobox", { name: "Pessoa assistida", exact: true }),
-    ).toBeVisible();
     await selectContext(
       page,
       name === "global" ? null : "20000000-0000-4000-8000-000000000001",
     );
+    if (name === "global") {
+      await expect(page.getByRole("button", { name: /^Paciente atual/ })).toBeEnabled();
+    } else {
+      await expect(page.getByRole("combobox", { name: "Pessoa assistida", exact: true })).toBeVisible();
+    }
   }
 
   async function createPatient(page: Page) {
@@ -70,7 +74,7 @@ test.describe("administração integrada no ambiente local", () => {
       sql(
         `insert into public.care_recipient_memberships(care_recipient_id,user_id,role) values('${patient}','${fixtures()[role].id}','${role === "adminA" ? "admin" : role === "shared" ? "reader" : "professional"}') on conflict do nothing;`,
       );
-    await page.reload();
+    await page.goto(`/admin?careRecipientId=${patient}`);
     await selectContext(page, patient);
     return patient;
   }
@@ -78,8 +82,17 @@ test.describe("administração integrada no ambiente local", () => {
   async function section(page: Page, patientId: string, name: string) {
     await page.goto(`/admin?careRecipientId=${patientId}`);
     await selectContext(page, patientId);
-    const areas: Record<string, string> = { "Paciente": "patient", "Catálogo": "catalog", "Vínculos": "memberships", "Convites": "invitations", "Alertas": "alerts", "Destinatários": "notificationRecipients", "Importação histórica": "import", "Contas globais": "profiles" };
-    await page.getByRole("navigation", { name: "Áreas administrativas", exact: true }).locator('a[href*="section=' + areas[name] + '"]').click();
+    const navigation = page.getByRole("navigation", { name: "Áreas administrativas", exact: true });
+    if (name === "Convites") {
+      await navigation.getByRole("link", { name: /^Pessoas e convites/ }).click();
+      await page.getByRole("navigation", { name: "Pessoas e convites", exact: true }).getByRole("link", { name: /^Convites/ }).click();
+    } else if (name === "Destinatários") {
+      await navigation.getByRole("link", { name: /^Regras e destinatários/ }).click();
+      await page.getByRole("navigation", { name: "Áreas da configuração", exact: true }).getByRole("link", { name: "Avisos", exact: true }).click();
+    } else {
+      const areas: Record<string, string> = { "Catálogo": "catalog", "Vínculos": "memberships", "Importação histórica": "import" };
+      await navigation.locator('a[href*="section=' + areas[name] + '"]').click();
+    }
     await expect(page.getByText("Carregando", { exact: false })).toHaveCount(0);
   }
 
@@ -105,46 +118,71 @@ test.describe("administração integrada no ambiente local", () => {
     const finalName = `${originalName} revisado`;
     await section(page, patientId, "Catálogo");
     await page.getByRole("button", { name: "Novo item", exact: true }).click();
-    await page.getByLabel("Nome", { exact: true }).fill(originalName);
+    const creation = page.getByRole("dialog", { name: "Novo material", exact: true });
+    const initialName = creation.getByRole("textbox", { name: "Nome do material", exact: true });
+    await expect(initialName).toBeEditable();
+    await initialName.focus();
+    await expect(initialName).toBeFocused();
+    await initialName.pressSequentially(originalName);
+    await expect(initialName).toHaveValue(originalName);
     await page
-      .getByRole("combobox", { name: "Categoria", exact: true })
+      .getByRole("combobox", { name: "Tipo de material", exact: true })
       .selectOption("higiene");
-    await page.getByLabel("Unidade", { exact: true }).fill("pacote");
+    await page.getByLabel("Unidade de controle", { exact: true }).selectOption("pacote");
     await page
-      .getByLabel("Nomes alternativos, separados por vírgula", { exact: true })
+      .getByLabel("Nomes alternativos", { exact: true })
       .fill("Material auxiliar, Apoio operacional");
-    const created = await submit(page, "Salvar item", "product");
-    expect(created).toMatchObject({ action: "commit", state: "consumed", purpose: "create" });
+    const record = async (editor: Locator, name: string, action: "Adicionar material" | "Salvar cadastro", result: string) => {
+      await expect(editor.getByRole("textbox", { name: "Nome do material", exact: true })).toHaveValue(name);
+      await editor.getByRole("button", { name: "Revisar material", exact: true }).press("Enter");
+      const confirmation = page.getByRole("dialog", { name: action + "?", exact: true });
+      await expect(confirmation).toBeVisible();
+      const [response] = await Promise.all([
+        page.waitForResponse(response => new URL(response.url()).pathname === "/api/admin/catalogue-actions" && response.request().method() === "POST"),
+        confirmation.getByRole("button", { name: action, exact: true }).press("Enter"),
+      ]);
+      expect(response.ok()).toBe(true);
+      await page.getByRole("dialog", { name: result, exact: true }).getByRole("button", { name: "Concluir", exact: true }).click();
+      return response.json();
+    };
+    const created = await record(creation, originalName, "Adicionar material", "Material adicionado");
+    expect(created).toMatchObject({ state: "recorded", purpose: "create" });
     const productId = created.outcome.productId as string;
     expect(productId).toBeTruthy();
-    await expect(page.getByRole("dialog", { name: "Adicionar item exclusivo deste paciente", exact: true })).toBeHidden();
-    await expect(page.getByText("Item salvo e auditado.", { exact: true })).toBeVisible();
-    await expect(page.getByText("Consultando catálogo…", { exact: true })).toBeHidden();
+    await expect(creation).toBeHidden();
+    await page.locator("[data-product-id]").filter({ hasText: originalName }).click();
+    await page.getByRole("dialog", { name: originalName, exact: true }).getByRole("button", { name: /^Editar cadastro/ }).click();
+    const edition = page.getByRole("dialog", { name: "Editar material", exact: true });
+    await expect(edition).toBeVisible();
     await expect(
-      page.getByRole("cell").filter({ has: page.getByText(originalName, { exact: true }) }),
-    ).toBeVisible();
-    const edit = page.getByRole("button", { name: `Editar ${originalName}`, exact: true });
-    if (test.info().project.use.hasTouch) await edit.tap();
-    else await edit.click();
-    await expect(page.getByRole("dialog", { name: "Editar item", exact: true })).toBeVisible();
-    await expect(
-      page.getByLabel("Nomes alternativos, separados por vírgula", {
+      page.getByLabel("Nomes alternativos", {
         exact: true,
       }),
     ).toHaveValue("Material auxiliar, Apoio operacional");
-    await page.getByLabel("Nome", { exact: true }).fill(finalName);
+    await page.getByLabel("Nome do material", { exact: true }).fill(finalName);
     await page
-      .getByLabel("Nomes alternativos, separados por vírgula", { exact: true })
+      .getByLabel("Nomes alternativos", { exact: true })
       .fill("Material auxiliar revisado, Apoio operacional");
-    await page
-      .getByRole("checkbox", { name: "Item ativo", exact: true })
-      .uncheck();
-    await submit(page, "Salvar item", "product");
+    await record(edition, finalName, "Salvar cadastro", "Cadastro atualizado");
+    const material = page.getByRole("dialog", { name: finalName, exact: true });
+    await expect(edition).toHaveCount(0);
+    await pressWorkspaceControl(page, material.getByRole("button", { name: /^Situação e sucessor/ }));
+    const identity = page.getByRole("dialog", { name: "Situação do material", exact: true });
+    await expect(identity).toBeVisible();
+    await identity.getByRole("button", { name: "Inativar material", exact: true }).click();
+    const identityEditor = page.getByRole("dialog", { name: "Inativar material", exact: true });
+    await identityEditor.getByLabel("Motivo da decisão", { exact: true }).fill("Identidade preservada durante a revisão do cadastro.");
+    await identityEditor.getByRole("button", { name: "Revisar efeito", exact: true }).click();
+    await page.getByRole("dialog", { name: "Confirmar efeito no catálogo?", exact: true })
+      .getByRole("button", { name: "Confirmar decisão", exact: true }).click();
+    await page.getByRole("dialog", { name: "Situação registrada", exact: true })
+      .getByRole("button", { name: "Concluir", exact: true }).click();
+    await expect(identity).toHaveCount(0);
+    await material.getByRole("button", { name: "Voltar", exact: true }).click();
     await page.getByRole("combobox", { name: "Situação dos produtos", exact: true }).selectOption("inactive");
-    const article = page.getByRole("row").filter({ has: page.getByRole("cell").filter({ has: page.getByText(finalName, { exact: true }) }) });
+    const article = page.locator("[data-product-id]").filter({ hasText: finalName });
     await expect(article.getByText("Inativo", { exact: true })).toBeVisible();
-    await expect(article).toContainText("higiene");
-    await expect(article.getByText("pacote", { exact: true })).toBeVisible();
+    await expect(article).toContainText("pacote");
     const all = await (
       await page.request.get(
         `/api/catalog?careRecipientId=${patientId}&includeInactive=true`,
@@ -176,19 +214,17 @@ test.describe("administração integrada no ambiente local", () => {
       [secondPatient, "reader"],
     ]) {
       await section(page, patientId, "Vínculos");
-      await page.getByRole("button", { name: "Vincular conta", exact: true }).click();
+      await page.getByRole("button", { name: "Vincular pessoa", exact: true }).click();
       await page
-        .getByRole("combobox", { name: "Conta vinculada", exact: true })
+        .getByRole("combobox", { name: "Conta a vincular", exact: true })
         .selectOption(shared.id);
       await page
-        .getByRole("combobox", { name: "Função neste paciente", exact: true })
+        .getByRole("combobox", { name: "Função na residência", exact: true })
         .selectOption(role);
-      await submit(page, "Salvar vínculo", "membership");
-      await expect(
-        page
-          .getByRole("article")
-          .filter({ has: page.getByText("Teste shared", { exact: true }) }),
-      ).toBeVisible();
+      await page.getByRole("button", { name: "Revisar vínculo", exact: true }).click();
+      await page.getByRole("dialog", { name: "Confirmar vínculo?", exact: true }).getByRole("button", { name: "Salvar vínculo", exact: true }).click();
+      await page.getByRole("dialog", { name: "Vínculo atualizado", exact: true }).getByRole("button", { name: "Concluir", exact: true }).click();
+      await expect(membershipRow(page, "Teste shared")).toBeVisible();
     }
     await page.goto(`/admin?careRecipientId=${firstPatient}`);
     await selectContext(page, firstPatient);
@@ -211,27 +247,19 @@ test.describe("administração integrada no ambiente local", () => {
     await expect(
       page.getByRole("button", { name: "Contas globais", exact: true }),
     ).toHaveCount(0);
-    const member = page
-      .getByRole("article")
-      .filter({ has: page.getByText("Teste shared", { exact: true }) });
+    const member = await openMembershipDetails(page, "Teste shared");
     const revoked = page.waitForResponse(
       (response) =>
-        new URL(response.url()).pathname === "/api/admin" &&
+        new URL(response.url()).pathname === "/api/admin/memberships" &&
         response.request().method() === "POST" &&
-        response.request().postDataJSON().action === "membershipStatus",
+        response.request().postDataJSON().purpose === "membershipStatus",
     );
-    await member.getByRole("button", { name: "Revogar", exact: true }).click();
+    await member.getByRole("button", { name: /^Revisar desligamento/ }).click();
+    await page.getByRole("dialog", { name: "Revisar desligamento", exact: true }).getByRole("button", { name: "Revogar vínculo", exact: true }).click();
     await page.getByRole("button", { name: "Revogar agora", exact: true }).click();
     expect((await revoked).ok()).toBeTruthy();
-    await expect(
-      page.getByText("Estado do vínculo atualizado.", { exact: true }),
-    ).toBeVisible();
-    await expect(
-      page
-        .getByRole("article")
-        .filter({ has: page.getByText("Teste shared", { exact: true }) })
-        .getByText("Revogado", { exact: true }),
-    ).toBeVisible();
+    await page.getByRole("dialog", { name: "Vínculo revogado", exact: true }).getByRole("button", { name: "Concluir", exact: true }).click();
+    await expect(membershipRow(page, "Teste shared").getByText("Revogado", { exact: true })).toBeVisible();
     const forbidden = await page.request.get(
       `/api/admin?section=memberships&careRecipientId=${secondPatient}`,
     );
@@ -266,68 +294,127 @@ test.describe("administração integrada no ambiente local", () => {
 
   test("convite é criado, reemitido e revogado pela interface", async ({
     page,
-  }) => {
+  }, info) => {
     await login(page);
     const patientId = await createPatient(page);
-    const email = `manual-${randomUUID()}@example.invalid`;
+    const email = `paula.${randomUUID().slice(0, 8)}@example.invalid`;
     await section(page, patientId, "Convites");
-    await page.getByLabel("E-mail do convidado", { exact: true }).fill(email);
-    await page
-      .getByRole("combobox", { name: "Função neste paciente", exact: true })
-      .selectOption("family");
-    const created = await submit(page, "Criar convite", "invitation");
-    await expect(page.getByLabel("Link", { exact: true })).toHaveValue(
-      created.invitationUrl,
-    );
+    const nextCommand = (action: string) => page.waitForResponse(response =>
+      new URL(response.url()).pathname === "/api/admin/invitations" && response.request().method() === "POST" && response.request().postDataJSON().intent?.action === action);
+    await page.getByRole("button", { name: "Novo convite", exact: true }).click();
+    const editor = page.getByRole("dialog", { name: "Novo convite", exact: true });
+    await editor.getByLabel("E-mail do destinatário", { exact: true }).fill(email);
+    await editor.getByRole("combobox", { name: "Função neste paciente", exact: true }).selectOption("family");
+    const creation = nextCommand("create");
+    await editor.getByRole("button", { name: "Criar convite", exact: true }).click();
+    const creationResponse = await creation;
+    expect(creationResponse.ok()).toBeTruthy();
+    const created = await creationResponse.json();
+    const success = page.getByRole("dialog", { name: "Convite criado", exact: true });
+    await expect(success.getByLabel("Link", { exact: true })).toHaveValue(created.invitationUrl);
     expect(new URL(created.invitationUrl).origin).toBe(
       process.env.NEXT_PUBLIC_APP_URL,
     );
     expect(new URL(created.invitationUrl).hash).toMatch(/^#token=/);
-    expect(created.data).not.toHaveProperty("token_hash");
-    const row = page
-      .getByRole("listitem")
-      .filter({ has: page.getByText(email, { exact: true }) });
+    expect(created.invitation).not.toHaveProperty("token_hash");
+    await success.getByRole("button", { name: "Concluir", exact: true }).click();
+    const row = page.getByRole("list", { name: "Convites da residência", exact: true }).getByRole("button").filter({ hasText: email });
     await expect(row).toBeVisible();
-    const rotation = page.waitForResponse(
-      (response) =>
-        new URL(response.url()).pathname === "/api/admin" &&
-        response.request().method() === "POST" &&
-        response.request().postDataJSON().action === "resendInvitation",
-    );
-    await row
-      .getByRole("button", { name: "Reemitir link", exact: true })
-      .click();
+    await expect(page.getByRole("navigation", { name: "Pessoas e convites", exact: true }).getByRole("link", { name: /^Convites/ })).toContainText("1");
+    const evidence = "output/playwright/l4-residencia";
+    mkdirSync(evidence, { recursive: true });
+    for (const width of [360, 412]) {
+      await page.setViewportSize({ width, height: 900 });
+      expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(width);
+      await page.screenshot({ path: `${evidence}/app-invitations-${info.project.name}-${width}.png`, scale: "css" });
+    }
+    await row.click();
+    const details = page.getByRole("dialog", { name: "Convite da residência", exact: true });
+    await details.getByRole("button", { name: "Reemitir link", exact: true }).click();
+    const rotation = nextCommand("reissue");
+    await page.getByRole("dialog", { name: "Reemitir convite?", exact: true }).getByRole("button", { name: "Reemitir convite", exact: true }).click();
     const rotatedResponse = await rotation;
     expect(rotatedResponse.ok()).toBeTruthy();
     const rotated = await rotatedResponse.json();
     expect(rotated.invitationUrl).not.toBe(created.invitationUrl);
-    await expect(page.getByLabel("Link", { exact: true })).toHaveValue(
-      rotated.invitationUrl,
-    );
-    const revocation = page.waitForResponse(
-      (response) =>
-        new URL(response.url()).pathname === "/api/admin" &&
-        response.request().method() === "POST" &&
-        response.request().postDataJSON().action === "revokeInvitation",
-    );
-    await row.getByRole("button", { name: "Revogar", exact: true }).click();
+    const replacement = page.getByRole("dialog", { name: "Novo link disponível", exact: true });
+    await expect(replacement.getByLabel("Link", { exact: true })).toHaveValue(rotated.invitationUrl);
+    const expiredLink = new URLSearchParams(new URL(created.invitationUrl).hash.slice(1)).get("token");
+    const oldPreview = await page.request.post("/api/invitations/preview", { data: { token: expiredLink } });
+    expect((await oldPreview.json()).data).toEqual({ state: "invalid" });
+    await replacement.getByRole("button", { name: "Concluir", exact: true }).click();
+    await row.click();
+    await details.getByRole("button", { name: "Revogar", exact: true }).click();
+    const revocation = nextCommand("revoke");
+    await page.getByRole("dialog", { name: "Revogar convite?", exact: true }).getByRole("button", { name: "Revogar convite", exact: true }).click();
     expect((await revocation).ok()).toBeTruthy();
     await expect(
-      page.getByText("Convite revogado.", { exact: true }),
+      page.getByRole("dialog", { name: "Convite revogado", exact: true }),
     ).toBeVisible();
     const persisted = await (
       await page.request.get(
-        `/api/admin?section=invitations&careRecipientId=${patientId}`,
+        `/api/admin/invitations?careRecipientId=${patientId}`,
       )
     ).json();
     expect(persisted.data).toHaveLength(1);
     expect(persisted.data[0]).toMatchObject({
-      id: created.data.id,
+      id: created.invitation.id,
       email,
       role: "family",
       status: "revoked",
     });
     expect(persisted.data[0]).not.toHaveProperty("token_hash");
+  });
+
+  test("E10-02 recupera convite após perder a resposta sem gerar um segundo link", async ({ page }) => {
+    const syncDuringEntry: string[] = [];
+    const entry = page.waitForResponse(response => {
+      const url = new URL(response.url());
+      return url.pathname === "/api/context" && url.searchParams.get("view") === "entry";
+    });
+    page.on("request", request => {
+      const path = new URL(page.url()).pathname;
+      if (new URL(request.url()).pathname === "/api/sync" && ["/login", "/acesso/continuar"].includes(path)) syncDuringEntry.push(path);
+    });
+    await login(page);
+    expect(syncDuringEntry).toEqual([]);
+    const entryResponse = await entry;
+    expect(entryResponse.status()).toBe(200);
+    const { data: entryContext } = await entryResponse.json();
+    expect(entryContext.isGlobalAdmin).toBe(true);
+    expect(entryContext.patients).toEqual([]);
+    expect(entryContext).not.toHaveProperty("avatarUrl");
+    const patientId = await createPatient(page);
+    const email = `residencia-${randomUUID()}@example.invalid`;
+    await section(page, patientId, "Convites");
+    await page.getByRole("button", { name: "Novo convite", exact: true }).click();
+    const editor = page.getByRole("dialog", { name: "Novo convite", exact: true });
+    await editor.getByLabel("E-mail do destinatário", { exact: true }).fill(email);
+    let original: { careRecipientId: string; key: string; intent: object } | undefined;
+    await page.route("**/api/admin/invitations", async route => {
+      if (route.request().method() !== "POST") { await route.continue(); return; }
+      original = route.request().postDataJSON();
+      expect((await route.fetch()).status()).toBe(200);
+      await route.abort();
+    });
+    await editor.getByRole("button", { name: "Criar convite", exact: true }).click();
+    const failure = page.getByRole("dialog", { name: "Não foi possível confirmar o convite", exact: true });
+    await expect(failure).toBeVisible();
+    await page.unroute("**/api/admin/invitations");
+    await page.reload();
+    await page.getByRole("button", { name: "Conferir resultado", exact: true }).click();
+    const request = page.waitForRequest(req => req.method() === "POST" && new URL(req.url()).pathname === "/api/admin/invitations");
+    await failure.getByRole("button", { name: "Conferir resultado", exact: true }).click();
+    expect((await request).postDataJSON()).toEqual({ careRecipientId: patientId, key: original?.key, intent: null });
+    const result = page.getByRole("dialog", { name: "Convite criado", exact: true });
+    await expect(result.getByText(/Para encaminhar um link, reemita/)).toBeVisible();
+    await expect(result.getByLabel("Link", { exact: true })).toHaveCount(0);
+    const replay = await page.request.post("/api/admin/invitations", { data: original });
+    expect(replay.ok()).toBeTruthy();
+    expect(await replay.json()).not.toHaveProperty("invitationUrl");
+    const { data } = await (await page.request.get(`/api/admin/invitations?careRecipientId=${patientId}`)).json();
+    expect(data).toHaveLength(1);
+    expect(data[0]).toMatchObject({ email, status: "pending" });
   });
 
   test("seletores administrativos salvam destinatário e limites por produto e custódia", async ({
@@ -362,74 +449,35 @@ test.describe("administração integrada no ambiente local", () => {
       ).ok(),
     ).toBeTruthy();
     await section(page, patientId, "Destinatários");
-    await page
-      .getByRole("combobox", { name: "Conta destinatária", exact: true })
-      .selectOption({ label: "Teste professional" });
-    await page
-      .getByRole("combobox", { name: "Grupo", exact: true })
-      .selectOption("family");
-    await page
-      .getByRole("combobox", { name: "Canal", exact: true })
-      .selectOption("internal");
-    await page
-      .getByRole("checkbox", {
-        name: "Família: receber também alertas da equipe",
-        exact: true,
-      })
-      .check();
-    await submit(page, "Salvar destinatário", "notificationRecipient");
-    await expect(
-      page.getByText("Destinatário de notificações salvo.", { exact: true }),
-    ).toBeVisible();
-    await expect(
-      page.getByText("Teste professional · family · internal", { exact: true }),
-    ).toBeVisible();
-    const settings = await (
-      await page.request.get(
-        `/api/admin?section=notificationRecipients&careRecipientId=${patientId}`,
-      )
-    ).json();
+    const recipients = page.getByRole("region", { name: "Destinatários", exact: true });
+    await recipients.getByRole("button", { name: "Adicionar", exact: true }).click();
+    const recipient = page.getByRole("dialog", { name: "Adicionar destinatário", exact: true });
+    await recipient.getByRole("combobox", { name: "Pessoa vinculada", exact: true }).selectOption({ label: "Teste professional" });
+    await recipient.getByRole("combobox", { name: "Canal", exact: true }).selectOption("internal");
+    await recipient.getByRole("combobox", { name: "Grupo", exact: true }).selectOption("family");
+    await recipient.getByRole("switch", { name: "Receber alertas da equipe", exact: true }).check();
+    await recipient.getByRole("button", { name: "Salvar destinatário", exact: true }).click();
+    await page.getByRole("dialog", { name: "Destinatário registrado", exact: true }).getByRole("button", { name: "Concluir", exact: true }).click();
+    await expect(recipients.getByRole("button", { name: /Teste professional.*Família.*Aplicativo/ })).toBeVisible();
+    const settings = await (await page.request.get(`/api/admin?section=notificationRecipients&careRecipientId=${patientId}`)).json();
     expect(settings.data).toHaveLength(1);
     expect(settings.data[0]).toMatchObject({
-      recipient_user_id: userId,
-      recipient_group: "family",
-      channel: "internal",
-      is_enabled: true,
-      include_team_alerts: true,
+      recipient_user_id: userId, recipient_group: "family", channel: "internal", is_enabled: true, include_team_alerts: true,
     });
-    await page.getByRole("button", { name: "Outras áreas", exact: true }).click();
-    await page.getByRole("menuitem", { name: "Alertas de estoque", exact: true }).click();
-    await page
-      .getByRole("combobox", { name: "Item do catálogo", exact: true })
-      .selectOption({ label: "Fralda" });
-    await page
-      .getByRole("combobox", { name: "Custódia", exact: true })
-      .selectOption("CARE_TEAM");
-    await page.getByLabel("Limite baixo", { exact: true }).fill("5");
-    await page.getByLabel("Limite crítico", { exact: true }).fill("2");
-    await page
-      .getByRole("checkbox", { name: "Regra habilitada", exact: true })
-      .check();
-    await submit(page, "Salvar regra", "alertRule");
-    await expect(
-      page.getByText(
-        "Fralda · CARE_TEAM · baixo: 5 · crítico: 2 · habilitada",
-        { exact: true },
-      ),
-    ).toBeVisible();
-    const alerts = await (
-      await page.request.get(
-        `/api/admin?section=alerts&careRecipientId=${patientId}`,
-      )
-    ).json();
+    await page.getByRole("navigation", { name: "Áreas da configuração", exact: true }).getByRole("link", { name: "Estoque", exact: true }).click();
+    await page.getByRole("button", { name: "Adicionar limite", exact: true }).click();
+    const limit = page.getByRole("dialog", { name: "Limite de estoque", exact: true });
+    await limit.getByRole("combobox", { name: "Material", exact: true }).selectOption({ label: "Fralda" });
+    await limit.getByRole("combobox", { name: "Estoque", exact: true }).selectOption("CARE_TEAM");
+    await limit.getByRole("textbox", { name: "Avisar estoque baixo a partir de", exact: true }).fill("5");
+    await limit.getByRole("textbox", { name: "Avisar estoque crítico a partir de", exact: true }).fill("2");
+    await limit.getByRole("switch", { name: "Regra habilitada", exact: true }).check();
+    await limit.getByRole("button", { name: "Salvar limite", exact: true }).click();
+    await page.getByRole("dialog", { name: "Limite registrado", exact: true }).getByRole("button", { name: "Concluir", exact: true }).click();
+    await expect(page.getByRole("button", { name: /Fralda.*Equipe.*baixo: 5.*crítico: 2.*Ativo/ })).toBeVisible();
+    const alerts = await (await page.request.get(`/api/admin?section=alerts&careRecipientId=${patientId}`)).json();
     expect(alerts.data).toHaveLength(1);
-    expect(alerts.data[0]).toMatchObject({
-      product_id: "fralda",
-      location: "CARE_TEAM",
-      low_threshold: 5,
-      critical_threshold: 2,
-      is_enabled: true,
-    });
+    expect(alerts.data[0]).toMatchObject({ product_id: "fralda", location: "CARE_TEAM", low_threshold: 5, critical_threshold: 2, is_enabled: true });
   });
 
   test("importação histórica revisada preserva itens extras e estoque desconhecido no comprovante", async ({

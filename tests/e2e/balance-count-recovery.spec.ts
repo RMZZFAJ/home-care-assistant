@@ -7,6 +7,7 @@ import { selectContext } from "./auth-context";
 import { audit } from "./accessibility-audit";
 import { randomUUID } from "node:crypto";
 import { rpc } from "../integration/v4-fixtures.mjs";
+import { balanceStage, finishBalanceMaterials } from "./balance-wizard-stages";
 
 test.setTimeout(150_000);
 const button = (page: Page, name: string) =>
@@ -21,7 +22,8 @@ async function open(page: Page, f: Awaited<ReturnType<typeof balanceSetup>>) {
   ).toBeVisible();
   await selectContext(page, f.patient);
   await page.goto("/fichas/bal");
-  await expect(button(page, "Revisar")).toBeEnabled();
+  await button(page, "Iniciar contagem").click();
+  await expect(button(page, "Avançar")).toBeEnabled();
 }
 const ownKey = (f: Awaited<ReturnType<typeof balanceSetup>>) =>
   `hca:v2:bal-count:${f.pro.id}:${f.patient}:new`;
@@ -35,6 +37,7 @@ async function fill(page: Page, f: Awaited<ReturnType<typeof balanceSetup>>) {
     await page
       .getByLabel(`Material fictício V4 ${i} · unidade`, { exact: true })
       .fill("0");
+  await finishBalanceMaterials(page);
   await page
     .getByLabel("Observações da contagem", { exact: true })
     .fill("Contagem própria preservada após resposta perdida");
@@ -43,6 +46,35 @@ async function fill(page: Page, f: Awaited<ReturnType<typeof balanceSetup>>) {
     page.getByRole("heading", { name: "Revisão da contagem", exact: true }),
   ).toBeVisible();
 }
+
+test("BAL iniciado no plantão retoma o rascunho e conclui após o horário", async ({ page }) => {
+  const f = await balanceSetup({ stableCurrentWindow: true });
+  await open(page, f);
+  const state = await rpc(f.pro.client, "balance_workspace", { p_patient: f.patient });
+  const assignment = state.eligibility.assignment;
+  expect(state.eligibility.admission).not.toBeNull();
+  for (let index = 0; index < f.products.length; index++)
+    await page.getByLabel(`Material fictício V4 ${index} · unidade`, { exact: true }).fill(index ? "0" : "2");
+  await expect(page.getByText("Último rascunho salvo.", { exact: true })).toBeVisible();
+  sql(`update public.bal_assignments set ends_at=clock_timestamp() where id=${q(assignment.id)};
+    select private.process_bal_patient(${q(f.patient)})`);
+  await page.reload();
+  await lastDraftPanel(page).getByRole("button", { name: "Continuar rascunho", exact: true }).click();
+  await expect(page.getByText("Esta contagem foi iniciada no plantão e pode ser concluída agora.", { exact: true })).toBeVisible();
+  await expect(page.getByLabel("Material fictício V4 0 · unidade", { exact: true })).toHaveValue("2");
+  await button(page, "Avançar").click();
+  await expect(balanceStage(page, "Itens extras")).toHaveAttribute("aria-current", "step");
+  await button(page, "Incluir item extra").click();
+  await page.getByRole("textbox", { name: "Nome do item extra", exact: true }).fill("Frasco avulso da equipe");
+  await page.getByRole("textbox", { name: "Unidade do item extra", exact: true }).fill("frasco");
+  await page.getByRole("textbox", { name: "Quantidade contada", exact: true }).fill("2");
+  await button(page, "Avançar").click();
+  await button(page, "Revisar").click();
+  await expect(page.getByRole("heading", { name: "Revisão da contagem", exact: true })).toBeVisible();
+  await expect(page.getByRole("region", { name: "Itens extras da contagem", exact: true })).toContainText("Frasco avulso da equipe · 2 frasco");
+  await button(page, "Confirmar contagem").click();
+  await expect(page.getByRole("link", { name: "Abrir ficha BAL", exact: true })).toBeVisible();
+});
 
 test("BAL review keeps physical fields after an invalid read and uses its own authorized stock reference", async ({ page }) => {
   const f = await balanceSetup();
@@ -76,6 +108,7 @@ test("BAL review keeps physical fields after an invalid read and uses its own au
     await count.fill(index ? "0" : "2");
     await expect(count).toHaveValue(index ? "0" : "2");
   }
+  await finishBalanceMaterials(page);
   await page.getByLabel("Observações da contagem", { exact: true }).fill("Conferência física preservada durante falha de leitura");
   const footer = page.locator(".hca-supply-wizard-footer");
   await expect(footer.getByRole("button", { name: "Salvar rascunho", exact: true })).toHaveCount(0);
@@ -84,10 +117,12 @@ test("BAL review keeps physical fields after an invalid read and uses its own au
     mode = invalid;
     await button(page, "Revisar").click();
     await expect(page.getByRole("main").getByRole("alert")).toContainText("não pôde ser conferida");
-    await expect(page.getByLabel("Material fictício V4 0 · unidade", { exact: true })).toHaveValue("2");
     await expect(page.getByLabel("Observações da contagem", { exact: true })).toHaveValue("Conferência física preservada durante falha de leitura");
     await expect(button(page, "Revisar")).toBeEnabled();
     await expect(page.getByRole("region", { name: "Conferir mudança da contagem", exact: true })).toHaveCount(0);
+    await balanceStage(page, "Materiais").click();
+    await expect(page.getByLabel("Material fictício V4 0 · unidade", { exact: true })).toHaveValue("2");
+    await finishBalanceMaterials(page);
   }
   mode = "live";
   await button(page, "Revisar").click();
@@ -219,7 +254,7 @@ for (const kind of ["damaged", "other owner"] as const)
     await expect(page.getByRole("main").getByRole("alert")).toContainText(
       "cópia desta contagem",
     );
-    await expect(button(page, "Revisar")).toBeDisabled();
+    await expect(button(page, "Avançar")).toBeDisabled();
     await expect(button(page, "Salvar rascunho")).toHaveCount(0);
     expect(await page.evaluate((k) => sessionStorage.getItem(k), key)).toBe(
       raw,

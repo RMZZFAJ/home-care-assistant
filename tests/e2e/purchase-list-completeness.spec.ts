@@ -8,7 +8,8 @@ import { sql, sqlLiteral as q } from "../../scripts/test-environment.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { selectContext } from "./auth-context";
 import { selectDocumentSection } from "./document-sections";
-import { audit } from "./accessibility-audit";
+import { pressWorkspaceControl } from "./workspace-controls";
+import { auditFromTop } from "./accessibility-audit";
 
 test.setTimeout(180_000);
 test.afterEach(async ({ page }) => page.unrouteAll({ behavior: "wait" }));
@@ -105,7 +106,7 @@ test("COM parcels keep more than100 native declarations reachable and filter wit
   await expect.poll(() => receiptIds(page)).toEqual([order[100]]);
   await expect(panel.getByRole("heading", { name: "Parcela 101 · Aguardando conferência", exact: true })).toBeVisible();
   await page.setViewportSize({ width: 320, height: 900 });
-  await audit(page, "purchase parcels101 narrow");
+  await auditFromTop(page, "purchase parcels101 narrow");
   mkdirSync("output/playwright/phase-d", { recursive: true });
   await panel.screenshot({ path: `output/playwright/phase-d/purchase-parcels101-${info.project.name}.png` });
   await page.route(`**/api/documents/${doc.id}`, route => route.request().method() === "GET" ? route.fulfill({ status: 503, json: { code: "UNAVAILABLE", error: "Consulta das parcelas temporariamente indisponível" } }) : route.continue());
@@ -118,10 +119,13 @@ test("COM parcels keep more than100 native declarations reachable and filter wit
   await expect(search).toHaveValue("101");
   await expect.poll(() => receiptIds(page)).toEqual([order[100]]);
   await page.unroute(`**/api/documents/${doc.id}`);
-  await page.getByRole("button", { name: "Atualizar ficha", exact: true }).click();
+  const refresh = page.getByRole("button", { name: "Atualizar ficha", exact: true });
+  await refresh.click();
   await failure.getByRole("button", { name: "Tentar novamente", exact: true }).click();
   await expect(failure).toBeHidden();
-  await panel.getByRole("button", { name: "Limpar consulta de parcelas", exact: true }).click();
+  await expect(refresh).toBeFocused();
+  await pressWorkspaceControl(page, panel.getByRole("button", { name: "Limpar consulta de parcelas", exact: true }));
+  await expect(search).toHaveValue("");
   await expect.poll(() => receiptIds(page)).toEqual(order.slice(0, 20));
   expect(facts(f.patient)).toBe(before); expect(writes).toEqual([]);
 });

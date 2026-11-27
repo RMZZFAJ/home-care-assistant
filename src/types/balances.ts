@@ -1,5 +1,6 @@
 import type { ScheduledShift, ShiftType } from "./schedules";
 import type { BalanceCounter, SupplyPayload } from "./documents";
+import type { BalanceCountAdmission } from "@/lib/validation/balances";
 export type BalanceCountReference = { revision: string; quantities: Record<string, string> };
 export type BalanceRecountContext = {
   documentId: string; patientId: string; code: string; documentVersion: number; status: string;
@@ -16,7 +17,17 @@ export type BalanceRecountResult = {
   reason: string; designerId: string; designerName: string; recordedAt: string;
 };
 export type BalanceAssignment = { id: string; cycle_id: string; shift_id: string; professional_id: string; starts_at: string; ends_at: string; status: string; version: number; kind: string; missed_at: string | null; professional_name?: string; type_name?: string };
-export type BalanceRegime = { enabled: boolean; activated_at: string | null; weekday: number; timezone: string; shift_type_id: string; designated_professional_id: string | null; starts_on: string; version: number };
+export type BalanceRegime = { enabled: boolean; activated_at: string | null; weekday: number; timezone: string; shift_type_id: string; designated_professional_id: string | null; starts_on: string; observation?: string | null; version: number };
 export type BalanceObligation = { id: string; cycle_id: string; week_start: string; original_start: string; original_due: string; effective_due: string; state: string; missed_at: string | null; count_document_id: string | null; regularized_by: string | null; actual_count_at: string | null };
 export type BalanceDeferral = { id: string; assignment_id: string | null; target_shift_id: string; target_shift_version: number; target_snapshot: {starts_at:string;ends_at:string;professional_name:string;type_name:string}; reason: string; requested_by: string; status: string; decided_by: string | null; decision_reason: string | null; created_at: string; decided_at: string | null; decision_snapshot: null | {actor:{id:string;name:string};recordedAt:string;outcome:"approved"|"rejected";reason:string;deadlineChanged:boolean}; decisionContext: {canApprove:boolean;canReject:boolean;sourceCurrent:boolean;sourceDeadline:string|null;targetState:"unchanged"|"changed"|"ineligible"|"unavailable";proposedVersion:number;currentTarget:null|{version:number;status:string;starts_at:string;ends_at:string;professional_name:string;type_name:string}} };
-export type BalanceWorkspace = { recountRecovery: { total: number; items: BalanceRecountContext[] }; enabled: boolean; referenceRevision: string; regime: BalanceRegime | null; types: ShiftType[]; professionals: { id: string; name: string }[]; eligibility: { available: boolean; assignment: BalanceAssignment | null; documentId: string | null; href: string; dueAt: string | null }; obligations: BalanceObligation[]; assignments: BalanceAssignment[]; deferrals: BalanceDeferral[]; targets: ScheduledShift[]; events: { id: string; action: string; reason: string; created_at: string; details: Record<string, unknown> }[] };
+export type BalanceCountPermissionRequest = {
+  assignmentId: string; version: number; startsAt: string; endsAt: string;
+  responsibleName: string; alreadyPending: boolean; referenceHash: string;
+};
+export type BalanceCountPermission = {
+  id: string; requesterName: string; responsibleName: string; startsAt: string; endsAt: string;
+  reason: string; createdAt: string; status: "pending" | "approved" | "rejected";
+  deciderName: string | null; decidedAt: string | null; decisionNote: string | null;
+  decision: null | { referenceHash: string; targets: { id: string; version: number; startsAt: string; endsAt: string; type: string }[] };
+};
+export type BalanceWorkspace = { recountRecovery: { total: number; items: BalanceRecountContext[] }; countPermissions?: { request: BalanceCountPermissionRequest | null; history: BalanceCountPermission[] }; enabled: boolean; referenceRevision: string; regime: BalanceRegime | null; types: ShiftType[]; professionals: { id: string; name: string }[]; eligibility: { available: boolean; admission?: BalanceCountAdmission | null; assignment: BalanceAssignment | null; documentId: string | null; href: string; dueAt: string | null }; obligations: BalanceObligation[]; assignments: BalanceAssignment[]; deferrals: BalanceDeferral[]; targets: ScheduledShift[]; events: { id: string; cycle_id?: string | null; action: string; reason: string; created_at: string; details: Record<string, unknown> }[] };

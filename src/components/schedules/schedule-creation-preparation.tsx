@@ -18,10 +18,12 @@ import { holdDialogFocus } from "@/lib/forms/dialog-focus";
 import { calendarPeriod } from "@/lib/schedules/calendar";
 import {
   initialScheduleSeries,
+  adoptResidenceHours,
   initialScheduleType,
   scheduleCreationFields,
   scheduleCreationCommand,
   schedulePurpose,
+  scheduleSpecialHoursIssue,
   type ScheduleCreationFields,
   type ScheduleCreationPurpose,
 } from "@/lib/schedules/creation";
@@ -30,11 +32,12 @@ import {
   parseScheduleRecovery,
   schedulePreparationCommitSchema,
   scheduleReceiptMatches,
-  type SchedulePreparationPacket,
   type SchedulePreparationReceipt,
   type ScheduleRecovery,
 } from "@/lib/validation/schedule-preparations";
 import { ScheduleForm } from "./schedule-forms";
+import { useResidenceHours } from "./use-residence-hours";
+import { ScheduleResidenceRequirement } from "./schedule-residence-requirement";
 import { ScheduleReviewDetails } from "./schedule-review";
 import {
   SchedulePreparationSummary,
@@ -59,6 +62,7 @@ const sourceSchema = z.object({
         name: z.string(),
         starts_local: z.string(),
         duration_minutes: z.number().int().min(15).max(1440),
+        rest_hours: z.number().int().min(0).max(32767).nullish(),
         version: z.number().int().positive(),
         is_active: z.boolean(),
       }),
@@ -77,6 +81,7 @@ const stored = z.discriminatedUnion("mode", [
       userId: z.uuid(),
       packet: schedulePreparationCommitSchema,
       fields: scheduleCreationFields,
+      resolutionKey: z.uuid().optional(),
     })
     .strict(),
   z
@@ -90,8 +95,14 @@ const stored = z.discriminatedUnion("mode", [
     .strict(),
 ]);
 type Stored = z.infer<typeof stored>;
-const equal = (a: unknown, b: unknown) =>
-  JSON.stringify(a) === JSON.stringify(b);
+type PendingConfirmation = Extract<Stored, { mode: "pending" }>;
+function equal(a: unknown, b: unknown) {
+  const orderedFields = (_key: string, value: unknown) =>
+    value !== null && typeof value === "object" && !Array.isArray(value)
+      ? Object.fromEntries(Object.entries(value).sort(([left], [right]) => left.localeCompare(right)))
+      : value;
+  return JSON.stringify(a, orderedFields) === JSON.stringify(b, orderedFields);
+}
 function load(
   key: string,
   userId: string,
@@ -108,6 +119,7 @@ function load(
       (v.mode === "pending"
         ? v.packet.careRecipientId !== patientId ||
           v.packet.purpose !== purpose ||
+          v.resolutionKey === v.packet.idempotencyKey ||
           !equal(v.packet.command, scheduleCreationCommand(v.fields))
         : v.patientId !== patientId || v.purpose !== purpose)
     )
@@ -148,7 +160,7 @@ export function ScheduleCreationPreparation({
   const [integrityError, setIntegrityError] = useState(initial.error),
     [error, setError] = useState(""),
     [message, setMessage] = useState("");
-  const [packet, setPacket] = useState<SchedulePreparationPacket | null>(null),
+  const [reviewed, setReviewed] = useState<PendingConfirmation | null>(null),
     [reviewRejected, setReviewRejected] = useState(false),
     [publishing, setPublishing] = useState(false),
     [proof, setProof] = useState<ScheduleRecovery | null>(null);
@@ -185,7 +197,9 @@ export function ScheduleCreationPreparation({
     decodeSource,
   );
   const data = mayRead && !source.loading && !source.error ? source.data : null;
-  const [fields, setFields] = useState<ScheduleCreationFields>(
+  const residenceRead = useResidenceHours(patient.id, mayRead || writable);
+  const residence = residenceRead.data?.hours;
+  const [storedFields, setStoredFields] = useState<ScheduleCreationFields>(
     () =>
       initial.value?.fields ??
       (purpose === "shift_type_create"
@@ -193,6 +207,19 @@ export function ScheduleCreationPreparation({
         : initialScheduleSeries(empty, userId, team, today)),
   );
   const [working, setWorking] = useState(Boolean(initial.value));
+  const fields = !working && storedFields.form === "series" && residence
+    ? adoptResidenceHours({ ...storedFields, recurrence: "once", until: "" }, residence)
+    : storedFields;
+  const residenceMismatch = fields.form === "series" && fields.residence
+    && (!residence || fields.residence.version !== residence.version);
+  const needsResidence = fields.form === "series" || fields.restHours !== undefined;
+  const residenceReady =
+    !residenceRead.loading && !residenceRead.error && Boolean(residence);
+  const canEditTiming = fields.form !== "series" || Boolean(fields.residence && !residenceMismatch);
+  const timingReady = fields.form !== "series" ||
+    (residenceReady && canEditTiming);
+  const reviewTimingReady = reviewed?.fields.form !== "series" ||
+    (residenceReady && reviewed.fields.residence?.version === residence?.version);
   const [datesMonth, setDatesMonth] = useState<string | null>(null);
   const [discardChoice, setDiscardChoice] = useState<{
     draftId: string;
@@ -200,6 +227,9 @@ export function ScheduleCreationPreparation({
   } | null>(null);
   const pending = local?.mode === "pending" ? local : null,
     carry = local?.mode === "carry" ? local : null;
+  const pendingHasCurrentContract =
+    pending?.packet.command.action !== "series" ||
+    Boolean(pending.packet.command.body.residenceHours);
   function writeLocal(next: Stored | null, expected = localRef.current) {
     const current = load(key, userId, patient.id, purpose);
     if (current.error) throw new Error(current.error);
@@ -236,7 +266,7 @@ export function ScheduleCreationPreparation({
           "O resultado não corresponde ao preenchimento preservado.",
         );
       writeLocal(null, original);
-      setPacket(null);
+      setReviewed(null);
       setProof(null);
       setMessage(
         "Resultado recuperado por consulta autorizada. Nenhum novo envio foi realizado.",
@@ -273,10 +303,10 @@ export function ScheduleCreationPreparation({
       )
         return false;
       try {
-        setFields(row.content.schedule);
+        setStoredFields(row.content.schedule);
         setDatesMonth(null);
         setWorking(true);
-        setPacket(null);
+        setReviewed(null);
         setError("");
         return true;
       } catch (e) {
@@ -289,10 +319,10 @@ export function ScheduleCreationPreparation({
     onDiscard(action) {
       if (!mountedRef.current) return;
       if (localRef.current?.mode === "pending" || integrityError) return;
-      setPacket(null);
+      setReviewed(null);
       setProof(null);
       if (action === "acknowledge" && localRef.current?.mode === "carry") {
-        setFields(localRef.current.fields);
+        setStoredFields(localRef.current.fields);
         setWorking(true);
       } else {
         try {
@@ -304,7 +334,7 @@ export function ScheduleCreationPreparation({
           return;
         }
         setDatesMonth(null);
-        setFields(
+        setStoredFields(
           purpose === "shift_type_create"
             ? initialScheduleType()
             : initialScheduleSeries(data ?? empty, userId, team, today),
@@ -325,7 +355,7 @@ export function ScheduleCreationPreparation({
     Boolean(draft.consumed) ||
     Boolean(draft.pending) ||
     Boolean(pending) ||
-    Boolean(packet) ||
+    Boolean(reviewed) ||
     Boolean(integrityError);
   const snapshot = { schedule: fields };
   const reviewHeadingRef = useRef<HTMLHeadingElement>(null),
@@ -334,22 +364,30 @@ export function ScheduleCreationPreparation({
   const showReview =
     !protectedView &&
     !pending &&
-    Boolean(packet) &&
+    Boolean(reviewed) &&
     !draft.consumed &&
     !draft.conflict &&
     !draft.offered &&
     !draft.pending;
+  const reviewDisabled = needsResidence && !residenceReady;
+  const canRestoreReviewFocus = !hiddenEditor && writable && canEditTiming &&
+    !reviewDisabled && !scheduleSpecialHoursIssue(fields);
   useEffect(() => {
     if (publishing || draft.busy) return;
-    const returning = previousReviewRef.current && !showReview;
-    previousReviewRef.current = showReview;
-    if (!showReview && !returning) return;
+    if (showReview) previousReviewRef.current = true;
+    else if (!previousReviewRef.current || !canRestoreReviewFocus) return;
     const frame = requestAnimationFrame(() => {
-      if (showReview) reviewHeadingRef.current?.focus();
-      else reviewTriggerRef.current?.focus();
+      const target = showReview ? reviewHeadingRef.current : reviewTriggerRef.current;
+      if (!target || target.matches(":disabled")) return;
+      if (!showReview) {
+        previousReviewRef.current = false;
+        const active = document.activeElement;
+        if (active !== document.body && active !== target.closest('[role="dialog"]')) return;
+      }
+      target.focus();
     });
     return () => cancelAnimationFrame(frame);
-  }, [showReview, publishing, draft.busy]);
+  }, [showReview, publishing, draft.busy, canRestoreReviewFocus]);
   const consumedReceipt = draft.consumed?.consumedResult;
   const localDifference = Boolean(
     working &&
@@ -387,6 +425,10 @@ export function ScheduleCreationPreparation({
     if (!writable || publishing || pending || draft.blocked || integrityError)
       return;
     try {
+      if (!timingReady)
+        throw new Error("Confira os horários atuais da residência antes de revisar.");
+      if (fields.form === "type" && fields.restHours !== undefined && !residence)
+        throw new Error("Preencha os horários em Configurações de plantões → Horários da residência.");
       const command = scheduleCreationCommand(fields);
       if (
         fields.form === "series" &&
@@ -406,15 +448,18 @@ export function ScheduleCreationPreparation({
       if (localRef.current?.mode === "carry" && !saved.replayed)
         writeLocal(null);
       setReviewRejected(false);
-      setPacket(
-        schedulePreparationCommitSchema.parse({
+      setReviewed({
+        mode: "pending",
+        userId,
+        fields,
+        packet: schedulePreparationCommitSchema.parse({
           careRecipientId: patient.id,
           purpose,
           draftCommit: { id: saved.id, revision: saved.revision },
           command,
           idempotencyKey: crypto.randomUUID(),
         }),
-      );
+      });
       setProof(null);
       setError("");
     } catch (e) {
@@ -428,14 +473,14 @@ export function ScheduleCreationPreparation({
   }
   function confirm(
     receipt: SchedulePreparationReceipt,
-    original: Extract<Stored, { mode: "pending" }>,
+    original: PendingConfirmation,
   ) {
     if (!equal(receipt.fields, original.fields))
       throw new Error(
         "O resultado não corresponde aos campos preservados. A referência foi mantida.",
       );
     writeLocal(null, original);
-    setPacket(null);
+    setReviewed(null);
     setProof(null);
     setMessage(
       "Resultado da escala conferido. A preparação foi utilizada uma única vez.",
@@ -448,13 +493,11 @@ export function ScheduleCreationPreparation({
       busyRef.current ||
       protectedView ||
       integrityError ||
-      (!pending && reviewRejected)
+      (!pending && (reviewRejected || !reviewTimingReady))
     )
       return;
-    const original =
-      pending ??
-      (packet ? { mode: "pending" as const, userId, packet, fields } : null);
-    if (!original) return;
+    const original = pending ?? reviewed;
+    if (!original || original.resolutionKey || (pending && !pendingHasCurrentContract)) return;
     const recovering = Boolean(pending);
     busyRef.current = true;
     setPublishing(true);
@@ -485,7 +528,7 @@ export function ScheduleCreationPreparation({
             e.code === "DRAFT_VERSION_CONFLICT" ||
             [401, 403, 404].includes(e.status)
           )
-            setPacket(null);
+            setReviewed(null);
           else setReviewRejected(true);
         } catch (c) {
           setIntegrityError(
@@ -497,7 +540,10 @@ export function ScheduleCreationPreparation({
         else if (e instanceof ApiError && [401, 403, 404].includes(e.status)) {
           await draft.revalidateRead();
           if (mountedRef.current) await context.refresh();
-        } else source.refresh();
+        } else {
+          source.refresh();
+          if (e.status === 409) residenceRead.refresh();
+        }
       }
       setError(
         e instanceof Error
@@ -509,16 +555,23 @@ export function ScheduleCreationPreparation({
       if (mountedRef.current) setPublishing(false);
     }
   }
-  async function check() {
+  async function check(resolve = false) {
     if (!pending || busyRef.current || protectedView || integrityError) return;
-    const original = pending;
+    let original = pending;
     busyRef.current = true;
     setPublishing(true);
     setError("");
     try {
+      if (resolve && !original.resolutionKey) {
+        const next = { ...original, resolutionKey: crypto.randomUUID() };
+        writeLocal(next, original);
+        original = next;
+      }
       const raw = await api<{ data: unknown }>(
         "/api/schedules/preparations/recovery",
-        original.packet,
+        original.resolutionKey
+          ? { packet: original.packet, resolutionKey: original.resolutionKey }
+          : original.packet,
       );
       if (!mountedRef.current) return;
       const result = parseScheduleRecovery(raw.data, original.packet, userId);
@@ -540,6 +593,9 @@ export function ScheduleCreationPreparation({
   async function preserveUnapplied() {
     if (!pending || proof?.status !== "not_applied" || busyRef.current) return;
     try {
+      const settledRevision = pending.resolutionKey && proof.reason === "advanced_revision"
+        ? proof.current
+        : null;
       const next: Stored = {
         mode: "carry",
         userId,
@@ -548,15 +604,19 @@ export function ScheduleCreationPreparation({
         fields: pending.fields,
       };
       writeLocal(next, pending);
-      setFields(next.fields);
+      setStoredFields(next.fields);
       setWorking(true);
-      setPacket(null);
+      setReviewed(null);
       setProof(null);
       setMessage(
         "A tentativa não foi aplicada. Sua edição foi preservada por sua escolha; nenhuma nova programação foi enviada.",
       );
       source.refresh();
-      await draft.revalidateRead();
+      await draft.revalidateRead(settledRevision
+        ? (row) => row.id === settledRevision.id
+          && row.revision === settledRevision.revision
+          && equal(row.content, { schedule: next.fields })
+        : undefined);
     } catch (e) {
       setIntegrityError(
         e instanceof Error ? e.message : "A referência foi preservada.",
@@ -564,11 +624,12 @@ export function ScheduleCreationPreparation({
     }
   }
   const dirty =
-    !packet &&
+    !reviewed &&
     !pending &&
     !draft.offered &&
     !draft.consumed &&
     !draft.pending &&
+    working &&
     (Boolean(carry) ||
       !equal(
         fields,
@@ -619,7 +680,7 @@ export function ScheduleCreationPreparation({
         title={
           pending
             ? "Recuperar confirmação da escala"
-            : packet
+            : reviewed
               ? "Revisar escala"
               : purpose === "shift_type_create"
                 ? "Tipo de plantão"
@@ -628,6 +689,7 @@ export function ScheduleCreationPreparation({
         onClose={close}
         restoreFocusTo={opener}
         restoreFocusFallbackRef={fallbackFocus}
+        restoreFocusToAriaDisabled={purpose === "schedule_series_create"}
         busy={publishing || draft.busy}
         preventClose={Boolean(pending) || Boolean(draft.pending)}
         hasUnsavedChanges={
@@ -699,7 +761,7 @@ export function ScheduleCreationPreparation({
                 <ActionButton
                   disabled={publishing || draft.busy}
                   onClick={() => {
-                    setFields(carry.fields);
+                    setStoredFields(carry.fields);
                     setWorking(true);
                     void draft.reportConflict();
                   }}
@@ -733,26 +795,43 @@ export function ScheduleCreationPreparation({
                   disabled={publishing || Boolean(integrityError)}
                   onClick={() => void check()}
                 >
-                  Conferir tentativa sem reenviar
+                  {pending.resolutionKey
+                    ? "Recuperar encerramento da tentativa"
+                    : "Conferir tentativa sem reenviar"}
                 </ActionButton>
-                <ActionButton
-                  disabled={
-                    publishing ||
-                    Boolean(integrityError) ||
-                    proof?.status === "not_applied"
-                  }
-                  onClick={() => void send()}
-                >
-                  Recuperar a mesma confirmação
-                </ActionButton>
+                {pendingHasCurrentContract && !pending.resolutionKey ? (
+                  <ActionButton
+                    disabled={
+                      publishing ||
+                      Boolean(integrityError) ||
+                      proof?.status === "not_applied"
+                    }
+                    onClick={() => void send()}
+                  >
+                    Recuperar a mesma confirmação
+                  </ActionButton>
+                ) : null}
                 <ActionButton disabled={publishing} onClick={onClose}>
                   Fechar guardando referência
                 </ActionButton>
               </div>
               {proof?.status === "unknown" ? (
                 <Notice>
-                  O resultado ainda é desconhecido. A ausência de registro não
-                  comprova falha; a referência foi preservada.
+                  <p>
+                    O resultado ainda é desconhecido. Ao encerrar a tentativa, o
+                    sistema consulta a confirmação original. Se ela já foi
+                    gravada, o resultado será exibido. Caso contrário, o
+                    preenchimento fica salvo e esta revisão deixa de poder
+                    publicar uma programação.
+                  </p>
+                  {!pending.resolutionKey ? (
+                    <ActionButton
+                      disabled={publishing || Boolean(integrityError)}
+                      onClick={() => void check(true)}
+                    >
+                      Encerrar esta tentativa e preservar meus campos
+                    </ActionButton>
+                  ) : null}
                 </Notice>
               ) : null}
               {proof?.status === "not_applied" ? (
@@ -771,7 +850,7 @@ export function ScheduleCreationPreparation({
               ) : null}
             </section>
           ) : null}
-          {showReview && packet ? (
+          {showReview && reviewed ? (
             <section
               className="hca-form-stack"
               aria-label="Conferência da nova escala"
@@ -786,14 +865,14 @@ export function ScheduleCreationPreparation({
                 </Notice>
               ) : null}
               <ScheduleReviewDetails
-                review={{ command: packet.command, workspace: data ?? empty }}
+                review={{ command: reviewed.packet.command, workspace: data ?? empty }}
               />
               <div className="hca-toolbar">
                 <ActionButton
                   disabled={publishing}
                   onClick={(event) => {
                     holdDialogFocus(event.currentTarget);
-                    setPacket(null);
+                    setReviewed(null);
                     setReviewRejected(false);
                   }}
                 >
@@ -806,6 +885,7 @@ export function ScheduleCreationPreparation({
                     draft.blocked ||
                     !writable ||
                     reviewRejected ||
+                    !reviewTimingReady ||
                     (purpose === "schedule_series_create" && !data) ||
                     Boolean(integrityError)
                   }
@@ -834,7 +914,24 @@ export function ScheduleCreationPreparation({
           ) : null}
           {!hiddenEditor && writable ? (
             <>
-              <fieldset className="min-w-0" disabled={publishing || draft.busy}>
+              {needsResidence && !residenceRead.loading && residenceRead.error ? <Notice error>
+                Os horários da residência estão indisponíveis. Seu preenchimento foi preservado.
+                <ActionButton onClick={residenceRead.refresh}>Consultar horários novamente</ActionButton>
+              </Notice> : null}
+              {needsResidence && residenceRead.loading ? <p role="status">Consultando horários da residência…</p> : null}
+              {needsResidence && !residenceRead.loading && !residenceRead.error
+                && residenceRead.data?.hours === null ? (
+                  <ScheduleResidenceRequirement context={context} day={today} />
+              ) : null}
+              {residenceReady && residence && fields.form === "series" && !timingReady ? <Notice>
+                Adote os horários atuais para continuar. O restante do preenchimento será preservado.
+                <ActionButton onClick={() => {
+                  setStoredFields(adoptResidenceHours(fields, residence));
+                  setWorking(true);
+                  setError("");
+                }}>Adotar horários da residência</ActionButton>
+              </Notice> : null}
+              {canEditTiming ? <fieldset className="min-w-0" disabled={publishing || draft.busy}>
                 <ScheduleForm
                   editor={
                     purpose === "shift_type_create"
@@ -847,6 +944,7 @@ export function ScheduleCreationPreparation({
                   publishOwn={publishOwn}
                   today={today}
                   creationFields={fields}
+                  reviewDisabled={reviewDisabled}
                   reviewTriggerRef={reviewTriggerRef}
                   datesMonth={datesMonth}
                   onDatesMonthChange={setDatesMonth}
@@ -857,14 +955,14 @@ export function ScheduleCreationPreparation({
                       value.from.slice(0, 7) !== fields.from.slice(0, 7)
                     )
                       setDatesMonth(null);
-                    setFields(value);
+                    setStoredFields(value);
                     setWorking(true);
                     setError("");
                   }}
                   onReview={() => void review()}
                 />
-              </fieldset>
-              <div className="hca-toolbar">
+              </fieldset> : null}
+              {canEditTiming ? <div className="hca-toolbar">
                 <ActionButton
                   disabled={publishing || draft.blocked}
                   onClick={() => void savePersonal()}
@@ -877,7 +975,7 @@ export function ScheduleCreationPreparation({
                 >
                   Guardar rascunho e fechar
                 </ActionButton>
-              </div>
+              </div> : null}
             </>
           ) : null}
         </div>

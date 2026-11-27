@@ -23,19 +23,24 @@ import {
   type WorkspaceContext,
 } from "@/components/workspace";
 import { ActionButton } from "@/components/ui/controls";
+import { useOperationActivity } from "@/components/ui/operation-activity";
 import { RecordDrawer } from "@/components/forms/record-drawer";
 import { CreationDraftPanel } from "@/components/forms/creation-draft-panel";
 import { useCreationDraft } from "@/components/forms/use-creation-draft";
 import { useScopedRead } from "@/lib/use-scoped-read";
 import { useLiveRevision } from "@/lib/use-live-revision";
 import { holdDialogFocus } from "@/lib/forms/dialog-focus";
+import { scheduleBalanceDecisionReady, scheduleBalanceReview } from "@/lib/schedules/balance-impact";
 import {
+  scheduleResourceFieldsSchema,
   scheduleResourceReferenceSchema,
   checkScheduleResourceReference,
   scheduleResourceLabels,
+  scheduleResourceEntryLabels,
   initialScheduleResource,
   scheduleResourceCommand,
   type ScheduleResourcePurpose,
+  type ScheduleResourceEntry,
   type ScheduleResourceFields,
   type ScheduleResourceReference,
 } from "@/lib/schedules/resource-preparations";
@@ -53,8 +58,10 @@ import { ScheduleResourceSummary } from "./schedule-resource-summary";
 import { ScheduleResourceReferenceFacts } from "./schedule-resource-reference";
 import { ScheduleSummaryContext } from "./schedule-preparation-summary";
 import { ScheduleReviewDetails } from "./schedule-review";
+import { ScheduleBalanceImpact } from "./schedule-balance-impact";
 import type { CreationDraft } from "@/types/creation-drafts";
 import type { ScheduleWorkspace } from "@/types/schedules";
+import { localMinute } from "@/lib/schedules/time";
 
 const empty: ScheduleWorkspace = {
   types: [],
@@ -81,6 +88,7 @@ export function ScheduleResourcePreparation({
   purpose,
   targetResourceId: target,
   today,
+  entry,
   onClose,
   onCommitted,
   opener,
@@ -90,6 +98,7 @@ export function ScheduleResourcePreparation({
   purpose: ScheduleResourcePurpose;
   targetResourceId: string;
   today: string;
+  entry?: ScheduleResourceEntry;
   onClose: () => void;
   onCommitted: (receipt: ScheduleResourceReceipt) => void;
   opener?: HTMLElement | null;
@@ -101,6 +110,7 @@ export function ScheduleResourcePreparation({
   const [initial] = useState(() =>
     load(sessionStorage, key, userId, patient.id, purpose, target),
   );
+  const [editingEntry, setEditingEntry] = useState(initial.value ? undefined : entry);
   const [local, setLocal] = useState(initial.value),
     localRef = useRef(initial.value);
   const [integrityError, setIntegrityError] = useState(initial.error),
@@ -116,6 +126,7 @@ export function ScheduleResourcePreparation({
         today,
         can(context, "schedule.manage.team") ||
           can(context, "schedule.manage.own"),
+        entry,
       ),
   );
   const [reference, setReference] = useState<ScheduleResourceReference | null>(
@@ -125,8 +136,14 @@ export function ScheduleResourcePreparation({
   const [packet, setPacket] = useState<ScheduleResourcePacket | null>(null),
     [proof, setProof] = useState<ScheduleResourceRecovery | null>(null),
     [reviewRejected, setReviewRejected] = useState(false),
-    [publishing, setPublishing] = useState(false);
+    [publishing, setPublishing] = useState(false),
+    [reviewing, setReviewing] = useState(false);
   const [obsoleteOutcome, setObsoleteOutcome] = useState(false);
+  const blockingActivity = Boolean(entry) && publishing;
+  useOperationActivity(blockingActivity, {
+    title: "Confirmando operação da agenda",
+    detail: "Aguarde enquanto conferimos o resultado.",
+  });
   const [discardChoice, setDiscardChoice] = useState<{
     id: string;
     fields: ScheduleResourceFields;
@@ -186,7 +203,7 @@ export function ScheduleResourcePreparation({
   const current =
     mayRead && !source.loading && !source.error ? source.data : null;
   const data: ScheduleWorkspace = {
-    ...(reference?.workspace ?? empty),
+    ...(current?.reference.workspace ?? empty),
     professionals: current?.professionals ?? [],
   };
   const pending = local?.mode === "pending" ? local : null,
@@ -236,9 +253,11 @@ export function ScheduleResourcePreparation({
     receipt: ScheduleResourceReceipt,
     original: Extract<Stored, { mode: "pending" }>,
   ) {
+    const preservedFields = scheduleResourceFieldsSchema.safeParse(original.fields);
     if (
       !scheduleResourceReceiptMatches(receipt, original.packet, userId) ||
-      !equal(receipt.fields, original.fields)
+      !preservedFields.success ||
+      !equal(receipt.fields, preservedFields.data)
     )
       throw Error(
         "O resultado não corresponde ao preenchimento preservado. A referência foi mantida.",
@@ -310,6 +329,7 @@ export function ScheduleResourcePreparation({
       )
         return false;
       setFields(row.content.scheduleAction);
+      setEditingEntry(undefined);
       setReference(row.content.reference ?? null);
       setWorking(true);
       setPacket(null);
@@ -331,6 +351,7 @@ export function ScheduleResourcePreparation({
       setReference(null);
       if (action === "acknowledge" && localRef.current?.mode === "carry") {
         setFields(localRef.current.fields);
+        setEditingEntry(undefined);
         setWorking(true);
       } else {
         try {
@@ -349,9 +370,11 @@ export function ScheduleResourcePreparation({
             current?.reference.workspace ?? null,
             today,
             team || publishOwn,
+            entry,
           ),
         );
         setWorking(false);
+        setEditingEntry(entry);
         if (action === "acknowledge") onClose();
       }
     },
@@ -383,6 +406,7 @@ export function ScheduleResourcePreparation({
           current.reference.workspace,
           today,
           team || publishOwn,
+          entry,
         );
         setSeedBaseline({
           scheduleAction: initialFields,
@@ -409,6 +433,7 @@ export function ScheduleResourcePreparation({
     today,
     team,
     publishOwn,
+    entry,
   ]);
   const stale = Boolean(
     reference && current && reference.hash !== current.reference.hash,
@@ -463,10 +488,15 @@ export function ScheduleResourcePreparation({
     seriesSource = reference?.workspace.series[0],
     shiftSource = reference?.workspace.shifts[0],
     changeSource = reference?.workspace.changes[0];
+  const balanceReference = current && !stale ? reference : null;
+  const balanceReview = scheduleBalanceReview(fields, balanceReference);
+  const balanceDecision = "balanceImpact" in fields ? fields.balanceImpact : undefined;
+  const balanceReady = scheduleBalanceDecisionReady(balanceReview, balanceDecision);
   const mayConfirm =
     writable &&
     Boolean(reference) &&
     !stale &&
+    balanceReady &&
     Boolean(current) &&
     (fields.form === "type"
       ? Boolean(typeSource)
@@ -506,13 +536,29 @@ export function ScheduleResourcePreparation({
                   ? !changeSource.is_stale &&
                     changeSource.source_snapshot &&
                     changeSource.proposed_snapshot &&
-                    !changeSource.bal_impact.requires_family_decision
+                    (!changeSource.bal_impact.requires_family_decision || balanceReview)
                   : fields.operation === "close"
                     ? changeSource.is_stale
                     : true),
             ));
+  let scopeChanged = true;
+  if (fields.form === "shift" && shiftSource) {
+    if (editingEntry === "replace") scopeChanged = fields.professionalId !== shiftSource.professional_id;
+    if (editingEntry === "time") scopeChanged = fields.start !== localMinute(shiftSource.starts_at, shiftSource.timezone)
+      || fields.end !== localMinute(shiftSource.ends_at, shiftSource.timezone);
+  }
   const canReview =
-    writable && Boolean(reference) && Boolean(current) && !stale;
+    writable && Boolean(reference) && Boolean(current) && !stale && scopeChanged;
+  function cutsStartedShift(from: string, now: number) {
+    if (entry !== "end") return false;
+    const localToday = seriesSource && localMinute(new Date(now).toISOString(), seriesSource.timezone).slice(0, 10);
+    return Boolean(localToday && from < localToday || seriesSource?.occurrences.some(shift =>
+      (shift.status === "published" || shift.status === "proposed") &&
+      Date.parse(shift.starts_at) <= now &&
+      localMinute(shift.starts_at, shift.timezone).slice(0, 10) >= from));
+  }
+  const futureCutoffMessage = "Escolha uma data que preserve os plantões já iniciados.";
+  const expiredBalanceMessage = "O plantão de destino já terminou. Atualize a referência e escolha outro encaminhamento para o balanço.";
   async function savePersonal(close = false) {
     if (
       !editorReady ||
@@ -538,18 +584,28 @@ export function ScheduleResourcePreparation({
       );
     }
   }
-  async function review(event: FormEvent<HTMLFormElement>) {
+  async function review(event: FormEvent<HTMLFormElement>, now: number) {
     event.preventDefault();
     if (
       !canReview ||
       !reference ||
+      !balanceReady ||
       busyRef.current ||
       draft.blocked ||
       pending ||
       integrityError
     )
       return;
+    if (!scheduleBalanceDecisionReady(scheduleBalanceReview(fields, balanceReference, now), balanceDecision, now)) {
+      setError(expiredBalanceMessage);
+      source.refresh();
+      return;
+    }
+    busyRef.current = true;
+    setReviewing(true);
     try {
+      if (fields.form === "series" && fields.operation === "end_series" && cutsStartedShift(fields.from, now))
+        throw Error(futureCutoffMessage);
       if (
         fields.form === "shift" &&
         fields.operation !== "cancel" &&
@@ -628,9 +684,12 @@ export function ScheduleResourcePreparation({
             ? e.message
             : "Confira o preenchimento antes de revisar.",
       );
+    } finally {
+      busyRef.current = false;
+      if (mountedRef.current) setReviewing(false);
     }
   }
-  async function send() {
+  async function send(now: number) {
     if (
       busyRef.current ||
       protectedView ||
@@ -638,6 +697,17 @@ export function ScheduleResourcePreparation({
       (!pending && (reviewRejected || !mayConfirm))
     )
       return;
+    if (!pending && !scheduleBalanceDecisionReady(scheduleBalanceReview(fields, balanceReference, now), balanceDecision, now)) {
+      setError(expiredBalanceMessage);
+      setReviewRejected(true);
+      source.refresh();
+      return;
+    }
+    if (!pending && packet?.command.action === "end_series" && cutsStartedShift(packet.command.body.fromDate, now)) {
+      setError(futureCutoffMessage);
+      setReviewRejected(true);
+      return;
+    }
     const original: Extract<Stored, { mode: "pending" }> | null =
       pending ??
       (packet
@@ -794,8 +864,8 @@ export function ScheduleResourcePreparation({
               }
             : seedBaseline,
         )));
-  const title =
-    purpose === "shift_type_edit"
+  const title = editingEntry ? scheduleResourceEntryLabels[editingEntry]
+    : purpose === "shift_type_edit"
       ? "Tipo de plantão"
       : purpose === "schedule_series_end"
         ? "Encerrar programação"
@@ -814,13 +884,46 @@ export function ScheduleResourcePreparation({
           ? "Aprovar proposta"
           : "Confirmar rejeição"
         : "Confirmar gravação";
-  const summary = { ...snapshot, reference: current ? reference : null };
+  const summary = { ...snapshot, reference: balanceReference };
+  const reviewButtons = <>
+    <ActionButton disabled={publishing} onClick={event => {
+      holdDialogFocus(event.currentTarget);
+      if (obsoleteOutcome) onClose();
+      else setPacket(null);
+    }}>
+      {obsoleteOutcome ? "Fechar revisão e atualizar" : "Voltar"}
+    </ActionButton>
+    <ActionButton
+      variant={editingEntry === "cancel" ? "danger" : "primary"}
+      disabled={publishing || reviewRejected || !mayConfirm}
+      onClick={() => void send(Date.now())}
+    >
+      {confirmLabel}
+    </ActionButton>
+  </>;
+  const reviewButton = <ActionButton
+    disabled={!canReview || !balanceReady || draft.blocked || publishing || reviewing}
+    variant={editingEntry === "cancel" ? "danger" : "primary"}
+    type="submit"
+    form="schedule-resource-fields"
+    ref={reviewTriggerRef}
+    id="schedule-resource-review-button"
+  >
+    {editingEntry === "cancel" ? "Continuar cancelamento" : "Revisar alteração"}
+  </ActionButton>;
   return (
     <ScheduleSummaryContext value={current ? data : null}>
       <RecordDrawer
+        modal={Boolean(entry)}
+        popupClassName={entry ? "hca-shift-operation-dialog" : undefined}
+        kicker={entry ? "Plantões e balanços" : undefined}
+        footer={entry ? close => showReview ? reviewButtons : !pending ? <>
+          <ActionButton onClick={close} disabled={publishing || reviewing || draft.busy || Boolean(draft.pending)}>Voltar</ActionButton>
+          {!hiddenEditor ? reviewButton : null}
+        </> : null : undefined}
         keyboardScrollable
         title={
-          pending
+          blockingActivity ? "Confirmando operação da agenda" : pending
             ? "Recuperar confirmação da escala"
             : packet
               ? "Revisar escala"
@@ -828,7 +931,8 @@ export function ScheduleResourcePreparation({
         }
         restoreFocusTo={opener}
         restoreFocusFallbackRef={fallbackFocus}
-        busy={publishing || draft.busy}
+        restoreFocusToAriaDisabled
+        busy={publishing || reviewing || draft.busy}
         preventClose={Boolean(pending) || Boolean(draft.pending)}
         hasUnsavedChanges={
           dirty ||
@@ -917,7 +1021,7 @@ export function ScheduleResourcePreparation({
               ) : null}
             </section>
           ) : null}
-          {!protectedView && pending ? (
+          {!protectedView && pending && !blockingActivity ? (
             <section
               className="ui-card hca-form-stack"
               aria-label="Confirmação de alteração da agenda"
@@ -928,6 +1032,7 @@ export function ScheduleResourcePreparation({
                   scheduleAction: pending.fields,
                   referenceHash: pending.packet.referenceHash,
                   referenceVersion: pending.packet.expectedVersion,
+                  reference: current?.reference.hash === pending.packet.referenceHash ? current.reference : null,
                 }}
                 sourceTimezone={pending.sourceTimezone}
               />
@@ -956,7 +1061,7 @@ export function ScheduleResourcePreparation({
                         publishing ||
                         Boolean(pending.resolutionKey)
                       }
-                      onClick={() => void send()}
+                      onClick={() => void send(Date.now())}
                     >
                       Reenviar explicitamente a mesma tentativa
                     </ActionButton>
@@ -1036,7 +1141,7 @@ export function ScheduleResourcePreparation({
               ) : null}
               {source.error ? <Notice error>{source.error}</Notice> : null}
               <ActionButton
-                disabled={publishing || draft.busy || source.loading}
+                disabled={publishing || reviewing || draft.busy || source.loading}
                 onClick={() => source.refresh()}
               >
                 Atualizar referência da agenda
@@ -1062,9 +1167,10 @@ export function ScheduleResourcePreparation({
                     reference={current.reference}
                   />
                   <ActionButton
-                    disabled={!writable || publishing || draft.busy}
+                    disabled={!writable || publishing || reviewing || draft.busy}
                     onClick={() => {
                       setReference(current.reference);
+                      if (editingEntry === "replace" || editingEntry === "time") setEditingEntry(undefined);
                       setPacket(null);
                       setWorking(true);
                       setReviewRejected(false);
@@ -1077,7 +1183,7 @@ export function ScheduleResourcePreparation({
                   </ActionButton>
                 </section>
               ) : null}
-              {!mayConfirm && reference && current && !stale ? (
+              {!mayConfirm && reference && current && !stale && balanceReady ? (
                 <Notice error>
                   O estado do recurso ou sua permissão atual impede esta
                   confirmação. Confira a referência e mantenha seus campos para
@@ -1085,12 +1191,13 @@ export function ScheduleResourcePreparation({
                 </Notice>
               ) : null}
               <form
+                id="schedule-resource-fields"
                 className="hca-form-stack hca-schedule-form min-w-0"
-                onSubmit={review}
+                onSubmit={event => void review(event, Date.now())}
               >
                 <fieldset
                   disabled={
-                    !editorReady || !writable || draft.blocked || publishing
+                    !editorReady || !writable || draft.blocked || publishing || reviewing
                   }
                 >
                   <ResourceFields
@@ -1104,17 +1211,31 @@ export function ScheduleResourcePreparation({
                     team={team}
                     publishOwn={publishOwn}
                     mayPropose={mayPropose}
+                    entry={editingEntry}
                   />
-                  <div className="hca-toolbar">
-                    <ActionButton
-                      disabled={!canReview || draft.blocked || publishing}
-                      variant="primary"
-                      type="submit"
-                      ref={reviewTriggerRef}
-                      id="schedule-resource-review-button"
-                    >
-                      Revisar alteração
+                  {editingEntry === "replace" || editingEntry === "time" ? (
+                    <ActionButton variant="quiet" onClick={() => setEditingEntry(undefined)}>
+                      Editar outros dados do plantão
                     </ActionButton>
+                  ) : null}
+                  {balanceReview && fields.form !== "type" ? (
+                    <ScheduleBalanceImpact review={balanceReview} value={balanceDecision}
+                      onChange={(value) => {
+                        setFields({ ...fields, balanceImpact: value });
+                        setWorking(true);
+                      }} />
+                  ) : null}
+                  {balanceReference && !balanceReview && balanceDecision && fields.form !== "type" ? (
+                    <Notice>
+                      Sua decisão sobre o balanço foi preservada. Confira as datas do plantão ou retire o encaminhamento para continuar sem ele.
+                      <ActionButton onClick={() => {
+                        setFields({ ...fields, balanceImpact: undefined });
+                        setWorking(true);
+                      }}>Retirar encaminhamento do balanço</ActionButton>
+                    </Notice>
+                  ) : null}
+                  <div className="hca-toolbar">
+                    {!entry ? reviewButton : null}
                     <ActionButton
                       disabled={
                         !editorReady || !writable || draft.blocked || publishing
@@ -1169,28 +1290,7 @@ export function ScheduleResourcePreparation({
                 </Notice>
               ) : null}
 
-              <div className="hca-toolbar hca-schedule-decision-actions">
-                <ActionButton
-                  disabled={publishing}
-                  onClick={(e) => {
-                    holdDialogFocus(e.currentTarget);
-                    if (obsoleteOutcome) {
-                      onClose();
-                      return;
-                    }
-                    setPacket(null);
-                  }}
-                >
-                  {obsoleteOutcome ? "Fechar revisão e atualizar" : "Voltar"}
-                </ActionButton>
-                <ActionButton
-                  variant="primary"
-                  disabled={publishing || reviewRejected || !mayConfirm}
-                  onClick={() => void send()}
-                >
-                  {confirmLabel}
-                </ActionButton>
-              </div>
+              {!entry ? <div className="hca-toolbar hca-schedule-decision-actions">{reviewButtons}</div> : null}
             </section>
           ) : null}
         </div>

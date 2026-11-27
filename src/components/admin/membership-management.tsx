@@ -1,166 +1,153 @@
 "use client";
-import { ActionButton, Pill, TextInput } from "@/components/ui/controls";
-import {roleLabel} from "@/lib/role-labels";
-import { useState } from "react";
 
-import { CredentialReview } from "./credential-review";
-import { EmptyState, Icon } from "@/components/ui/primitives";
-import { text, type Row } from "./admin-fields";
-
-import { AdministrativePreparationEditor } from "./administrative-preparation-editor";
-import type { AdministrativeOutcome } from "@/lib/validation/administrative-preparation";
+import Link from "next/link";
+import { useRef, useState } from "react";
 import { ProfileAvatar } from "@/components/ui/avatar";
-import { Dialog } from "@/components/ui/overlays";
+import { ActionButton, DefinitionGrid, Pill, TextInput } from "@/components/ui/controls";
+import { FeedbackBanner } from "@/components/ui/feedback";
+import { Drawer } from "@/components/ui/overlays";
+import { Icon, type IconName } from "@/components/ui/icon";
+import { roleLabel } from "@/lib/role-labels";
+import type { AdministrativeOutcome } from "@/lib/validation/administrative-preparation";
+import type { ReviewedMembershipCommand, ReviewedMembershipScope } from "@/lib/validation/reviewed-membership";
+import { CredentialReview } from "./credential-review";
 import { MembershipImpact } from "./membership-impact";
-import "./identity.css";
+import { ReviewedMemberEditor, ReviewedMemberStatus } from "./reviewed-member-editor";
+import { ReviewedMembershipFeedback, useReviewedMembershipOperation } from "./reviewed-membership-operation";
+import { text, type Row } from "./admin-fields";
+import "../guides/guides.css";
+import "./people-administration.css";
 
-export function MembershipManagement({
-  rows,
-  directory,
-  userId, globalMode, onConfirmed,
-  confirmationRevision = 0,
-  patientId,
-  credentialReviewAllowed = false,
-  mayRegularize = false,
-}: {
+function memberName(row: Row) {
+  return (row.profiles as { full_name?: string } | null)?.full_name || text(row, "full_name") || text(row, "user_id");
+}
+
+function MemberActionLabel({ title, detail, icon }: { title: string; detail: string; icon: IconName }) {
+  return <><span className="hca-guide-row-icon"><Icon name={icon} /></span>
+    <span className="hca-guide-row-label"><strong>{title}</strong><small>{detail}</small></span>
+    <Icon name="chevron" width={15} height={15} />
+  </>;
+}
+
+function MemberAction({ title, detail, icon, onClick, danger }: {
+  title: string; detail: string; icon: IconName; onClick: (opener: HTMLButtonElement) => void; danger?: boolean;
+}) {
+  return <button type="button" className="hca-guide-row" data-danger={danger || undefined} onClick={event => onClick(event.currentTarget)}>
+    <MemberActionLabel title={title} detail={detail} icon={icon} />
+  </button>;
+}
+
+type Panel = { kind: "new" } | { kind: "detail" | "edit" | "status" | "impact"; id: string };
+
+export function MembershipManagement({ rows, directory, userId, globalMode, onConfirmed, patientId, patientName, credentialReviewAllowed, mayRegularize }: {
   rows: Row[];
   directory: Row[];
-  userId: string; globalMode: boolean;
+  userId: string;
+  globalMode: boolean;
   onConfirmed: (outcome: AdministrativeOutcome) => void;
-  confirmationRevision?: number;
   patientId: string;
-  credentialReviewAllowed?: boolean;
-  mayRegularize?: boolean;
+  patientName: string;
+  credentialReviewAllowed: boolean;
+  mayRegularize: boolean;
 }) {
   const [search, setSearch] = useState("");
-  type MemberReference = { patientId: string; userId: string };
-  const [impact, setImpact] = useState<MemberReference | null>(null);
-  const [revocation, setRevocation] = useState<MemberReference | null>(null);
-  const impactSubject = impact?.patientId === patientId ? impact.userId : null;
-  const revokedSubject = revocation?.patientId === patientId ? revocation : null;
-  const [credential, setCredential] = useState<{ subjectId: string; opener: HTMLElement } | null>(null);
-  type Editor = {
-    row: Row | null;
-    opener: HTMLElement;
-  };
-  const [editorState, setEditorState] = useState<(Editor & { revision: number }) | null>(null);
-  const editor = editorState?.revision === confirmationRevision ? editorState : null;
-  const setEditor = (value: Editor | null) => setEditorState(value ? { ...value, revision: confirmationRevision } : null);
-  const [changeState, setChangeState] = useState<{ row: Row; revision: number } | null>(null);
-  const change = changeState?.revision === confirmationRevision ? changeState.row : null;
-  const setChange = (row: Row | null) => setChangeState(row ? { row, revision: confirmationRevision } : null);
-  const name = (row: Row) =>
-    (row.profiles as { full_name?: string } | null)?.full_name ||
-    text(row, "full_name") ||
-    text(row, "user_id");
-  const filtered = rows.filter((row) =>
-    (
-      name(row) +
-      " " +
-      (roleLabel(text(row, "role")))
-    )
-      .toLocaleLowerCase("pt-BR")
-      .includes(search.toLocaleLowerCase("pt-BR")),
-  );
-  return (
-    <section className="hca-identity-management" aria-label="Pessoas e vínculos">
-      <div className="hca-section-heading">
-        <div>
-          <h2>Pessoas e vínculos</h2>
-          <p>A função e as permissões se aplicam somente a este paciente.</p>
-        </div>
-        <ActionButton
-          variant="primary"
+  const [panel, setPanel] = useState<Panel | null>(null);
+  const [revokedMemberId, setRevokedMemberId] = useState<string | null>(null);
+  const [credential, setCredential] = useState<{ subjectId: string; opener: HTMLButtonElement } | null>(null);
+  const openerRef = useRef<HTMLButtonElement | null>(null);
+  const context = { patientId, mode: globalMode ? "global" : "patient" } as const;
+  const operation = useReviewedMembershipOperation(userId, context);
+  const id = panel && "id" in panel ? panel.id : null;
+  const member = id ? rows.find(row => text(row, "user_id") === id) : null;
+  const revoked = member?.status === "revoked";
+  const role = member ? roleLabel(text(member, "role")) : "";
+  const name = member ? memberName(member) : "";
+  const query = search.trim().toLocaleLowerCase("pt-BR");
+  const filtered = rows.filter(row => `${memberName(row)} ${roleLabel(text(row, "role"))}`.toLocaleLowerCase("pt-BR").includes(query));
 
-          onClick={(event) =>
-            setEditor({ row: null, opener: event.currentTarget })
-          }
-        >{<Icon name="plus" />}
-          Vincular conta
-        </ActionButton>
-      </div>
-      {revokedSubject && !globalMode ? <div className="hca-attention">
-        <p>Consulte as entregas e outras pendências da pessoa desligada.</p>
-        <ActionButton onClick={() => setImpact(revokedSubject)}>Acompanhar pendências do vínculo</ActionButton>
-      </div> : null}
-      <div className="hca-toolbar">
-        <TextInput
-          type="search"
-          aria-label="Pesquisar pessoas"
-          placeholder="Nome ou função"
-          leading={<Icon name="search" />}
-          value={search}
-          onChange={controlEvent => { const controlValue = controlEvent.currentTarget.value; return setSearch(controlValue); }}
-        />
-        <span role="status" className="hca-result-count">
-          {filtered.length} vínculos
-        </span>
-      </div>
-      <div className="ui-card hca-identity-list">
-        {filtered.map((row) => (
-          <article
-            key={text(row, "id") || text(row, "user_id")}
-            className="hca-identity-row"
-          >
-            <ProfileAvatar name={name(row)} />
-            <div className="hca-identity-main">
-              <h3>{name(row)}</h3>
-              <small>
-                {roleLabel(text(row, "role"))}
-              </small>
-              <Pill
+  function closePanel() { setPanel(null); }
+  function show(next: Panel, trigger: HTMLButtonElement) {
+    openerRef.current = trigger;
+    setPanel(next);
+  }
+  function submit(scope: ReviewedMembershipScope, intent: NonNullable<ReviewedMembershipCommand["intent"]>) {
+    closePanel();
+    void operation.submit(scope, intent);
+  }
 
-                tone={row.status === "revoked" ? "neutral" : "success"}
-              >
-                {row.status === "revoked" ? "Revogado" : "Ativo"}
-              </Pill>
-            </div>
-            <div className="hca-identity-actions">
-              <ActionButton
-                aria-label={"Editar vínculo de " + name(row)}
-                disabled={row.status === "revoked"}
-                onClick={(event) =>
-                  setEditor({ row, opener: event.currentTarget })
-                }
-              >
-                Editar
-              </ActionButton>
-              <ActionButton variant="quiet" onClick={() => setChange(row)}>
-                {row.status === "revoked" ? "Reativar" : "Revogar"}
-              </ActionButton>
-              {row.status === "revoked" && !globalMode ? <ActionButton onClick={() => setImpact({ patientId, userId: text(row, "user_id") })}>
-                Acompanhar pendências
-              </ActionButton> : null}
-              {patientId ? <ActionButton disabled={!credentialReviewAllowed} title={!credentialReviewAllowed ? "Selecione seu vínculo local para conferir uma credencial." : undefined} onClick={event => setCredential({ subjectId: text(row, "user_id"), opener: event.currentTarget })}>Conferir credencial</ActionButton> : null}
-            </div>
-          </article>
-        ))}
-        {!filtered.length ? (
-          <EmptyState title="Nenhum vínculo nesta seleção">
-            Busque outra pessoa ou crie um convite.
-          </EmptyState>
-        ) : null}
+  return <section aria-label="Pessoas e vínculos">
+    <ReviewedMembershipFeedback operation={operation} focus={openerRef} onConfirmed={outcome => {
+      if (outcome.kind === "local" && outcome.action === "membershipStatus") setRevokedMemberId(outcome.status === "revoked" ? outcome.userId : null);
+      onConfirmed(outcome);
+    }} />
+    {revokedMemberId && !globalMode ? <FeedbackBanner tone="info">
+      Consulte as entregas e outras pendências da pessoa desligada.
+      <ActionButton onClick={event => show({ kind: "impact", id: revokedMemberId }, event.currentTarget)}>Acompanhar pendências do vínculo</ActionButton>
+    </FeedbackBanner> : null}
+    <section className="hca-people-card hca-linked-people" aria-labelledby="linked-people">
+      <header><h2 id="linked-people">Pessoas vinculadas</h2>
+        <ActionButton disabled={operation.blocked} onClick={event => show({ kind: "new" }, event.currentTarget)}><Icon name="plus" />Vincular pessoa</ActionButton>
+      </header>
+      <div className="hca-people-body">
+        <TextInput type="search" aria-label="Pesquisar pessoas" placeholder="Nome ou função" leading={<Icon name="search" />}
+          value={search} onChange={event => setSearch(event.currentTarget.value)} />
+        <p role="status" className="hca-field-hint mt-2">{filtered.length} vínculos</p>
+        {filtered.length ? <ul className="hca-member-list" aria-label="Pessoas vinculadas">{filtered.map(row => {
+          const memberId = text(row, "user_id");
+          const label = memberName(row);
+          return <li key={text(row, "id") || memberId}>
+            <button type="button" className="hca-guide-row" disabled={operation.blocked} onClick={event => show({ kind: "detail", id: memberId }, event.currentTarget)}>
+              <ProfileAvatar name={label} />
+              <span className="hca-guide-row-label"><strong>{label}</strong><small>{roleLabel(text(row, "role"))}</small>
+                <Pill tone={row.status === "revoked" ? "neutral" : "success"}>{row.status === "revoked" ? "Revogado" : "Ativo"}</Pill></span>
+              <Icon name="chevron" width={15} height={15} />
+            </button>
+          </li>;
+        })}</ul> : <p className="hca-field-hint">Nenhum vínculo nesta seleção. Busque outra pessoa ou crie um convite.</p>}
       </div>
-      {credential && patientId ? <CredentialReview patientId={patientId} subjectId={credential.subjectId} opener={credential.opener} onClose={() => setCredential(null)}/> : null}
-      {editor ? <AdministrativePreparationEditor
-        key={text(editor.row ?? {}, "user_id") || "new"}
-        scope={{patientId,mode:globalMode ? "global" : "patient",purpose:"membership",targetId:editor.row ? text(editor.row,"user_id") : null}}
-        userId={userId} people={directory} opener={editor.opener}
-        onClose={() => setEditor(null)} onConfirmed={onConfirmed}
-      /> : null}
-      {change ? <AdministrativePreparationEditor
-        key={text(change,"user_id")}
-        scope={{patientId,mode:globalMode ? "global" : "patient",purpose:"membershipStatus",targetId:text(change,"user_id")}}
-        userId={userId} people={rows} onClose={() => setChange(null)} onConfirmed={outcome => {
-          if (outcome.kind === "local" && outcome.action === "membershipStatus" && outcome.userId)
-            setRevocation(outcome.status === "revoked" ? { patientId, userId: outcome.userId } : null);
-          onConfirmed(outcome);
-        }}
-      /> : null}
-      {impactSubject && !globalMode ? <Dialog open title="Acompanhar pendências do vínculo"
-        onClose={() => setImpact(null)} footer={<ActionButton onClick={() => setImpact(null)}>Voltar</ActionButton>}>
-        <MembershipImpact patientId={patientId} userId={impactSubject} afterRevocation mayRegularize={mayRegularize} />
-      </Dialog> : null}
     </section>
-  );
+    <p className="hca-people-hint"><Icon name="shield" />Função e permissões são próprias desta residência. Desligamentos preservam o histórico.</p>
+    <Link className="hca-control hca-control--secondary hca-member-policy-link" prefetch={false}
+      href={`/configuracoes?area=people&careRecipientId=${patientId}`}>
+      <Icon name="shield" />Permissões e alterações com dupla aprovação
+    </Link>
+
+    {member && id && panel?.kind === "detail" ? <Drawer open title={name} subtitle="Vínculo na residência" headingIcon="user"
+      finalFocus={openerRef} onClose={closePanel} footer={<ActionButton onClick={closePanel}>Voltar</ActionButton>}>
+      <div className="hca-member-panel">
+        <div className="hca-member-hero"><ProfileAvatar name={name} /><div><strong>{name}</strong><p>{role}</p></div>
+          {revoked ? null : <Pill tone="success">Vínculo ativo</Pill>}</div>
+        <DefinitionGrid items={[{ label: "Residência", value: patientName }, { label: "Função", value: role }, { label: "Situação", value: revoked ? "Revogada" : "Ativa" }]} />
+        <section className="hca-member-actions" aria-label="Acesso e responsabilidade">
+          <h3>Acesso e responsabilidade</h3>
+          {!revoked ? <>
+            <MemberAction title="Editar vínculo" detail="Função e competências nesta residência" icon="edit" onClick={() => setPanel({ kind: "edit", id })} />
+            <Link className="hca-guide-row" prefetch={false} href={"/configuracoes?" + new URLSearchParams({ area: "permissions", person: id, careRecipientId: patientId })}>
+              <MemberActionLabel title="Ver permissões" detail="Padrão da função e exceções pessoais" icon="shield" />
+            </Link>
+          </> : null}
+          {credentialReviewAllowed ? <MemberAction title="Credencial profissional" detail="Declaração e conferência da família" icon="note"
+            onClick={trigger => setCredential({ subjectId: id, opener: trigger })} /> : null}
+          <MemberAction title={revoked ? "Reativar vínculo" : "Revisar desligamento"}
+            detail={revoked ? "Retomar o vínculo local com revisão explícita" : "Consultar tarefas e preservar o histórico"}
+            icon={revoked ? "refresh" : "users"} danger={!revoked} onClick={() => setPanel({ kind: "status", id })} />
+          {revoked && !globalMode ? <MemberAction title="Acompanhar pendências" detail="Consultar as tarefas desta pessoa" icon="checklist"
+            onClick={() => setPanel({ kind: "impact", id })} /> : null}
+        </section>
+      </div>
+      {credential && credentialReviewAllowed ? <CredentialReview patientId={patientId} subjectId={credential.subjectId}
+        subjectRole={member.role === "professional" ? "Profissional da equipe" : role}
+        opener={credential.opener} onClose={() => setCredential(null)} /> : null}
+    </Drawer> : null}
+    {panel?.kind === "new" || (panel?.kind === "edit" && member) ? <ReviewedMemberEditor
+      key={id ?? "new"} scope={{ ...context, purpose: "membership", targetId: id }} people={directory}
+      focus={openerRef} onClose={closePanel} onSubmit={submit} /> : null}
+    {panel?.kind === "status" && id && member ? <ReviewedMemberStatus
+      key={id} scope={{ ...context, purpose: "membershipStatus", targetId: id }} name={name} role={role} revoked={revoked}
+      focus={openerRef} onClose={closePanel} onSubmit={submit} /> : null}
+    {panel?.kind === "impact" && id && !globalMode ? <Drawer open title="Acompanhar pendências do vínculo" headingIcon="checklist"
+      finalFocus={openerRef} onClose={closePanel} footer={<ActionButton onClick={closePanel}>Voltar</ActionButton>}>
+      <MembershipImpact patientId={patientId} userId={id} afterRevocation mayRegularize={mayRegularize} />
+    </Drawer> : null}
+  </section>;
 }

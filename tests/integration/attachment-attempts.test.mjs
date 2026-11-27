@@ -45,6 +45,39 @@ test("frozen original and derivative fingerprints reject byte substitution; priv
   assert.equal(sql("select not has_table_privilege('authenticated','private.attachment_attempts','select,insert,update,delete') and not has_table_privilege('service_role','private.attachment_uploads','select,insert,update,delete')"), "t");
 });
 
+test("two independent sessions reopening the same attachment converge on one reservation", async () => {
+  const f = await fixture();
+  const second = await actor("family", f.patient);
+  const inputs = [args(f), { ...args(f), p_filename: "mesmo-original-renomeado.png" }]
+    .map(({ p_movement, ...input }) => {
+      assert.equal(p_movement, null);
+      return input;
+    });
+  const [first, retry] = await Promise.all([
+    rpc(f.owner, "prepare_document_attachment_attempt", inputs[0]),
+    rpc(second, "prepare_document_attachment_attempt", inputs[1]),
+  ]);
+  assert.equal(first.id, retry.id);
+  assert.equal(count(f), 1);
+  for (const input of inputs) {
+    const canonical = await rpc(f.owner, "document_attachment_request_key", {
+      p_patient: f.patient, p_document: f.doc.id, p_key: input.p_key,
+    });
+    assert.equal(canonical, first.upload_key);
+    assert.equal((await get(f, canonical))[0].id, first.id);
+  }
+  const alias = inputs.find(input => input.p_key !== first.upload_key);
+  assert.ok(alias);
+  const conflict = await second.rpc("prepare_document_attachment_attempt", { ...alias, p_hash: "b".repeat(64) });
+  assert.equal(conflict.error?.code, "23505");
+  const reviewer = await actor("adminA", f.patient);
+  const unrelated = await rpc(reviewer, "document_attachment_request_key", {
+    p_patient: f.patient, p_document: f.doc.id, p_key: alias.p_key,
+  });
+  assert.equal(unrelated, alias.p_key);
+  assert.deepEqual(await get(f, unrelated, reviewer), []);
+});
+
 test("ten formal abandonments free capacity and preserve all rows, fingerprints, audit history and official document facts", async () => {
   const f = await fixture(), reservations = [];
   const before = sql(`select jsonb_build_object('version',version,'snapshot',canonical_snapshot,'hash',content_hash) from public.operational_documents where id=${q(f.doc.id)}`);

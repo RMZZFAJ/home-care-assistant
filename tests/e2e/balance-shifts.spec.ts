@@ -3,7 +3,7 @@ import { test, expect, type Page } from "@playwright/test";
 import { mkdirSync, readFileSync } from "node:fs";
 import { fixtureFile } from "../../scripts/test-environment.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
-import { setup, rpc } from "../integration/v4-fixtures.mjs";
+import { setup, rpc, fixtures, adjustCapability } from "../integration/v4-fixtures.mjs";
 import {
   balanceSetup,
   dayOffset,
@@ -14,6 +14,7 @@ import {
 import { chooseBalanceTarget } from "./balance-preparation-steps";
 import { selectContext } from "./auth-context";
 import { audit } from "./accessibility-audit";
+import { balanceStage, finishBalanceMaterials } from "./balance-wizard-stages";
 
 async function login(page: Page, email: string, patient: string) {
   await page.goto("/login");
@@ -119,7 +120,28 @@ async function capture(page: Page, name: string, operational = false) {
   }
 }
 
-test("BAL por plantão: ativação local, duas etapas, referência, resposta perdida e documento real", async ({
+test("L4 mostra a nova contagem facultativa somente enquanto a pessoa tem a permissão", async ({ page }) => {
+  const f = await setup();
+  await login(page, fixtures.reader.email, f.patient);
+  const url = "/balancos?careRecipientId=" + f.patient;
+  await page.goto(url);
+  const create = page.getByRole("link", { name: "Nova contagem", exact: true });
+  await expect(page.getByText("Não há contagem pendente neste momento.", { exact: true })).toBeVisible();
+  await expect(create).toHaveCount(0);
+  const subject = { capability: "bal.count", subjectUser: fixtures.reader.id, reviewedRole: "reader" };
+  await adjustCapability(f.admin, f.patient, { ...subject, enabled: true, confirmIndividual: true });
+  await page.reload();
+  await expect(create).toBeVisible();
+  await create.click();
+  await expect(page).toHaveURL(/\/fichas\/bal/);
+  await expect(page.getByRole("navigation", { name: "Etapas da ficha", exact: true })).toBeVisible();
+  await adjustCapability(f.admin, f.patient, { ...subject, enabled: null });
+  await page.goto(url);
+  await expect(page.getByText("Não há contagem pendente neste momento.", { exact: true })).toBeVisible();
+  await expect(create).toHaveCount(0);
+});
+
+test("BAL por plantão: ativação local, cinco etapas, referência, resposta perdida e documento real", async ({
   page,
 }, info) => {
   test.setTimeout(120_000);
@@ -152,6 +174,8 @@ test("BAL por plantão: ativação local, duas etapas, referência, resposta per
   });
   await login(page, fixture.adminA.email, patient);
   await page.goto("/balancos");
+  await page.getByRole("link", { name: "Programação dos balanços", exact: true }).click();
+  await expect(page).toHaveURL(/\/configuracoes\?[^#]+#programacao-balancos$/);
   await page
     .getByRole("button", { name: "Configurar dia e plantão", exact: true })
     .click();
@@ -160,8 +184,8 @@ test("BAL por plantão: ativação local, duas etapas, referência, resposta per
     exact: true,
   });
   await form
-    .getByRole("checkbox", {
-      name: "Processamento automático neste paciente",
+    .getByRole("switch", {
+      name: "Balanços programados",
       exact: true,
     })
     .check();
@@ -171,9 +195,8 @@ test("BAL por plantão: ativação local, duas etapas, referência, resposta per
   await form
     .getByRole("combobox", { name: "Plantão responsável", exact: true })
     .selectOption(type.id);
-  await form
-    .getByRole("textbox", { name: "Justificativa", exact: true })
-    .fill("Ativação isolada na homologação fictícia");
+  await expect(form.getByRole("textbox", { name: "Observação (opcional)", exact: true })).toBeVisible();
+  await expect(form.getByRole("textbox", { name: "Justificativa", exact: true })).toHaveCount(0);
   await audit(page, "BAL configuration drawer");
   await form
     .getByRole("button", { name: "Revisar decisão", exact: true })
@@ -221,7 +244,7 @@ test("BAL por plantão: ativação local, duas etapas, referência, resposta per
   ).toBeVisible();
   await page.getByRole("link", { name: /Balanço do seu plantão/ }).click();
   await expect(
-    page.getByRole("heading", { name: "Balanços e plantões", exact: true }),
+    page.getByRole("heading", { name: "Plantões e balanços", exact: true }),
   ).toBeVisible();
   await page
     .getByRole("main")
@@ -230,16 +253,14 @@ test("BAL por plantão: ativação local, duas etapas, referência, resposta per
   await expect(
     page.getByRole("heading", { name: "Balanço de estoque", exact: true }),
   ).toBeVisible();
+  await page.getByRole("button", { name: "Iniciar contagem", exact: true }).click();
   await expect(
     page
-      .getByRole("list", {
-        name: "Barra de etapas; use as setas do teclado para rolar",
-        exact: true,
-      })
+      .getByRole("navigation", { name: "Etapas da ficha", exact: true })
       .getByRole("listitem"),
-  ).toHaveCount(2);
-  await expect(page.getByText(/^Referência:/)).toHaveCount(0);
-  await page.getByRole("button", { name: "Revisar", exact: true }).click();
+  ).toHaveCount(5);
+  await expect(page.getByText(/^Referência 0 unidade$/)).toHaveCount(2);
+  await page.getByRole("button", { name: "Avançar", exact: true }).click();
   await expect(page.locator('input[aria-invalid="true"]')).toHaveCount(2);
   const catalogue = (
     await (
@@ -251,13 +272,10 @@ test("BAL por plantão: ativação local, duas etapas, referência, resposta per
       .getByLabel(`${p.name} · ${p.unit}`, { exact: true })
       .fill(index ? "0" : "1");
   await expect(page.locator('input[aria-invalid="true"]')).toHaveCount(0);
-  await page
-    .getByLabel("Observações da contagem", { exact: true })
-    .fill("Conferência física atual; diferença para revisão familiar.");
   const widths =
     info.project.name === "chromium"
-      ? [320, 360, 390, 428, 768, 1024, 1366, 1920]
-      : [390];
+      ? [320, 360, 412, 768, 1024, 1366, 1920]
+      : [360, 412];
   for (const width of widths) {
     await page.setViewportSize({ width, height: 900 });
     expect(
@@ -270,6 +288,10 @@ test("BAL por plantão: ativação local, duas etapas, referência, resposta per
   }
   await capture(page, "bal-contagem-" + info.project.name, true);
   await audit(page, "scheduled BAL count");
+  await finishBalanceMaterials(page);
+  await page
+    .getByLabel("Observações da contagem", { exact: true })
+    .fill("Conferência física atual; diferença para revisão familiar.");
   await page.getByRole("button", { name: "Revisar", exact: true }).click();
   await expect(
     page.getByRole("heading", { name: "Revisão da contagem", exact: true }),
@@ -278,12 +300,13 @@ test("BAL por plantão: ativação local, duas etapas, referência, resposta per
     page.getByRole("table", { name: "Materiais da contagem", exact: true }).locator('td[data-label="Referência"]').filter({ hasText: /^0 unidade$/ }),
   ).toHaveCount(2);
   await audit(page, "scheduled BAL review");
-  await page.getByRole("button", { name: "Voltar", exact: true }).click();
+  await balanceStage(page, "Materiais").click();
   await expect(
     page.getByLabel(`${catalogue[0].name} · ${catalogue[0].unit}`, {
       exact: true,
     }),
   ).toHaveValue("1");
+  await finishBalanceMaterials(page);
   await page.getByRole("button", { name: "Revisar", exact: true }).click();
   await capture(page, "bal-revisao-" + info.project.name, true);
   let lost = false;
@@ -344,6 +367,36 @@ test("BAL por plantão: ativação local, duas etapas, referência, resposta per
   await expect(page.getByRole("region", { name: "Próximo passo sugerido", exact: true })).toContainText("Acompanhar as revisões do balanço");
 });
 
+test("pedido de adiamento sem plantão elegível mantém o prazo e oferece a agenda do paciente", async ({ page }) => {
+  test.setTimeout(90_000);
+  const { patient, pro, today } = await balanceSetup({ stableCurrentWindow: true, durationMinutes: 720, futureDays: 0 });
+  await login(page, pro.email, patient);
+  await page.goto("/balancos");
+  const workspace = async () => (await (await page.request.get("/api/balances?careRecipientId=" + patient)).json()).data;
+  const before = await workspace();
+  expect(before.eligibility.assignment).toBeTruthy();
+  await page.getByRole("button", { name: "Solicitar adiamento", exact: true }).click();
+  const request = page.getByRole("dialog", { name: "Solicitar adiamento", exact: true });
+  await expect(request.getByText("Responsável", { exact: true })).toBeVisible();
+  await expect(request.getByText("Prazo atual", { exact: true })).toBeVisible();
+  await expect(request.getByText("Não há outro plantão disponível", { exact: true })).toBeVisible();
+  await expect(request.getByRole("combobox")).toHaveCount(0);
+  await expect(request.getByRole("button", { name: "Revisar decisão", exact: true })).toBeDisabled();
+  let writes = 0;
+  page.on("request", value => {
+    if (value.method() === "POST" && new URL(value.url()).pathname.startsWith("/api/balances")) writes++;
+  });
+  const agenda = request.getByRole("link", { name: "Ver agenda", exact: true });
+  await expect(agenda).toHaveAttribute("href", "/escalas?" + new URLSearchParams({ careRecipientId: patient, day: today }));
+  await agenda.click();
+  await expect(page).toHaveURL(url => url.pathname === "/escalas" && url.searchParams.get("day") === today);
+  await expect(page.getByLabel("Data de referência", { exact: true })).toHaveValue(today);
+  const after = await workspace();
+  expect(after.eligibility.assignment).toEqual(before.eligibility.assignment);
+  expect(after.deferrals).toEqual(before.deferrals);
+  expect(writes).toBe(0);
+});
+
 test("supervisão solicita adiamento, família decide e o prazo só muda após a aprovação", async ({
   page,
 }, info) => {
@@ -362,7 +415,7 @@ test("supervisão solicita adiamento, família decide e o prazo só muda após a
     }),
   ).toHaveCount(0);
   await expect(
-    page.getByRole("button", { name: "Configurar dia e plantão", exact: true }),
+    page.getByRole("link", { name: "Programação dos balanços", exact: true }),
   ).toHaveCount(0);
   const before = (
     await (
@@ -379,6 +432,7 @@ test("supervisão solicita adiamento, família decide e o prazo só muda após a
   await expect(
     form.getByText(/O adiamento depende de aprovação familiar/),
   ).toBeVisible();
+  await expect(form.getByText("Prazo atual", { exact: true })).toBeVisible();
   await form
     .getByRole("textbox", { name: "Justificativa", exact: true })
     .fill("Necessidade de reorganização justificada na equipe.");
@@ -392,8 +446,10 @@ test("supervisão solicita adiamento, família decide e o prazo só muda após a
   await form
     .getByRole("button", { name: "Revisar decisão", exact: true })
     .click();
-  await page
-    .getByRole("dialog", { name: "Revisar decisão do balanço", exact: true })
+  const requestReview = page.getByRole("dialog", { name: "Revisar decisão do balanço", exact: true });
+  await expect(requestReview.getByText("Prazo atual", { exact: true })).toBeVisible();
+  await expect(requestReview.getByText("Prazo solicitado", { exact: true })).toBeVisible();
+  await requestReview
     .getByRole("button", { name: "Confirmar decisão", exact: true })
     .click();
   await expect(form).not.toBeVisible();

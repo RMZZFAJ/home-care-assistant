@@ -24,12 +24,17 @@ consulta a conselho e homologação externa estão adiados por P01.
 
 ## Recuperação e autorização
 
-Perda de resposta mantém pacote/chave imutáveis por usuário/paciente/pessoa e
-permite replay após reload, sem duplicar registro. Recusa comprovada conserva
-campos. Armazenamento opcional indisponível é diagnosticado; referência local
-corrompida bloqueia nova intenção automática. Falha de leitura oculta conteúdo
-consultado e permite retry, sem aria-invalid em saída. Confirmar e fechar não
-inventa alteração não salva.
+Desde L4, a interface guarda somente paciente, pessoa, revisão, chave e
+contagem das consultas de recuperação, no escopo da conta. Uma resposta
+perdida permite consultar a mesma tentativa após recarregar a aba. O banco
+confirma o registro oficial ou encerra a tentativa ainda ausente sob o mesmo
+lock do comando. A edição permanece em memória até sair do painel. O conflito
+de versão exige comparar os dados e confirmar de novo a declaração atual.
+
+A recuperação oferece até duas consultas e mantém a referência para suporte.
+Referência local inválida bloqueia nova conferência até verificar a tentativa
+anterior. Falha de leitura retira o conteúdo da consulta e oferece atualização.
+O aplicativo continua usando o mesmo histórico oficial para autoria e versões.
 
 API e RPC exigem Auth atual, contexto e capacidade do paciente. O banco
 revalida depois de esperas reais. Autoaprovação, global sem vínculo, outro
@@ -41,7 +46,8 @@ conferências existentes conservam referências históricas. Papéis não mudam.
 
 ## Provas e contraprovas
 
-Sete unitários passaram. Cinco casos Auth distintos passaram em coortes:
+Na verificação original de D3.17, sete unitários passaram. Cinco casos Auth
+distintos passaram em coortes:
 snapshot/replay/mudança-restauração; escopo/paginação/concorrência; cuidadora e
 fonte externa proibida; sessão/vínculo após locks reais; exclusão local de
 perfil sem histórico e JWT invalidado. Dez execuções Auth: sete PASS/três FAIL

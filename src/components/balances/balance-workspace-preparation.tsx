@@ -1,7 +1,7 @@
 "use client";
 import { useOperationActivity } from "@/components/ui/operation-activity";
 import { useEffect, useRef, useState, type RefObject } from "react";
-import { ActionButton } from "@/components/ui/controls";
+import { ActionButton, DefinitionGrid } from "@/components/ui/controls";
 import {
   api,
   ApiError,
@@ -19,6 +19,7 @@ import {
 import {
   initialBalancePreparationFields,
   balancePreparationCommand,
+  balancePreparationRequiresReason,
   balancePreparationVersion,
 } from "@/lib/forms/balance-preparation";
 import {
@@ -33,7 +34,7 @@ import {
 import type { BalanceWorkspace } from "@/types/balances";
 import { BalancePreparationFields } from "./balance-preparation-fields";
 import { BalanceConfigurationFacts } from "./balance-configuration-facts";
-import { DeferralFacts } from "./balance-deferral-facts";
+import { DeferralAssignmentFacts, DeferralFacts } from "./balance-deferral-facts";
 import { formatZonedDate } from "@/lib/schedules/time";
 
 export type BalancePreparationSelection = {
@@ -108,19 +109,27 @@ export function BalanceWorkspacePreparation({
   const content = { values, referenceHash: reference.referenceHash, referenceVersion: reference.referenceVersion };
   const saved = { values: initialValues, ...initialReference };
   const dirty = JSON.stringify(content) !== JSON.stringify(saved);
-  const family = ["family", "admin"].includes(patient.role),
-    allowDeferral = family && can(context, "bal.defer.approve");
+  const assignment = source?.workspace.assignments.find(a => a.id === targetResourceId);
+  const allowDeferral = can(context, "bal.defer.approve");
   const canWrite =
     purpose === "configure" || purpose === "assign"
-      ? family && can(context, "bal.schedule.manage")
+      ? can(context, "bal.schedule.manage")
       : purpose === "request_deferral"
         ? can(context, "bal.defer.request") &&
-          (source?.workspace.assignments.find((a) => a.id === targetResourceId)
-            ?.professional_id === context.userId ||
+          (assignment?.professional_id === context.userId ||
             patient.role === "supervisor")
-        : allowDeferral;
+        : allowDeferral && (purpose !== "defer" || assignment?.professional_id !== context.userId);
   const protectedView =
     referenceForbidden;
+  const deferralCommand = review?.command.action === "request_deferral" || review?.command.action === "defer"
+    ? review.command : null;
+  const requestAssignment = deferralCommand && source?.workspace.assignments.find(item => item.id === deferralCommand.body.assignmentId);
+  const requestTarget = deferralCommand && source?.workspace.targets.find(item => item.id === deferralCommand.body.targetShiftId);
+  const requiresReason = balancePreparationRequiresReason(
+    purpose,
+    source?.workspace.regime?.enabled ?? false,
+    values,
+  );
   const stale =
     !source ||
     source.referenceHash !== reference.referenceHash ||
@@ -301,7 +310,7 @@ export function BalanceWorkspacePreparation({
   async function prepare() {
     if (busy || !canWrite) return;
     const reason = (values.reason ?? "").trim();
-    if (Array.from(reason).length < 3 || reason.length > 1000) {
+    if (requiresReason && (Array.from(reason).length < 3 || reason.length > 1000)) {
       setFieldError(
         "Informe uma justificativa própria com 3 a 1.000 caracteres.",
       );
@@ -441,7 +450,9 @@ export function BalanceWorkspacePreparation({
                 ? "Rejeitar este pedido com motivo próprio, sem alterar atribuição, prazo ou estoque."
                 : purpose === "approve_deferral"
                   ? "Aprovar somente o destino congelado, se ainda elegível. A alteração do prazo será explícita e auditável."
-                  : "A decisão será registrada com seu responsável e justificativa."}
+                  : purpose === "configure"
+                    ? "A programação será registrada com a identificação de quem confirmou."
+                    : "A decisão será registrada com seu responsável e justificativa."}
           </p>
           {review.command.action === "configure" && source ? (
             <BalanceConfigurationFacts
@@ -449,6 +460,10 @@ export function BalanceWorkspacePreparation({
               data={source.workspace}
             />
           ) : null}
+          {requestAssignment ? <DeferralAssignmentFacts assignment={requestAssignment} timezone={source?.workspace.regime?.timezone} /> : null}
+          {requestTarget ? <DefinitionGrid items={[{
+            label: "Prazo solicitado", value: formatZonedDate(requestTarget.ends_at, source?.workspace.regime?.timezone),
+          }]} /> : null}
           {(purpose === "approve_deferral" || purpose === "reject_deferral") &&
           source?.workspace.deferrals.find((d) => d.id === targetResourceId) ? (
             <DeferralFacts
@@ -463,7 +478,7 @@ export function BalanceWorkspacePreparation({
           {values.targetShiftLabel ? (
             <p className="wrap-anywhere">Destino: {values.targetShiftLabel}.</p>
           ) : null}
-          {"reason" in review.command.body ? (
+          {"reason" in review.command.body && review.command.body.reason ? (
             <div>
               <h3>Sua justificativa</h3>
               <p className="whitespace-pre-wrap wrap-anywhere">
@@ -551,7 +566,9 @@ export function BalanceWorkspacePreparation({
               onReview={() => void prepare()}
               canReview={!stale && canWrite}
               allowDeferral={allowDeferral}
+              canReadSchedule={can(context, "schedule.read.team") || can(context, "schedule.read.own")}
               reasonRef={reasonRef}
+              requiresReason={requiresReason}
               error={fieldError || undefined}
             />
           </fieldset>

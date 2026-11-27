@@ -10,6 +10,17 @@ E01–E03 seguem também a revisão L1 posterior, indicada no
 dessa revisão: materiais unificados, atualização da cópia, Andamentos,
 identificação compacta e cartões do início. Controles de simulação ficam no HTML.
 
+O [contrato canônico](CANONICAL_MODEL.md) também referencia as revisões L2 v7
+e L3 v4 para suas superfícies. No Histórico de Plantões e balanços, as fichas
+usam cartões compactos com código, data, autoria e situação. Os filtros
+abrem no diálogo compartilhado. A navegação conserva a consulta de origem.
+
+Na área Arquivos da ficha, Gerados e Anexos usam cartões com formato,
+identificação, autoria, data, situação e ações. O menu do exemplar abre
+o painel de identificação e compartilhamento. Os botões de visualizar
+e baixar usam a mesma emissão registrada. O diálogo Gerar PDF conserva
+as ações no rodapé enquanto as opções rolam.
+
 Os PDFs têm [referência documental própria](../documents/03_ESPECIFICACAO_DOCUMENTAL_APROVADA.md),
 autorizada em 11/11/2026. A composição impressa não substitui este sistema visual
 da aplicação; autoria, estados e ícones conservam o significado compartilhado.
@@ -124,14 +135,14 @@ a origem preservada sob sua autorização própria. Consulta, compensação,
 referências e atalhos permanecem separados. Trânsito conserva expedido,
 aceito, conciliado e pendente em leitura; esses valores não viram saldo.
 
-ConsumptionRecord reproduz o registro e ícone do modelo. Texto completo,
-autoria histórica, instante, custódia e situação permanecem visíveis. Materiais
-de relato e complemento usam MaterialReview; metadados e decisões usam a grade
-compartilhada. Relatar, complementar, confirmar e debitar continuam atos próprios.
-O texto integral exige a variante móvel de conteúdo longo: ícone e conteúdo
-ficam em duas colunas; situação e ação vêm abaixo do texto, como as ações dos
-registros de arquivos do modelo. Conserva espaçamentos, paleta e componentes,
-sem comprimir o relato numa coluna estreita ou ocultar trechos.
+Em Consumo e faltas, E07-07 usa os cartões inteiros clicáveis da v4,
+com tipo, custódia, situação, resumo dos materiais vigentes, texto preservado,
+autoria e instante. A busca, a paginação e os filtros de estado e período
+consultam os mesmos registros autorizados no banco. O painel de filtros
+abre pela lateral no desktop e pela base no celular. A lista diferencia
+Consumos e Faltas e oferece acesso ao estoque do mesmo paciente.
+Os detalhes usam MaterialReview para relato e complemento e a grade
+compartilhada para os atos preservados.
 
 FileRecord compartilha a composição de arquivos do modelo entre anexos,
 exemplares assinados e arquivos legados. Nome, fatos e ações permanecem

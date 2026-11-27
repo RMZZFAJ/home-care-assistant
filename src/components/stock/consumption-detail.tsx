@@ -1,6 +1,10 @@
 "use client";
 import { ActionButton, DefinitionGrid } from "@/components/ui/controls";
 import { FeedbackBanner } from "@/components/ui/feedback";
+import { DocumentProgress } from "@/components/documents/document-progress";
+import { CatalogueMaterialPanel } from "@/components/documents/catalogue-material-panel";
+import { DocumentPanel, DocumentTabs, useDocumentTabs } from "@/components/documents/document-tabs";
+import { Icon } from "@/components/ui/icon";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useWorkspaceState } from "@/components/layout/workspace-context";
@@ -13,15 +17,19 @@ import {
   type WorkspaceContext,
 } from "@/components/workspace";
 import { useLiveRevision } from "@/lib/use-live-revision";
+import { canReportConsumption } from "@/lib/client/capabilities";
 import { formatBrazilDate } from "@/lib/receipt";
 import { formatQuantity } from "@/lib/quantity";
 import type { CatalogProduct } from "@/types/documents";
-import type { ConsumptionReport } from "@/types/consumption";
+import type { ConsumptionLine, ConsumptionReport } from "@/types/consumption";
 import { ConsumptionPrivateResults } from "./consumption-private-results";
 import { ConsumptionLines } from "./consumption-lines";
+import { ConsumptionMaterialFacts } from "./consumption-material-facts";
 import { ConsumptionEditor } from "./consumption-editor";
 import { ConsumptionDecision } from "./consumption-decision";
-import { consumptionFollowUp, consumptionLocationLabel, consumptionReadStampMatches, mergeConsumptionRead } from "@/lib/consumption/follow-up";
+import { TeamConsumptionAction, type TeamConsumptionActionKind } from "./team-consumption-action";
+import { TeamConsumptionCorrection } from "./team-consumption-correction";
+import { consumptionFollowUp, consumptionLocationLabel, consumptionReadStampMatches, consumptionRecordLabel, consumptionStateLabels, mergeConsumptionRead } from "@/lib/consumption/follow-up";
 
 export function ConsumptionDetail({
   id,
@@ -30,7 +38,12 @@ export function ConsumptionDetail({
   catalogError,
   catalogLoading,
   onCatalogRetry,
+  teamBalances,
+  teamStockLoading,
+  teamStockError,
+  onTeamMaterialRetry,
   onChange,
+  onOpenRecord,
   onClose,
 }: {
   id: string;
@@ -39,7 +52,12 @@ export function ConsumptionDetail({
   catalogError: string;
   catalogLoading: boolean;
   onCatalogRetry: () => void;
+  teamBalances: ReadonlyMap<string, string>;
+  teamStockLoading: boolean;
+  teamStockError: string;
+  onTeamMaterialRetry: () => void;
   onChange: () => void;
+  onOpenRecord: (id: string) => void;
   onClose: () => void;
 }) {
   const [data, setData] = useState<ConsumptionReport | null>(null),
@@ -48,6 +66,8 @@ export function ConsumptionDetail({
     [message, setMessage] = useState(""),
     [reading, setReading] = useState(true);
   const [editor, setEditor] = useState<HTMLElement | null>(null),
+    [teamAction, setTeamAction] = useState<{ kind: TeamConsumptionActionKind | "correct"; opener: HTMLElement; report: ConsumptionReport } | null>(null),
+    [material, setMaterial] = useState<{ line: ConsumptionLine; opener: HTMLElement; scroll: number } | null>(null),
     [decision, setDecision] = useState<{
       report: ConsumptionReport;
       accept: boolean;
@@ -56,6 +76,7 @@ export function ConsumptionDetail({
     headingRef = useRef<HTMLHeadingElement>(null),
     firstFocusRef = useRef(false);
   const { loading, selecting } = useWorkspaceState();
+  const tabs = useDocumentTabs(false);
   useEffect(() => {
     if (!data || reading || loading || selecting || firstFocusRef.current) return;
     // URL/context reads keep this detail mounted but inert under the loading
@@ -98,6 +119,7 @@ export function ConsumptionDetail({
             setMessage("");
             setEditor(null);
             setDecision(null);
+            setMaterial(null);
           }
         }
       })
@@ -140,15 +162,41 @@ export function ConsumptionDetail({
     data &&
     !reading &&
     !error &&
-    can(context, "consumption.report") &&
-    (data.location !== "FAMILY" ||
-      ["admin", "family"].includes(context.patient!.role));
+    canReportConsumption(context, data.location);
   const followUp = data ? consumptionFollowUp(data) : null;
+  const legacy = data?.workflow_mode === "legacy" || data?.workflow_mode === undefined;
+  const mayWriteTeam = context.patient?.is_active !== false && can(context, "consumption.team.write") && can(context, "stock.team.read");
+  const mayWrite = Boolean(data && !reading && !error && mayWriteTeam);
+  const canAmend = mayWrite && data?.status === "recorded" && (data.reported_by === context.userId || can(context, "consumption.team.correct"));
+  const progressType = data?.kind === "shortage" ? "FAL" : "CON";
+  const recordLabel = consumptionRecordLabel(data?.kind ?? "consumption", id);
+  const currentProducts = new Set(data?.current_lines.map(line => line.productId));
+  const previousMaterials = data?.revisions.length
+    ? [...new Map([data.lines, ...data.revisions.map(revision => revision.lines)].flat()
+      .filter(line => !currentProducts.has(line.productId)).map(line => [line.productId, line])).values()]
+    : [];
+  function consult(line: ConsumptionLine) {
+    const name = line.name ?? "material com nome não preservado";
+    return <ActionButton variant="quiet" compact className="hca-material-consult-button"
+      aria-label={`Consultar material ${name}`}
+      onClick={event => setMaterial({ line, opener: event.currentTarget, scroll: window.scrollY })}>
+      <Icon name="eye" />Consultar material
+    </ActionButton>;
+  }
+  function closeMaterial() {
+    const origin = material;
+    setMaterial(null);
+    requestAnimationFrame(() => {
+      const field = origin?.opener.isConnected ? origin.opener : headingRef.current;
+      field?.focus({ preventScroll: true });
+      if (origin) window.scrollTo({ top: origin.scroll, behavior: "instant" });
+    });
+  }
   return (
     <section className="ui-card space-y-4" aria-label="Detalhe do relato">
       <div className="hca-toolbar">
         <h2 className="font-semibold" tabIndex={-1} ref={headingRef}>
-          Relato e conferência
+          {data && !legacy ? data.kind === "shortage" ? "Aviso de falta" : "Consumo do plantão" : "Relato e conferência"}
         </h2>
         <ActionButton onClick={onClose}>Voltar à lista</ActionButton>
         <ActionButton onClick={() => { setReading(true); setAttempt((value) => value + 1); }}>
@@ -175,17 +223,41 @@ export function ConsumptionDetail({
       {data ? (
         <>
           <DefinitionGrid items={[
-            { label: "Tipo", value: data.kind === "shortage" ? "Falta de material" : "Consumo extraordinário" },
+            { label: "Tipo", value: data.kind === "shortage" ? "Falta de material" : legacy ? "Consumo extraordinário" : "Consumo do plantão" },
             { label: "Custódia", value: consumptionLocationLabel(data.location) },
-            { label: "Situação", value: data.status === "reported" ? "Aguardando conferência" : data.status === "confirmed" ? "Confirmado" : "Rejeitado" },
+            { label: "Situação", value: consumptionStateLabels[data.status] },
             { label: "Versão", value: data.version },
-            { label: "Referência", value: data.id, wide: true },
+            { label: "Referência", value: recordLabel },
+            ...(data.acts?.some(act => act.source === "whatsapp")
+              ? [{ label: "Origem", value: "Sugestão do WhatsApp" }] : []),
           ]} />
+          {canAmend || mayWrite && data.status === "communicated" ? <div className="hca-toolbar">
+            {canAmend ? <>
+              <ActionButton onClick={event => setTeamAction({ kind: "correct", opener: event.currentTarget, report: data })}>Corrigir consumo</ActionButton>
+              <ActionButton onClick={event => setTeamAction({ kind: "cancel", opener: event.currentTarget, report: data })}>Cancelar consumo</ActionButton>
+            </> : <ActionButton onClick={event => setTeamAction({ kind: "shortage", opener: event.currentTarget, report: data })}>Avisar novamente</ActionButton>}
+          </div> : null}
           {reading || error ? (
             <p className="text-sm text-(--muted)">
               Última consulta confirmada; os dados preservados não representam uma nova atualização.
             </p>
           ) : null}
+          <DocumentTabs auditAllowed={false} sections={["materials", "progress"]}
+            value={tabs.value === "progress" ? "progress" : "materials"} onSelect={tabs.select} rootRef={tabs.rootRef}>
+          <DocumentPanel value="materials">
+          <section>
+            <h3 className="font-semibold">{data.kind === "shortage" ? "Materiais em falta" : "Materiais do consumo"}</h3>
+            <ConsumptionLines lines={data.current_lines} renderConsult={consult}
+              emptyMessage={data.kind === "shortage" ? "O aviso foi registrado sem materiais identificados." : undefined} />
+          </section>
+          {previousMaterials.length ? <section>
+            <h3 className="font-semibold">Materiais de versões anteriores</h3>
+            <ConsumptionLines lines={previousMaterials} renderConsult={consult} />
+          </section> : null}
+          <details>
+            <summary>Identificação do registro</summary>
+            <p className="break-all">{data.id}</p>
+          </details>
           {data.source_reminder_id ? (
             <Link
               href={
@@ -206,7 +278,7 @@ export function ConsumptionDetail({
             <p className="my-2 whitespace-pre-wrap wrap-break-word">
               {data.body}
             </p>
-            <ConsumptionLines lines={data.lines} />
+            {data.revisions.length ? <ConsumptionLines lines={data.lines} /> : null}
           </section>
           {data.revisions.map((revision) => (
             <section
@@ -214,7 +286,7 @@ export function ConsumptionDetail({
               key={revision.id}
             >
               <h3 className="font-semibold">
-                Complemento · versão {revision.version}
+                {legacy ? "Complemento" : "Correção"} · versão {revision.version}
               </h3>
               <DefinitionGrid items={[{ label: "Complementado por", value: revision.actor_name ?? "Nome não preservado" },{ label: "Registrado em", value: formatBrazilDate(revision.created_at) }]} />
               <p className="my-2 whitespace-pre-wrap wrap-break-word">
@@ -270,7 +342,7 @@ export function ConsumptionDetail({
                 ) : null}
               </div>
             </section>
-          ) : (
+          ) : legacy ? (
             <section>
               <h3 className="font-semibold">
                 Decisão preservada · versão{" "}
@@ -289,10 +361,10 @@ export function ConsumptionDetail({
                     : "Consumo confirmado com movimentos vinculados ao relato."}
               </p>
             </section>
-          )}
+          ) : null}
           {data.movements.length ? (
             <section>
-              <h3 className="font-semibold">Movimentos desta confirmação</h3>
+              <h3 className="font-semibold">{data.workflow_mode === "direct" ? "Movimentos do consumo" : "Movimentos desta confirmação"}</h3>
               <ul className="space-y-3">
                 {data.movements.map((movement) => (
                   <li className="wrap-break-word text-sm" key={movement.id}>
@@ -306,8 +378,8 @@ export function ConsumptionDetail({
                         (line) => line.productId === movement.productId,
                       )?.unit,
                     )}{" "}
-                    · saída de{" "}
-                    {consumptionLocationLabel(movement.source)} ·{" "}
+                    · {movement.source ? "saída de " : "entrada em "}
+                    {consumptionLocationLabel(movement.source ?? movement.destination)} ·{" "}
                     {formatBrazilDate(movement.createdAt)}
                     <details className="mt-2">
                       <summary>Referência do movimento</summary>
@@ -318,7 +390,7 @@ export function ConsumptionDetail({
               </ul>
             </section>
           ) : null}
-          <section
+          {legacy ? <section
             className="hca-form-stack"
             aria-label="Meus preenchimentos privados do relato"
           >
@@ -342,7 +414,31 @@ export function ConsumptionDetail({
                 Minha rejeição preservada
               </ActionButton>
             </div>
-          </section>
+          </section> : null}
+          </DocumentPanel>
+          <DocumentPanel value="progress">
+            <DocumentProgress id={id} type={progressType} patientId={context.patient!.id} context={context}
+              code={recordLabel} readOnly={context.patient?.is_active === false} />
+          </DocumentPanel>
+          </DocumentTabs>
+          {material ? <CatalogueMaterialPanel key={material.line.productId}
+            context={context} recordCode={recordLabel}
+            material={{ id: material.line.productId, name: material.line.name ?? "Material do relato", unit: material.line.unit }}
+            detail={<ConsumptionMaterialFacts report={data} material={material.line} />}
+            finalFocus={() => false} onClose={closeMaterial} closeText="Voltar à ficha" /> : null}
+          {teamAction?.kind === "correct" && mayWriteTeam ? (
+            <TeamConsumptionCorrection context={context} report={teamAction.report} products={products}
+              balances={teamBalances} loading={catalogLoading || teamStockLoading} materialError={catalogError || teamStockError}
+              retry={onTeamMaterialRetry} opener={teamAction.opener} onClose={() => setTeamAction(null)}
+              onSaved={() => { setTeamAction(null); onChange(); setReading(true); setAttempt(value => value + 1); }} />
+          ) : null}
+          {teamAction && teamAction.kind !== "correct" && mayWriteTeam ? <TeamConsumptionAction context={context} kind={teamAction.kind} report={teamAction.report}
+            products={products} opener={teamAction.opener} onClose={() => setTeamAction(null)} onSaved={recordId => {
+              setTeamAction(null);
+              onChange();
+              if (recordId !== id) onOpenRecord(recordId);
+              else { setReading(true); setAttempt(value => value + 1); }
+            }} /> : null}
           {editor ? (
             <ConsumptionEditor
               context={context}

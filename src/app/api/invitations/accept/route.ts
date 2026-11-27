@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { api, ApiError, authenticatedIdentity, readJson, rpc } from "@/lib/server/api";
+import { invitationDecision, invitationToken } from "@/lib/validation/invitation";
 
 export async function POST(request: Request) {
   return api("invitation.accept", async () => {
@@ -9,8 +10,8 @@ export async function POST(request: Request) {
       request,
       z
         .object({
-          token: z.string().regex(/^[A-Za-z0-9_-]{43}$/),
-          decision: z.enum(["accept", "decline"]).default("accept"),
+          token: invitationToken,
+          decision: invitationDecision.default("accept"),
           expectedActor: z.uuid().optional(),
         })
         .strict(),

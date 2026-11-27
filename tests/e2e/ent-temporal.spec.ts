@@ -1,4 +1,4 @@
-import { CURRENT_PDF_REVISION, pdfIssuanceReference } from "./generated-pdf";
+import { CURRENT_PDF_REVISION, generateStandardPdf, pdfIssuanceReference } from "./generated-pdf";
 import { selectDocumentSection } from "./document-sections";
 import { expect,test,type Page } from "@playwright/test";
 import { createHash,randomUUID } from "node:crypto";
@@ -25,7 +25,7 @@ for(const mode of ["prepared","private"] as const)test(`ENT ${mode} preserva mar
   const expected=["Expedição registrada",formatBrazilDate(oracle.issuedAt),"Autenticidade e verificação"];
   let first:{id:string;bytes:Buffer;requestedAt:string}|null=null;
   for(let count=1;count<=2;count++){
-    await page.getByRole("button",{name:"Gerar PDF",exact:true}).click();
+    await generateStandardPdf(page);
     await expect(files.getByRole("link",{name:"Baixar PDF",exact:true})).toHaveCount(count);
     const rows=(await(await page.request.get(endpoint)).json()).data;
     expect(rows).toHaveLength(count);const row=rows.find((r:{id:string})=>r.id!==first?.id);

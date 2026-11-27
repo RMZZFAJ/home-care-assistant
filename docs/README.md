@@ -1,7 +1,9 @@
 # Documentação do Home Care Assistant
 
-Para conferir a entrega e retomar a auditoria, comece pelo
-[fechamento A–D da PR 7](audits/FECHAMENTO_PR7.md).
+O [quadro de fechamento de D-B](audits/D/D-B/FECHAMENTO_D_B.md) reúne a
+validação da PR 8 e as decisões para D-C. O
+[fechamento A–D da PR 7](audits/FECHAMENTO_PR7.md) registra a integração
+de L1 e L2 e o início da continuidade.
 
 **UI/UX vigente:**[Modelo Integral](ui-ux/CANONICAL_MODEL.md), aprovado
 em 09/11/2026, substitui Fluent e a direção visual anterior. Aplicar a todos
@@ -20,6 +22,14 @@ L2 é o [laboratório v7](../hca-laboratorio-02-v7.html), com as regras do
 [comando mestre](../HCA_L2_COMANDO_MESTRE_CODEX_V7.md). A
 [consolidação intermediária](../HCA_L2_DECISOES_VIGENTES_E_PENDENCIAS.md)
 serve como apoio histórico.
+
+L3 segue o [comando mestre v4](../HCA_L3_COMANDO_MESTRE_CODEX_V4.md) e o
+[laboratório v4 aprovado](../hca-laboratorio-03-v4-aprovado.html) para
+estoque e consumo, plantões e balanços, arquivos e verificação.
+
+L4 segue o [comando mestre v2](../HCA_L4_COMANDO_MESTRE_CODEX_V2.md) e o
+[laboratório v2 aprovado](../hca-laboratorio-04-v2-aprovado.html) para
+residência, permissões e catálogo, conta e avisos, ajuda e continuidade.
 
 **Andamento da D-B:** [acompanhamento principal](../TEMP_D_B_ATUALIZACAO.md),
 com capacidades entregues, trabalho local, fila e responsabilidades. A
@@ -40,7 +50,8 @@ não autorizada permanece OWNER-DEFERRED. Produção NO-GO.
 
 **Histórico e planejamento.** A/B registram o diagnóstico. C conserva o
 projeto integrado pela PR 6. D-A registra D0–D2. D-B reúne a execução de
-D3–D5 e L1/L2, com validação conjunta e homologação ainda pendentes.
+D3–D5 e L1–L4, com as condições de integração e homologação registradas
+no quadro de fechamento.
 
 <!-- c-table:start -->
 

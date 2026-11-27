@@ -1,4 +1,5 @@
 import { selectDocumentSection } from "./document-sections";
+import { finishBalanceMaterials } from "./balance-wizard-stages";
 import { generatedPdf } from "./generated-pdf";
 import { test, expect, type Page } from "@playwright/test";
 import { createHash } from "node:crypto";
@@ -31,7 +32,7 @@ test("BAL legado facultativo permite designar Sheila, preservar o efeito anterio
   await login(page, fixtures.family.email, f.patient);
   await page.goto("/fichas/" + f.document.id);
   await expect(page.getByRole("region", { name: "Próximo passo sugerido", exact: true })).toContainText("Consultar a contagem conciliada");
-  await selectDocumentSection(page, "workflow");
+  await selectDocumentSection(page, "counts");
   const versions = page.getByRole("region", {
     name: "Versões das contagens físicas",
     exact: true,
@@ -95,6 +96,7 @@ test("BAL legado facultativo permite designar Sheila, preservar o efeito anterio
     await expect(
       counter.getByRole("heading", { name: "Balanço de estoque", exact: true }),
     ).toBeVisible();
+    await counter.getByRole("button", { name: "Iniciar contagem", exact: true }).click();
     const catalogue = (
       await (
         await counter.request.get("/api/catalog?careRecipientId=" + f.patient)
@@ -107,6 +109,7 @@ test("BAL legado facultativo permite designar Sheila, preservar o efeito anterio
       await expect(input).toHaveValue("");
       await input.fill("1");
     }
+    await finishBalanceMaterials(counter);
     const notes = counter.getByLabel("Observações da contagem", {
       exact: true,
     });
@@ -169,7 +172,7 @@ test("BAL legado facultativo permite designar Sheila, preservar o efeito anterio
   }
   await page.goto("/fichas/" + f.document.id);
   await expect(page.getByRole("region", { name: "Próximo passo sugerido", exact: true })).toContainText("Consultar a contagem conciliada");
-  await selectDocumentSection(page, "workflow");
+  await selectDocumentSection(page, "counts");
   const document = (
     await (await page.request.get("/api/documents/" + f.document.id)).json()
   ).data as SupplyDocument;

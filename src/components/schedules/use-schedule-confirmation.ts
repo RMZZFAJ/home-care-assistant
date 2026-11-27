@@ -20,11 +20,12 @@ export function useScheduleConfirmation(userId: string, patientId: string) {
   const [error, setError] = useState(""),
     [notFound, setNotFound] = useState(false),
     [readDenied, setReadDenied] = useState(false);
-  const inFlightRef = useRef(false);
+  const scopeRef = useRef<{ inFlight: boolean } | null>(null);
   useEffect(() => {
-    let alive = true;
+    const scope = { inFlight: false };
+    scopeRef.current = scope;
     void Promise.resolve().then(() => {
-      if (!alive) return;
+      if (scopeRef.current !== scope) return;
       try {
         setPending(
           parseSchedulePending(
@@ -41,7 +42,7 @@ export function useScheduleConfirmation(userId: string, patientId: string) {
       }
     });
     return () => {
-      alive = false;
+      scopeRef.current = null;
     };
   }, [userId, patientId]);
   async function lookup(packet: SchedulePacket) {
@@ -70,8 +71,10 @@ export function useScheduleConfirmation(userId: string, patientId: string) {
     send: boolean,
     first: boolean,
   ) {
-    if (inFlightRef.current) return null;
-    inFlightRef.current = true;
+    const scope = scopeRef.current;
+    if (!scope || scope.inFlight) return null;
+    const isCurrent = () => scopeRef.current === scope;
+    scope.inFlight = true;
     setBusy(true);
     setError("");
     try {
@@ -83,6 +86,7 @@ export function useScheduleConfirmation(userId: string, patientId: string) {
         try {
           await api("/api/schedules", packet);
         } catch (reason) {
+          if (!isCurrent()) return null;
           // An explicit rejection can still be an obsolete proposal recorded by the native command.
           // A prior uncertain attempt is retained even if a later POST now loses authorization.
           if (
@@ -91,6 +95,7 @@ export function useScheduleConfirmation(userId: string, patientId: string) {
             [400, 401, 403, 404, 409, 422].includes(reason.status)
           ) {
             const known = await lookup(packet);
+            if (!isCurrent()) return null;
             if (known.found) return finish(known, packet);
             clearSchedulePending(sessionStorage, userId, packet);
             setPending(null);
@@ -101,7 +106,10 @@ export function useScheduleConfirmation(userId: string, patientId: string) {
         // Do not clear or replay a different envelope that appeared since rendering.
         saveSchedulePending(sessionStorage, userId, packet);
       }
+      if (!isCurrent()) return null;
       const result = await lookup(packet);
+      // An earlier panel cannot clear the reference restored by its replacement.
+      if (!isCurrent()) return null;
       if (result.found) return finish(result, packet);
       setReadDenied(false);
       setNotFound(true);
@@ -110,6 +118,7 @@ export function useScheduleConfirmation(userId: string, patientId: string) {
       );
       return null;
     } catch (reason) {
+      if (!isCurrent()) return null;
       if (
         reason instanceof ApiError &&
         [401, 403, 404].includes(reason.status)
@@ -124,8 +133,8 @@ export function useScheduleConfirmation(userId: string, patientId: string) {
       );
       throw reason;
     } finally {
-      inFlightRef.current = false;
-      setBusy(false);
+      scope.inFlight = false;
+      if (isCurrent()) setBusy(false);
     }
   }
   const submit = (packet: SchedulePacket) => execute(packet, true, true);

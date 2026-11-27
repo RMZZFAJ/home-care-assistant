@@ -16,6 +16,7 @@ import { useLiveRevision } from "@/lib/use-live-revision";
 import { formatQuantity } from "@/lib/quantity";
 import { formatBrazilDate } from "@/lib/receipt";
 import type { OriginMovement, StockOrigin } from "@/types/stock-origin";
+import type { StockOperationMovement } from "@/lib/validation/stock-reads";
 
 const custody: Record<string, string> = {
   FAMILY: "Família",
@@ -230,12 +231,14 @@ function OriginContent({ data }: { data: StockOrigin }) {
 export function MovementOrigin({
   patientId,
   movementId,
+  effect,
   opener,
   onClose,
   restoreFocusFallbackRef,
 }: {
   patientId: string;
   movementId: string;
+  effect?: StockOperationMovement;
   opener: HTMLElement;
   onClose: () => void;
   restoreFocusFallbackRef: RefObject<HTMLElement | null>;
@@ -313,6 +316,12 @@ export function MovementOrigin({
                 Identificação atual do catálogo; os nomes preservados no ato
                 aparecem na origem abaixo.
               </p>
+              {effect && !source.loading && !source.error && effect.id === source.data.data.movement.id ? <DefinitionGrid items={[
+                { label: "Custódia", value: custody[effect.custody] },
+                { label: "Saldo anterior", value: effect.before === null ? "Indisponível" : formatQuantity(effect.before, effect.unit ?? undefined) },
+                { label: "Efeito no saldo", value: (effect.direction === "inbound" ? "+" : "−") + formatQuantity(effect.quantity, effect.unit ?? undefined) },
+                { label: "Saldo posterior", value: effect.after === null ? "Indisponível" : formatQuantity(effect.after, effect.unit ?? undefined) },
+              ]} /> : null}
               <MovementFacts movement={source.data.data.movement} />
               <p>Ator: {source.data.data.actor.name ?? "Nome indisponível"}.</p>
               {source.data.data.actor.source === "current_profile" ? (

@@ -31,14 +31,50 @@ test("seis perfis abrem destinos pessoais e unidades com nomes compatíveis e se
   await login(page,role==="global"?null:f.patient,role);await page.goto("/mais");let menu=page.getByRole("navigation",{name:"Rotina e funções autorizadas",exact:true});await expect(menu.getByRole("link",{name:/^Catálogo e unidades/})).toHaveCount(0);
   const units=menu.getByRole("link",{name:/^Unidades e apresentações/});if(role==="adminA")await expect(units).toHaveCount(1);if(["professional","reader"].includes(role))await expect(units).toHaveCount(0);
   if(await units.count()){await units.click();await expect(page.getByRole("heading",{level:1,name:"Unidades e apresentações",exact:true})).toBeVisible();await page.goto("/mais");menu=page.getByRole("navigation",{name:"Rotina e funções autorizadas",exact:true});}
-  await menu.getByRole("link",{name:/^Meu perfil e segurança/}).click();await expect(page.getByRole("heading",{level:1,name:/^Meu perfil/})).toBeVisible();await page.goto("/mais");await page.getByRole("navigation",{name:"Rotina e funções autorizadas",exact:true}).getByRole("link",{name:/^Notificações/}).click();await expect(page.getByRole("heading",{level:1,name:"Central de notificações",exact:true})).toBeVisible();if(role==="global")await expect(page.getByText("Selecione um vínculo com paciente em Mudar perfil para consultar suas notificações.",{exact:true})).toBeVisible();
+  await menu.getByRole("link",{name:/^Meu perfil e segurança/}).click();await expect(page.getByRole("heading",{level:1,name:"Minha conta",exact:true})).toBeVisible();await page.goto("/mais");await page.getByRole("navigation",{name:"Rotina e funções autorizadas",exact:true}).getByRole("link",{name:/^Notificações/}).click();await expect(page.getByRole("heading",{level:1,name:"Avisos",exact:true})).toBeVisible();if(role==="global")await expect(page.getByText("Selecione um vínculo com paciente em Mudar perfil para consultar suas notificações.",{exact:true})).toBeVisible();
  }
  expect(official(f.patient)).toBe(before);
 });
 
 test("aviso real de compra abre a ficha e conserva o paciente anunciado",async({page})=>{
  const f=await setup(),family=await actor("family",f.patient),doc=await rpc(family,"create_supply_document",{p_patient:f.patient,p_type:"COM",p_payload:{origin:"purchase",lines:[{productId:f.products[0],quantity:"1"}]},p_key:randomUUID(),p_draft:false}),before=official(f.patient);
- await login(page,f.patient,"family");await page.goto(`/notificacoes?careRecipientId=${f.patient}`);const row=page.getByRole("region",{name:"Acompanhamento pessoal",exact:true}).getByRole("listitem").filter({hasText:doc.code}),link=row.getByRole("link",{name:"Abrir compra ou doação",exact:true});await expect(row.locator("p > div")).toHaveCount(0);await expect(link).toHaveAttribute("href",`/fichas/${doc.id}?careRecipientId=${f.patient}`);await link.click();await expect(page).toHaveURL(new RegExp(`/fichas/${doc.id}\\?careRecipientId=${f.patient}`));await expect(page.locator(".hca-workspace")).toHaveAttribute("data-context-patient",f.patient);await expect(page.getByRole("heading",{name:doc.code,exact:true})).toBeVisible();expect(official(f.patient)).toBe(before);
+ await login(page,f.patient,"family");
+ const inbox = "/notificacoes?" + new URLSearchParams({ careRecipientId: f.patient, q: doc.code });
+ await page.goto(inbox);
+ const origin = page.url();
+ const row = page.getByRole("region", { name: "Acompanhamento pessoal", exact: true }).getByRole("listitem").filter({ hasText: doc.code });
+ const open = row.getByRole("button", { name: "Ver aviso de " + doc.code, exact: true });
+ const details = page.getByRole("dialog", { name: doc.code, exact: true });
+ const inboxWrites: string[] = [];
+ page.on("request", request => {
+   if (new URL(request.url()).pathname === "/api/notifications" && request.method() === "POST") inboxWrites.push(request.url());
+ });
+ const noticeId = await row.getAttribute("data-notification-id");
+ expect(noticeId).toBeTruthy();
+ await expect(row.locator("p > div")).toHaveCount(0);
+ await open.click();
+ await expect(details).toBeVisible();
+ await details.getByRole("button", { name: "Voltar", exact: true }).click();
+ await expect(open).toBeFocused();
+ await open.press("Enter");
+ const destination = details.getByRole("button", { name: "Abrir compra ou doação", exact: true });
+ await expect(destination).toBeEnabled();
+ const [rechecked] = await Promise.all([
+   page.waitForResponse(response => {
+     const url = new URL(response.url());
+     return url.pathname === "/api/notifications" && url.searchParams.get("noticeId") === noticeId;
+   }),
+   destination.click(),
+ ]);
+ expect(rechecked.ok()).toBe(true);
+ await expect(page).toHaveURL(url => url.pathname === "/fichas/" + doc.id && url.searchParams.get("careRecipientId") === f.patient);
+ await expect(page.locator(".hca-workspace")).toHaveAttribute("data-context-patient", f.patient);
+ await expect(page.getByRole("heading", { name: doc.code, exact: true })).toBeVisible();
+ await page.goBack();
+ await expect(page).toHaveURL(origin);
+ await expect(open).toBeVisible();
+ expect(inboxWrites).toEqual([]);
+ expect(official(f.patient)).toBe(before);
 });
 
 test("entregas ignoram resposta invertida e distinguem erro de vazio sem perder foco no filtro",async({page})=>{
@@ -56,7 +92,44 @@ test("estoque ignora custódia tardia e mantém erro e vazio distintos com saldo
  const f=await setup(),before=official(f.patient);await page.addInitScript(()=>{const native=window.fetch.bind(window);window.fetch=(input,init)=>{const url=new URL(typeof input==="string"?input:input instanceof URL?input.href:input.url,location.origin);return native(input,url.pathname==="/api/stock/balances"?{...init,signal:undefined}:init);};});await login(page,f.patient,"family");
  let release!:()=>void,entered!:()=>void;const gate=new Promise<void>(resolve=>{release=resolve;}),oldEntered=new Promise<void>(resolve=>{entered=resolve;});let mode:"live"|"error"|"empty"="live";
  await page.route("**/api/stock/balances?*",async route=>{const custody=new URL(route.request().url()).searchParams.get("custody");if(custody==="TRANSIT"){const response=await route.fetch();entered();await gate;return route.fulfill({response});}if(mode==="error")return route.fulfill({status:500,json:{code:"INTERNAL_ERROR",error:"Falha controlada na consulta do saldo"}});if(mode==="empty"){const response=await route.fetch();return route.fulfill({response,json:{...await response.json(),overview:[],data:[],metrics:[],transit:[]}});}return route.continue();});
- try{await page.goto(`/estoque?careRecipientId=${f.patient}&custody=FAMILY`);const balances=page.getByRole("region",{name:"Saldos e previsões",exact:true}),row=balances.getByRole("row",{name:"Material fictício V4 0 · Família",exact:true}).or(balances.getByRole("article",{name:"Material fictício V4 0 · Família",exact:true})),filter=page.getByRole("combobox",{name:"Custódia",exact:true});await expect(row).toContainText("30");await filter.focus();await filter.selectOption("TRANSIT");await oldEntered;await expect(balances).toHaveAttribute("aria-busy","true");await expect(row).toHaveCount(0);await filter.selectOption("FAMILY");await expect(row).toContainText("30");await expect(filter).toBeFocused();const oldResponse=page.waitForResponse(response=>new URL(response.url()).pathname==="/api/stock/balances"&&new URL(response.url()).searchParams.get("custody")==="TRANSIT");release();await(await oldResponse).finished();await page.evaluate(()=>new Promise<void>(resolve=>requestAnimationFrame(()=>requestAnimationFrame(()=>resolve()))));await expect(filter).toHaveValue("FAMILY");await expect(row).toContainText("30");
-  mode="error";await balances.getByRole("button",{name:"Atualizar saldos",exact:true}).click();await expect(balances.getByRole("alert")).toContainText("Falha controlada na consulta do saldo");await expect(balances.getByText("Última consulta válida",{exact:false})).toBeVisible();await expect(row).toContainText("30");mode="empty";await balances.getByRole("button",{name:"Atualizar saldos",exact:true}).click();await expect(balances.getByText("Nenhum produto encontrado",{exact:true})).toBeVisible();await expect(balances).toHaveAttribute("aria-busy","false");await widths(page,"D3 stock current filter empty");expect(official(f.patient)).toBe(before);
+ try {
+  await page.goto(`/estoque?careRecipientId=${f.patient}&custody=FAMILY`);
+  const balances = page.getByRole("region", { name: "Saldos e previsões", exact: true });
+  const row = balances.getByRole("region", { name: "Material fictício V4 0 · Família", exact: true });
+  const family = balances.getByRole("button", { name: "Família", exact: true });
+  const opener = balances.getByRole("button", { name: "Em trânsito", exact: true });
+  const transit = page.getByRole("dialog", { name: "Materiais em trânsito", exact: true });
+  const refresh = page.getByRole("button", { name: "Atualizar saldos", exact: true });
+  await expect(row).toContainText("30");
+  await opener.click();
+  await oldEntered;
+  await expect(transit.getByText("Consultando os materiais em trânsito", { exact: true })).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(transit).toHaveCount(0);
+  await expect(opener).toBeFocused();
+  const oldResponse = page.waitForResponse(response => {
+    const url = new URL(response.url());
+    return url.pathname === "/api/stock/balances" && url.searchParams.get("custody") === "TRANSIT";
+  });
+  release();
+  await (await oldResponse).finished();
+  await expect(family).toHaveAttribute("aria-pressed", "true");
+  await expect(transit).toHaveCount(0);
+  await expect(row).toContainText("30");
+  mode = "error";
+  await refresh.click();
+  const unavailable = page.getByRole("dialog", { name: "Não foi possível consultar o estoque", exact: true });
+  await expect(unavailable).toContainText("Falha controlada na consulta do saldo");
+  await unavailable.getByRole("button", { name: "Voltar ao estoque", exact: true }).click();
+  await expect(refresh).toBeFocused();
+  await expect(balances.getByRole("alert")).toContainText("Falha controlada na consulta do saldo");
+  await expect(balances.getByText("Última consulta válida", { exact: false })).toBeVisible();
+  await expect(row).toContainText("30");
+  mode = "empty";
+  await refresh.click();
+  await expect(balances.getByText("Nenhum material encontrado", { exact: true })).toBeVisible();
+  await expect(balances).toHaveAttribute("aria-busy", "false");
+  await widths(page, "D3 stock current filter empty");
+  expect(official(f.patient)).toBe(before);
  }finally{release?.();}
 });

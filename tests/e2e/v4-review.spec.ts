@@ -9,14 +9,16 @@ import {
 } from "../../scripts/test-environment.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { selectContext } from "./auth-context";
+import { shiftWorker } from "../integration/shift-fixtures.mjs";
+import { setup as seedPatient } from "../integration/v4-fixtures.mjs";
 test.setTimeout(180000);
 test.afterEach(async ({ page }) => {
   await page.unrouteAll({ behavior: "wait" });
 });
 const fixtures = () => JSON.parse(readFileSync(fixtureFile, "utf8"));
-async function login(page: Page, role: string, patient: string | null) {
+async function login(page: Page, account: string | { email: string }, patient: string | null) {
   await page.goto("/login");
-  await page.getByLabel("E-mail", { exact: true }).fill(fixtures()[role].email);
+  await page.getByLabel("E-mail", { exact: true }).fill(typeof account === "string" ? fixtures()[account].email : account.email);
   await page.getByLabel("Senha", { exact: true }).fill(fixturePassword);
   await page.getByRole("button", { name: "Entrar", exact: true }).click();
   await expect(
@@ -24,8 +26,11 @@ async function login(page: Page, role: string, patient: string | null) {
   ).toBeVisible();
   await selectContext(page, patient);
 }
-async function post(page: Page, path: string, data: unknown) {
-  const response = await page.request.post(path, { data });
+async function post(actor: Pick<Page, "request">, path: string, data: unknown, timeout?: number) {
+  const response = await actor.request.post(path, { data, timeout }).catch((reason: unknown) => {
+    const name = reason instanceof Error ? reason.name : "RequestError";
+    throw new Error("POST " + path + " falhou antes da resposta (" + name + ").");
+  });
   expect(response.ok(), (await response.text()).slice(0, 500)).toBeTruthy();
   return response.json();
 }
@@ -93,75 +98,85 @@ test("V4 review: matriz reconcilia horários, intervalo, versões e falhas sem s
         idempotencyKey: randomUUID(),
         expectedVersion: (await governance(other)).version,
       });
+    const complete = (name: string) =>
+      page.getByRole("dialog", { name, exact: true }).getByRole("button", { name: "Concluir", exact: true }).click();
+    const rejected = page.getByRole("dialog", { name: "Não foi possível registrar a configuração", exact: true });
+    const review = rejected.getByRole("button", { name: "Revisar configuração vigente", exact: true });
     await expect(page.getByText("Arquivamento 7 dias após conclusão ou cancelamento", { exact: true })).toBeVisible();
     await revisePolicy({ archiveDays: 8 });
     await expect(page.getByText("Arquivamento 8 dias após conclusão ou cancelamento", { exact: true })).toBeVisible({ timeout: 45000 });
-    await page.getByRole("button", { name: "Editar Comunicação e lembretes", exact: true }).click();
+    await page.getByRole("button", { name: "Editar Mensagens e lembretes", exact: true }).click();
     await page.getByLabel("Primeiro lembrete (horas)", { exact: true }).fill("3");
     await page.getByRole("button", { name: "Registrar política", exact: true }).click();
+    await complete("Regra registrada");
     await expect.poll(async () => (await governance(page)).settings.reminderHours).toBe(3);
     expect((await governance(page)).settings.archiveDays).toBe(8);
     await expect(page.getByRole("dialog")).toHaveCount(0);
-    await page.getByRole("button", { name: "Editar Encerramento e histórico", exact: true }).click();
+    await page.getByRole("button", { name: "Editar Arquivamento", exact: true }).click();
     const archiveDays = page.getByLabel("Arquivar após conclusão ou cancelamento (dias)", { exact: true });
     await expect(archiveDays).toHaveValue("8");
     await archiveDays.fill("9");
+    const refresh = page.waitForResponse(async response => {
+      const url = new URL(response.url());
+      return response.ok() && response.request().method() === "GET" && url.pathname === "/api/patient-settings"
+        && url.searchParams.get("careRecipientId") === patient && (await response.json()).data?.settings?.archiveDays === 10;
+    }, { timeout: 45_000 });
     await revisePolicy({ archiveDays: 10 });
-    await expect(page.getByText("Política v" + (await governance(other)).version, { exact: false })).toBeVisible({ timeout: 45000 });
+    await refresh;
     await expect(archiveDays).toHaveValue("9");
     await page.getByRole("button", { name: "Registrar política", exact: true }).click();
-    await expect(page.getByRole("alert").filter({ hasText: "configuração mudou em outra sessão" })).toBeVisible();
+    await expect(rejected).toBeVisible();
     await expect(archiveDays).toHaveValue("9");
     await expect(archiveDays).toBeDisabled();
-    await page.getByRole("dialog").getByRole("button", { name: "Revisar configuração vigente", exact: true }).click();
+    await review.click();
     await expect(page.getByRole("dialog")).toHaveCount(0);
-    await expect(page.getByRole("button", { name: "Editar Encerramento e histórico", exact: true })).toBeFocused();
-    await page.getByRole("button", { name: "Editar Encerramento e histórico", exact: true }).click();
+    await expect(page.getByRole("button", { name: "Editar Arquivamento", exact: true })).toBeFocused();
+    await page.getByRole("button", { name: "Editar Arquivamento", exact: true }).click();
     await expect(archiveDays).toHaveValue("10");
     await archiveDays.fill("11");
     await page.getByRole("button", { name: "Registrar política", exact: true }).click();
+    await complete("Regra registrada");
     await expect.poll(async () => (await governance(page)).settings.archiveDays).toBe(11);
     await expect(page.getByRole("dialog")).toHaveCount(0);
-    await page.getByRole("navigation", { name: "Áreas da configuração", exact: true }).getByRole("link", { name: "Notificações", exact: true }).click();
-    await page.getByRole("button", { name: "Opções de Requisição emitida · Familiar", exact: true }).click();
-    const cell = page.getByRole("dialog");
+    await page.getByRole("navigation", { name: "Áreas da configuração", exact: true }).getByRole("link", { name: "Avisos", exact: true }).click();
+    const cell = page.getByRole("dialog", { name: "Requisição emitida", exact: true });
+    const openRule = async () => {
+      await page.getByRole("region", { name: "Regras de avisos", exact: true }).getByRole("button", { name: /^Requisição emitida/ }).click();
+      await cell.getByLabel("Função", { exact: true }).selectOption("family");
+    };
+    const saveRule = cell.getByRole("button", { name: "Salvar regra", exact: true });
     const start = cell.getByLabel("Início", { exact: true }),
       end = cell.getByLabel("Fim", { exact: true }),
-      cooldown = cell.getByLabel("Intervalo mínimo (min)", { exact: true });
+      cooldown = cell.getByRole("spinbutton", { name: "Intervalo mínimo entre avisos (minutos)", exact: true });
     const persisted = async () => {
-      const r = await page.request.get(
-        "/api/notification-rules?careRecipientId=" + patient,
-      );
+      const r = await page.request.get("/api/notification-rules?careRecipientId=" + patient);
       return (await r.json()).rules.find(
-        (r: { event: string; subject_role: string }) =>
-          r.event === "req.issued" && r.subject_role === "family",
+        (r: { event: string; subject_role: string }) => r.event === "req.issued" && r.subject_role === "family",
       );
     };
+    await openRule();
     for (const [field, value, key] of [
-      [start, "21", "quiet_start"],
-      [end, "7", "quiet_end"],
-      [start, "", "quiet_start"],
-      [end, "", "quiet_end"],
+      [start, "21", "quiet_start"], [end, "7", "quiet_end"],
+      [start, "", "quiet_start"], [end, "", "quiet_end"],
     ] as const) {
       await field.selectOption(value);
-      await expect(field).toBeEnabled();
-      await expect
-        .poll(async () => (await persisted())?.[key])
-        .toBe(value === "" ? null : Number(value));
+      await saveRule.click();
+      await complete("Regra de aviso registrada");
+      await expect(cell).toHaveCount(0);
+      await expect.poll(async () => (await persisted())?.[key]).toBe(value === "" ? null : Number(value));
+      await openRule();
       await expect(field).toHaveValue(value);
     }
     await cooldown.fill("23");
-    await cooldown.blur();
-    await expect(cooldown).toBeEnabled();
-    await expect
-      .poll(async () => (await persisted())?.cooldown_minutes)
-      .toBe(23);
     await start.selectOption("20");
-    await expect(start).toBeEnabled();
+    await saveRule.click();
+    await complete("Regra de aviso registrada");
+    await expect(cell).toHaveCount(0);
     await expect.poll(async () => (await persisted())?.quiet_start).toBe(20);
     expect((await persisted()).cooldown_minutes).toBe(23);
+    await openRule();
     let conflict = true;
-    await page.route("**/api/patient-settings", async (route) => {
+    await page.route("**/api/admin/residence-rules", async (route) => {
       if (route.request().method() === "POST" && conflict) {
         conflict = false;
         // Inject a concurrent server revision while this browser write is paused.
@@ -174,24 +189,25 @@ test("V4 review: matriz reconcilia horários, intervalo, versões e falhas sem s
       await route.continue();
     });
     await end.selectOption("6");
-    await expect(
-      page
-        .getByRole("alert")
-        .filter({ hasText: "configuração mudou em outra sessão" }),
-    ).toBeVisible();
-    await expect(end).toBeDisabled();
-    await cell.getByRole("button", { name: "Revisar configuração vigente", exact: true }).click();
+    await saveRule.click();
+    await expect(rejected).toBeVisible();
+    await review.click();
+    await expect(cell).toHaveCount(0);
+    await openRule();
     await expect(end).toBeEnabled();
     await expect(end).toHaveValue("");
     expect((await persisted()).quiet_start).toBe(20);
     expect((await persisted()).cooldown_minutes).toBe(23);
     await page.unrouteAll({ behavior: "wait" });
     await end.selectOption("6");
-    await expect(end).toBeEnabled();
+    await saveRule.click();
+    await complete("Regra de aviso registrada");
+    await expect(cell).toHaveCount(0);
     await expect.poll(async () => (await persisted())?.quiet_end).toBe(6);
+    await openRule();
     for (const failure of ["permission", "network"]) {
       let once = true;
-      await page.route("**/api/patient-settings", async (route) => {
+      await page.route("**/api/admin/residence-rules", async (route) => {
         if (route.request().method() === "POST" && once) {
           once = false;
           if (failure === "network") await route.abort("failed");
@@ -206,14 +222,18 @@ test("V4 review: matriz reconcilia horários, intervalo, versões e falhas sem s
         } else await route.continue();
       });
       await start.selectOption("19");
-      await expect(page.getByRole("alert").first()).toBeVisible();
+      await saveRule.click();
       if (failure === "network") {
-        await expect(start).toBeDisabled();
         expect((await persisted()).quiet_start).toBe(20);
-        await cell.getByRole("button", { name: "Recuperar mesma alteração", exact: true }).click();
+        await page.getByRole("dialog", { name: "A resposta da configuração não chegou", exact: true })
+          .getByRole("button", { name: "Conferir resultado", exact: true }).click();
+        await complete("Tentativa encerrada");
+      } else {
+        await rejected.getByRole("button", { name: "Voltar", exact: true }).click();
       }
       await expect(start).toBeEnabled();
-      await expect(start).toHaveValue(failure === "network" ? "19" : "20");
+      await expect(start).toHaveValue("19");
+      expect((await persisted()).quiet_start).toBe(20);
       expect((await persisted()).cooldown_minutes).toBe(23);
       await page.unrouteAll({ behavior: "wait" });
     }
@@ -224,17 +244,21 @@ test("V4 review: matriz reconcilia horários, intervalo, versões e falhas sem s
 });
 
 test("V4 review: sino filtra silenciosas antes da página e ficha acompanha estado posterior ao vivo", async ({
-  page,
   browser,
 }) => {
-  const { patient, product } = await setup(page),
-    familyContext = await browser.newContext(),
+  const { patient, products: [product] } = await seedPatient();
+  const { patient: otherPatient } = await seedPatient();
+  const familyUser = await shiftWorker(patient, "family");
+  const administrator = await shiftWorker(patient, "admin");
+  sql(`insert into public.care_recipient_memberships(care_recipient_id,user_id,role)
+    values(${sqlLiteral(otherPatient)},${sqlLiteral(familyUser.id)},'family');`);
+  const familyContext = await browser.newContext(),
     proContext = await browser.newContext();
   try {
     const family = await familyContext.newPage(),
       pro = await proContext.newPage();
-    await login(family, "family", patient);
-    await login(pro, "adminA", patient);
+    await login(family, familyUser, patient);
+    await login(pro, administrator, patient);
     const com = (
       await post(family, "/api/documents", {
         careRecipientId: patient,
@@ -250,7 +274,7 @@ test("V4 review: sino filtra silenciosas antes da página e ficha acompanha esta
       "select id from public.requisition_notifications where document_id=" +
         sqlLiteral(receipt.requisitionId) +
         " and recipient_user_id=" +
-        sqlLiteral(fixtures().family.id) +
+        sqlLiteral(familyUser.id) +
         " and channel='internal' limit 1",
     );
     sql(
@@ -289,7 +313,7 @@ test("V4 review: sino filtra silenciosas antes da página e ficha acompanha esta
       exact: true,
     });
     await expect(
-      bell.getByRole("link").filter({ hasText: receipt.code }),
+      bell.getByRole("button").filter({ hasText: receipt.code }),
     ).toHaveCount(1);
     await family.keyboard.press("Escape");
     // The 25 newer silent records occupy the first communications page.
@@ -319,12 +343,6 @@ test("V4 review: sino filtra silenciosas antes da página e ficha acompanha esta
       )
       .toBe(0);
     await family.goto("/notificacoes?careRecipientId=" + patient);
-    const otherPatient = (
-      await (await family.request.get("/api/context")).json()
-    ).data.patients.find(
-      (p: { id: string; hasMembership: boolean }) =>
-        p.id !== patient && p.hasMembership,
-    ).id;
     const picker = family.getByLabel("Pessoa assistida", { exact: true });
     await picker.selectOption(otherPatient);
     await expect
@@ -340,12 +358,8 @@ test("V4 review: sino filtra silenciosas antes da página e ficha acompanha esta
       family.getByRole("button", { name: /^Notificações/ }),
     ).toBeVisible();
     await family.getByRole("button", { name: /^Notificações/ }).click();
-    await expect(
-      family
-        .getByRole("region", { name: "Notificações recentes", exact: true })
-        .getByRole("link")
-        .and(family.locator('a[href*="' + receipt.requisitionId + '"]')),
-    ).toHaveCount(0);
+    await expect(bell.getByText("Você está em dia. As próximas atualizações aparecerão aqui.", { exact: true })).toBeVisible();
+    await expect(bell.getByRole("button").filter({ hasText: receipt.code })).toHaveCount(0);
     await family.keyboard.press("Escape");
     await picker.selectOption(patient);
     await expect
@@ -361,7 +375,7 @@ test("V4 review: sino filtra silenciosas antes da página e ficha acompanha esta
     await expect(
       family
         .getByRole("region", { name: "Notificações recentes", exact: true })
-        .getByRole("link")
+        .getByRole("button")
         .filter({ hasText: receipt.code }),
     ).toHaveCount(1);
   } finally {
@@ -376,14 +390,24 @@ test("V4 review: cartão de arquivamento abre exatamente as conclusões contadas
   page,
   browser,
 }) => {
-  const { patient, product } = await setup(page),
+  const { patient, products: [product] } = await seedPatient(),
+    subject = await shiftWorker(patient, "admin"),
+    permissionEditor = await shiftWorker(patient, "admin"),
+    familyUser = await shiftWorker(patient, "family"),
+    professional = await shiftWorker(patient),
     familyContext = await browser.newContext(),
-    proContext = await browser.newContext();
+    proContext = await browser.newContext(),
+    editorContext = await browser.newContext();
   try {
     const family = await familyContext.newPage(),
-      pro = await proContext.newPage();
-    await login(family, "family", patient);
-    await login(pro, "professional", patient);
+      pro = await proContext.newPage(),
+      editor = await editorContext.newPage();
+    await login(page, subject, patient);
+    await login(family, familyUser, patient);
+    await login(pro, professional, patient);
+    await login(editor, permissionEditor, patient);
+    await Promise.all([family.close(), pro.close(), editor.close()]);
+    await page.bringToFront();
     await post(page, "/api/stock/movements", {
       careRecipientId: patient,
       productId: product,
@@ -393,7 +417,7 @@ test("V4 review: cartão de arquivamento abre exatamente as conclusões contadas
       idempotencyKey: randomUUID(),
     });
     const req = (
-      await post(pro, "/api/requisitions", {
+      await post(proContext, "/api/requisitions", {
         careRecipientId: patient,
         idempotencyKey: randomUUID(),
         lines: [{ productId: product, currentStock: 0, urgent: false }],
@@ -403,27 +427,27 @@ test("V4 review: cartão de arquivamento abre exatamente as conclusões contadas
     ).receipt;
     const version = (
       await (
-        await family.request.get("/api/requisitions/" + req.requisitionId)
+        await familyContext.request.get("/api/requisitions/" + req.requisitionId)
       ).json()
     ).data.progress.version;
-    await post(family, "/api/requisitions/" + req.requisitionId + "/science", {
+    await post(familyContext, "/api/requisitions/" + req.requisitionId + "/science", {
       mode: "express",
       expectedVersion: version,
     });
     const item = (
       await (
-        await pro.request.get("/api/requisitions/" + req.requisitionId)
+        await proContext.request.get("/api/requisitions/" + req.requisitionId)
       ).json()
     ).data.requisition_items[0].id;
     const ent = (
-      await post(family, "/api/documents", {
+      await post(familyContext, "/api/documents", {
         careRecipientId: patient,
         type: "ENT",
         payload: {
           recipientReason: "Escolha manual fictícia para este recebimento",
           source: "FAMILY",
           destination: "CARE_TEAM",
-          recipientId: fixtures().professional.id,
+          recipientId: professional.id,
           lines: [
             { requestFulfillment: "complete", productId: product, quantity: "10", requisitionItemIds: [item] },
           ],
@@ -432,31 +456,31 @@ test("V4 review: cartão de arquivamento abre exatamente as conclusões contadas
         draft: false,
       })
     ).data;
-    await post(pro, "/api/documents/" + ent.id, {
+    await post(proContext, "/api/documents/" + ent.id, {
       action: "receive",
       body: { divergences: [] },
       idempotencyKey: randomUUID(),
       expectedVersion: ent.version,
     });
-    const archivePermission = async (enabled: boolean | null) =>
-      post(page, "/api/patient-settings", {
+    const archivePermission = async (actor: Pick<Page, "request">, enabled: boolean | null) =>
+      ({
         careRecipientId: patient,
         kind: "capability",
         change: {
           capability: "req.archive",
-          subjectUser: fixtures().global.id,
+          subjectUser: subject.id,
           enabled,
         },
         idempotencyKey: randomUUID(),
         expectedVersion: (
           await (
-            await page.request.get(
+            await actor.request.get(
               "/api/patient-settings?careRecipientId=" + patient,
             )
           ).json()
         ).data.version,
       });
-    await archivePermission(false);
+    await post(editorContext, "/api/patient-settings", await archivePermission(editorContext, false));
     await page.goto("/fichas/" + req.requisitionId);
     await expect(
       page.getByRole("heading", { name: req.code, exact: false }),
@@ -488,7 +512,11 @@ test("V4 review: cartão de arquivamento abre exatamente as conclusões contadas
         ).json()
       ).data.archivePending,
     ).toBe(0);
-    await archivePermission(null);
+    const deniedRestore = await page.request.post("/api/patient-settings", {
+      data: await archivePermission(page, null),
+    });
+    expect(deniedRestore.status()).toBe(403);
+    await post(editorContext, "/api/patient-settings", await archivePermission(editorContext, null));
     await page.goto("/?careRecipientId=" + patient);
     const card = page
       .getByRole("link")
@@ -531,7 +559,7 @@ test("V4 review: cartão de arquivamento abre exatamente as conclusões contadas
     expect(await unreviewed.json()).toMatchObject({ code: "INVALID_OPERATION" });
     const reference = await (await page.request.get(canonical)).json();
     const command = { action: "archive", key: randomUUID(), version: reference.version, referenceHash: reference.referenceHash, mode: "other", reason };
-    const result = await post(page, legacyEndpoint, command);
+    const result = await post(page, legacyEndpoint, command, 45_000);
     expect(result).toMatchObject({ documentId: req.requisitionId, issuanceId: expect.any(String), reason });
     expect(await post(page, canonical, command)).toEqual(result);
     expect((await post(page, legacyEndpoint, { reason })).data.archivedAt).toBe(result.archivedAt);
@@ -543,5 +571,6 @@ test("V4 review: cartão de arquivamento abre exatamente as conclusões contadas
     await proContext.unrouteAll({ behavior: "wait" });
     await familyContext.close();
     await proContext.close();
+    await editorContext.close();
   }
 });

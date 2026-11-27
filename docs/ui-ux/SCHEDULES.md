@@ -11,9 +11,21 @@ Estado: [PROJECT_STATUS](../current/PROJECT_STATUS.md); futuro:
 
 A agenda representa a programação prevista, sem controle de presença.
 Tipos, séries, ocorrências, propostas e eventos são persistentes por paciente.
-Séries têm validade explícita de até 366 dias e são materializadas integralmente,
-com conflitos verificados na mesma transação. Uma série futura pode substituir
-uma programação encerrada; exceções pontuais preservam o início original.
+Abra **Ações da agenda → Tipos de plantão · configurações** para consultar,
+criar ou editar tipos. Os horários da residência estão na mesma área.
+Configure o fuso e os inícios diurno e noturno da residência antes de
+cadastrar um tipo. O tipo informa as horas de trabalho e de descanso.
+Na repetição por ciclo, o cadastro usa os dois valores do tipo escolhido.
+Horários especiais podem mudar o início, preservando as horas de trabalho
+do ciclo. A edição do tipo vale para as próximas programações.
+**Voltar à agenda** retorna ao dia de referência anterior. As séries já
+publicadas ficam na agenda com suas ações operacionais.
+
+Séries com data final têm validade de até 366 dias. Uma residência com
+horários configurados também pode programar séries semanais e em ciclo
+sem data final, materializadas em um horizonte limitado. Os conflitos
+são verificados na transação. Uma série futura pode substituir uma
+programação encerrada. Exceções preservam o início original.
 
 Programação semanal conserva o horário civil no fuso escolhido. Ciclos 12×36,
 24×48 e 24×24 conservam horas corridas a partir da âncora. Os intervalos UTC

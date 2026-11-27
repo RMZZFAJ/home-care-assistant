@@ -5,7 +5,7 @@ import { formatBrazilDate } from "@/lib/receipt";
 import { formatQuantity, quantity } from "@/lib/quantity";
 import { ActionButton, DefinitionGrid, Pill } from "@/components/ui/controls";
 import { Icon } from "@/components/ui/icon";
-import { DocumentChangeFacts } from "./document-freshness";
+import { ChangeFacts } from "@/components/ui/change-facts";
 import type {
   DeliveryCancellationContext,
   DeliveryCancellationLine,
@@ -228,7 +228,7 @@ export function DeliveryCancellationComparison({
       </p>
       {rows.map(({ line, facts }) => <article className="hca-receipt-line" key={line.lineId}>
         <h4>{line.name}</h4>
-        <DocumentChangeFacts changes={facts} />
+        <ChangeFacts changes={facts} />
       </article>)}
       {returnChanged ? <p className="hca-document-change-note">Revise a quantidade fisicamente devolvida considerando o retorno mínimo atualizado.</p> : null}
     </section>

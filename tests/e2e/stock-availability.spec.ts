@@ -55,19 +55,13 @@ test("estoque isola saldos válidos da falha inicial do histórico e recupera se
   ).toBeVisible();
   await expect(
     balances
-      .getByRole("row", {
+      .getByRole("region", {
         name: "Material fictício V4 0 · Família",
         exact: true,
-      })
-      .or(
-        balances.getByRole("article", {
-          name: "Material fictício V4 0 · Família",
-          exact: true,
-        }),
-      ),
+      }),
   ).toContainText("30");
   await expect(
-    balances.getByText("Nenhum produto encontrado", { exact: true }),
+    balances.getByText("Nenhum material encontrado", { exact: true }),
   ).toHaveCount(0);
   await expect(
     history.getByText("Sem movimentações neste filtro", { exact: true }),
@@ -145,6 +139,10 @@ test("estoque distingue indisponibilidade de vazio e conserva somente consultas 
     name: "Histórico auditável",
     exact: true,
   });
+  const unavailable = page.getByRole("dialog", { name: "Não foi possível consultar o estoque", exact: true });
+  const backToStock = unavailable.getByRole("button", { name: "Voltar ao estoque", exact: true });
+  await expect(unavailable).toContainText("Saldos indisponíveis no ensaio controlado.");
+  await backToStock.click();
   await expect(
     balances.getByText("Saldos indisponíveis no ensaio controlado.", {
       exact: true,
@@ -156,7 +154,7 @@ test("estoque distingue indisponibilidade de vazio e conserva somente consultas 
     }),
   ).toBeVisible();
   await expect(
-    balances.getByText("Nenhum produto encontrado", { exact: true }),
+    balances.getByText("Nenhum material encontrado", { exact: true }),
   ).toHaveCount(0);
   await expect(
     history.getByText("Saldo fictício controlado de homologação V4", {
@@ -181,26 +179,22 @@ test("estoque distingue indisponibilidade de vazio e conserva somente consultas 
     }),
   ).toHaveCount(2);
   stockFailure = false;
-  await balances
+  await page
     .getByRole("button", { name: "Atualizar saldos", exact: true })
     .click();
   await expect(
     balances
-      .getByRole("row", {
+      .getByRole("region", {
         name: "Material fictício V4 0 · Família",
         exact: true,
-      })
-      .or(
-        balances.getByRole("article", {
-          name: "Material fictício V4 0 · Família",
-          exact: true,
-        }),
-      ),
+      }),
   ).toContainText("30");
   stockFailure = true;
-  await balances
+  await page
     .getByRole("button", { name: "Atualizar saldos", exact: true })
     .click();
+  await expect(unavailable).toContainText("Saldos indisponíveis no ensaio controlado.");
+  await backToStock.click();
   await expect(
     balances.getByText("Saldos indisponíveis no ensaio controlado.", {
       exact: true,
@@ -211,28 +205,24 @@ test("estoque distingue indisponibilidade de vazio e conserva somente consultas 
   ).toBeVisible();
   await expect(
     balances
-      .getByRole("row", {
+      .getByRole("region", {
         name: "Material fictício V4 0 · Família",
         exact: true,
-      })
-      .or(
-        balances.getByRole("article", {
-          name: "Material fictício V4 0 · Família",
-          exact: true,
-        }),
-      ),
+      }),
   ).toContainText("30");
   // A failure under another custody must not label old FAMILY data as CARE_TEAM.
   await page
-    .getByRole("combobox", { name: "Custódia", exact: true })
-    .selectOption("CARE_TEAM");
+    .getByRole("group", { name: "Custódia", exact: true })
+    .getByRole("button", { name: "Equipe", exact: true }).click();
+  await expect(unavailable).toContainText("Saldos indisponíveis no ensaio controlado.");
+  await backToStock.click();
   await expect(
     balances.getByText("Saldos ainda não consultados com sucesso.", {
       exact: true,
     }),
   ).toBeVisible();
   await expect(
-    balances.getByRole("row", { name: /Material fictício/ }),
+    balances.getByRole("region", { name: /Material fictício/ }),
   ).toHaveCount(0);
   await expect(
     history.getByText("Histórico ainda não consultado com sucesso.", {
@@ -244,7 +234,7 @@ test("estoque distingue indisponibilidade de vazio e conserva somente consultas 
   ).toHaveCount(0);
   stockFailure = false;
   historyFailure = false;
-  await balances
+  await page
     .getByRole("button", { name: "Atualizar saldos", exact: true })
     .click();
   await history
@@ -255,15 +245,9 @@ test("estoque distingue indisponibilidade de vazio e conserva somente consultas 
   ).toBeVisible();
   await expect(
     balances
-      .getByRole("row", {
+      .getByRole("region", {
         name: "Material fictício V4 0 · Equipe",
         exact: true,
-      })
-      .or(
-        balances.getByRole("article", {
-          name: "Material fictício V4 0 · Equipe",
-          exact: true,
-        }),
-      ),
+      }),
   ).toContainText("0");
 });

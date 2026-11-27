@@ -31,6 +31,7 @@ export function initialBalancePreparationFields(
   const r = workspace.regime;
   return {
     reason: "",
+    observation: r?.observation ?? "",
     enabled: String(r?.enabled ?? false),
     weekday: String(r?.weekday ?? 1),
     shiftTypeId: r?.shift_type_id ?? "",
@@ -48,6 +49,14 @@ export function initialBalancePreparationFields(
     targetShiftQuery: "",
   };
 }
+export function balancePreparationRequiresReason(
+  purpose: BalancePreparationPurpose,
+  wasEnabled: boolean,
+  values: BalancePreparationFields,
+): boolean {
+  return purpose !== "configure" || (wasEnabled && values.enabled === "false");
+}
+
 export function balancePreparationCommand(
   purpose: BalancePreparationPurpose,
   targetResourceId: string,
@@ -73,7 +82,10 @@ export function balancePreparationCommand(
             professionalId: values.professionalId || null,
             timezone: values.timezone,
             startsOn: values.startsOn,
-            reason,
+            ...(values.observation !== undefined
+              ? { observation: values.observation.trim() }
+              : {}),
+            ...(reason ? { reason } : {}),
           },
         }
       : purpose === "assign"

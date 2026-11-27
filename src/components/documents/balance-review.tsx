@@ -1,7 +1,7 @@
 "use client";
 import { ActionButton, DefinitionGrid } from "@/components/ui/controls";
 import { Icon } from "@/components/ui/icon";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { recountHref } from "@/components/balances/balance-recount-assignment";
 
@@ -13,7 +13,8 @@ import { formatBrazilDate } from "@/lib/receipt";
 import { formatQuantity } from "@/lib/quantity";
 import type { BalanceReviewContext, SupplyDocument } from "@/types/documents";
 
-import { BalanceMaterials } from "@/components/balances/balance-materials";
+import { BalanceMaterials, BalanceRecordedExtras } from "@/components/balances/balance-materials";
+import { issuedBalanceExtras } from "@/lib/validation/balance-count-extras";
 import { BalanceReviewItemFacts } from "@/components/balances/balance-review-items";
 import { BalanceApplication } from "@/components/balances/balance-application";
 
@@ -27,8 +28,8 @@ function referenceLabel(context: BalanceReviewContext) {
     ? "Contagem já conciliada. Nenhuma revisão repete a movimentação."
     : "A revisão confirma ou aponta diferenças na contagem. Aplicar a contagem ao estoque exige um ato separado, com referência válida e as revisões previstas.";
 }
-function CountFacts({ data }: { data: SupplyDocument; }) {
-  const context = data.balanceReview!;
+function CountFacts({ data, context }: { data: SupplyDocument; context: BalanceReviewContext; }) {
+  const extras = issuedBalanceExtras.safeParse(data.payload.balanceExtras ?? []);
   return (
     <div className="hca-form-stack hca-balance-facts">
       <DefinitionGrid items={[
@@ -39,7 +40,7 @@ function CountFacts({ data }: { data: SupplyDocument; }) {
       ]} />
       {context.counter.source === "current_profile" ? <p>Nome atual do cadastro; o nome histórico não foi preservado.</p> : null}
       <div>
-        <h4 className="font-semibold">Observações originais de quem contou</h4>
+        <h3 className="font-semibold">Observações originais de quem contou</h3>
         <p className="whitespace-pre-wrap wrap-break-word">
           {context.notes || "Nenhuma observação registrada."}
         </p>
@@ -52,66 +53,26 @@ function CountFacts({ data }: { data: SupplyDocument; }) {
       <details className="doc-help-details">
         <summary className="min-h-11"><Icon name="stock" width={16} height={16} />Comparar contagem e referência</summary>
         <BalanceMaterials rows={data.lines.map(line => ({ id: line.id, name: line.name_snapshot, unit: line.unit_snapshot, counted: line.quantity, reference: line.metadata.expectedQuantity as string | number | null | undefined }))} />
+        {extras.success ? <BalanceRecordedExtras extras={extras.data} /> : <Notice error>Os dados dos extras desta contagem estão indisponíveis.</Notice>}
       </details>
     </div>
   );
 }
-export function BalanceReview({
-  data,
-  onRefresh,
-  onEditingChange,
-  context: workspace,
-}: {
-  data: SupplyDocument;
-  onRefresh: () => void;
-  context: WorkspaceContext;
-  onEditingChange: (editing: boolean) => void;
-}) {
-  const [editor, setEditor] = useState<{
-    purpose: BalanceDocumentPurpose;
-    consulting?: boolean;
-    opener: HTMLElement;
-  } | null>(null);
-  const [message, setMessage] = useState("");
-  const resultRef = useRef<HTMLHeadingElement>(null),
-    focusAfterSuccessRef = useRef(false);
-  useEffect(() => {
-    if (!editor && focusAfterSuccessRef.current) {
-      focusAfterSuccessRef.current = false;
-      // Finish the drawer's focus handoff before selecting the confirmed result.
-      const frame = requestAnimationFrame(() => resultRef.current?.focus());
-      return () => cancelAnimationFrame(frame);
-    }
-  }, [editor]);
-  const context = data.balanceReview;
+export function BalanceCounts({ data, children }: { data: SupplyDocument; children?: ReactNode }) {
   const countEvents = data.events
     .filter((event) =>
       ["bal.issued", "bal.submit", "bal.recount"].includes(event.action),
     )
     .sort((a, b) => a.version - b.version);
-  if (!context)
-    return (
-      <Notice>
-        Referência de revisão indisponível. Consulte novamente o balanço;
-        nenhuma aprovação foi presumida.
-      </Notice>
-    );
-  function close() {
-    setEditor(null);
-    onEditingChange(false);
-    onRefresh();
-  }
   return (
     <section
       className="ui-card space-y-4"
-      aria-labelledby="balance-review-heading"
+      aria-labelledby="balance-counts-heading"
     >
-      <h2 ref={resultRef} tabIndex={-1} id="balance-review-heading">
-        Contagem e revisão
-      </h2>
-      {message ? <Notice>{message}</Notice> : null}
-      <CountFacts data={data} />
-      <BalanceApplication key={workspace.userId + ":" + data.id} data={data} userId={workspace.userId} patientActive={workspace.patient?.id === data.care_recipient_id} onRefresh={onRefresh} onEditingChange={onEditingChange} />
+      <h2 id="balance-counts-heading">Contagem física</h2>
+      {data.balanceReview ? <CountFacts data={data} context={data.balanceReview} />
+        : <Notice>Os dados da contagem atual estão indisponíveis. Atualize a ficha para consultar a referência.</Notice>}
+      {children}
       {data.balanceRecount?.canAssign ? (
         <Link
           href={recountHref(data.balanceRecount.patientId, data.id)}
@@ -171,6 +132,54 @@ export function BalanceReview({
           );
         })}
       </section>
+    </section>
+  );
+}
+
+export function BalanceReview({
+  data,
+  onRefresh,
+  onEditingChange,
+  context: workspace,
+}: {
+  data: SupplyDocument;
+  onRefresh: () => void;
+  context: WorkspaceContext;
+  onEditingChange: (editing: boolean) => void;
+}) {
+  const [editor, setEditor] = useState<{
+    purpose: BalanceDocumentPurpose;
+    opener: HTMLElement;
+  } | null>(null);
+  const [message, setMessage] = useState("");
+  const resultRef = useRef<HTMLHeadingElement>(null),
+    focusAfterSuccessRef = useRef(false);
+  useEffect(() => {
+    if (!editor && focusAfterSuccessRef.current) {
+      focusAfterSuccessRef.current = false;
+      const frame = requestAnimationFrame(() => resultRef.current?.focus());
+      return () => cancelAnimationFrame(frame);
+    }
+  }, [editor]);
+
+  const context = data.balanceReview;
+  if (!context)
+    return (
+      <Notice>
+        Referência de revisão indisponível. Atualize a ficha para consultar as revisões.
+      </Notice>
+    );
+  function close() {
+    setEditor(null);
+    onEditingChange(false);
+    onRefresh();
+  }
+  return (
+    <section className="ui-card space-y-4" aria-labelledby="balance-review-heading">
+      <h2 ref={resultRef} tabIndex={-1} id="balance-review-heading">
+        {context.countVersion === null ? "Revisões" : `Revisões da contagem ${context.countVersion}`}
+      </h2>
+      {message ? <Notice>{message}</Notice> : null}
       <Notice>
         {["cancelled", "rejected"].includes(data.status)
           ? "Balanço encerrado: revisões e observações permanecem em leitura."
@@ -252,6 +261,7 @@ export function BalanceReview({
                   </li>
                 ))}
               </ul>
+              <BalanceRecordedExtras extras={row.reviewed_snapshot.extras ?? []} />
             </details>
           </article>
         ))}
@@ -275,6 +285,7 @@ export function BalanceReview({
           </details>
         ) : null}
       </section>
+      <BalanceApplication key={workspace.userId + ":" + data.id} data={data} userId={workspace.userId} patientActive={workspace.patient?.id === data.care_recipient_id} onRefresh={onRefresh} onEditingChange={onEditingChange} />
       {editor ? (
         <BalanceDocumentPreparation
           key={
@@ -284,15 +295,12 @@ export function BalanceReview({
             ":" +
             data.id +
             ":" +
-            editor.purpose +
-            ":" +
-            Boolean(editor.consulting)
+            editor.purpose
           }
           context={workspace}
           patientId={data.care_recipient_id}
           documentId={data.id}
           purpose={editor.purpose}
-          consulting={editor.consulting}
           restoreFocusTo={editor.opener}
           restoreFocusFallbackRef={resultRef}
           onClose={close}

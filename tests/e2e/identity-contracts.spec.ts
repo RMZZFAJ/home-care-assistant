@@ -1,7 +1,9 @@
-import { selectProfileSection } from "./profile-sections";
+import { openProfilePassword, selectProfileSection } from "./profile-sections";
 import { expect, test, type Page } from "@playwright/test";
 import { createHash, randomBytes, randomUUID } from "node:crypto";
 import { mkdirSync, readFileSync } from "node:fs";
+import { resolve } from "node:path";
+import { pathToFileURL } from "node:url";
 import { fixtureFile, sql, sqlLiteral } from "../../scripts/test-environment.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { setup, actor, rpc } from "../integration/v4-fixtures.mjs";
@@ -21,7 +23,7 @@ test("CFinal021 conta alheia tem revisão global própria e não atravessa Meu p
     await page.getByRole("button", { name: "Buscar contas", exact: true }).click();
     await page.getByRole("button", { name: "Editar conta " + before.fullName, exact: true }).click();
     const editor = page.getByRole("dialog", { name: "Editar conta global", exact: true });
-    await expect(editor.getByRole("heading", { name: "Meu perfil e segurança", exact: true })).toHaveCount(0);
+    await expect(editor.getByRole("heading", { name: "Minha conta", exact: true })).toHaveCount(0);
     const classification = editor.getByRole("combobox", { name: "Papel global", exact: true });
     await expect(classification.locator("option")).toHaveText(["Administração", "Supervisão", "Profissional", "Leitura"]);
     await expect(classification).toHaveValue(before.role);
@@ -46,7 +48,8 @@ test("CFinal021 conta alheia tem revisão global própria e não atravessa Meu p
     await review.getByRole("button", { name: "Confirmar conta global", exact: true }).click(); expect((await restored).ok()).toBe(true);
     await expect.poll(() => profile(target)).toEqual(before);
     await page.goto("/perfil"); await selectProfileSection(page, "identity");
-    await expect(page.getByLabel("Nome", { exact: true })).toHaveValue(ownBefore.fullName);
+    const identity = page.getByRole("region", { name: "Identificação pessoal", exact: true });
+    await expect(identity.getByText(ownBefore.fullName, { exact: true })).toBeVisible();
     await login(page, "adminA", f.patient);
     expect((await page.request.get("/api/admin?section=profiles")).status()).toBe(403);
     expect((await page.request.post("/api/admin", { data: { action: "profile", userId: target, ...before, fullName: changedName } })).status()).toBe(403);
@@ -67,33 +70,75 @@ async function login(page: Page, name: string, patient: string | null) {
   await selectContext(page, patient);
 }
 
-test("convite exige a conta correta e apresenta o vínculo somente para leitura antes do aceite", async ({ page }) => {
-  test.setTimeout(120_000);
+test("convite exige a conta correta e apresenta o vínculo somente para leitura antes do aceite", async ({ page, browser }, info) => {
+  test.setTimeout(150_000);
   const f = await setup(), token = randomBytes(32).toString("base64url"), hash = createHash("sha256").update(token).digest("hex");
   const invitation = await rpc(f.admin, "admin_create_invitation", { p_care_recipient_id: f.patient, p_email: fixtures().adminB.email, p_role: "professional", p_can_manage_stock: false, p_can_count_stock: true, p_token_hash: hash, p_expires_at: new Date(Date.now() + 3600_000).toISOString() });
+  const expiredToken = randomBytes(32).toString("base64url");
+  const expired = await rpc(f.admin, "admin_create_invitation", { p_care_recipient_id: f.patient, p_email: fixtures().adminB.email, p_role: "family", p_can_manage_stock: false, p_can_count_stock: false, p_token_hash: createHash("sha256").update(expiredToken).digest("hex"), p_expires_at: new Date(Date.now() + 3600_000).toISOString() });
+  sql(`update public.care_recipient_invitations set expires_at=now()-interval '1 second' where id=${sqlLiteral(expired.id)};`);
+  const displayName = sql(`select display_name from public.care_recipients where id=${sqlLiteral(f.patient)};`);
+  await page.goto("/convites/aceitar#token=" + expiredToken);
+  await expect(page.getByRole("heading", { name: "Este convite expirou", exact: true })).toBeVisible();
+  await expect(page.getByText(displayName, { exact: true })).toHaveCount(0);
+  await expect(page.getByText(fixtures().adminB.email, { exact: true })).toHaveCount(0);
   await login(page, "adminA", f.patient);
   await page.goto("/convites/aceitar#token=" + token);
   await expect(page.getByRole("button", { name: "Trocar conta", exact: true })).toBeVisible();
   await expect(page.getByRole("definition")).toHaveCount(0);
-  await expect(page.getByRole("button", { name: "Aceitar convite com minha conta", exact: true })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Aceitar convite", exact: true })).toHaveCount(0);
+  await expect(page.getByText(displayName, { exact: true })).toHaveCount(0);
+  await expect(page.getByText(fixtures().adminB.email, { exact: true })).toHaveCount(0);
   await page.getByRole("button", { name: "Trocar conta", exact: true }).click();
+  await page.getByRole("dialog", { name: "Continuar com a conta convidada", exact: true }).getByRole("button", { name: "Entrar com a conta convidada", exact: true }).click();
   await expect(page).toHaveURL(/\/login\?next=/); await enter(page, "adminB");
-  const preview = page.getByRole("definition");
-  await expect(preview).toContainText([sql(`select display_name from public.care_recipients where id=${sqlLiteral(f.patient)};`), "Profissional", fixtures().adminB.email, "Teste adminA", "America/Sao_Paulo", "Realizar contagem"]);
   const summary = page.getByRole("region", { name: "Resumo do vínculo convidado", exact: true });
   await expect(summary).toBeVisible();
+  await expect(summary).toContainText(displayName);
+  await expect(summary).toContainText("Convite enviado por Teste adminA");
+  await expect(summary.getByRole("definition")).toContainText([fixtures().adminB.email, "Profissional", "America/Sao_Paulo"]);
   await expect(summary.locator("input,select,textarea")).toHaveCount(0);
-  for (const width of [1440, 390]) { await page.setViewportSize({ width, height: 900 }); await audit(page, "D1 invitation preview " + width); }
+  const extra = summary.getByText("Permissões específicas de estoque", { exact: true });
+  await extra.click(); await expect(summary.getByText(/Realizar contagem/)).toBeVisible(); await extra.click();
+  const reference = await browser.newContext({ viewport: { width: 1280, height: 1000 }, isMobile: false, hasTouch: false, deviceScaleFactor: 1 });
+  try {
+    const model = await reference.newPage(); await model.route(/^https?:/, route => route.abort());
+    await model.goto(pathToFileURL(resolve("hca-laboratorio-04-v2-aprovado.html")).href + "#E10-02/accept");
+    for (const width of [360, 412]) {
+      await page.setViewportSize({ width, height: 900 });
+      await model.getByRole("combobox", { name: "Visualização", exact: true }).selectOption(String(width));
+      const frame = model.locator("#device-frame");
+      await expect(frame).toHaveCSS("width", `${width}px`);
+      for (const [actual, expected] of [[".hca-invited-hero", ".e10-hero"], [".hca-invited-card", ".section"]]) {
+        const radius = await frame.locator(expected).evaluate(element => getComputedStyle(element).borderRadius);
+        await expect(summary.locator(actual)).toHaveCSS("border-radius", radius);
+      }
+      await info.attach(`lab-convite-${width}`, { body: await frame.screenshot(), contentType: "image/png" });
+      await audit(page, "E10-02 invitation preview " + width);
+      await info.attach(`convite-${width}`, { body: await page.screenshot(), contentType: "image/png" });
+    }
+  } finally { await reference.close(); }
+  await page.setViewportSize({ width: 1440, height: 900 }); await audit(page, "E10-02 invitation preview desktop");
   mkdirSync("output/playwright/phase-d", { recursive: true });
   await page.screenshot({ path: `output/playwright/phase-d/invitation-preview-${test.info().project.name}.png`, fullPage: true, animations: "disabled" });
   const sent = page.waitForRequest(request => request.method() === "POST" && new URL(request.url()).pathname === "/api/invitations/accept");
-  await page.getByRole("button", { name: "Aceitar convite com minha conta", exact: true }).click();
+  await page.getByRole("button", { name: "Aceitar convite", exact: true }).click();
   expect(Object.keys((await sent).postDataJSON()).sort()).toEqual(["decision", "expectedActor", "token"]);
-  await expect(page.getByText("Convite aceito.", { exact: false })).toBeVisible();
+  await expect(page.getByRole("dialog", { name: "Convite aceito", exact: true })).toBeVisible();
   expect(sql(`select role::text from public.care_recipient_memberships where care_recipient_id=${sqlLiteral(f.patient)} and user_id=${sqlLiteral(fixtures().adminB.id)};`)).toBe("professional");
   await page.goto("/convites/aceitar#token=" + token);
-  await expect(page.getByText("Convite já aceito por sua conta.", { exact: false })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Convite aceito", exact: true })).toBeVisible();
+  await expect(page.getByRole("dialog", { name: "Convite aceito", exact: true })).toHaveCount(0);
   expect(sql(`select accepted_by::text from public.care_recipient_invitations where id=${sqlLiteral(invitation.id)};`)).toBe(fixtures().adminB.id);
+  const changedActor = await page.request.post("/api/context", { data: { careRecipientId: f.patient, expectedActor: fixtures().adminA.id } });
+  expect(changedActor.status()).toBe(409);
+  await page.getByRole("button", { name: "Selecionar residência", exact: true }).click();
+  const selected = page.getByRole("dialog", { name: "Residência selecionada", exact: true });
+  await expect(selected).toContainText(displayName);
+  await selected.getByRole("button", { name: "Concluir", exact: true }).click();
+  await expect(page).toHaveURL(new RegExp(`careRecipientId=${f.patient}$`));
+  const context = await (await page.request.get("/api/context")).json();
+  expect(context.data.activeContext).toMatchObject({ mode: "patient", care_recipient_id: f.patient });
 });
 
 test("retry de aprovação oferece reemissão explícita sem duplicar convite nem inventar o segredo", async ({ page }) => {
@@ -113,11 +158,18 @@ test("retry de aprovação oferece reemissão explícita sem duplicar convite ne
   expect(recovered).not.toHaveProperty("invitationUrl");
   expect(recovered.invitationRecovery).toMatchObject({ action: "reissue", invitationId: issued.data.resolution.invitationId });
   expect(sql(`select count(*) from public.care_recipient_invitations where care_recipient_id=${sqlLiteral(f.patient)};`)).toBe("1");
-  await page.goto("/configuracoes?area=people");
-  const renewed = page.waitForResponse(response => response.request().method() === "POST" && new URL(response.url()).pathname === "/api/admin");
-  await page.getByRole("button", { name: "Reemitir convite e invalidar link anterior", exact: true }).click();
-  expect((await renewed).ok()).toBe(true);
-  const newLink = await page.getByRole("textbox", { name: "Convite aprovado", exact: true }).inputValue();
+  await page.goto("/configuracoes?area=people&careRecipientId=" + f.patient);
+  const row = page.getByRole("article", { name: "Proposta " + proposal.id.slice(0, 8), exact: true });
+  await row.getByRole("button").click();
+  await page.getByRole("dialog", { name: "Proposta aprovada", exact: true }).getByRole("link", { name: "Reemitir convite", exact: true }).click();
+  const invitation = page.getByRole("dialog", { name: "Convite da residência", exact: true });
+  await invitation.getByRole("button", { name: "Reemitir link", exact: true }).click();
+  const [renewed] = await Promise.all([
+    page.waitForResponse(response => response.request().method() === "POST" && new URL(response.url()).pathname === "/api/admin/invitations"),
+    page.getByRole("dialog", { name: "Reemitir convite?", exact: true }).getByRole("button", { name: "Reemitir convite", exact: true }).click(),
+  ]);
+  expect(renewed.ok()).toBe(true);
+  const newLink = await page.getByRole("textbox", { name: "Link", exact: true }).inputValue();
   expect(newLink).not.toBe(issued.invitationUrl);
   const oldToken = new URLSearchParams(new URL(issued.invitationUrl).hash.slice(1)).get("token");
   const oldPreview = await page.request.post("/api/invitations/preview", { data: { token: oldToken } });
@@ -143,7 +195,8 @@ test("perfil recebe invalidação externa e senha nova conserva limites em carac
     await rpc(f.admin, "update_my_profile", { p_name: name, p_registration: "", p_state: null, p_category: "", p_preferences: {} });
     await expect(page.getByLabel("Menu do usuário", { exact: true })).toContainText(name);
     await selectProfileSection(page, "security");
-    const password = page.getByLabel("Nova senha", { exact: true });
+    const editor = await openProfilePassword(page);
+    const password = editor.getByLabel("Nova senha", { exact: true });
     await expect(password).toHaveAttribute("minlength", "6"); await expect(password).toHaveAttribute("maxlength", "72");
     await expect(password).toHaveAttribute("autocomplete", "new-password");
     await password.fill("Aa1!x"); expect(await password.evaluate((input: HTMLInputElement) => input.checkValidity())).toBe(false);

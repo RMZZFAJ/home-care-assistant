@@ -8,6 +8,7 @@ import { formatBrazilDate } from "@/lib/receipt";
 import { formatQuantity } from "@/lib/quantity";
 import { purchaseArrivalVariance } from "@/lib/documents/purchase";
 import { pendingPurchaseItems } from "@/lib/documents/pending-purchase-items";
+import { issuedBalanceExtras } from "@/lib/validation/balance-count-extras";
 
 const name = (line: Record<string, unknown>) => String(line.name_snapshot ?? line.product_name_snapshot ?? line.custom_name ?? "Material não identificado");
 const unit = (line: Record<string, unknown>) => String(line.unit_snapshot ?? "Unidade não preservada");
@@ -83,6 +84,9 @@ export function approvedSupplyContent(snapshot: DocumentSnapshot, emission: PdfE
     }
   } else {
     semanticFacts["balance/countNature"] = Number(snapshot.workflow?.countVersion) > 1 ? "Reconto registrado em ato próprio, mantendo a contagem anterior." : documentVariant("BAL", snapshot.payload, snapshot.workflow).includes("contexto de plantão não preservado") ? "Contexto de plantão não preservado neste registro." : "Primeira contagem desta ficha, sem afirmar primeira contagem da residência.";
+    issuedBalanceExtras.parse(snapshot.payload.balanceExtras ?? []).forEach((extra, index) => {
+      semanticFacts["balance/extra/" + index] = extra.name + " · " + amount(extra.quantity, extra.unit);
+    });
     const application = balanceApplicationFacts.parse(snapshot.balanceApplication);
     snapshot.lines.forEach((line, index) => {
       const prefix = "material/" + index, applied = application.state === "applied" ? application.lines.find(item => item.lineId === line.id) : null;
@@ -99,15 +103,18 @@ export function approvedSupplyContent(snapshot: DocumentSnapshot, emission: PdfE
       semanticFacts[prefix + "/comment"] = review.comment || "Sem comentário adicional.";
       for (const [itemIndex, item] of (review.item_results ?? []).entries()) {
         const line = review.reviewed_snapshot.lines.find(value => value.id === item.lineId);
-        semanticFacts[prefix + "/item/" + itemIndex] = (line?.name_snapshot ?? "Material não identificado") + " · " + (item.result === "confirmed" ? "Confirmado" : "Diferença apontada") + " · " + ({ none: "Sem encaminhamento", recount: "Reconto indicado", adjustment: "Ajuste autorizado indicado" }[item.forwarding]);
+        const extra = review.reviewed_snapshot.extras?.find(value => value.id === item.lineId);
+        const material = line?.name_snapshot ?? (extra ? `${extra.name} (item extra)` : "Material não identificado");
+        semanticFacts[prefix + "/item/" + itemIndex] = material + " · " + (item.result === "confirmed" ? "Confirmado" : "Diferença apontada") + " · " + ({ none: "Sem encaminhamento", recount: "Reconto indicado", adjustment: "Ajuste autorizado indicado" }[item.forwarding]);
         if (item.comment) semanticFacts[prefix + "/itemComment/" + itemIndex] = item.comment;
       }
     }
     for (const [index, correction] of balanceCorrectionFacts.parse(snapshot.balanceReviewCorrections).entries()) for (const [actIndex, act] of correction.acts.entries()) {
       const prefix = "correction/" + index + "/" + actIndex;
-      semanticFacts[prefix + "/count"] = "Reconto · " + act.line.name + " · " + amount(act.line.quantity, act.line.unit);
+      const stillExtra = act.line.id === correction.sourceLineId;
+      semanticFacts[prefix + "/count"] = "Reconto · " + act.line.name + (stillExtra ? " (item extra)" : "") + " · " + amount(act.line.quantity, act.line.unit);
       semanticFacts[prefix + "/actor"] = (act.actorName ?? "Nome não preservado") + " · " + formatBrazilDate(act.recordedAt);
-      semanticFacts[prefix + "/application"] = act.application.state === "not_applied" ? "Reconto não aplicado ao estoque." : act.application.state === "unavailable" ? "Resultado da aplicação não disponível no registro." : "Aplicado por " + act.application.actorName + " · " + formatBrazilDate(act.application.appliedAt);
+      semanticFacts[prefix + "/application"] = stillExtra ? "Item contado como extra, sem movimentação de estoque." : act.application.state === "not_applied" ? "Reconto não aplicado ao estoque." : act.application.state === "unavailable" ? "Resultado da aplicação não disponível no registro." : "Aplicado por " + act.application.actorName + " · " + formatBrazilDate(act.application.appliedAt);
       if (act.application.state === "applied") semanticFacts[prefix + "/balance"] = "Saldo após este reconto: " + (act.application.lines[0].state === "restricted" ? "Acesso restrito" : amount(act.application.lines[0].quantity, act.line.unit));
     }
     for (const [index, approval] of (snapshot.balanceReviews?.legacyApprovals ?? []).entries()) semanticFacts["balance/legacy/" + index] = (approval.actorName ?? "Nome não preservado") + " · " + formatBrazilDate(approval.created_at);

@@ -21,13 +21,14 @@ type OverlayProps = {
   id?: string;
   keyboardScrollable?: boolean;
   keepMounted?: boolean;
+  showNestedBackdrop?: boolean;
   success?: boolean;
   failure?: "rejected" | "uncertain";
   popupClassName?: string;
   contentRef?: ComponentProps<"div">["ref"];
 };
 
-function Overlay({ open, title, kicker, subtitle, headingIcon, children, navigation, footer, onClose, closeDisabled = false, dismissOnOutsideClick = true, closeLabel = "Fechar diálogo", finalFocus, id, side, keyboardScrollable = false, keepMounted = false, success = false, failure, popupClassName, contentRef }: OverlayProps & { side?: "start" | "end" }) {
+function Overlay({ open, title, kicker, subtitle, headingIcon, children, navigation, footer, onClose, closeDisabled = false, dismissOnOutsideClick = true, closeLabel = "Fechar diálogo", finalFocus, id, side, keyboardScrollable = false, keepMounted = false, showNestedBackdrop, success = false, failure, popupClassName, contentRef }: OverlayProps & { side?: "start" | "end" }) {
   const titleId = useId();
   const outcome = success ? "success" : failure;
   return <BaseDialog.Root open={open} disablePointerDismissal={closeDisabled || !dismissOnOutsideClick} onOpenChange={(next, details) => {
@@ -36,7 +37,7 @@ function Overlay({ open, title, kicker, subtitle, headingIcon, children, navigat
   }}>
     <BaseDialog.Portal keepMounted={keepMounted}>
       <div className="hca-overlay hca-l1" hidden={keepMounted && !open}>
-        <BaseDialog.Backdrop className="hca-modal-backdrop" />
+        <BaseDialog.Backdrop className="hca-modal-backdrop" forceRender={showNestedBackdrop} />
         <BaseDialog.Viewport className={side ? "hca-drawer-viewport" : "hca-modal-viewport"} data-side={side}>
           <BaseDialog.Popup id={id} aria-labelledby={titleId} className={[side ? "hca-modal hca-drawer" : outcome ? "hca-modal hca-modal-success" : "hca-modal", popupClassName].filter(Boolean).join(" ")} data-outcome={outcome} finalFocus={finalFocus}>
             <header className={kicker || subtitle || headingIcon ? "hca-modal-head hca-modal-context-head" : "hca-modal-head"}>

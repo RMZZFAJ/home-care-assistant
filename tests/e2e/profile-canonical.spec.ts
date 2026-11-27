@@ -1,42 +1,29 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Browser, type TestInfo } from "@playwright/test";
 import { randomUUID } from "node:crypto";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { mkdirSync } from "node:fs";
-import { setup, fixtures } from "../integration/v4-fixtures.mjs";
+import { rpc, setup } from "../integration/v4-fixtures.mjs";
+import { shiftWorker } from "../integration/shift-fixtures.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { sql, sqlLiteral as q } from "../../scripts/test-environment.mjs";
 import { selectContext } from "./auth-context";
-import { selectProfileSection } from "./profile-sections";
+import { confirmationLink } from "./local-mail";
+import { openProfileIdentity, profileIdentityEditor, selectProfileSection } from "./profile-sections";
 import { auditFromTop } from "./accessibility-audit";
 
-test.setTimeout(180_000);
-test("15 ID02 NOT02 NOT04 profile tabs follow the model and retain unsaved fields through every account destination", async ({ page, browser }, info) => {
-  const f = await setup();
-
-  await page.goto("/login");
-  await page.getByLabel("E-mail", { exact: true }).fill(fixtures.family.email);
-  await page.getByLabel("Senha", { exact: true }).fill(fixturePassword);
-  await page.getByRole("button", { name: "Entrar", exact: true }).click();
-  await expect(page.getByRole("heading", { name: "Visão geral", exact: true })).toBeVisible();
-  await selectContext(page, f.patient); await page.goto("/perfil?careRecipientId=" + f.patient);
-  await selectProfileSection(page, "identity");
-  const marker = "Nome em edição sem confirmação " + randomUUID().slice(0, 8);
-  const name = page.getByRole("textbox", { name: "Nome", exact: true }); await name.fill(marker);
-  const before = sql(`select jsonb_build_object('profile',(select to_jsonb(p) from public.profiles p where id=${q(fixtures.family.id)}),'stock',(select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where care_recipient_id=${q(f.patient)}),'documents',(select count(*) from public.operational_documents where care_recipient_id=${q(f.patient)}));`);
-  const writes: string[] = [];
-  page.on("request", request => { if (request.method() !== "GET" && ["/api/profile", "/api/profile/science", "/api/push/devices"].includes(new URL(request.url()).pathname)) writes.push(request.url()); });
+async function captureProfileReference(browser: Browser, info: TestInfo) {
   const reference = await browser.newContext();
   try {
-    const model = await reference.newPage(); await model.route(/^https?:/, route => route.abort());
+    const model = await reference.newPage(), styles = [];
+    await model.route(/^https?:/, route => route.abort());
     await model.goto(pathToFileURL(resolve("Home_Care_Assistant_Modelo_Integral.html")).href + "#perfil/identidade");
     for (const width of [320, 390, 768, 1024, 1440]) {
-      await page.setViewportSize({ width, height: 900 }); await model.setViewportSize({ width, height: 900 });
+      await model.setViewportSize({ width, height: 900 });
       // WebKit can expose fallback custom-property styles until this reference
       // is painted. Capture its real rendering before measuring the card.
       const referenceCapture = await model.screenshot();
       if (width === 320) await info.attach("profile-model-320", { contentType: "image/png", body: referenceCapture });
-      const actual = page.getByRole("region", { name: "Identidade pessoal", exact: true });
       const modelCard = model.locator(".card.pad").first();
       await expect(modelCard).toBeVisible();
       await expect(modelCard).toHaveCSS("border-top-style", "solid");
@@ -53,38 +40,280 @@ test("15 ID02 NOT02 NOT04 profile tabs follow the model and retain unsaved field
         };
       });
       await info.attach("profile-reference-style-" + width, { contentType: "application/json", body: JSON.stringify(referenceStyle) });
-      for (const [property, expected] of Object.entries(referenceStyle.card)) await expect(actual).toHaveCSS(property, expected);
-      for (const [property, expected] of Object.entries(referenceStyle.field)) await expect(actual.locator("label").filter({ has: name }).first()).toHaveCSS(property, expected);
-      for (const [property, expected] of Object.entries(referenceStyle.heading)) await expect(actual.getByRole("heading")).toHaveCSS(property, expected);
-      await auditFromTop(page, "profile identity " + width);
+      styles.push({ width, referenceStyle });
     }
-    await selectProfileSection(page, "security");
-    await expect(page.getByRole("region", { name: "Sessões autenticadas", exact: true })).toBeVisible();
-    await expect(page.getByLabel("Senha atual", { exact: true })).toBeVisible();
-    await expect(page.getByRole("region", { name: "Contatos e métodos de login", exact: true })).toBeVisible();
-    await expect(name).not.toBeVisible();
-    await page.goBack(); await expect(name).toHaveValue(marker); await expect(name).toBeVisible();
-    await page.goForward(); await expect(page.getByRole("tab", { name: "Segurança", exact: true })).toHaveAttribute("aria-selected", "true");
-    await selectProfileSection(page, "notices");
-    await expect(page.getByRole("region", { name: "Aplicativo neste aparelho", exact: true })).toBeVisible();
-    await expect(page.getByRole("region", { name: "Avisos neste aparelho", exact: true })).toBeVisible();
-    await expect(page.getByRole("region", { name: "Ciência das requisições", exact: true })).toBeVisible();
-    await selectProfileSection(page, "devices");
-    await expect(page.getByRole("region", { name: "Aparelhos com avisos", exact: true })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Consultar aparelhos novamente", exact: true })).toBeVisible();
-    await selectProfileSection(page, "help");
-    await expect(page.getByRole("region", { name: "Guias e ajuda", exact: true })).toBeVisible();
-    const selected = page.getByRole("tab", { name: "Ajuda", exact: true });
-    await selected.focus(); await page.keyboard.press("Home");
-    await expect(page.getByRole("tab", { name: "Meu perfil", exact: true })).toBeFocused();
-    await page.keyboard.press("Enter");
-    await expect(name).toBeVisible(); await expect(name).toHaveValue(marker);
-    await page.setViewportSize({ width: 320, height: 900 }); await auditFromTop(page, "profile retained field320");
-    mkdirSync("output/playwright/phase-d", { recursive: true });
-    await page.screenshot({ path: `output/playwright/phase-d/profile-${info.project.name}.png` });
-    expect(await page.evaluate(() => JSON.stringify({ local: { ...localStorage }, session: { ...sessionStorage } }))).not.toContain(marker);
-    expect(writes).toEqual([]);
-    const after = sql(`select jsonb_build_object('profile',(select to_jsonb(p) from public.profiles p where id=${q(fixtures.family.id)}),'stock',(select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where care_recipient_id=${q(f.patient)}),'documents',(select count(*) from public.operational_documents where care_recipient_id=${q(f.patient)}));`);
-    expect(after).toBe(before);
+    return styles;
   } finally { await reference.close(); }
+}
+
+test.setTimeout(180_000);
+
+async function openContacts(page: import("@playwright/test").Page, patient: string, email: string) {
+  await page.goto("/login");
+  await page.getByLabel("E-mail", { exact: true }).fill(email);
+  await page.getByLabel("Senha", { exact: true }).fill(fixturePassword);
+  await page.getByRole("button", { name: "Entrar", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Visão geral", exact: true })).toBeVisible();
+  await selectContext(page, patient);
+  await page.goto(`/perfil?careRecipientId=${patient}`);
+  await page.getByRole("button", { name: /^Contatos de acesso/ }).click();
+  return page.getByRole("dialog", { name: "Contatos de acesso", exact: true });
+}
+
+test("E11-02 confirma sessão recente e recupera pedido real de e-mail sem reenviar", async ({ page }) => {
+  const f = await setup(), account = await shiftWorker(f.patient, "family");
+  const contacts = await openContacts(page, f.patient, account.email);
+  const before = await (await page.request.get("/api/profile")).json();
+  const sid = before.sessions.find((session: { current: boolean }) => session.current)?.id;
+  expect(sid).toBeTruthy();
+  sql(`update auth.sessions set created_at = now() - interval '20 minutes' where user_id=${q(account.id)} and id=${q(sid)};`);
+  await contacts.getByRole("button", { name: "Alterar e-mail", exact: true }).click();
+  const email = page.getByRole("dialog", { name: "Alterar e-mail", exact: true });
+  const requested = `Contato-${randomUUID()}@EXAMPLE.INVALID`;
+  const pending = requested.toLowerCase();
+  await email.getByRole("textbox", { name: "Novo e-mail", exact: true }).fill(requested);
+  await email.getByRole("button", { name: "Solicitar alteração", exact: true }).click();
+  const recent = page.getByRole("dialog", { name: "Confirme que é você", exact: true });
+  const currentPassword = recent.getByLabel(/Senha atual/);
+  await currentPassword.fill("Senha incorreta 77!");
+  await recent.getByRole("button", { name: "Confirmar sessão", exact: true }).click();
+  await expect(recent.getByText(/Não foi possível confirmar a senha atual/)).toBeVisible();
+  await expect(currentPassword).toHaveValue("");
+  expect((await (await page.request.get("/api/profile")).json()).data.contactStatus).toMatchObject({ recent: false, pendingEmail: null });
+  await currentPassword.fill(fixturePassword);
+  await recent.getByRole("button", { name: "Confirmar sessão", exact: true }).click();
+  await expect(email.getByRole("textbox", { name: "Novo e-mail", exact: true })).toHaveValue(requested);
+  const after = await (await page.request.get("/api/context")).json();
+  expect(after.data.activeContext.care_recipient_id).toBe(f.patient);
+
+  let emailPosts = 0;
+  await page.route("**/api/profile", async route => {
+    if (route.request().method() !== "POST" || route.request().postDataJSON().action !== "email") return route.continue();
+    emailPosts += 1;
+    // Exercise the API with a caller that has not normalized the form value.
+    const response = await route.fetch({ postData: { action: "email", email: requested } });
+    expect(response.ok()).toBe(true);
+    expect(await response.json()).toEqual({ saved: true, confirmedEmail: false });
+    expect(route.request().postDataJSON()).toEqual({ action: "email", email: pending });
+    await route.abort("failed");
+  });
+  await email.getByRole("button", { name: "Solicitar alteração", exact: true }).click();
+  const uncertain = page.getByRole("dialog", { name: "Não foi possível concluir", exact: true });
+  await uncertain.getByRole("button", { name: "Conferir resultado", exact: true }).click();
+  const success = page.getByRole("dialog", { name: "Confirmação solicitada", exact: true });
+  await success.getByRole("button", { name: "Concluir", exact: true }).click();
+  await expect(contacts.getByText(pending, { exact: true })).toBeVisible();
+  expect(emailPosts).toBe(1);
+  await page.reload();
+  await page.getByRole("button", { name: /^Contatos de acesso/ }).click();
+  await expect(contacts.getByText(account.email, { exact: true })).toBeVisible();
+  await expect(contacts.getByText(pending, { exact: true })).toBeVisible();
+  const accountState = (await (await page.request.get("/api/profile")).json()).data;
+  expect(accountState.email).toBe(account.email);
+  expect(accountState.contactStatus).toMatchObject({ recent: true, pendingEmail: pending });
+  await page.goto(await confirmationLink(page, account.email, "Confirm your new email address"));
+  await expect(page).toHaveURL(/\/perfil\?contatos=1/);
+  await expect(contacts.getByText(account.email, { exact: true })).toBeVisible();
+  await expect(contacts.getByText(pending, { exact: true })).toBeVisible();
+
+  await page.goto(await confirmationLink(page, pending, "Confirm your new email address"));
+  await expect(page).toHaveURL(/\/perfil\?contatos=1/);
+  await expect(contacts.getByText(pending, { exact: true })).toBeVisible();
+  await expect(contacts.getByText("Confirme seu novo e-mail", { exact: true })).toHaveCount(0);
+  const confirmed = (await (await page.request.get("/api/profile")).json()).data;
+  expect(confirmed.email).toBe(pending);
+  expect(confirmed.contactStatus).toMatchObject({ emailConfirmed: true, pendingEmail: null });
+});
+
+test("E11-02 distingue Google desligado e SMS indisponível sem iniciar envio", async ({ page }, info) => {
+  const f = await setup(), account = await shiftWorker(f.patient, "family");
+  const writes: string[] = [];
+  page.on("request", request => {
+    if (request.method() === "POST" && new URL(request.url()).pathname === "/api/profile")
+      writes.push(request.postDataJSON().action);
+  });
+  const contacts = await openContacts(page, f.patient, account.email);
+  await expect(contacts.getByRole("button", { name: /Conta Google .*Indisponível/ })).toBeVisible();
+  await contacts.getByRole("button", { name: /Conta Google/ }).click();
+  const google = page.getByRole("dialog", { name: "Acesso Google indisponível", exact: true });
+  await expect(google.getByText(/Em breve/)).toBeVisible();
+  await google.getByRole("button", { name: "Voltar", exact: true }).click();
+  await contacts.getByRole("button", { name: "Alterar telefone", exact: true }).click();
+  const sms = page.getByRole("dialog", { name: "Não foi possível enviar o SMS", exact: true });
+  await expect(sms.getByText(/Seu telefone atual continua válido/)).toBeVisible();
+  await sms.getByRole("button", { name: "Conferir disponibilidade", exact: true }).click();
+  await expect(sms).toBeVisible();
+  await sms.getByRole("button", { name: "Voltar", exact: true }).click();
+  await expect(contacts.getByText("SMS indisponível neste momento", { exact: true })).toBeVisible();
+  await expect(contacts.getByRole("textbox", { name: "Código de confirmação", exact: true })).toHaveCount(0);
+  expect(writes).toEqual([]);
+  const contact = (await (await page.request.get("/api/profile")).json()).data;
+  expect(contact.phone).toBeNull();
+  expect(contact.contactStatus.pendingPhone).toBeNull();
+  const provider = await page.request.post("/api/profile", { data: { action: "prepareLink" } });
+  expect(provider.status()).toBe(503);
+  expect((await provider.json()).code).toBe("NOT_CONFIGURED");
+  for (const width of [360, 412]) {
+    await page.setViewportSize({ width, height: 844 });
+    await expect(contacts).toBeVisible();
+    const box = await contacts.boundingBox();
+    expect(box && box.x + box.width).toBeLessThanOrEqual(width);
+    await info.attach(`e11-contatos-${width}`, { body: await page.screenshot(), contentType: "image/png" });
+  }
+});
+
+test("L4 canais descartam edição concorrente e conferem uma tentativa no máximo duas vezes", async ({ page, browser }, info) => {
+  const f = await setup(), account = await shiftWorker(f.patient, "family");
+  await page.goto("/login");
+  await page.getByLabel("E-mail", { exact: true }).fill(account.email);
+  await page.getByLabel("Senha", { exact: true }).fill(fixturePassword);
+  await page.getByRole("button", { name: "Entrar", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Visão geral", exact: true })).toBeVisible();
+  await selectContext(page, f.patient);
+  await page.goto("/perfil?profileTab=notices");
+  const edit = page.getByRole("button", { name: "Editar canais de comunicação", exact: true });
+  await edit.click();
+  const editor = page.getByRole("dialog", { name: "Canais de comunicação", exact: true });
+  const reference = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+  try {
+    const model = await reference.newPage();
+    await model.route(/^https?:/, route => route.abort());
+    await model.goto(pathToFileURL(resolve("hca-laboratorio-04-v2-aprovado.html")).href + "#E11-05/channels");
+    const frame = model.locator("#device-frame");
+    for (const width of [360, 412]) {
+      await model.getByRole("combobox", { name: "Visualização", exact: true }).selectOption(String(width));
+      await expect(frame.getByRole("heading", { name: "Canais de comunicação", exact: true })).toBeVisible();
+      await info.attach(`L4-canais-${width}`, { body: await frame.screenshot(), contentType: "image/png" });
+      await page.setViewportSize({ width, height: 900 });
+      await auditFromTop(page, `E11-05 canais ${width}`);
+      await info.attach(`canais-${width}`, { body: await page.screenshot(), contentType: "image/png" });
+    }
+  } finally { await reference.close(); await page.bringToFront(); }
+  await editor.getByRole("switch", { name: "No sistema", exact: true }).uncheck();
+  const baseline = await rpc(account.client, "my_notice_preferences");
+  const outside = await rpc(account.client, "set_my_notice_preferences", {
+    p_internal: true, p_email: true, p_whatsapp: false, p_version: baseline.version, p_key: randomUUID(),
+  });
+  await page.evaluate(() => window.dispatchEvent(new Event("hca:data-changed")));
+  const conflict = page.getByRole("dialog", { name: "Preferência alterada em outra sessão", exact: true });
+  await conflict.getByRole("button", { name: "Conferir versão atual", exact: true }).click();
+  await expect(editor.getByRole("switch", { name: "No sistema", exact: true })).toBeChecked();
+  await expect(editor.getByRole("switch", { name: "E-mail", exact: true })).toBeChecked();
+  await editor.getByRole("switch", { name: "WhatsApp", exact: true }).check();
+  await editor.getByRole("button", { name: "Salvar preferências", exact: true }).click();
+  const saved = page.getByRole("dialog", { name: "Preferências salvas", exact: true });
+  const conclude = saved.getByRole("button", { name: "Concluir", exact: true });
+  await conclude.focus(); await conclude.press("Enter"); await expect(saved).toHaveCount(0);
+  await expect(page.getByRole("region", { name: "Canais de comunicação", exact: true })).toContainText("WhatsApp");
+  await edit.click();
+  await editor.getByRole("switch", { name: "WhatsApp", exact: true }).uncheck();
+  const attempts: string[] = [], checks: string[] = [];
+  await page.route(/\/api\/profile\/notices(?:\?.*)?$/, async route => {
+    if (route.request().method() === "POST") {
+      attempts.push(route.request().postDataJSON().idempotencyKey);
+      await route.abort("failed");
+    } else {
+      const attempt = new URL(route.request().url()).searchParams.get("attempt");
+      if (attempt) checks.push(attempt);
+      await route.continue();
+    }
+  });
+  await editor.getByRole("button", { name: "Salvar preferências", exact: true }).click();
+  const uncertain = page.getByRole("dialog", { name: "Gravação ainda sem confirmação", exact: true });
+  await uncertain.getByRole("button", { name: "Conferir resultado", exact: true }).click();
+  await uncertain.getByRole("button", { name: "Conferir resultado", exact: true }).click();
+  await expect(uncertain.getByRole("button", { name: "Conferir resultado", exact: true })).toHaveCount(0);
+  await expect(uncertain.getByText("Copie os detalhes e avise o responsável pelo sistema.", { exact: true })).toBeVisible();
+  expect(attempts).toHaveLength(1);
+  expect(checks).toEqual([attempts[0], attempts[0]]);
+  expect(await rpc(account.client, "my_notice_preferences")).toMatchObject({ version: outside.version + 1, whatsapp: true });
+  await uncertain.getByRole("button", { name: "Voltar às preferências", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Conferir tentativa", exact: true })).toBeVisible();
+  await selectProfileSection(page, "identity");
+  await page.getByRole("button", { name: /^Apresentação do início/ }).click();
+  const presentation = page.getByRole("dialog", { name: "Apresentação do início", exact: true });
+  const simple = presentation.getByRole("radio", { name: "Simples", exact: true });
+  await expect(simple).toHaveAccessibleDescription("Áreas complementares começam recolhidas e continuam disponíveis para abrir.");
+  await simple.check();
+  await presentation.getByRole("button", { name: "Aplicar apresentação", exact: true }).click();
+  await page.getByRole("dialog", { name: "Apresentação aplicada", exact: true }).getByRole("button", { name: "Concluir", exact: true }).click();
+  await expect(page.getByRole("region", { name: "Apresentação do início", exact: true })).toContainText("Simples neste aparelho");
+  await page.goto("/");
+  const complement = page.locator("details").filter({ has: page.getByText("Movimentações do paciente", { exact: true }) });
+  const recent = page.getByRole("heading", { name: "Movimentações recentes", exact: true });
+  await expect(complement).toBeVisible();
+  await expect(recent).not.toBeVisible();
+  await complement.locator("summary").click();
+  await expect(recent).toBeVisible();
+});
+
+test("15 ID02 NOT02 NOT04 profile tabs follow the model and retain unsaved fields through every account destination", async ({ page, browser }, info) => {
+  // Close the reference context before running the product's focus and axe checks.
+  const styles = await captureProfileReference(browser, info);
+  const f = await setup(), viewer = await shiftWorker(f.patient, "family");
+
+  await page.goto("/login");
+  await page.getByLabel("E-mail", { exact: true }).fill(viewer.email);
+  await page.getByLabel("Senha", { exact: true }).fill(fixturePassword);
+  await page.getByRole("button", { name: "Entrar", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Visão geral", exact: true })).toBeVisible();
+  await selectContext(page, f.patient);
+  const guideReads: string[] = [];
+  page.on("request", request => {
+    if (request.method() === "GET" && new URL(request.url()).pathname === "/api/guides") guideReads.push(request.url());
+  });
+  await page.goto("/perfil?careRecipientId=" + f.patient);
+  await selectProfileSection(page, "security");
+  await selectProfileSection(page, "identity");
+  const marker = "Nome em edição sem confirmação " + randomUUID().slice(0, 8);
+  const name = page.getByRole("textbox", { name: "Nome completo", exact: true });
+  const before = sql(`select jsonb_build_object('profile',(select to_jsonb(p) from public.profiles p where id=${q(viewer.id)}),'stock',(select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where care_recipient_id=${q(f.patient)}),'documents',(select count(*) from public.operational_documents where care_recipient_id=${q(f.patient)}));`);
+  const writes: string[] = [];
+  page.on("request", request => { if (request.method() !== "GET" && ["/api/profile", "/api/profile/science", "/api/push/devices"].includes(new URL(request.url()).pathname)) writes.push(request.url()); });
+  for (const { width, referenceStyle } of styles) {
+    await page.setViewportSize({ width, height: 900 });
+    const actual = page.getByRole("region", { name: "Seus vínculos com pacientes", exact: true });
+    for (const [property, expected] of Object.entries(referenceStyle.card)) await expect(actual).toHaveCSS(property, expected);
+    for (const [property, expected] of Object.entries(referenceStyle.heading)) await expect(actual.getByRole("heading")).toHaveCSS(property, expected);
+    await auditFromTop(page, "profile identity " + width);
+  }
+  await openProfileIdentity(page);
+  await name.fill(marker);
+  await page.setViewportSize({ width: 360, height: 900 });
+  await info.attach("perfil-edicao-360", { body: await page.screenshot(), contentType: "image/png" });
+  await page.goBack();
+  await expect(page.getByRole("region", { name: "Sessões", exact: true })).toBeVisible();
+  await expect(page.getByRole("button", { name: /^Senha Atualize sua senha de acesso/ })).toBeVisible();
+  await expect(page.getByRole("region", { name: "Acesso", exact: true }).getByRole("button", { name: /^Contatos de acesso/ })).toBeVisible();
+  await expect(name).not.toBeVisible();
+  await page.goForward(); await expect(name).toHaveValue(marker); await expect(name).toBeVisible();
+  await page.goBack(); await expect(page.getByRole("tab", { name: "Segurança", exact: true })).toHaveAttribute("aria-selected", "true");
+  await selectProfileSection(page, "notices");
+  await expect(page.getByRole("region", { name: "Aplicativo neste aparelho", exact: true })).toBeVisible();
+  await expect(page.getByRole("region", { name: "Avisos neste aparelho", exact: true })).toBeVisible();
+  await expect(page.getByRole("region", { name: "Ciência de requisições", exact: true })).toBeVisible();
+  await selectProfileSection(page, "devices");
+  await expect(page.getByRole("region", { name: "Aparelhos com avisos", exact: true })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Atualizar dispositivos", exact: true })).toBeVisible();
+  expect(guideReads).toEqual([]);
+  await selectProfileSection(page, "help");
+  await expect(page.getByRole("region", { name: "Guias e ajuda", exact: true })).toBeVisible();
+  await expect(page.getByRole("region", { name: "Guia do seu perfil", exact: true })).toBeVisible();
+  expect(guideReads.length).toBeGreaterThan(0);
+  const selected = page.getByRole("tab", { name: "Ajuda", exact: true });
+  await selected.focus(); await page.keyboard.press("Home");
+  await expect(page.getByRole("tab", { name: "Meu perfil", exact: true })).toBeFocused();
+  await page.keyboard.press("Enter");
+  await expect(name).toBeVisible(); await expect(name).toHaveValue(marker);
+  await page.setViewportSize({ width: 320, height: 900 }); await auditFromTop(page, "profile retained field320");
+  await profileIdentityEditor(page).getByRole("button", { name: "Cancelar", exact: true }).click();
+  await openProfileIdentity(page);
+  await expect(name).not.toHaveValue(marker);
+  await profileIdentityEditor(page).getByRole("button", { name: "Cancelar", exact: true }).click();
+  mkdirSync("output/playwright/phase-d", { recursive: true });
+  await page.screenshot({ path: `output/playwright/phase-d/profile-${info.project.name}.png` });
+  expect(await page.evaluate(() => JSON.stringify({ local: { ...localStorage }, session: { ...sessionStorage } }))).not.toContain(marker);
+  expect(writes).toEqual([]);
+  const after = sql(`select jsonb_build_object('profile',(select to_jsonb(p) from public.profiles p where id=${q(viewer.id)}),'stock',(select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where care_recipient_id=${q(f.patient)}),'documents',(select count(*) from public.operational_documents where care_recipient_id=${q(f.patient)}));`);
+  expect(after).toBe(before);
 });

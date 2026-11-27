@@ -1,7 +1,8 @@
 import { generatedPdf } from "./generated-pdf";
+import { stockMovement } from "./stock-operation";
 import { expect, test, type Page } from "@playwright/test";
 import { createHash, randomUUID } from "node:crypto";
-import type { CatalogueAttempt } from "../../src/lib/validation/catalogue-preparation";
+import type { ReviewedCatalogueCommand } from "../../src/lib/validation/catalogue-preparation";
 import { mkdirSync } from "node:fs";
 import {
   catalogueIdentityFixture,
@@ -17,6 +18,11 @@ import { selectContext } from "./auth-context";
 import { audit } from "./accessibility-audit";
 
 test.setTimeout(180_000);
+const command = "/api/admin/catalogue-actions";
+const failure = (page: Page) => page.getByRole("dialog", { name: "A resposta do catálogo não chegou", exact: true });
+const review = (page: Page) => page.getByRole("dialog", { name: "Confirmar efeito no catálogo?", exact: true });
+const finish = (page: Page) => page.getByRole("dialog", { name: "Situação registrada", exact: true })
+  .getByRole("button", { name: "Concluir", exact: true }).click();
 async function login(
   page: Page,
   patient: string,
@@ -33,70 +39,57 @@ async function login(
 }
 const modal = (page: Page) =>
   page.getByRole("dialog", {
-    name: "Situação e sucessor do material",
+    name: "Situação do material",
     exact: true,
   });
+async function openIdentity(page: Page) {
+  await page.getByRole("region", { name: "Produtos do catálogo", exact: true }).getByRole("button", { name: /^Material fictício V4 0/ }).click();
+  await page.getByRole("dialog", { name: "Material fictício V4 0", exact: true }).getByRole("button", { name: /^Situação e sucessor/ }).click();
+}
 async function open(page: Page, patient: string, inactive = false) {
   await page.goto(`/admin?careRecipientId=${patient}&section=catalog`);
   await expect(
-    page.getByRole("heading", { name: "Catálogo do paciente", exact: true }),
+    page.getByRole("heading", { name: "Catálogo", exact: true }),
   ).toBeVisible();
   if (inactive)
     await page
       .getByRole("combobox", { name: "Situação dos produtos", exact: true })
       .selectOption("inactive");
-  await page
-    .getByRole("button", {
-      name: "Situação e sucessor: Material fictício V4 0",
-      exact: true,
-    })
-    .click();
+  await openIdentity(page);
   await expect(
     modal(page).getByRole("region", {
-      name: "Material de origem",
+      name: "Saldos preservados",
       exact: true,
     }),
   ).toBeVisible();
 }
 async function choose(
   page: Page,
-  action: string,
+  action: "retire" | "reactivate",
   reason: string,
   successor = "",
 ) {
-  const actionField = modal(page).getByRole("combobox", { name: "Ato no catálogo", exact: true });
-  const next = modal(page).getByRole("button", { name: "Iniciar outro preenchimento", exact: true });
-  await expect(actionField.or(next).first()).toBeVisible();
-  if (await next.isVisible()) await next.click();
-  await actionField.selectOption(action);
+  const title = action === "retire" ? "Inativar material" : "Reativar material";
+  await modal(page).getByRole("button", { name: title, exact: true }).click();
+  const editor = page.getByRole("dialog", { name: title, exact: true });
   if (successor) {
-    await modal(page)
+    await editor
       .getByRole("combobox", {
-        name: "Sucessor para novas escolhas, opcional",
+        name: "Sucessor para novas escolhas",
         exact: true,
       })
       .selectOption(successor);
-    await expect(
-      modal(page).getByRole("region", {
-        name: "Material comparado",
-        exact: true,
-      }),
-    ).toBeVisible();
+    await expect(editor.getByText(/Ambas as unidades e seus saldos permanecem separados/)).toBeVisible();
   }
-  await modal(page)
-    .getByLabel("Motivo próprio da escolha", { exact: true })
+  await editor
+    .getByLabel("Motivo da decisão", { exact: true })
     .fill(reason);
-  await modal(page)
-    .getByRole("button", { name: "Revisar mudança no catálogo", exact: true })
+  await editor
+    .getByRole("button", { name: "Revisar efeito", exact: true })
     .click();
-  await expect(
-    modal(page).getByRole("heading", {
-      name: "Confira o efeito no catálogo",
-      exact: true,
-    }),
-  ).toBeFocused();
-  await expect(page.getByRole("dialog")).toHaveCount(1);
-  await expect(modal(page).getByRole("textbox")).toHaveCount(0);
+  await expect(review(page)).toBeVisible();
+  await expect(editor).toHaveCount(0);
+  await expect(review(page).getByRole("textbox")).toHaveCount(0);
 }
 
 test("sucessor de outra unidade preserva PDF e saldos; resposta perdida recupera a mesma intenção após perda de escrita", async ({
@@ -112,6 +105,12 @@ test("sucessor de outra unidade preserva PDF e saldos; resposta perdida recupera
   expect(firstBytes.subarray(0, 5).toString()).toBe("%PDF-");
   const before = identityPhysicalState(f);
   await open(page, f.patient);
+  if (info.project.name === "chromium") {
+    for (const width of [360, 412]) {
+      await page.setViewportSize({ width, height: 900 });
+      await modal(page).screenshot({ path: info.outputPath(`situacao-${width}.png`) });
+    }
+  }
   await choose(
     page,
     "retire",
@@ -119,13 +118,13 @@ test("sucessor de outra unidade preserva PDF e saldos; resposta perdida recupera
     f.successorId,
   );
   await expect(
-    modal(page).getByRole("region", {
+    review(page).getByRole("region", {
       name: "Material de origem",
       exact: true,
     }),
   ).toContainText("4 unidade");
   await expect(
-    modal(page).getByRole("region", {
+    review(page).getByRole("region", {
       name: "Sucessor para novas escolhas",
       exact: true,
     }),
@@ -136,19 +135,19 @@ test("sucessor de outra unidade preserva PDF e saldos; resposta perdida recupera
   }
   mkdirSync("output/playwright/phase-d", { recursive: true });
   await page.setViewportSize({ width: 320, height: 900 });
-  await modal(page)
+  await review(page)
     .getByRole("region", { name: "Material de origem", exact: true })
     .screenshot({
       path: `output/playwright/phase-d/catalogue-successor-source-${info.project.name}.png`,
     });
-  await modal(page)
+  await review(page)
     .getByRole("region", { name: "Sucessor para novas escolhas", exact: true })
     .screenshot({
       path: `output/playwright/phase-d/catalogue-successor-target-${info.project.name}.png`,
     });
   let lose = true;
-  const packets: unknown[] = [];
-  await page.route("**/api/catalog/identities**", async (route) => {
+  const packets: ReviewedCatalogueCommand[] = [];
+  await page.route("**" + command, async (route) => {
     if (route.request().method() !== "POST") return route.continue();
     packets.push(route.request().postDataJSON());
     if (lose) {
@@ -158,16 +157,13 @@ test("sucessor de outra unidade preserva PDF e saldos; resposta perdida recupera
       await route.abort("failed");
     } else await route.continue();
   });
-  await modal(page)
-    .getByRole("button", { name: "Confirmar mudança no catálogo", exact: true })
+  await review(page)
+    .getByRole("button", { name: "Confirmar decisão", exact: true })
     .click();
-  await expect(
-    modal(page).getByText(/A escolha, o motivo e a chave estão congelados/),
-  ).toBeVisible();
+  await expect(failure(page)).toBeVisible();
   await page.reload();
-  await page.getByRole("combobox", { name: "Situação dos produtos", exact: true }).selectOption("inactive");
-  await page.getByRole("button", { name: "Situação e sucessor: Material fictício V4 0", exact: true }).click();
-  await expect(modal(page).getByRole("button", { name: "Recuperar mesma intenção", exact: true })).toBeVisible();
+  const pending = page.getByRole("button", { name: "Conferir resultado pendente", exact: true });
+  await expect(pending).toBeVisible();
   expect(packets).toHaveLength(1);
   sql(
     `insert into public.capability_overrides(care_recipient_id,subject_user,capability,enabled) values(${sqlLiteral(f.patient)},${sqlLiteral(fixtures.adminA.id)},'catalog.manage',false);`,
@@ -193,21 +189,13 @@ test("sucessor de outra unidade preserva PDF e saldos; resposta perdida recupera
   await expect(
     page.getByRole("button", { name: "Novo item", exact: true }),
   ).toHaveCount(0);
-  await expect(
-    modal(page).getByRole("button", {
-      name: "Recuperar mesma intenção",
-      exact: true,
-    }),
-  ).toBeVisible();
-  await modal(page)
-    .getByRole("button", { name: "Recuperar mesma intenção", exact: true })
-    .click();
-  await expect(modal(page)).toHaveCount(0);
+  await pending.click();
+  await failure(page).getByRole("button", { name: "Conferir resultado", exact: true }).click();
+  await finish(page);
   expect(packets).toHaveLength(2);
-  expect(packets[1]).toEqual(packets[0]);
-  await expect(page.getByText(/A mesma intenção foi recuperada/)).toBeVisible();
+  expect(packets[1]).toEqual({ ...packets[0], intent: null });
   await audit(page, "catalogue-recovered-without-write");
-  await page.unroute("**/api/catalog/identities**");
+  await page.unroute("**" + command);
   const fresh = await page.request.get(
     `/api/catalog?careRecipientId=${f.patient}`,
   );
@@ -262,33 +250,20 @@ test("sucessor de outra unidade preserva PDF e saldos; resposta perdida recupera
     `update public.capability_overrides set enabled=true where care_recipient_id=${sqlLiteral(f.patient)} and subject_user=${sqlLiteral(fixtures.adminA.id)} and capability='catalog.manage';`,
   );
   await open(page, f.patient, true);
-  // Acknowledging the previous result starts a separate private fill. The
-  // fresh read must finish before its fields accept a new choice or reason.
-  const another = modal(page).getByRole("button", { name: "Iniciar outro preenchimento", exact: true });
-  await expect(another).toBeVisible();
-  let releaseFresh!: () => void, enteredFresh!: () => void;
-  const freshGate = new Promise<void>(resolve => { releaseFresh = resolve; });
-  const freshEntered = new Promise<void>(resolve => { enteredFresh = resolve; });
-  await page.route("**/api/admin/catalogue-preparations?*", async route => {
-    const response = await route.fetch(); enteredFresh(); await freshGate;
-    return route.fulfill({ response });
-  });
-  try {
-    await another.click(); await freshEntered;
-    await expect(modal(page).getByRole("combobox", { name: "Ato no catálogo", exact: true })).toHaveCount(0);
-    const freshRead = page.waitForResponse(response => new URL(response.url()).pathname === "/api/admin/catalogue-preparations" && response.request().method() === "GET");
-    releaseFresh(); await (await freshRead).finished();
-  } finally {
-    releaseFresh?.(); await page.unroute("**/api/admin/catalogue-preparations?*");
-  }
+  await modal(page).getByRole("button", { name: /^Histórico da situação/ }).click();
+  const history = page.getByRole("dialog", { name: "Histórico da situação", exact: true });
+  await expect(history).toContainText("Inativação registrada");
+  await expect(history).toContainText("Escolhi um sucessor para novas seleções, mantendo os fatos e as unidades distintas");
+  await history.getByRole("button", { name: "Voltar", exact: true }).click();
   await choose(
     page,
     "reactivate",
     "Reativação explícita da mesma identidade e das quatro unidades preservadas em cada custódia",
   );
-  await modal(page)
-    .getByRole("button", { name: "Confirmar mudança no catálogo", exact: true })
+  await review(page)
+    .getByRole("button", { name: "Confirmar decisão", exact: true })
     .click();
+  await finish(page);
   await expect(modal(page)).toHaveCount(0);
   expect(identityPhysicalState(f)).toBe(before);
   sql(`update public.care_recipient_memberships set status='revoked'
@@ -301,10 +276,10 @@ test("sucessor de outra unidade preserva PDF e saldos; resposta perdida recupera
   );
   await noRead;
   await expect(
-    page.getByRole("heading", { name: "Catálogo do paciente", exact: true }),
+    page.getByRole("region", { name: "Produtos do catálogo", exact: true }),
   ).toHaveCount(0);
-  const denied = await page.request.post("/api/catalog/identities", {
-    data: packets[0],
+  const denied = await page.request.post(command, {
+    data: { ...packets[0], intent: null },
   });
   expect(denied.status()).toBe(404);
   expect(identityPhysicalState(f)).toBe(before);
@@ -330,7 +305,7 @@ test("referência alterada compara saldo atual, preserva motivo e exige adoção
   const before = identityState(f),
     physical = identityPhysicalState(f);
   let fail = true;
-  await page.route("**/api/catalog/identities**", async (route) => {
+  await page.route("**/api/catalog/identities?*", async (route) => {
     if (route.request().method() === "GET" && fail) {
       fail = false;
       await route.fulfill({
@@ -339,50 +314,33 @@ test("referência alterada compara saldo atual, preserva motivo e exige adoção
       });
     } else await route.continue();
   });
-  await modal(page)
-    .getByRole("button", { name: "Confirmar mudança no catálogo", exact: true })
+  await review(page)
+    .getByRole("button", { name: "Confirmar decisão", exact: true })
     .click();
+  await page.getByRole("dialog", { name: "Não foi possível registrar no catálogo", exact: true })
+    .getByRole("button", { name: "Conferir atualização", exact: true }).click();
+  const comparison = page.getByRole("dialog", { name: "Referência atual do material", exact: true });
   await expect(
-    modal(page).getByText(/A referência atual está indisponível/),
+    comparison.getByText(/A referência atual está indisponível/),
   ).toBeVisible();
   expect(identityState(f)).toBe(before);
-  const reason = modal(page).getByLabel("Motivo próprio da escolha", {
-    exact: true,
-  });
-  await expect(reason).toHaveValue(ownReason);
-  await expect(reason).toBeFocused();
+  await expect(comparison.getByRole("button", { name: "Usar referência atual", exact: true })).toBeDisabled();
+  await comparison.getByRole("button", { name: "Consultar novamente", exact: true }).click();
   await expect(
-    modal(page).getByRole("button", {
-      name: "Revisar mudança no catálogo",
-      exact: true,
-    }),
-  ).toBeDisabled();
-  await modal(page)
-    .getByRole("button", {
-      name: "Consultar referência para comparação",
-      exact: true,
-    })
-    .click();
-  await expect(
-    modal(page).getByRole("region", {
+    comparison.getByRole("region", {
       name: "Referência atual de origem",
       exact: true,
     }),
   ).toContainText("5 unidade");
-  await modal(page)
-    .getByRole("button", {
-      name: "Adotar referência consultada e manter meu motivo",
-      exact: true,
-    })
+  expect(identityState(f)).toBe(before);
+  await comparison.getByRole("button", { name: "Usar referência atual", exact: true }).click();
+  const editor = page.getByRole("dialog", { name: "Inativar material", exact: true });
+  await expect(editor.getByLabel("Motivo da decisão", { exact: true })).toHaveValue(ownReason);
+  await editor.getByRole("button", { name: "Revisar efeito", exact: true }).click();
+  await review(page)
+    .getByRole("button", { name: "Confirmar decisão", exact: true })
     .click();
-  await expect(reason).toHaveValue(ownReason);
-  await expect(reason).toBeFocused();
-  await modal(page)
-    .getByRole("button", { name: "Revisar mudança no catálogo", exact: true })
-    .click();
-  await modal(page)
-    .getByRole("button", { name: "Confirmar mudança no catálogo", exact: true })
-    .click();
+  await finish(page);
   await expect(modal(page)).toHaveCount(0);
   expect(identityPhysicalState(f)).toBe(physical);
 });
@@ -405,13 +363,7 @@ test("compensação de inativo mantém a referência visível e usa uma única s
     );
   await login(page, f.patient);
   await page.goto(`/estoque?careRecipientId=${f.patient}`);
-  const history = page.getByRole("region", {
-      name: "Histórico auditável",
-      exact: true,
-    }),
-    row = history
-      .locator("tbody tr[data-movement-id]")
-      .filter({ has: page.getByText(original.id, { exact: true }) });
+  const row = await stockMovement(page, original.id);
   await row
     .getByRole("button", { name: "Corrigir este movimento", exact: true })
     .click();
@@ -494,13 +446,13 @@ test("gestor delegado conserva somente recuperação própria ao perder a últim
     "Motivo próprio do gestor delegado para preservar a identidade e seu estoque",
   );
   const before = identityPhysicalState(f);
-  const packets: { cataloguePreparation: CatalogueAttempt }[] = [];
+  const packets: ReviewedCatalogueCommand[] = [];
   let lost = true;
   let confirmLostResponse!: () => void;
   const lostResponse = new Promise<void>((resolve) => {
     confirmLostResponse = resolve;
   });
-  await page.route("**/api/catalog/identities**", async (route) => {
+  await page.route("**" + command, async (route) => {
     if (route.request().method() !== "POST") return route.continue();
     packets.push(route.request().postDataJSON());
     if (!lost) return route.continue();
@@ -510,15 +462,12 @@ test("gestor delegado conserva somente recuperação própria ao perder a últim
     await route.abort("failed");
     confirmLostResponse();
   });
-  await modal(page)
-    .getByRole("button", { name: "Confirmar mudança no catálogo", exact: true })
+  await review(page)
+    .getByRole("button", { name: "Confirmar decisão", exact: true })
     .click();
-  await expect(
-    modal(page).getByText(/A escolha, o motivo e a chave estão congelados/),
-  ).toBeVisible();
-  // The pending UI freezes before the server finishes. Revoke only after the
-  // committed response is lost, so this case exercises receipt recovery.
   await lostResponse;
+  await failure(page).getByRole("button", { name: "Voltar", exact: true }).click();
+  await expect(modal(page).getByRole("button", { name: "Conferir resultado pendente", exact: true })).toBeVisible();
   sql(
     `update public.capability_overrides set enabled=false where care_recipient_id=${sqlLiteral(f.patient)} and subject_user=${sqlLiteral(fixtures.professional.id)} and capability='catalog.manage';`,
   );
@@ -538,22 +487,22 @@ test("gestor delegado conserva somente recuperação própria ao perder a últim
     window.dispatchEvent(new Event("hca:profile-updated")),
   );
   await refreshed;
+  await expect(modal(page)).toHaveCount(0);
   await expect(
     page.getByText(/Seu vínculo não permite novas mudanças no catálogo/),
   ).toBeVisible();
   await expect(
     page.getByRole("button", { name: "Novo item", exact: true }),
   ).toHaveCount(0);
-  await modal(page)
-    .getByRole("button", { name: "Recuperar mesma intenção", exact: true })
-    .click();
-  await expect(page.getByText(/A mesma intenção foi recuperada/)).toBeVisible();
+  await page.getByRole("button", { name: "Conferir resultado pendente", exact: true }).click();
+  await failure(page).getByRole("button", { name: "Conferir resultado", exact: true }).click();
+  await finish(page);
   expect(packets).toHaveLength(2);
-  expect(packets[0]).toEqual(packets[1]);
+  expect(packets[1]).toEqual({ ...packets[0], intent: null });
   expect(identityPhysicalState(f)).toBe(before);
-  await page.unroute("**/api/catalog/identities**");
-  const denied = await page.request.post("/api/catalog/identities", {
-    data: { cataloguePreparation: { ...packets[0].cataloguePreparation, key: randomUUID() } },
+  await page.unroute("**" + command);
+  const denied = await page.request.post(command, {
+    data: { ...packets[0], key: randomUUID() },
   });
   expect(denied.status()).toBe(403);
   expect(identityPhysicalState(f)).toBe(before);

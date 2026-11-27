@@ -27,7 +27,7 @@ test("COM shows each material's last validated family balance, distinct parcels 
   const row = (id: string) => list.locator('[data-material-line-id="' + id + '"]');
   async function withBalance(id: string, check: (balance: Locator, panel: Locator) => Promise<void>) {
     await row(id).getByRole("button", { name: /^Detalhes de / }).click();
-    const panel = page.getByRole("dialog").filter({ has: page.getByRole("heading", { name: "Estoque atual", exact: true }) });
+    const panel = page.getByRole("dialog").filter({ has: page.getByRole("heading", { name: "Material nesta ficha", exact: true }) });
     await check(panel.locator('[data-material-fact="Saldo após última entrada"] dd'), panel);
     await panel.getByRole("button", { name: "Voltar à ficha", exact: true }).click();
   }

@@ -41,6 +41,7 @@ const labels: Record<string, string> = {
   "bal.cycle.recount_recorded": "Nova contagem física do reconto registrada",
   "bal.cycle.counted": "Contagem atual registrada e pendências regularizadas",
   "bal.cycle.assignment_resolved": "Responsabilidade do balanço definida",
+  "bal.cycle.schedule_impact": "Encaminhamento do balanço após alteração de plantão",
   "schedule.type": "Tipo de plantão atualizado",
   "schedule.published": "Programação de plantões publicada",
   "schedule.proposed": "Programação proposta para aprovação",
@@ -53,6 +54,16 @@ const labels: Record<string, string> = {
   "schedule.change_decided": "Alteração de plantão decidida",
   "stock.alert": "Estoque abaixo do limite configurado",
   "occurrence.received": "Ocorrência recebida para revisão",
+  "shortage.communicated": "Aviso de falta de material",
+  "consumption.shortage": "Falta comunicada à família",
+  "consumption.issue": "Consumo registrado no estoque da equipe",
+  "consumption.correct": "Correção de consumo registrada",
+  "consumption.cancel": "Consumo cancelado com compensação",
+  "consumption.shortage_reported": "Falta de material relatada",
+  "consumption.reported": "Consumo relatado",
+  "consumption.supplemented": "Relato complementado",
+  "consumption.confirmed": "Consumo conferido",
+  "consumption.rejected": "Relato rejeitado",
   "bal.reminder": "Lembrete de balanço da equipe",
   "shift.reminder": "Comunicação de materiais do período",
   "req.remaining_need_declared": "Nova necessidade vinculada declarada",
@@ -112,6 +123,12 @@ const labels: Record<string, string> = {
 };
 export function isKnownDocumentEvent(action: string) {
   return Object.hasOwn(labels, action);
+}
+export function matchingDocumentEvents(search: string) {
+  if (!search) return [];
+  const normalize = (value: string) => value.normalize("NFD").replaceAll(/\p{M}/gu, "").toLocaleLowerCase("pt-BR");
+  const term = normalize(search);
+  return Object.entries(labels).filter(([, label]) => normalize(label).includes(term)).map(([action]) => action);
 }
 export function documentEventLabel(action?: string, origin?: "purchase" | "donation") {
   if (!action) return "Atualização disponível";

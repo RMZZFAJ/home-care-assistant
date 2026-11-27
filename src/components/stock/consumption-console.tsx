@@ -1,6 +1,14 @@
 "use client";
-import { ActionButton } from "@/components/ui/controls";
-import { useEffect, useRef, useState, type FormEvent } from "react";
+import { Menu } from "@base-ui/react/menu";
+import { ActionButton, DefinitionGrid, SelectField, TextInput } from "@/components/ui/controls";
+import { MenuPopup } from "@/components/ui/floating";
+import { Icon } from "@/components/ui/icon";
+import { useWorkspaceState } from "@/components/layout/workspace-context";
+import { Dialog, Drawer } from "@/components/ui/overlays";
+import { useOperationActivity } from "@/components/ui/operation-activity";
+import { ScopedReadFailureDialog } from "@/components/documents/scoped-read-failure-dialog";
+import Link from "next/link";
+import { useCallback, useEffect, useEffectEvent, useId, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import {
@@ -14,13 +22,19 @@ import {
 } from "@/components/workspace";
 import { useLiveRevision } from "@/lib/use-live-revision";
 import { formatBrazilDate } from "@/lib/receipt";
+import { consumptionStateLabels } from "@/lib/consumption/follow-up";
 import type { CatalogProduct } from "@/types/documents";
 import type { ConsumptionSummary } from "@/types/consumption";
 import { ConsumptionEditor } from "./consumption-editor";
+import { TeamConsumptionWizard, type IssuedConsumption } from "./team-consumption-wizard";
+import { TeamConsumptionAction } from "./team-consumption-action";
 import { ConsumptionRecord } from "./consumption-record";
 import { ConsumptionDetail } from "./consumption-detail";
 import { FlowReviews } from "./flow-reviews";
+import type { FlowSubmission } from "@/lib/validation/flow-reviews";
 import { parseConsumptionListRead } from "@/lib/validation/consumption";
+import { parseStockBalances } from "@/lib/validation/stock-reads";
+import { useScopedRead } from "@/lib/use-scoped-read";
 import { useNotificationReference } from "@/lib/notifications/use-notification-reference";
 import {
   NotificationReference,
@@ -28,12 +42,34 @@ import {
 } from "@/components/notifications/notification-reference";
 
 type Cursor = { at: string; id: string };
+type ReadFailure = { cause: unknown; denied: boolean; interactive: boolean; attempts: number };
+const emptyFilters = { q: "", kind: "", status: "", from: "", to: "" };
+const filterKeys = ["q", "kind", "status", "from", "to"] as const;
+function consumptionQuery(params: Pick<URLSearchParams, "get">) {
+  const query = new URLSearchParams();
+  for (const key of [...filterKeys, "sourceReminder"]) {
+    const value = params.get(key);
+    if (value) query.set(key, value);
+  }
+  return query.toString();
+}
+const reportKinds = [
+  { value: "", label: "Todos" },
+  { value: "consumption", label: "Consumos" },
+  { value: "shortage", label: "Faltas" },
+];
 export function ConsumptionConsole() {
   return (
-    <Workspace title="Faltas e consumo extraordinário">
+    <Workspace title="Consumo e faltas" heading={context => (
+      <div className="page-heading">
+        {context.patient ? <p className="eyebrow">{context.patient.display_name}</p> : null}
+        <h1>Consumo e faltas</h1>
+        <p className="hca-stock-subtitle">Registros do plantão e avisos à família</p>
+      </div>
+    )}>
       {(context) =>
         context.patient ? (
-          <Reports key={context.patient.id} context={context} />
+          <Reports key={`${context.userId}:${context.patient.id}`} context={context} />
         ) : (
           <Notice>Selecione um paciente.</Notice>
         )
@@ -47,11 +83,8 @@ function Reports({ context }: { context: WorkspaceContext }) {
     live = useLiveRevision(),
     patient = context.patient!.id;
   const selected = params.get("ref");
-  const query = new URLSearchParams(
-    ["q", "kind", "status", "from", "to", "sourceReminder"]
-      .filter(key => Boolean(params.get(key)))
-      .map(key => [key, params.get(key)!]),
-  ).toString();
+  const query = consumptionQuery(params);
+  const { loading: contextLoading, selecting } = useWorkspaceState();
   const fields = { q: params.get("q") ?? "", kind: params.get("kind") ?? "", status: params.get("status") ?? "", from: params.get("from") ?? "", to: params.get("to") ?? "" };
   const [draft, setDraft] = useState(fields), [previousQuery, setPreviousQuery] = useState(query);
   if (previousQuery !== query) {
@@ -68,13 +101,17 @@ function Reports({ context }: { context: WorkspaceContext }) {
   const [read, setRead] = useState<{
     query: string;
     key: string;
+    attempt: number;
     rows: ConsumptionSummary[] | null;
     next: Cursor | null;
     queriedAt: string | null;
     error: string;
+    failure?: ReadFailure;
   } | null>(null);
   const [attempt, setAttempt] = useState(0),
     [moreRequestKey, setMoreRequestKey] = useState<string | null>(null);
+  const [manual, setManual] = useState<{ query: string; attempt: number; retries: number } | null>(null);
+  const [dismissed, setDismissed] = useState<ReadFailure | null>(null);
   const readKey = JSON.stringify([patient, query, live, attempt]),
     current = read?.query === query ? read : null;
   const rows = current?.rows ?? null,
@@ -89,13 +126,58 @@ function Reports({ context }: { context: WorkspaceContext }) {
   const [editor, setEditor] = useState<HTMLElement | null>(null),
     [message, setMessage] = useState(""),
     [referenceError, setReferenceError] = useState("");
+  const [panel, setPanel] = useState<"filters" | "reference" | "flow" | null>(null);
   const [editorOrigin, setEditorOrigin] = useState<ReminderOrigin | null>(null);
+  const [teamEditor, setTeamEditor] = useState<HTMLElement | null>(null);
+  const [teamFlow, setTeamFlow] = useState<FlowSubmission>();
+  const [issued, setIssued] = useState<IssuedConsumption | null>(null);
+  const [shortage, setShortage] = useState<{ opener: HTMLElement; origin?: ReminderOrigin } | null>(null);
+  const listContext = !selected && !panel && !editor && !teamEditor && !issued && !shortage;
+  const manualRead = manual?.query === query && manual.attempt === attempt ? manual : null;
+  const foregroundRead = current === null || (manualRead !== null && current.attempt !== attempt);
+  const showingActivity = reading && foregroundRead;
+  const readActivity = useEffectEvent(() => ({ interactive: foregroundRead, attempts: manualRead?.retries ?? 0 }));
+  useOperationActivity(listContext && showingActivity, {
+    title: "Consultando relatos",
+    detail: "Aguarde enquanto consultamos os registros de consumo e os avisos de falta.",
+  });
+  const failure = current?.failure;
+  const showFailure = Boolean(listContext && !showingActivity && failure?.interactive && failure !== dismissed);
+  const filterFormId = useId();
+  const mayRecordTeam = can(context, "consumption.team.write") && can(context, "stock.team.read") &&
+    context.patient?.is_active !== false;
+  const mayReadStock = can(context, "stock.family.read") || can(context, "stock.team.read");
+  const mayOpenLegacy = mayReadStock || can(context, "consumption.report");
+  const hasFilters = filterKeys.some(key => Boolean(fields[key]));
+  const decodeTeamStock = useCallback(
+    (raw: unknown) => parseStockBalances(raw, { careRecipientId: patient, custody: "CARE_TEAM" }),
+    [patient],
+  );
+  const stock = useScopedRead(
+    mayRecordTeam ? `/api/stock/balances?careRecipientId=${patient}&custody=CARE_TEAM` : null,
+    `${live}:${attempt}`,
+    decodeTeamStock,
+  );
   const listHeadingRef = useRef<HTMLHeadingElement>(null),
+    filterRef = useRef<HTMLButtonElement>(null),
+    refreshRef = useRef<HTMLButtonElement>(null),
+    moreRef = useRef<HTMLButtonElement>(null),
     triggerRef = useRef<HTMLElement | null>(null),
     generationRef = useRef(0),
     moreRequestRef = useRef<{ key: string } | null>(null);
+  const filterReturnRef = useRef<{ query: string; attempt: number } | null>(null);
+  useEffect(() => {
+    const pending = filterReturnRef.current;
+    if (!pending || pending.query !== query || pending.attempt !== attempt || reading || panel || contextLoading || selecting) return;
+    // The loading dialog can take focus from the trigger as the filter dialog closes.
+    filterReturnRef.current = null;
+    if (showFailure) return;
+    const frame = requestAnimationFrame(() => filterRef.current?.focus({ preventScroll: true }));
+    return () => cancelAnimationFrame(frame);
+  }, [attempt, contextLoading, panel, query, reading, selecting, showFailure]);
   useEffect(() => {
     const controller = new AbortController();
+    const activity = readActivity();
     generationRef.current++;
     api<unknown>(
       `/api/consumption?careRecipientId=${patient}&${query}`,
@@ -108,6 +190,7 @@ function Reports({ context }: { context: WorkspaceContext }) {
           setRead({
             query,
             key: readKey,
+            attempt,
             rows: result.data,
             next: result.next,
             queriedAt: new Date().toISOString(),
@@ -123,6 +206,7 @@ function Reports({ context }: { context: WorkspaceContext }) {
           setRead((previous) => ({
             query,
             key: readKey,
+            attempt,
             rows:
               !unavailable && previous?.query === query ? previous.rows : null,
             next:
@@ -133,11 +217,13 @@ function Reports({ context }: { context: WorkspaceContext }) {
               reason instanceof Error
                 ? reason.message
                 : "Não foi possível consultar os relatos.",
+            failure: !activity.interactive && previous?.query === query && previous.attempt === attempt && previous.failure?.denied === unavailable
+              ? previous.failure : { cause: reason, denied: unavailable, ...activity },
           }));
         }
       });
     return () => controller.abort();
-  }, [patient, query, readKey]);
+  }, [patient, query, readKey, attempt]);
   useEffect(() => {
     const controller = new AbortController();
     api<{ data: CatalogProduct[] }>(
@@ -171,27 +257,34 @@ function Reports({ context }: { context: WorkspaceContext }) {
       scroll: false,
     });
   }
-  function filter(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const values = new URLSearchParams();
+  function refreshList(retries = 0) {
+    const nextAttempt = attempt + 1;
+    setManual({ query, attempt: nextAttempt, retries });
+    setAttempt(nextAttempt);
+  }
+  function applyFilters(filters: typeof emptyFilters, returnToFilter = false) {
+    const values = new URLSearchParams(query);
+    let changed = false;
+    for (const key of filterKeys) {
+      const value = filters[key].trim();
+      if (value !== (values.get(key) ?? "")) changed = true;
+      if (value) values.set(key, value);
+      else values.delete(key);
+    }
+    setDraft(filters);
+    filterReturnRef.current = returnToFilter
+      ? { query: consumptionQuery(values), attempt: changed ? attempt : attempt + 1 }
+      : null;
+    if (!changed) {
+      refreshList();
+      return;
+    }
     values.set("careRecipientId", patient);
-    const source = new URLSearchParams(query).get("sourceReminder");
-    if (source) values.set("sourceReminder", source);
-    for (const [key, value] of new FormData(event.currentTarget))
-      if (typeof value === "string" && value.trim())
-        values.set(key, value.trim());
-    const applied = new URLSearchParams(values);
-    applied.delete("careRecipientId");
-    if (["q", "kind", "status", "from", "to", "sourceReminder"].every(key =>
-      (applied.get(key) ?? "") === (new URLSearchParams(query).get(key) ?? ""),
-    )) setAttempt(value => value + 1);
     if (selected) {
       values.set("ref", selected);
       if (params.get("refKind")) values.set("refKind", params.get("refKind")!);
     }
-    router.push("/consumo" + (values.size ? "?" + values : ""), {
-      scroll: false,
-    });
+    router.push("/consumo?" + values, { scroll: false });
   }
   async function loadMore() {
     if (!next || reading || error || moreRequestRef.current?.key === readKey) return;
@@ -247,6 +340,34 @@ function Reports({ context }: { context: WorkspaceContext }) {
     setCatalogLoading(true);
     setCatalogAttempt((value) => value + 1);
   };
+  const teamBalances = new Map((stock.data?.overview ?? []).flatMap(item => item.team ? [[item.productId, item.team.confirmed] as const] : []));
+  const retryTeamMaterials = () => { stock.refresh(); catalogRetry(); };
+  const teamWizard = teamEditor && mayRecordTeam ? (
+    <TeamConsumptionWizard context={context} products={products}
+      balances={teamBalances}
+      materialLoading={stock.loading || catalogLoading}
+      materialError={stock.error || catalogError}
+      retryMaterials={retryTeamMaterials}
+      opener={teamEditor} sourceReminder={editorOrigin ?? undefined} sourceFlow={teamFlow}
+      onClose={() => { setTeamEditor(null); setEditorOrigin(null); setTeamFlow(undefined); }}
+      onSaved={result => {
+        setTeamEditor(null);
+        setEditorOrigin(null);
+        setTeamFlow(undefined);
+        if (teamFlow) {
+          setPanel(null);
+          triggerRef.current = moreRef.current;
+        }
+        setMessage("");
+        setIssued(result);
+        setAttempt(value => value + 1);
+      }} />
+  ) : null;
+  function concludeIssuance() {
+    if (!issued) return;
+    setIssued(null);
+    open(issued.id);
+  }
   return (
     <div className="space-y-5">
       <NotificationReference
@@ -255,150 +376,84 @@ function Reports({ context }: { context: WorkspaceContext }) {
         context={context}
         onReport={(origin, opener) => {
           setEditorOrigin(origin);
-          setEditor(opener);
+          if (mayRecordTeam) setTeamEditor(opener);
+          else setEditor(opener);
         }}
+        onShortage={mayRecordTeam ? (origin, opener) => setShortage({ opener, origin }) : undefined}
       />
       {message ? <Notice>{message}</Notice> : null}
-      <div className="hca-toolbar">
-        {can(context, "consumption.report") ? (
-          <ActionButton
-            variant="primary"
-            onClick={(event) => {
-              setEditorOrigin(null);
-              setEditor(event.currentTarget);
-            }}
-          >
-            Registrar ocorrência
-          </ActionButton>
-        ) : null}
-        {can(context, "stock.family.read") ||
-        can(context, "stock.team.read") ? (
-          <ActionButton
-            onClick={(e) => {
-              setEditorOrigin(null);
-              setEditor(e.currentTarget);
-            }}
-          >
-            Meu preenchimento de relato
-          </ActionButton>
-        ) : null}
-        <ActionButton onClick={() => setAttempt((value) => value + 1)}>
-          Atualizar lista
-        </ActionButton>
-      </div>
-      <section className="ui-card" aria-label="Relatos registrados">
-        <h2 className="font-semibold" tabIndex={-1} ref={listHeadingRef}>
+      <section className="hca-consumption-list" aria-label="Relatos registrados">
+        <h2 className="sr-only focus:not-sr-only" tabIndex={-1} ref={listHeadingRef}>
           Relatos registrados
         </h2>
-        <form className="my-4 grid gap-3 sm:grid-cols-2" onSubmit={filter}>
-          <label className="block text-sm">
-            Buscar no relato original
-            <input
-              className={inputClass}
-              name="q"
-              maxLength={120}
-              value={draft.q}
-              onChange={event => setDraft({ ...draft, q: event.target.value })}
-            />
-          </label>
-          <label className="block text-sm">
-            Tipo
-            <select
-              className={inputClass}
-              name="kind"
-              value={draft.kind}
-              onChange={event => setDraft({ ...draft, kind: event.target.value })}
-            >
-              <option value="">Todos</option>
-              <option value="consumption">Consumo</option>
-              <option value="shortage">Falta</option>
-            </select>
-          </label>
-          <label className="block text-sm">
-            Estado
-            <select
-              className={inputClass}
-              name="status"
-              value={draft.status}
-              onChange={event => setDraft({ ...draft, status: event.target.value })}
-            >
-              <option value="">Todos</option>
-              <option value="reported">Aguardando conferência</option>
-              <option value="confirmed">Confirmado</option>
-              <option value="rejected">Rejeitado</option>
-            </select>
-          </label>
-          <label className="block text-sm">
-            Desde
-            <input
-              className={inputClass}
-              name="from"
-              type="date"
-              value={draft.from}
-              onChange={event => setDraft({ ...draft, from: event.target.value })}
-            />
-          </label>
-          <label className="block text-sm">
-            Até
-            <input
-              className={inputClass}
-              name="to"
-              type="date"
-              value={draft.to}
-              onChange={event => setDraft({ ...draft, to: event.target.value })}
-            />
-          </label>
-          <ActionButton type="submit">Aplicar filtros</ActionButton>
-        </form>
-        <form
-          className="my-4 space-y-2"
-          onSubmit={(event) => {
+        <div className="hca-stock-custody-tabs" role="group" aria-label="Tipo de registro">
+          {reportKinds.map(({ value, label }) => (
+            <button key={value} type="button" aria-pressed={fields.kind === value}
+              onClick={() => applyFilters({ ...fields, q: draft.q, kind: value })}>{label}</button>
+          ))}
+        </div>
+        <div className="hca-consumption-tools">
+          <form role="search" className="hca-consumption-search" onSubmit={event => {
             event.preventDefault();
-            const id = String(
-              new FormData(event.currentTarget).get("reference") ?? "",
-            ).trim();
-            if (!/^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i.test(id)) {
-              setReferenceError("Confira a referência completa do relato.");
-              return;
-            }
-            setReferenceError("");
-            open(id);
-          }}
-        >
-          <label className="block text-sm">
-            Referência do relato
-            <input
-              className={inputClass}
-              name="reference"
-              maxLength={36}
-              required
-              aria-invalid={Boolean(referenceError)}
-              aria-describedby={
-                referenceError ? "consumption-reference-error" : undefined
-              }
-            />
-          </label>
-          {referenceError ? (
-            <p role="alert" id="consumption-reference-error">
-              {referenceError}
-            </p>
-          ) : null}
-          <ActionButton type="submit">Consultar referência</ActionButton>
-        </form>
-        {error ? (
+            applyFilters({ ...fields, q: draft.q });
+          }}>
+            <TextInput aria-label="Buscar relato ou material" placeholder="Buscar relato ou material"
+              maxLength={120} value={draft.q} onChange={event => setDraft({ ...draft, q: event.target.value })} />
+            <ActionButton variant="quiet" compact type="submit" aria-label="Buscar relatos">
+              <Icon name="search" />
+            </ActionButton>
+          </form>
+          <ActionButton ref={filterRef} compact aria-label="Filtrar relatos" aria-haspopup="dialog"
+            variant={fields.status || fields.from || fields.to ? "primary" : "secondary"}
+            onClick={() => { setDraft({ ...fields, q: draft.q }); setPanel("filters"); }}>
+            <Icon name="filter" />
+          </ActionButton>
+        </div>
+        <div className="hca-stock-list-meta">
+          <span className="hca-field-hint">
+            {rows ? `${rows.length} ${rows.length === 1 ? "registro" : "registros"}${next ? " carregados" : ""}` : ""}
+          </span>
+          <div className="hca-consumption-list-links">
+            <ActionButton ref={refreshRef} compact variant="quiet" aria-label="Atualizar lista"
+              onClick={() => refreshList()}><Icon name="refresh" /></ActionButton>
+            {mayReadStock ? <Link className="hca-control hca-control--compact hca-control--secondary"
+              href={`/estoque?careRecipientId=${patient}`}><Icon name="box" /> Estoque</Link> : null}
+            <Menu.Root>
+              <Menu.Trigger render={<ActionButton ref={moreRef} compact aria-label="Mais opções de consumo" />}>
+                <Icon name="more" />
+              </Menu.Trigger>
+              <MenuPopup>
+                <Menu.Item className="hca-menu-item" onClick={() => { setReferenceError(""); setPanel("reference"); }}>
+                  <Icon name="link" /> Consultar referência
+                </Menu.Item>
+                <Menu.Item className="hca-menu-item" onClick={() => setPanel("flow")}>
+                  <Icon name="comment" /> Sugestões do WhatsApp
+                </Menu.Item>
+                {mayOpenLegacy ? <Menu.Item className="hca-menu-item" onClick={() => {
+                  setEditorOrigin(null);
+                  setEditor(moreRef.current);
+                }}><Icon name="history" /> Relatos anteriores</Menu.Item> : null}
+              </MenuPopup>
+            </Menu.Root>
+          </div>
+        </div>
+        {error && !reading && !showFailure ? (
           <Notice error>
             {error} Use Atualizar lista para repetir a consulta.
           </Notice>
         ) : null}
-        {reading ? <Notice>Carregando relatos…</Notice> : null}
-        {current?.queriedAt ? <p className="my-3 text-sm text-(--muted)">
-          {reading || error ? "Última consulta confirmada; aguardando atualização." : "Relatos consultados:"} {formatBrazilDate(current.queriedAt)}.
+        {current?.queriedAt ? <p className={error && !reading ? "hca-field-hint" : "sr-only"}>
+          {error && !reading ? "Última consulta confirmada; aguardando atualização." : "Relatos consultados:"} {formatBrazilDate(current.queriedAt)}.
         </p> : null}
         <ul className="hca-consumption-records" aria-label="Relatos da consulta" aria-busy={reading || moreBusy}>
           {rows?.map(row => <ConsumptionRecord key={row.id} row={row} onOpen={target => { triggerRef.current = target; open(row.id); }} />)}
         </ul>
         {!reading && rows?.length === 0 && !error ? (
-          <p>Nenhum relato encontrado para estes filtros.</p>
+          <div className="hca-consumption-empty">
+            <Icon name="search" />
+            <p>Nenhum relato encontrado para estes filtros.</p>
+            {hasFilters ? <ActionButton compact onClick={() => applyFilters(emptyFilters)}>Limpar filtros</ActionButton> : null}
+          </div>
         ) : null}
         {next ? (
           <ActionButton
@@ -409,7 +464,69 @@ function Reports({ context }: { context: WorkspaceContext }) {
             Carregar mais relatos
           </ActionButton>
         ) : null}
+        {mayRecordTeam ? <div className="hca-consumption-actions">
+          <ActionButton onClick={event => setShortage({ opener: event.currentTarget })}><Icon name="bell" /> Avisar falta</ActionButton>
+          <ActionButton variant="primary" onClick={event => {
+            setEditorOrigin(null);
+            setTeamEditor(event.currentTarget);
+          }}><Icon name="plus" /> Registrar consumo</ActionButton>
+        </div> : null}
       </section>
+      <ScopedReadFailureDialog subject="consumption" open={showFailure}
+        title="Não foi possível consultar os relatos" denied={failure?.denied ?? false} message={error}
+        cause={failure?.cause} attempts={failure?.attempts ?? 0} loading={showingActivity} returnFocus={refreshRef}
+        onClose={() => setDismissed(failure ?? null)}
+        onRetry={() => refreshList(failure?.denied ? 0 : (failure?.attempts ?? 0) + 1)} />
+      <Dialog open={panel === "filters"} title="Filtrar registros" headingIcon="filter"
+        onClose={() => setPanel(null)} finalFocus={filterRef}
+        footer={<>
+          <ActionButton onClick={() => { applyFilters(emptyFilters, true); setPanel(null); }}>Limpar</ActionButton>
+          <ActionButton type="submit" variant="primary" form={filterFormId}>Aplicar</ActionButton>
+        </>}>
+        <form id={filterFormId} className="grid gap-4" onSubmit={event => {
+          event.preventDefault();
+          applyFilters(draft, true);
+          setPanel(null);
+        }}>
+          <label className="grid gap-1 text-sm">Situação
+            <SelectField value={draft.status} onChange={event => setDraft({ ...draft, status: event.target.value })}>
+              <option value="">Todos os registros</option>
+              {Object.entries(consumptionStateLabels).map(([status, label]) => <option key={status} value={status}>{label}</option>)}
+            </SelectField>
+          </label>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <label className="grid gap-1 text-sm">Desde
+              <input className={inputClass} type="date" value={draft.from}
+                onChange={event => setDraft({ ...draft, from: event.target.value })} />
+            </label>
+            <label className="grid gap-1 text-sm">Até
+              <input className={inputClass} type="date" value={draft.to}
+                onChange={event => setDraft({ ...draft, to: event.target.value })} />
+            </label>
+          </div>
+        </form>
+      </Dialog>
+      <Drawer open={panel === "reference"} title="Consultar referência" headingIcon="link"
+        popupClassName="hca-consumption-sheet" onClose={() => setPanel(null)} finalFocus={moreRef}>
+        <form className="grid gap-3" onSubmit={event => {
+          event.preventDefault();
+          const id = String(new FormData(event.currentTarget).get("reference") ?? "").trim();
+          if (!/^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i.test(id)) {
+            setReferenceError("Confira a referência completa do relato.");
+            return;
+          }
+          setPanel(null);
+          triggerRef.current = moreRef.current;
+          open(id);
+        }}>
+          <label className="grid gap-1 text-sm">Referência do relato
+            <TextInput name="reference" maxLength={36} required aria-invalid={Boolean(referenceError)}
+              aria-describedby={referenceError ? "consumption-reference-error" : undefined} />
+          </label>
+          {referenceError ? <p role="alert" id="consumption-reference-error">{referenceError}</p> : null}
+          <div><ActionButton type="submit" variant="primary">Abrir relato</ActionButton></div>
+        </form>
+      </Drawer>
       {selected && (explicitReport || notice.data?.kind === "report") ? (
         <ConsumptionDetail
           key={selected}
@@ -419,7 +536,12 @@ function Reports({ context }: { context: WorkspaceContext }) {
           catalogError={catalogError}
           catalogLoading={catalogLoading}
           onCatalogRetry={catalogRetry}
+          teamBalances={teamBalances}
+          teamStockLoading={stock.loading}
+          teamStockError={stock.error}
+          onTeamMaterialRetry={retryTeamMaterials}
           onChange={() => setAttempt((value) => value + 1)}
+          onOpenRecord={open}
           onClose={() => {
             open(null);
             requestAnimationFrame(() => {
@@ -450,13 +572,45 @@ function Reports({ context }: { context: WorkspaceContext }) {
           }}
         />
       ) : null}
-      <FlowReviews
-        key={context.userId}
-        context={context}
-        products={catalogError ? [] : products}
-        catalogReady={!catalogLoading && !catalogError}
-        onChange={() => setAttempt((value) => value + 1)}
-      />
+      {!teamFlow ? teamWizard : null}
+      {issued ? <Dialog open success title={issued.recovered ? "Consumo encontrado" : "Consumo registrado"}
+        subtitle={issued.recovered ? "A emissão já estava confirmada. O estoque foi descontado uma única vez." : "As quantidades foram descontadas do estoque da equipe."}
+        onClose={concludeIssuance} finalFocus={false}
+        footer={<ActionButton variant="primary" onClick={concludeIssuance}><Icon name="check" />Concluir</ActionButton>}>
+        <DefinitionGrid items={[
+          ...(issued.code ? [{ label: "Registro", value: issued.code }] : []),
+          { label: "Registrado em", value: formatBrazilDate(issued.recordedAt) },
+        ]} />
+      </Dialog> : null}
+      {shortage && mayRecordTeam ? <TeamConsumptionAction context={context} kind="shortage" products={products}
+        opener={shortage.opener} sourceReminder={shortage.origin} onClose={() => setShortage(null)} onSaved={id => {
+          triggerRef.current = shortage.opener;
+          setShortage(null);
+          setAttempt(value => value + 1);
+          open(id);
+        }} /> : null}
+      {panel === "flow" ? <Drawer open title="Sugestões do WhatsApp" headingIcon="comment" keyboardScrollable
+        popupClassName="hca-consumption-sheet hca-consumption-flow-sheet" onClose={() => {
+          setPanel(null);
+          setTeamFlow(undefined);
+          setTeamEditor(null);
+        }} finalFocus={moreRef}
+        closeDisabled={Boolean(teamFlow && teamWizard)}>
+        <FlowReviews
+          key={context.userId}
+          context={context}
+          products={catalogError ? [] : products}
+          catalogReady={!catalogLoading && !catalogError}
+          refreshRevision={attempt}
+          onContinueConsumption={mayRecordTeam ? (source, opener) => {
+            setEditorOrigin(null);
+            setTeamFlow(source);
+            setTeamEditor(opener);
+          } : undefined}
+          onChange={() => setAttempt((value) => value + 1)}
+        />
+        {teamFlow ? teamWizard : null}
+      </Drawer> : null}
     </div>
   );
 }

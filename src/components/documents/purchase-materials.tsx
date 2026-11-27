@@ -85,7 +85,7 @@ export function PurchaseMaterials({ data, active }: { data: SupplyDocument; acti
     try { return { valid: true, facts: requirePurchaseEntryBalances(data.purchaseEntryBalances, { version: data.version, lines: data.lines, receipts: data.receipts, events: data.events }) }; }
     catch { return { valid: false, facts: [] }; }
   }, [data.purchaseEntryBalances, data.version, data.lines, data.receipts, data.events]);
-  return <DocumentMaterialList key={data.id} documentId={data.id} patientId={data.care_recipient_id}
+  return <DocumentMaterialList key={data.id} documentId={data.id} documentCode={data.code ?? data.protocol} patientId={data.care_recipient_id}
     revision={String(data.version)} active={active} label="Materiais da compra ou doação" settledLabel="Recebidos"
     today={{ location: "family", label: "Família hoje" }}
     heading={<><h2>Materiais</h2><p>Da autorização à entrada efetiva no estoque familiar.</p>
@@ -124,7 +124,7 @@ export function PurchaseMaterials({ data, active }: { data: SupplyDocument; acti
           ? <EntryBalance fact={balances.facts.find(fact => fact.lineId === line.id)} unit={line.unit_snapshot} receipts={data.receipts} /> : "Saldo não conferido" },
       ];
       const currentDecision = shortageClosed ? undefined : decision;
-      return { id: line.id, name: line.name_snapshot, unit: line.unit_snapshot, done, pending: !done && !shortageClosed,
+      return { id: line.id, productId: line.product_id, name: line.name_snapshot, unit: line.unit_snapshot, done, pending: !done && !shortageClosed,
         ...(currentDecision ?? { status, tone: done ? "success" : hasPending || !shortageClosed && decimal(entered).gt(0) ? "pending" : "neutral" }),
         related: data.originDocuments?.filter(origin => origin.productIds.includes(line.product_id)).map(origin => ({
           document: { id: origin.documentId, type: origin.type, code: origin.code },

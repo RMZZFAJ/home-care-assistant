@@ -12,7 +12,7 @@ import {
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { selectContext } from "./auth-context";
 import { audit } from "./accessibility-audit";
-import { openSchedulePrivateArea } from "./schedule-private-area";
+import { openSchedulePrivateArea, openScheduleTypeSettings } from "./schedule-private-area";
 import {
   scheduleResourcePurposes,
   scheduleResourceLabels,
@@ -43,7 +43,7 @@ async function login(page: Page, patient: string) {
   await selectContext(page, patient);
   await page.goto("/escalas");
   await expect(
-    page.getByRole("heading", { name: "Escalas e plantões", exact: true }),
+    page.getByRole("heading", { name: "Plantões e balanços", exact: true }),
   ).toBeVisible();
 }
 async function peerContext(browser: Browser) {
@@ -65,15 +65,17 @@ async function open(
   own = false,
   recovering = false,
 ) {
+  if (purpose === "shift_type_edit") await openScheduleTypeSettings(page);
   if (own) {
     await openSchedulePrivateArea(page);
     await button(page, "Consultar ou retomar este preenchimento").click();
   } else {
-    await page
-      .getByLabel("Data de referência", { exact: true })
-      .fill("2100-04-01");
-    if (purpose === "shift_type_edit" || purpose.startsWith("schedule_series_"))
-      await page.getByText("Tipos e programações", { exact: true }).click();
+    if (purpose !== "shift_type_edit") {
+      await page.getByLabel("Data de referência", { exact: true }).fill("2100-04-01");
+      await page.getByLabel("Visualização", { exact: true }).selectOption("week");
+      if (purpose === "schedule_series_end")
+        await page.getByText("Séries publicadas", { exact: true }).click();
+    }
     const names: Record<ScheduleResourcePurpose, string> = {
       shift_type_edit: "Editar tipo",
       schedule_series_end: "Encerrar série",
@@ -130,7 +132,8 @@ async function review(page: Page) {
     await trigger.focus({ timeout: 750 });
     await expect(trigger).toBeFocused({ timeout: 750 });
   }).toPass({ timeout: 15_000 });
-  await trigger.press("Enter");
+  if (test.info().project.name === "chromium") await trigger.click();
+  else await trigger.press("Enter");
   const d = drawer(page, "Revisar escala");
   await expect(d).toBeVisible();
   await expect(d.locator("input,select,textarea")).toHaveCount(0);

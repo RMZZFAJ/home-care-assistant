@@ -1,3 +1,5 @@
+import { beginTabCommand, tabUpdateLocked } from "./tab-commands";
+
 export function errorMessage(body: unknown, fallback: string) {
   if (!body || typeof body !== "object") return fallback;
   const value = body as { error?: unknown; correlationId?: string };
@@ -20,6 +22,7 @@ export class ApiError extends Error {
     public status: number,
     public code?: string,
     public correlationId?: string,
+    public retryAfter?: string,
   ) {
     super(message);
     this.name = "ApiError";
@@ -33,8 +36,28 @@ export function setRuntimeCommandsAvailable(available: boolean | undefined) {
   if (typeof window !== "undefined") runtimeCommandsAvailable = available;
 }
 export function requireRuntimeCommandsAvailable() {
+  if (tabUpdateLocked())
+    throw new ApiError("Aguarde a atualização desta aba antes de iniciar outra ação.", 400, "CLIENT_RUNTIME_BLOCKED");
   if (typeof window !== "undefined" && runtimeCommandsAvailable === false)
     throw new ApiError("A ação não foi enviada. Aguarde conexão e versão compatíveis antes de tentar novamente. Seus campos foram preservados.", 400, "CLIENT_RUNTIME_BLOCKED");
+}
+
+function commandWasDecided(error: unknown) {
+  return error instanceof ApiError && error.status >= 400 && error.status < 500 && error.status !== 408 &&
+    error.code !== "PERSISTENCE_UNCONFIRMED" && error.code !== "RECONCILIATION_REQUIRED";
+}
+
+export async function observeCommand<T>(run: () => Promise<T>) {
+  requireRuntimeCommandsAvailable();
+  const finish = beginTabCommand();
+  try {
+    const result = await run();
+    finish?.("confirmed");
+    return result;
+  } catch (reason) {
+    finish?.(commandWasDecided(reason) ? "confirmed" : "uncertain");
+    throw reason;
+  }
 }
 
 type RequestKind = "read" | "command";
@@ -65,6 +88,8 @@ export async function api<T>(
   if (signal?.aborted) controller.abort();
   signal?.addEventListener("abort", cancel, { once: true });
   const timeout = setTimeout(cancel, timeoutMs);
+  // An already cancelled request never reached the transport.
+  const finish = requestKind === "command" && !controller.signal.aborted ? beginTabCommand() : undefined;
   try {
     const response = await fetch(url, {
       cache: "no-store",
@@ -105,9 +130,12 @@ export async function api<T>(
         body && typeof body === "object" && "correlationId" in body && typeof body.correlationId === "string"
           ? body.correlationId
           : undefined,
+        response.headers.get("retry-after") ?? undefined,
       );
+    finish?.("confirmed");
     return body as T;
   } catch (error) {
+    finish?.(commandWasDecided(error) ? "confirmed" : "uncertain");
     if (controller.signal.aborted && !signal?.aborted)
       throw new TransportError(
         requestKind === "read"

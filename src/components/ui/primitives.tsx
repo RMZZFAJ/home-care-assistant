@@ -5,7 +5,7 @@ import { documentStatuses } from "@/types/documents";
 
 import { useEffect, useRef, type ReactNode } from "react";
 export { Dialog } from "./overlays";
-import { Icon } from "./icon";
+import { Icon, type IconName } from "./icon";
 export { Icon, type IconName } from "./icon";
 
 export function StatusBadge({ status, label }: { status: string; label?: string }) {
@@ -34,15 +34,17 @@ export function EmptyState({
   title,
   children,
   action,
+  icon = "forms",
 }: {
   title: string;
   children?: ReactNode;
   action?: ReactNode;
+  icon?: IconName;
 }) {
   return (
     <div className="ui-empty">
       <span className="ui-empty-icon">
-        <Icon name="forms" />
+        <Icon name={icon} />
       </span>
       <h2>{title}</h2>
       {children ? <p>{children}</p> : null}

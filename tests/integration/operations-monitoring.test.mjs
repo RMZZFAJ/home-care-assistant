@@ -33,13 +33,44 @@ test("technical diagnostics require current global Auth mode; local, anonymous a
     assert.ok((await client.rpc("operations_diagnostics", { p_environment: "local" })).error);
     assert.ok((await client.rpc("operations_history", { p_environment: "local" })).error);
     assert.ok((await client.rpc("operations_command", configure(data.policy.version, {}))).error);
+    assert.ok((await client.rpc("operations_recover", { p_environment: "local", p_key: randomUUID() })).error);
+    assert.ok((await client.rpc("operations_incident", { p_environment: "local", p_id: randomUUID() })).error);
   }
   await rpc(global, "select_active_context", { p_patient: f.patient });
   assert.equal((await global.rpc("operations_diagnostics", { p_environment: "local" })).error?.code, "42501");
+  assert.equal((await global.rpc("operations_recover", { p_environment: "local", p_key: randomUUID() })).error?.code, "42501");
   await rpc(global, "select_active_context", { p_patient: null });
   const serialized = JSON.stringify(await diagnostic(global));
   for (const forbidden of [f.patient, fixtures.global.id, fixtures.adminA.email, "care_recipient_id", "actor_id", "endpoint", "lease_hash", "Paciente fictício"]) assert.ok(!serialized.includes(forbidden), forbidden);
   assert.equal(sql("select count(*) from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname='private' and c.relname like 'operations_%' and c.relkind='r' and (has_table_privilege('anon',c.oid,'SELECT,INSERT,UPDATE,DELETE,TRUNCATE') or has_table_privilege('authenticated',c.oid,'SELECT,INSERT,UPDATE,DELETE,TRUNCATE') or has_table_privilege('service_role',c.oid,'SELECT,INSERT,UPDATE,DELETE,TRUNCATE'));"), "0");
+});
+
+test("technical recovery finds the same receipt or fences an absent command without changing incident history", async () => {
+  const global = await actor("global"), environment = "operator";
+  const { policy } = await diagnostic(global, environment);
+  const packet = configure(policy.version, policy.values, randomUUID(), environment);
+  const lookup = { p_environment: environment, p_key: packet.p_key };
+  const [command, recovery] = await Promise.all([
+    global.rpc("operations_command", packet), global.rpc("operations_recover", lookup),
+  ]);
+  assert.ifError(recovery.error);
+  if (recovery.data.recorded) {
+    assert.ifError(command.error);
+    assert.deepEqual(recovery.data, command.data);
+    assert.equal((await diagnostic(global, environment)).policy.version, policy.version + 1);
+  } else {
+    assert.equal(command.error?.code, "23505");
+    assert.equal((await diagnostic(global, environment)).policy.version, policy.version);
+  }
+  assert.deepEqual(await rpc(global, "operations_recover", lookup), recovery.data);
+  assert.equal((await global.rpc("operations_recover", { ...lookup, p_environment: "preview" })).error?.code, "42501");
+
+  const current = (await diagnostic(global, environment)).policy;
+  const late = configure(current.version, current.values, randomUUID(), environment);
+  const absent = await rpc(global, "operations_recover", { ...lookup, p_key: late.p_key });
+  assert.deepEqual(absent, { environment, idempotencyKey: late.p_key, recorded: false });
+  assert.equal((await global.rpc("operations_command", late)).error?.code, "23505");
+  assert.deepEqual((await diagnostic(global, environment)).policy, current);
 });
 
 test("service events reject SQL NULL, private payloads, invalid codes and fabricated verified archives; exact replays deduplicate", async () => {
@@ -91,8 +122,12 @@ test("policy CAS preserves exact snapshots; commands replay and conflicting oper
 
 test("acknowledge/resolve race uses CAS, preserves history and does not change any operational record", async () => {
   const global = await actor("global"), recorded = await rpc(service, "record_operations_event", { p_event: event({ component: "integrity", code: "INTEGRITY_FAILURE" }) });
-  const row = (await diagnostic(global)).data.find(x => x.correlationId && sql(`select correlation_id::text from private.operations_events where id=${sqlLiteral(recorded.id)};`) === x.correlationId);
-  assert.ok(row);
+  const id = sql(`select id from private.operations_incidents where last_event_id=${sqlLiteral(recorded.id)};`);
+  assert.ok(id);
+  const { incident: row, environment } = await rpc(global, "operations_incident", { p_environment: "local", p_id: id });
+  assert.equal(environment, "local");
+  assert.equal(row.correlationId, sql(`select correlation_id::text from private.operations_events where id=${sqlLiteral(recorded.id)};`));
+  assert.equal((await global.rpc("operations_incident", { p_environment: "preview", p_id: id })).error?.code, "42501");
   const business = () => sql("select jsonb_build_object('documents',(select count(*) from public.operational_documents),'science',(select count(*) from public.requisition_science_events),'stock',(select count(*) from public.stock_movements));");
   const before = business(), base = { p_environment: "local", p_id: row.id, p_expected: row.version };
   const race = await Promise.all([global.rpc("operations_command", { ...base, p_action: "acknowledge", p_payload: { reason: "investigating" }, p_key: randomUUID() }), global.rpc("operations_command", { ...base, p_action: "resolve", p_payload: { reason: "corrected" }, p_key: randomUUID() })]);

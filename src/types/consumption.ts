@@ -1,6 +1,6 @@
 export type ConsumptionLine = {
   productId: string;
-  quantity: string;
+  quantity: string | null;
   unit: string;
   name?: string;
 };
@@ -9,12 +9,15 @@ export type ConsumptionSummary = {
   care_recipient_id: string;
   kind: "consumption" | "shortage";
   location: "FAMILY" | "CARE_TEAM";
-  status: "reported" | "confirmed" | "rejected";
+  status: "reported" | "confirmed" | "rejected" | "recorded" | "cancelled" | "communicated";
+  workflow_mode?: "legacy" | "direct" | "shortage";
   body: string;
   created_at: string;
   version: number;
   reported_by: string;
   reported_name: string | null;
+  code?: string;
+  materials?: { productId: string; name: string; quantity: string | null; unit: string | null }[];
 };
 export type ConsumptionReport = ConsumptionSummary & {
   source_reminder_id?:string|null;
@@ -44,9 +47,22 @@ export type ConsumptionReport = ConsumptionSummary & {
     id: string;
     productId: string;
     quantity: string;
-    source: string;
+    source: string | null;
     destination: string | null;
     createdAt: string;
+    actId?: string | null;
+    balanceBefore?: string | null;
+    balanceAfter?: string | null;
+  }[];
+  acts?: {
+    id: string;
+    action: "issue" | "correct" | "cancel" | "shortage";
+    version: number;
+    by: string | null;
+    at: string;
+    reason: string | null;
+    repeatedReportId: string | null;
+    source?: "whatsapp" | null;
   }[];
   replayed?: boolean;
 };

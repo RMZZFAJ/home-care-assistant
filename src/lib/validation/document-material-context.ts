@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { stockCustodyProjection } from "./stock-reads";
 
 const scope = z.object({ documentId: z.uuid(), patientId: z.uuid() });
 const quantity = z.string().regex(/^-?\d+(?:\.\d+)?$/);
@@ -16,6 +17,12 @@ export const documentMaterialSummary = scope.extend({
   })).optional(),
 });
 export const materialPanelSections = ["stock", "history", "links"] as const;
+export const materialLinkKinds = ["REQ", "COM", "ENT", "DEV", "BAL"] as const;
+export const materialLinkFilters = z.object({
+  kind: z.enum(materialLinkKinds).nullable(),
+  search: z.string().trim().max(160).transform(value => value.toLowerCase()),
+});
+export type MaterialLinkFilters = z.infer<typeof materialLinkFilters>;
 const lineScope = scope.extend({
   documentId: z.uuid().nullable(), lineId: z.uuid().nullable(),
   productId: z.string().nullable(), page: z.number().int().positive(),
@@ -41,6 +48,11 @@ export type MaterialHistoryRow = z.infer<typeof materialHistoryRow>;
 export const documentMaterialPanel = z.discriminatedUnion("section", [
   lineScope.extend({
     section: z.literal("stock"), ...balances,
+    positions: z.object({
+      family: stockCustodyProjection.nullable(),
+      team: stockCustodyProjection.nullable(),
+      transfersAvailable: z.boolean(),
+    }).optional(),
     observations: z.array(z.object({
       documentId: z.uuid(), code: z.string().nullable(), createdAt: date,
       quantity: quantity.nullable(), observation: materialHistoryObservation.nullable(),
@@ -55,6 +67,7 @@ export const documentMaterialPanel = z.discriminatedUnion("section", [
   lineScope.extend({
     section: z.literal("links"), total: z.number().int().nonnegative(),
     rows: z.array(document.extend({ archived: z.boolean() })),
+    filters: materialLinkFilters.optional(),
   }),
 ]);
 export type MaterialPanelSection = typeof materialPanelSections[number];

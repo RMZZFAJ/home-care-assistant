@@ -27,7 +27,7 @@ export function AdministrativePendingRecovery({ userId }: { userId: string }) {
           if (!key.startsWith(prefix)) continue;
           try {
             const parsed=administrativeAttempt.safeParse(JSON.parse(sessionStorage.getItem(key) ?? "null"));
-            if (parsed.success && key===storageKey(userId,parsed.data)) retained.push(parsed.data);
+            if (parsed.success && parsed.data.action === "commit" && key === storageKey(userId, parsed.data)) retained.push(parsed.data);
           } catch { /* Keep other readable attempts available. */ }
         }
       } catch { /* Browser retention may be unavailable. */ }
@@ -49,8 +49,7 @@ export function AdministrativePendingRecovery({ userId }: { userId: string }) {
         return;
       }
       const receipt=verifyAdministrativeReceipt(userId,attempt,response.receipt);
-      const text=receipt.action==="commit" && receipt.outcome ? administrativeOutcomeText(receipt.outcome)
-        : {save:"Preenchimento privado salvo.",discard:"Descarte privado confirmado.",acknowledge:"Comprovante anterior reconhecido.",commit:"Alteração confirmada."}[receipt.action];
+      const text = receipt.outcome ? administrativeOutcomeText(receipt.outcome) : "Alteração confirmada.";
       try {
         const retained=administrativeAttempt.safeParse(JSON.parse(sessionStorage.getItem(storageKey(userId,attempt)) ?? "null"));
         if (retained.success && retained.data.key===attempt.key) sessionStorage.removeItem(storageKey(userId,attempt));

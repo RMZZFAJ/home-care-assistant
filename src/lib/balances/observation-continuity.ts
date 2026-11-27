@@ -22,7 +22,7 @@ export function beginBalanceObservation(
   const previous = balanceDraftContent.parse(source);
   if (previous.context.documentId !== context.documentId)
     throw Error("Abra a ficha original para recuperar este preenchimento.");
-  const { previousObservations = [], ...snapshot } = previous;
+  const { previousObservations = [], materialReferences, ...snapshot } = previous;
   if (previousObservations.length >= 10)
     throw Error(
       "Este preenchimento já preserva dez conferências anteriores. Salve e consulte os valores antes de descartar explicitamente o preenchimento privado e iniciar outro.",
@@ -31,6 +31,9 @@ export function beginBalanceObservation(
     counts: {},
     observationTimes: {},
     notes: previous.notes,
+    materialCategory: previous.materialCategory,
+    balanceExtras: previous.balanceExtras?.map(extra => ({ ...extra, quantity: "" })),
+    materialReferences,
     materials,
     context,
     previousObservations: [

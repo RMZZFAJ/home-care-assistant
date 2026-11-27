@@ -22,11 +22,15 @@ export function FlowReviews({
   context,
   products,
   catalogReady,
+  refreshRevision,
+  onContinueConsumption,
   onChange,
 }: {
   context: WorkspaceContext;
   products: CatalogProduct[];
   catalogReady: boolean;
+  refreshRevision: number;
+  onContinueConsumption?: (source: FlowSubmission, opener: HTMLElement) => void;
   onChange: () => void;
 }) {
   const patientId = context.patient!.id,
@@ -58,7 +62,7 @@ export function FlowReviews({
     } | null>(null),
     [cursors, setCursors] = useState<(Cursor | null)[]>([null]);
   const cursor = cursors[cursors.length - 1],
-    readKey = JSON.stringify([patientId, page, attempt, live]),
+    readKey = JSON.stringify([patientId, page, attempt, refreshRevision, live]),
     privateScope = JSON.stringify([
       context.userId,
       patientId,
@@ -78,7 +82,7 @@ export function FlowReviews({
       accept: boolean;
       opener: HTMLElement;
     } | null>(null),
-    headingRef = useRef<HTMLHeadingElement>(null);
+    refreshRef = useRef<HTMLButtonElement>(null);
   useEffect(() => {
     if (!canWrite) return;
     const controller = new AbortController();
@@ -172,18 +176,15 @@ export function FlowReviews({
   }
   return (
     <section
-      className="ui-card hca-form-stack"
+      className="hca-form-stack"
       aria-label="Relatos recebidos por Flow"
     >
-      <h2 ref={headingRef} tabIndex={-1}>
-        Relatos recebidos por Flow
-      </h2>
       <p>
         {result?.data.configured
           ? "Confira os dados recebidos no WhatsApp antes de registrá-los no aplicativo."
           : "O canal de Flows aguarda configuração do provedor. Sugestões já recebidas continuam disponíveis para revisão."}
       </p>
-      <ActionButton onClick={() => setAttempt((n) => n + 1)}>
+      <ActionButton ref={refreshRef} onClick={() => setAttempt((n) => n + 1)}>
         Atualizar sugestões
       </ActionButton>
       <section
@@ -209,16 +210,15 @@ export function FlowReviews({
               <div className="hca-toolbar">
                 <ActionButton
                   disabled={!catalogReady}
-                  onClick={(e) =>
-                    setSelected({
-                      target: row.id,
-                      source: row,
-                      accept: true,
-                      opener: e.currentTarget,
-                    })
-                  }
+                  onClick={(e) => {
+                    if (row.body.kind === "consumption" && onContinueConsumption) {
+                      onContinueConsumption(row, e.currentTarget);
+                      return;
+                    }
+                    setSelected({ target: row.id, source: row, accept: true, opener: e.currentTarget });
+                  }}
                 >
-                  Conferir sugestão
+                  {row.body.kind === "consumption" && onContinueConsumption ? "Continuar consumo" : "Conferir sugestão"}
                 </ActionButton>
                 <ActionButton
                   onClick={(e) =>
@@ -340,7 +340,7 @@ export function FlowReviews({
           initialAccept={selected.accept}
           products={products}
           restoreFocusTo={selected.opener}
-          restoreFocusFallbackRef={headingRef}
+          restoreFocusFallbackRef={refreshRef}
           onClose={() => setSelected(null)}
           onSaved={refreshed}
         />

@@ -23,9 +23,8 @@ const drawer = (page: Page) =>
 const panel = (page: Page) =>
   drawer(page).getByRole("region", { name: "Rascunho privado", exact: true });
 async function open(page: Page) {
-  await page
-    .getByRole("button", { name: "Meu preenchimento de relato", exact: true })
-    .click();
+  await page.getByRole("button", { name: "Mais opções de consumo", exact: true }).click();
+  await page.getByRole("menuitem", { name: "Relatos anteriores", exact: true }).click();
   await drawer(page)
     .getByLabel("Custódia", { exact: true })
     .selectOption("FAMILY");
@@ -193,6 +192,8 @@ test("preenchimento de consumo retoma em outra sessão com quantidade incompleta
     expect(JSON.parse(facts(f.patient)).ledger).toEqual(
       JSON.parse(before).ledger,
     );
+    await expect(other).toHaveURL(url =>
+      url.pathname === "/consumo" && url.searchParams.get("ref") === reports[0].id);
     await other.goto(`/consumo?careRecipientId=${f.patient}`);
     await open(other);
     await expect(panel(other)).toContainText(

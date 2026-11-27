@@ -89,6 +89,7 @@ async function declareInUi(page: Page, f: Fixture, source: Custody, info: TestIn
     await page.getByRole("menuitem", { name: "Detalhes do material", exact: true }).click();
     const panel = page.getByRole("dialog", { name: "Material fictício V4 0", exact: true });
     await expect(panel.getByRole("heading", { name: "Estoque atual", exact: true })).toBeVisible();
+    await expect(panel.getByRole("tab", { name: "Nesta ficha", exact: true })).toHaveCount(0);
     await panel.getByRole("tab", { name: "Histórico", exact: true }).click();
     await expect(panel.getByRole("heading", { name: "Movimentações e decisões", exact: true })).toBeVisible();
     await panel.getByRole("button", { name: "Voltar ao preenchimento", exact: true }).click();

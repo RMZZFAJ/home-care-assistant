@@ -1,6 +1,24 @@
-.hca-local-preparation { display: grid; gap: 20px; }
-.hca-preparation-tasks { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 20px; }
-.hca-preparation-task { min-width: 0; display: grid; align-content: start; gap: 14px; }
-.hca-preparation-task > p { margin: 0; }
-.hca-preparation-task h2 { display: flex; align-items: center; gap: 9px; }
-@media (max-width:850px) { .hca-preparation-tasks { grid-template-columns: minmax(0,1fr); } }
+.hca-local-preparation { display: grid; gap: 16px; min-width: 0; }
+.hca-preparation-content { display: grid; align-content: start; gap: 16px; min-width: 0; }
+.hca-preparation-lead { display: flex; align-items: flex-start; gap: 12px; }
+.hca-preparation-lead p, .hca-preparation-intro > p { color: var(--hca-muted); font-size: 13px; }
+.hca-preparation-intro { display: grid; gap: 12px; }
+.hca-local-preparation h2 { font-size: 15px; font-weight: 700; }
+.hca-preparation-lead h2 { margin: 0 0 4px; }
+.hca-preparation-lead p, .hca-preparation-intro > .hca-preparation-hint { margin: 0; line-height: 1.6; }
+.hca-preparation-hint { display: flex; align-items: flex-start; gap: 8px; }
+.hca-preparation-hint > svg { flex: none; margin-top: 2px; }
+.hca-guide-card > .hca-preparation-registration { margin-bottom: 12px; }
+.hca-local-preparation .hca-guide-actions { justify-content: space-between; }
+.hca-local-preparation .hca-guide-actions > :is(a, button) { flex: none; min-width: 0; max-width: 100%; white-space: normal; }
+.hca-local-preparation .hca-guide-actions > button { margin-inline-start: auto; }
+
+@media (max-width: 420px) {
+  .workspace-content:has(.hca-local-preparation) > .page-heading h1 {
+    font-size: clamp(20px, 6vw, 24px);
+  }
+  .hca-local-preparation .hca-preparation-intro { padding: 12px; gap: 10px; }
+  .hca-preparation-lead p, .hca-preparation-intro > .hca-preparation-hint { font-size: 12px; line-height: 1.5; }
+  .hca-preparation-intro .hca-definition-grid { grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 10px; }
+  .hca-local-preparation .hca-guide-actions { flex-direction: column; align-items: flex-start; }
+}

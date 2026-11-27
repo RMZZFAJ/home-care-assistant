@@ -119,7 +119,7 @@ test("BAL encerra recusa do adiamento obsoleto com destino em leitura, autoria p
   await expect(form(page)).toHaveCount(0);
   expect(attempts).toHaveLength(1);
   await expect(
-    page.getByRole("heading", { name: "Programação do balanço", exact: true }),
+    page.getByRole("heading", { name: "Previstos", exact: true }),
   ).toBeFocused();
   await expect(
     page.getByText("Solicitação rejeitada", { exact: true }),

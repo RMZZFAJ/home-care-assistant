@@ -267,10 +267,10 @@ test("C026 REQ anuncia erro no campo e conserva extra e observação de 1001 car
 test("C026 apresentação incompleta aponta material, nome, código e fator sem perder dados nem mover estoque", async ({ page }, info) => {
   const f = await fixture(), ledger = sql(`select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where care_recipient_id=${q(f.patient)}`);
   let commands = 0;
-  page.on("request", request => { if (new URL(request.url()).pathname === "/api/catalog/presentations" && request.method() === "POST") commands++; });
+  page.on("request", request => { if (new URL(request.url()).pathname === "/api/admin/catalogue-actions" && request.method() === "POST") commands++; });
   await login(page, f.patient);
   await page.goto("/unidades?careRecipientId=" + f.patient);
-  await page.getByRole("button", { name: "Nova apresentação", exact: true }).click();
+  await page.getByRole("button", { name: "Adicionar apresentação", exact: true }).click();
   const drawer = page.getByRole("dialog", { name: "Nova apresentação", exact: true });
   const review = drawer.getByRole("button", { name: "Revisar apresentação", exact: true });
   const material = drawer.getByRole("combobox", { name: "Material da apresentação", exact: true });
@@ -284,18 +284,18 @@ test("C026 apresentação incompleta aponta material, nome, código e fator sem 
   await errorAt(name, "Informe um nome de pelo menos dois caracteres.");
   await name.fill("Pacote preservado");
   await review.click();
-  const barcode = drawer.getByLabel("Código da apresentação", { exact: false });
+  const barcode = drawer.getByLabel("Código de barras", { exact: true });
   await errorAt(barcode, "Informe um código de 8 a 14 algarismos, preservando os zeros iniciais.");
   await barcode.fill("0012345678901");
   await review.click();
-  const factor = drawer.getByLabel("Fator na unidade base", { exact: false });
+  const factor = drawer.getByLabel("Quantidade na unidade base", { exact: true });
   await expect(factor).toBeFocused(); await expect(factor).toHaveAttribute("aria-invalid", "true");
   await expect(name).toHaveValue("Pacote preservado"); await expect(barcode).toHaveValue("0012345678901"); expect(commands).toBe(0);
   for (const width of [1440, 768, 390, 320]) { await page.setViewportSize({ width, height: 900 }); await audit(page, "C026-apresentacao-" + width); }
   await capture(page, "C026-apresentacao", info.project.name);
   await factor.fill("10"); await review.click();
-  await expect(drawer.getByRole("heading", { name: "Revisar apresentação", exact: true })).toBeVisible();
-  await drawer.getByRole("button", { name: "Confirmar apresentação", exact: true }).click();
+  await page.getByRole("dialog", { name: "Confirmar apresentação?", exact: true }).getByRole("button", { name: "Confirmar apresentação", exact: true }).click();
+  await page.getByRole("dialog", { name: "Apresentação registrada", exact: true }).getByRole("button", { name: "Concluir", exact: true }).click();
   await expect(drawer).toHaveCount(0); expect(commands).toBe(1);
   expect(sql(`select jsonb_agg(to_jsonb(m) order by id) from public.stock_movements m where care_recipient_id=${q(f.patient)}`)).toBe(ledger);
 });
@@ -306,15 +306,19 @@ test("C031 política diferencia manter, alterar, branco, espaços e remover sem 
   await login(page, f.patient);
   await page.goto("/configuracoes?careRecipientId=" + f.patient);
   const packets: { change: Record<string, unknown> }[] = [];
-  page.on("request", request => { if (new URL(request.url()).pathname === "/api/patient-settings" && request.method() === "POST") packets.push(request.postDataJSON()); });
-  const open = () => page.getByRole("button", { name: "Editar Comunicação e lembretes", exact: true }).click();
-  const drawer = page.getByRole("dialog", { name: "Comunicação e lembretes", exact: true });
+  page.on("request", request => { if (new URL(request.url()).pathname === "/api/admin/residence-rules" && request.method() === "POST") packets.push(request.postDataJSON().intent); });
+  const open = () => page.getByRole("button", { name: "Editar Mensagens e lembretes", exact: true }).click();
+  const drawer = page.getByRole("dialog", { name: "Mensagens e lembretes", exact: true });
   const mode = drawer.getByRole("combobox", { name: "O que fazer com o nome curto", exact: true });
   const name = drawer.getByRole("textbox", { name: "Nome curto nas mensagens", exact: true });
   const save = drawer.getByRole("button", { name: "Registrar política", exact: true });
-  await open(); await expect(mode).toHaveValue("keep"); await expect(name).toBeDisabled(); await save.click();
+  const record = async () => {
+    await save.click();
+    await page.getByRole("dialog", { name: "Regra registrada", exact: true }).getByRole("button", { name: "Concluir", exact: true }).click();
+  };
+  await open(); await expect(mode).toHaveValue("keep"); await expect(name).toBeDisabled(); await record();
   await expect(drawer).toHaveCount(0); expect(state(f.patient).settings.patientShortName).toBe("Nome anterior");
-  await expect(page.getByRole("button", { name: "Editar Comunicação e lembretes", exact: true })).toBeFocused();
+  await expect(page.getByRole("button", { name: "Editar Mensagens e lembretes", exact: true })).toBeFocused();
   expect(Object.hasOwn(packets[0].change, "patientShortName")).toBe(false);
   await open(); await mode.selectOption("change");
   const before = count(f.patient);
@@ -326,12 +330,12 @@ test("C031 política diferencia manter, alterar, branco, espaços e remover sem 
   expect(packets).toHaveLength(1);
   for (const width of [1440, 768, 390, 320]) { await page.setViewportSize({ width, height: 900 }); await fieldGeometry(drawer, "C031-controles-" + width); await audit(page, "C031-nome-curto-" + width); }
   await capture(page, "C031-nome-curto", info.project.name);
-  await name.fill("  Nome novo  "); await save.click(); await expect(drawer).toHaveCount(0);
-  await expect(page.getByRole("button", { name: "Editar Comunicação e lembretes", exact: true })).toBeFocused();
+  await name.fill("  Nome novo  "); await record(); await expect(drawer).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Editar Mensagens e lembretes", exact: true })).toBeFocused();
   expect(state(f.patient).settings.patientShortName).toBe("Nome novo");
   expect(packets[1].change.patientShortName).toBe("Nome novo");
-  await open(); await mode.selectOption("remove"); await expect(name).toBeDisabled(); await save.click(); await expect(drawer).toHaveCount(0);
-  await expect(page.getByRole("button", { name: "Editar Comunicação e lembretes", exact: true })).toBeFocused();
+  await open(); await mode.selectOption("remove"); await expect(name).toBeDisabled(); await record(); await expect(drawer).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Editar Mensagens e lembretes", exact: true })).toBeFocused();
   expect(state(f.patient).settings.patientShortName).toBeNull();
   expect(packets).toHaveLength(3); expect(packets[2].change.patientShortName).toBeNull();
   expect(state(other.patient)).toEqual(otherBefore);
@@ -345,12 +349,14 @@ test("C031 comparação anuncia remoção proposta e mantém o nome vigente até
   await login(page, f.patient);
   await page.goto(`/configuracoes?careRecipientId=${f.patient}&area=people`);
   const row = page.getByRole("article", { name: "Proposta " + proposal.id.slice(0, 8), exact: true });
-  await row.getByText("Comparar configuração vigente e proposta", { exact: true }).click();
-  const comparison = row.getByRole("row").filter({ hasText: "Nome curto" });
+  await row.getByRole("button").click();
+  const review = page.getByRole("dialog", { name: "Conferir proposta", exact: true });
+  const comparison = review.getByRole("region", { name: "Compare a alteração", exact: true });
   await expect(comparison).toContainText("Nome vigente");
   await expect(comparison).toContainText("Sem nome curto · usar o nome do cadastro");
   expect(state(f.patient).settings.patientShortName).toBe("Nome vigente");
-  await row.getByRole("button", { name: "Aprovar proposta", exact: true }).click();
-  await expect(page.getByRole("status").filter({ hasText: "Configuração aplicada no paciente." })).toBeVisible();
+  await review.getByRole("button", { name: "Aprovar proposta", exact: true }).click();
+  await page.getByRole("dialog", { name: "Aprovar esta proposta?", exact: true }).getByRole("button", { name: "Aprovar proposta", exact: true }).click();
+  await expect(page.getByRole("dialog", { name: "Proposta aplicada", exact: true })).toBeVisible();
   expect(state(f.patient).settings.patientShortName).toBeNull();
 });

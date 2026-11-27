@@ -27,7 +27,8 @@ describe("D1 schedule decisions", () => {
     const change: ShiftChange = { id, shift_id: id, professional_id: id, proposed_professional_id: id, starts_at: before.starts_at, ends_at: before.ends_at, reason: "Substituição previamente combinada", status: "pending", shift_version: 3, version: 1, created_by: id, source_snapshot: before, proposed_snapshot: { ...before, professional_name: "Sheila fictícia", notes: "Nota própria da proposta" }, notes: "Nota própria da proposta", is_stale: false, current_professional_name: "Nome cadastral diferente", current_proposed_professional_name: "Outro nome atual", bal_impact: { has_assignment: true, changes_window: false, requires_family_decision: false, assignment_deadline: before.ends_at } };
     const workspace: ScheduleWorkspace = { types: [], shifts: [], professionals: [], series: [], changes: [change], events: [] };
     const html = renderToStaticMarkup(createElement(ScheduleReviewDetails, { review: { command: { action: "decide_change", body: { id, approve: true } }, version: 1, workspace } }));
-    for (const fact of ["Juliana fictícia", "Sheila fictícia", "06/11/2026", "07/11/2026", "19:00", "07:00", "America/Sao_Paulo", "Nota original preservada", "Nota própria da proposta", "A janela e o prazo do BAL permanecem"]) expect(html).toContain(fact);
+    for (const fact of ["Juliana fictícia", "Sheila fictícia", "06/11/2026", "07/11/2026", "19:00", "07:00", "America/Sao_Paulo", "Nota original preservada", "Nota própria da proposta", "Este plantão tem um balanço designado", "Prazo da atribuição: 07/11/2026, 07:00"]) expect(html).toContain(fact);
+    expect(html).not.toContain("A janela e o prazo do BAL permanecem");
     expect(html).not.toContain("Nome cadastral diferente");
     expect(html).not.toMatch(/<(input|select|textarea)\b/);
   });

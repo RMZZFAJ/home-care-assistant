@@ -49,6 +49,7 @@ import { DocumentHeader, DocumentMoreButton, DocumentMoreLink } from "@/componen
 import {
   DocumentTabs,
   DocumentPanel,
+  DocumentFileSections,
   DocumentAuditAccess,
   useDocumentTabs,
 } from "@/components/documents/document-tabs";
@@ -550,7 +551,6 @@ export function RequisitionDocumentContent({
       ) : null}
       <DocumentTabs
         rootRef={tabs.rootRef}
-        type="REQ"
         value={tabs.value}
         onSelect={tabs.select}
         auditAllowed={can(context, "audit.read")}
@@ -687,7 +687,7 @@ export function RequisitionDocumentContent({
         </DocumentPanel>
         <DocumentPanel value="materials">
           <section className="hca-materials-section">
-            <DocumentMaterialList key={data.id} documentId={data.id} patientId={data.care_recipient_id}
+            <DocumentMaterialList key={data.id} documentId={data.id} documentCode={data.code ?? data.protocol} patientId={data.care_recipient_id}
               revision={String(p.version)} active={tabs.value === "materials"} label="Materiais requisitados" settledLabel="Supridos"
               today={{ location: "family", label: "Família hoje" }}
               heading={<><h2>Materiais</h2><p>Estoque informado na emissão e avaliação da necessidade.</p></>}
@@ -706,7 +706,8 @@ export function RequisitionDocumentContent({
                   ? formatQuantity(item.current_stock)
                   : formatStockObservation(item.current_stock, item.stock_observation);
                 return {
-                  id: item.id, name, unit: item.unit_snapshot ?? null, urgent: item.urgent, done: Boolean(line?.attended),
+                  id: item.id, productId: item.product_id ?? item.resolution?.product_id, name,
+                  unit: item.unit_snapshot ?? null, urgent: item.urgent, done: Boolean(line?.attended),
                   status, tone: data.is_historical ? "neutral" : line?.attended ? "success" : "pending",
                   facts: [{ label: "Informado na REQ", value: reported }],
                   detail: <div className="space-y-2">
@@ -787,9 +788,10 @@ export function RequisitionDocumentContent({
 
         </DocumentPanel>
         <DocumentPanel value="communications"><DocumentCommunications id={id} version={p.version} /></DocumentPanel>
-        <DocumentPanel value="files">
+        <DocumentFileSections value={tabs.value} onSelect={tabs.select} generated={<>
           {data.receipt ? <RequisitionReceiptCard receipt={data.receipt} /> : null}
           <DocumentActions
+            active={tabs.value === "files"}
             generationBlocked={stale}
             readOnly={Boolean(p.archivedAt)}
             actionTarget={fileActionTarget}
@@ -798,14 +800,15 @@ export function RequisitionDocumentContent({
             code={data.code ?? data.protocol}
             version={p.version}
           />
-        </DocumentPanel>
-        <DocumentPanel value="attachments">
+        </>} attachments={
           <Attachments
             patientId={data.care_recipient_id}
             documentId={id}
+            documentCode={data.code ?? data.protocol}
+            active={tabs.value === "attachments"}
             writable={!p.archivedAt && can(context, "req.create")}
           />
-        </DocumentPanel>
+        } />
         <DocumentPanel value="history">
           <OpeningHistory id={id} refreshKey={openingRevision} authorized={can(context, "document.access.read")} />
           <DocumentTimeline id={id} version={p.version} events={p.events} />

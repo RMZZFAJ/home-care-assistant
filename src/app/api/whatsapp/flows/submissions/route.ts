@@ -7,6 +7,7 @@ import {
   databaseError,
   patientContext,
   pageParameters,
+  parseUuid,
   readJson,
   rpc,
   uuid,
@@ -41,12 +42,14 @@ export async function GET(request: Request) {
       "consumption.report",
     );
     const { page, pageSize, start, end } = pageParameters(params);
-    const { data, error, count } = await auth.client
+    let suggestions = auth.client
       .from("flow_submissions")
       .select("id,body,status,created_at,report_id", { count: "exact" })
       .eq("care_recipient_id", patient.id)
       .eq("user_id", auth.userId)
-      .eq("status", "pending_confirmation")
+      .eq("status", "pending_confirmation");
+    if (params.has("id")) suggestions = suggestions.eq("id", parseUuid(params.get("id")));
+    const { data, error, count } = await suggestions
       .order("created_at", { ascending: false })
       .order("id", { ascending: false })
       .range(start, end);

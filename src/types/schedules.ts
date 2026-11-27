@@ -3,6 +3,7 @@ export type ShiftType = {
   name: string;
   starts_local: string;
   duration_minutes: number;
+  rest_hours?: number | null;
   is_active: boolean;
   version: number;
 };
@@ -33,6 +34,9 @@ export type ShiftSeries = {
   weekdays: number[];
   anchor_date: string;
   valid_until: string;
+  open_ended?: boolean;
+  residence_version?: number | null;
+  continuation_blocked?: boolean;
   ended_on: string | null;
   status: string;
   version: number;

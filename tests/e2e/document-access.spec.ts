@@ -2,6 +2,7 @@ import { isDocumentAccessReport } from "./display-access-report";
 import { expect, test } from "@playwright/test";
 import { randomUUID } from "node:crypto";
 import { setup, rpc, issue, fixtures } from "../integration/v4-fixtures.mjs";
+import { shiftWorker } from "../integration/shift-fixtures.mjs";
 import { sql, sqlLiteral as q } from "../../scripts/test-environment.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { selectContext } from "./auth-context";
@@ -56,8 +57,11 @@ test("access-report failure stays in history without moving the ficha controls a
   let release!: () => void;
   const held = new Promise<void>(resolve => { release = resolve; });
   let intercepted = false;
+  let accessWrites = 0;
   await page.route("**" + endpoint, async route => {
-    if (route.request().method() !== "POST" || intercepted) return route.continue();
+    if (route.request().method() !== "POST") return route.continue();
+    accessWrites++;
+    if (intercepted) return route.continue();
     intercepted = true;
     await held;
     await route.fulfill({ status: 503, contentType: "application/json", body: JSON.stringify({ error: "Registro temporariamente indisponível." }) });
@@ -76,9 +80,16 @@ test("access-report failure stays in history without moving the ficha controls a
     await selectDocumentSection(page, "workflow");
     await selectDocumentSection(page, "history");
     await expect(retry).toBeVisible();
+    await page.evaluate(() => window.dispatchEvent(new Event("offline")));
+    await expect(page.getByText(/^Sem conexão\./)).toBeVisible();
+    await page.evaluate(() => window.dispatchEvent(new Event("online")));
+    await expect(retry).toBeEnabled();
+    await page.evaluate(() => new Promise<void>(resolve => requestAnimationFrame(() => requestAnimationFrame(() => requestAnimationFrame(() => resolve())))));
+    expect(accessWrites).toBe(1);
     const recovered = page.waitForResponse(response => new URL(response.url()).pathname === endpoint && response.request().method() === "POST");
     await retry.click();
     expect((await recovered).status()).toBe(200);
+    expect(accessWrites).toBe(2);
     await expect(retry).toHaveCount(0);
     await expect(page.getByRole("region", { name: "Histórico de acesso à ficha", exact: true }).getByRole("listitem")).toHaveCount(1);
     expect(physical(f.patient)).toBe(before);
@@ -136,7 +147,7 @@ test("background ficha refresh keeps the summary stationary and tabs selectable 
     release();
     await expect(refresh).toHaveAttribute("aria-disabled", "false");
     await expect(refresh).toHaveAttribute("aria-busy", "false");
-    await expect(page.getByRole("tab", { name: "Anexos", exact: true })).toHaveAttribute("aria-selected", "true");
+    await expect(page.getByRole("button", { name: "Anexos", exact: true })).toHaveAttribute("aria-pressed", "true");
     expect(physical(f.patient)).toBe(before);
   } finally {
     release();
@@ -146,13 +157,14 @@ test("background ficha refresh keeps the summary stationary and tabs selectable 
 
 test("L2 revogação deixa só o fundo neutro mesmo quando uma leitura autorizada chega atrasada", async ({ page }, info) => {
   const f = await setup();
+  const family = await shiftWorker(f.patient, "family");
   const privateNote = "Observação reservada da residência " + randomUUID();
   const patientName = sql(`select display_name from public.care_recipients where id=${q(f.patient)}`);
   const doc = await rpc(f.admin, "create_supply_document", {
     p_patient: f.patient, p_type: "COM", p_key: randomUUID(), p_draft: false,
     p_payload: { origin: "purchase", notes: privateNote, lines: [{ productId: f.products[0], quantity: "2" }] },
   });
-  await loginDecision(page, fixtures.family.email, f.patient);
+  await loginDecision(page, family.email, f.patient);
   await page.goto(`/fichas/${doc.id}`);
   await expect(page.getByRole("heading", { name: doc.code, exact: true })).toBeVisible();
   await expect(page.getByRole("tabpanel", { name: "Visão geral", exact: true }).getByText(privateNote, { exact: true })).toBeVisible();
@@ -165,7 +177,7 @@ test("L2 revogação deixa só o fundo neutro mesmo quando uma leitura autorizad
   await page.route("**" + endpoint, async route => {
     if (intercepted || route.request().method() !== "GET") return route.continue();
     intercepted = true;
-    const oldResponse = await route.fetch();
+    const oldResponse = await route.fetch({ maxRetries: 1 });
     expect(oldResponse.ok()).toBe(true);
     captured();
     await hold;
@@ -177,7 +189,7 @@ test("L2 revogação deixa só o fundo neutro mesmo quando uma leitura autorizad
     await page.evaluate(() => window.dispatchEvent(new Event("hca:data-changed")));
     await first;
     sql(`update public.care_recipient_memberships set status='revoked'
-         where care_recipient_id=${q(f.patient)} and user_id=${q(fixtures.family.id)}`);
+         where care_recipient_id=${q(f.patient)} and user_id=${q(family.id)}`);
     await page.evaluate(() => window.dispatchEvent(new Event("hca:profile-updated")));
     const modal = page.getByRole("dialog", { name: "O acesso à residência foi revogado", exact: true });
     await expect(modal).toBeVisible();
@@ -198,6 +210,7 @@ test("L2 revogação deixa só o fundo neutro mesmo quando uma leitura autorizad
     });
     await modal.getByRole("button", { name: "Entendi", exact: true }).click();
     await expect(page.getByRole("heading", { name: "Acesso encerrado", exact: true })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Conferir decisão na minha conta", exact: true })).toHaveCount(0);
     await expect(returnLink).toBeFocused();
     await returnLink.click();
     await expect(page.getByText(patientName, { exact: true })).toHaveCount(0);

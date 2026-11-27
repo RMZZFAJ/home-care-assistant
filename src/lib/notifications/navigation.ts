@@ -24,11 +24,12 @@ function notificationDestination(row: NotificationTarget) {
     path=(kind==="REQ"?"/historico/":"/fichas/")+row.document_id;
     label=kind==="REQ"?"Abrir requisição":kind==="COM"?"Abrir compra ou doação":kind==="ENT"?"Abrir entrega ou devolução":kind==="BAL"?"Abrir balanço":"Abrir ficha";
   }else if(row.requisition_id){path="/historico/"+row.requisition_id;label="Abrir requisição";}
+  else if(row.alert_event_id){path="/estoque";label="Abrir estoque";}
+  else if(row.consumption_report_id){path="/consumo";label="Abrir ocorrências e consumo";}
   else if(row.event_key?.startsWith("schedule.")){path="/escalas";label="Abrir escalas e plantões";}
   else if(row.event_key?.startsWith("bal.cycle.")){path="/balancos";label="Abrir balanços e plantões";}
-  else if(row.alert_event_id){path="/estoque";label="Abrir estoque";}
   else if(row.event_key==="bal.reminder"){path="/fichas/bal";label="Abrir contagem de estoque";}
-  else if(row.consumption_report_id||row.reminder_id){path="/consumo";label="Abrir ocorrências e consumo";}
+  else if(row.reminder_id){path="/consumo";label="Abrir ocorrências e consumo";}
   else{path="/notificacoes";label="Abrir notificações";}
   return {href:path+(query.size?"?"+query:""),label};
 }

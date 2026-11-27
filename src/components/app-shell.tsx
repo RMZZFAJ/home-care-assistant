@@ -7,10 +7,11 @@ import {
 
 import { useState, type ReactNode } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 
 import { can } from "@/lib/client/capabilities";
 import type { WorkspaceContext } from "@/types/workspace";
+import { localPreparationArea, mayPrepareLocally } from "@/lib/validation/local-preparation";
 import { Icon } from "@/components/ui/primitives";
 import "./layout/context-selection.css";
 import {
@@ -18,23 +19,29 @@ import {
   useWorkspaceState,
 } from "@/components/layout/workspace-context";
 
+const preparationDestinations = new Set(["/admin", "/estoque", "/escalas", "/balancos", "/configuracoes"]);
+
 export function AppWorkspace({
   title,
+  eyebrow,
   heading,
   children,
   administration = false,
   administrationCapabilities = ["access.manage"],
   administrationReadRecovery = false,
+  administrationUnavailable,
   compact = false,
   account = false,
   documentPage = false,
 }: {
   title: string;
+  eyebrow?: string;
   heading?: (context: WorkspaceContext) => ReactNode;
   children: (context: WorkspaceContext) => ReactNode;
   administration?: boolean;
   administrationCapabilities?: string[];
   administrationReadRecovery?: boolean;
+  administrationUnavailable?: ReactNode;
   compact?: boolean;
   account?: boolean;
   documentPage?: boolean;
@@ -65,7 +72,11 @@ export function AppWorkspace({
           normalize(profileSearch.trim()),
         ),
     ) ?? [];
-  const routePatient = useSearchParams().get("careRecipientId");
+  const search = useSearchParams();
+  const pathname = usePathname();
+  const routePatient = search.get("careRecipientId");
+  const originArea = search.get("fromPreparation");
+  const fromPreparation = originArea && localPreparationArea.safeParse(originArea).data;
   const linkedPatient = data?.documentContext?.patientId ?? routePatient;
   const mismatch =
     linkedPatient &&
@@ -88,7 +99,12 @@ export function AppWorkspace({
   const [initialized, setInitialized] = useState(false);
   if (!loading && !selecting && value && !initialized) setInitialized(true);
   if ((loading || selecting) && !initialized) return <main id="workspace-content" className="workspace-content" tabIndex={-1} aria-busy="true" />;
-  const customHeading = heading && value?.patient && !choose && !error ? heading(value) : null;
+  const customHeading = heading && value && (account || value.patient || administration && value.activeContext?.mode === "global") && !choose && !error ? heading(value) : null;
+  const contextLabel = value?.activeContext?.mode === "global" ? "Administração global" : roleLabel(value?.patient?.role);
+  const preparationReturn = value?.patient?.id === routePatient && value && mayPrepareLocally(value) &&
+    !choose && !error && fromPreparation && preparationDestinations.has(pathname)
+    ? "/preparacao-local?" + new URLSearchParams({ careRecipientId: value.patient.id, area: fromPreparation })
+    : null;
   return (
     <main
       id="workspace-content"
@@ -102,23 +118,22 @@ export function AppWorkspace({
         <div className="page-heading">
           <div>
             <p className="eyebrow">
-              {account
+              {eyebrow ?? (account
                 ? "Conta pessoal"
-                : (value?.patient?.display_name ?? "Home Care Assistant")}
+                : (value?.patient?.display_name ?? "Home Care Assistant"))}
             </p>
             <h1>{title}</h1>
           </div>
           {account ? (
             <span className="context-tag">Sua conta</span>
-          ) : value?.activeContext ? (
-            <span className="context-tag">
-              {value.activeContext.mode === "global"
-                ? "Administração global"
-                : roleLabel(value.patient?.role)}
-            </span>
+          ) : value?.activeContext && contextLabel !== eyebrow ? (
+            <span className="context-tag">{contextLabel}</span>
           ) : null}
         </div>
       ) : null}
+      {preparationReturn ? <Link className="hca-control hca-control--quiet" href={preparationReturn}>
+        <Icon name="back" />Voltar à preparação
+      </Link> : null}
       {error ? (
         <FeedbackBanner tone="error" role="alert">
           <p>{error}</p>
@@ -208,7 +223,7 @@ export function AppWorkspace({
             Nenhum paciente autorizado está vinculado à sua conta.
           </FeedbackBanner>
         ) : administration && !canAdminister && !canRecover ? (
-          <FeedbackBanner tone="error">
+          administrationUnavailable ?? <FeedbackBanner tone="error">
             Seu vínculo não permite administrar este paciente.
           </FeedbackBanner>
         ) : (

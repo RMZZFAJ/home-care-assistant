@@ -94,12 +94,13 @@ test("schedule list rejects incomplete reads,isolates periods and clears denied 
   const alerts = page.getByRole("main").getByRole("alert").filter({ hasText: /agenda|escala/i });
   try {
     await page.goto(`/escalas?careRecipientId=${f.patient}`);
+    await page.getByLabel("Visualização", { exact: true }).selectOption("week");
     await page.getByLabel("Data de referência", { exact: true }).fill("2100-06-15"); await expect(cards(page)).toHaveCount(2);
     for (const invalid of ["incomplete", "patient", "period", "nested", "duplicate", "window", "zone"]) {
       mode = invalid; await refresh.click(); await expect(alerts).toBeVisible(); await expect(cards(page)).toHaveCount(2);
       await expect(page.getByText("Última consulta preservada; ações aguardam atualização.", { exact: false })).toBeVisible();
       for (const action of await page.getByRole("button", { name: "Alterar plantão", exact: true }).all()) await expect(action).toBeDisabled();
-      await expect(page.getByRole("button", { name: "Novo tipo de plantão", exact: true })).toBeDisabled();
+      await expect(page.getByRole("button", { name: "Nova programação", exact: true })).toBeDisabled();
       mode = "live"; await refresh.click(); await expect(alerts).toHaveCount(0);
     }
     mode = "unavailable"; await refresh.click(); await expect(alerts).toContainText("temporariamente indisponível"); await expect(cards(page)).toHaveCount(2);
@@ -118,7 +119,7 @@ test("schedule list rejects incomplete reads,isolates periods and clears denied 
     await expect(page.getByText("Sem programação no dia.", { exact: true }).filter({ visible: true }).first()).toBeVisible();
     await page.getByLabel("Data de referência", { exact: true }).fill("2100-06-15"); await expect(cards(page)).toHaveCount(3);
     mode = "denied"; await refresh.click(); await expect(alerts).toContainText("Consulta da agenda recusada"); await expect(cards(page)).toHaveCount(0);
-    await expect(page.getByRole("button", { name: "Novo tipo de plantão", exact: true })).toBeDisabled();
+    await expect(page.getByRole("button", { name: "Nova programação", exact: true })).toBeDisabled();
     await page.unroute("**/api/schedules?*");
     sql(`insert into public.capability_overrides(care_recipient_id,subject_user,capability,enabled) values(${q(f.patient)},${q(fixtures.adminA.id)},'schedule.read.team',false),(${q(f.patient)},${q(fixtures.adminA.id)},'schedule.read.own',false);`);
     expect((await page.request.get(`/api/schedules?careRecipientId=${f.patient}&from=2100-06-01&until=2100-06-30`)).status()).toBe(403);
@@ -132,6 +133,10 @@ test("schedule list keeps own scope under real Auth and rejects foreign patients
   await login(page, f.patient, f.first.email);
   await page.goto(`/escalas?careRecipientId=${f.patient}`);
   await page.getByLabel("Data de referência", { exact: true }).fill("2100-06-15"); await expect(cards(page)).toHaveCount(1);
+  await expect(page.getByRole("switch", { name: "Só meus plantões" })).toHaveCount(0);
+  await expect(page.getByText("Peça à administração do paciente para configurar os horários.", { exact: true })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Configurar horários da residência", exact: true })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Nova programação", exact: true })).toBeDisabled();
   await expect(cards(page)).toContainText(f.names.first); await expect(page.getByLabel("Profissional", { exact: true })).toHaveCount(0);
   const url = `/api/schedules?careRecipientId=${f.patient}&from=2100-06-01&until=2100-06-30`;
   const result = await (await page.request.get(url)).json(); expect(result.data.shifts).toHaveLength(2);

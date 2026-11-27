@@ -16,7 +16,7 @@ async function login(page: Page, patient: string | null, role: "adminA" | "globa
   await expect(page.getByRole("heading", { name: "Visão geral", exact: true })).toBeVisible();
   await selectContext(page, patient);
 }
-const catalogueRows = (page: Page) => page.getByRole("table", { name: "Produtos do catálogo", exact: true }).locator("tbody tr");
+const catalogueRows = (page: Page) => page.getByRole("region", { name: "Produtos do catálogo", exact: true }).locator("[data-product-id]");
 const catalogueIds = (page: Page) => catalogueRows(page).evaluateAll(nodes => nodes.map(node => node.getAttribute("data-product-id")));
 const profileIds = (page: Page) => page.locator("article[data-profile-id]").evaluateAll(nodes => nodes.map(node => node.getAttribute("data-profile-id")));
 const catalogueFacts = (patient: string) => sql(`select encode(sha256(convert_to(jsonb_build_object('items',(select jsonb_agg(to_jsonb(c) order by product_id) from public.care_recipient_products c where care_recipient_id=${q(patient)}),'guidance',(select jsonb_agg(to_jsonb(c) order by product_id) from public.catalogue_successors c where care_recipient_id=${q(patient)}),'stock',(select jsonb_agg(to_jsonb(c) order by id) from public.stock_movements c where care_recipient_id=${q(patient)}),'documents',(select jsonb_agg(to_jsonb(c) order by id) from public.operational_documents c where care_recipient_id=${q(patient)}))::text,'UTF8')),'hex');`);
@@ -40,7 +40,8 @@ test("catalogue directory returns more than1000 items and reaches every late mat
   expect(active.data).toHaveLength(all.length - 1); expect(active.data.some((row: { id: string }) => row.id === prefix + "1005")).toBe(false);
   expect(active.data.find((row: { id: string }) => row.id === prefix + "1004").selectionPredecessors).toEqual([{ id: prefix + "1005", name: "Alvo de catálogo 1005", unit: "unidade" }]);
   await page.goto(`/admin?careRecipientId=${f.patient}&section=catalog`);
-  await page.getByRole("searchbox", { name: "Pesquisar catálogo", exact: true }).fill("Alvo de catálogo");
+  const search = page.getByRole("searchbox", { name: "Pesquisar catálogo", exact: true });
+  await search.fill("Alvo de catálogo"); await search.press("Enter");
   await page.getByRole("combobox", { name: "Situação dos produtos", exact: true }).selectOption("");
   const seen: string[] = [];
   for (let offset = 0; offset < selected.length; offset += 15) {
@@ -49,11 +50,11 @@ test("catalogue directory returns more than1000 items and reaches every late mat
     if (offset + 15 < selected.length) await next.click(); else await expect(next).toBeDisabled();
   }
   expect(seen).toEqual(selected);
-  await page.getByRole("searchbox", { name: "Pesquisar catálogo", exact: true }).fill("Alias " + prefix + "1005");
+  await search.fill("Alias " + prefix + "1005"); await search.press("Enter");
   await expect.poll(() => catalogueIds(page)).toEqual([prefix + "1005"]);
   await page.setViewportSize({ width: 320, height: 900 }); await auditFromTop(page, "complete catalogue1000 late alias320");
   mkdirSync("output/playwright/phase-d", { recursive: true });
-  await page.getByRole("table", { name: "Produtos do catálogo", exact: true }).screenshot({ path: `output/playwright/phase-d/catalogue-late-item-${info.project.name}.png` });
+  await page.getByRole("region", { name: "Produtos do catálogo", exact: true }).screenshot({ path: `output/playwright/phase-d/catalogue-late-item-${info.project.name}.png` });
   expect(catalogueFacts(f.patient)).toBe(before); expect(writes).toEqual([]);
 });
 
@@ -125,7 +126,7 @@ test("catalogue directory rejects incomplete collections,keeps confirmed filters
   await page.goto(`/admin?careRecipientId=${f.patient}&section=catalog`);
   await expect(catalogueRows(page).first()).toBeVisible(); const initial = (await catalogueIds(page)).slice(0, 1);
   const name = await catalogueRows(page).first().locator("strong").innerText();
-  const search = page.getByRole("searchbox", { name: "Pesquisar catálogo", exact: true }); await search.fill(name);
+  const search = page.getByRole("searchbox", { name: "Pesquisar catálogo", exact: true }); await search.fill(name); await search.press("Enter");
   await expect.poll(() => catalogueIds(page)).toEqual(initial);
   for (const invalid of ["incomplete", "patient", "total", "duplicate"]) {
     mode = invalid; await page.evaluate(() => window.dispatchEvent(new Event("hca:data-changed")));

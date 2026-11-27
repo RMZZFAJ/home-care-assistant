@@ -306,6 +306,29 @@ describe("BAL workspace private preparations", () => {
         ),
       ).toThrow();
   });
+  it("binds an optional observation independently of the audit reason", () => {
+    const observation = "Rotina do armário";
+    const command = balancePreparationCommand("configure", patient, {
+      ...values,
+      reason: "",
+      observation: " " + observation + " ",
+    });
+    const configured = {
+      ...receipt,
+      command,
+      preparedValues: { ...receipt.preparedValues, reason: undefined, observation },
+      nativeResult: { ...receipt.nativeResult, observation },
+    };
+    expect(
+      parseBalancePreparationReceipt(configured, scope).preparedValues.observation,
+    ).toBe(observation);
+    expect(() =>
+      parseBalancePreparationReceipt({
+        ...configured,
+        nativeResult: { ...configured.nativeResult, observation: null },
+      }, scope),
+    ).toThrow();
+  });
   it("cannot turn a decision result into a fictitious completed document", () => {
     const consumed = {
       ...row,

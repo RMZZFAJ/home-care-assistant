@@ -1,38 +1,55 @@
 "use client";
 import { ActionButton, CheckboxField, FormField, SelectField, TextInput } from "@/components/ui/controls";
-import { useState, type FormEvent, type ReactNode } from "react";
+import { useId, useState, type FormEvent, type ReactNode } from "react";
 
 import { RecordDrawer } from "@/components/forms/record-drawer";
 import { Notice } from "@/components/workspace";
+import { FeedbackBanner } from "@/components/ui/feedback";
+import { Icon, type IconName } from "@/components/ui/icon";
 import { ReminderSettings } from "./reminder-settings";
 import { roles } from "./admin-fields";
 import type { ShortNameMode } from "@/lib/validation/governance";
 
 type Settings = Record<string, unknown>;
-const groups = [
-  { code: "bal", title: "Balanço e revisão" },
-  { code: "science", title: "Ciência da requisição" },
-  { code: "messages", title: "Comunicação e lembretes" },
-  { code: "archive", title: "Encerramento e histórico" },
+const groups: { code: string; title: string; icon: IconName }[] = [
+  { code: "bal", title: "Balanço de estoque", icon: "calendar" },
+  { code: "science", title: "Ciência da requisição", icon: "checklist" },
+  { code: "messages", title: "Mensagens e lembretes", icon: "bell" },
+  { code: "archive", title: "Arquivamento", icon: "archive" },
 ];
 const days = ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];
-export function PolicyRules({ settings, directory, busy, locked, recovery, revision, error, message, versionKey, onStartEditing, save }: {
+export function PolicyRules({ settings, directory, busy, locked, recovery, revision, error, message, versionKey, onStartEditing, save, globalMode }: {
   settings: Settings; directory: { id: string; name: string; role: string }[]; busy: boolean; error: string; message: string; versionKey: string;
-  locked: boolean; recovery: ReactNode; revision: number;
-  onStartEditing: () => void; save: (event: FormEvent<HTMLFormElement>) => Promise<boolean>;
+  locked: boolean; recovery: ReactNode; revision: number; globalMode: boolean;
+  onStartEditing: () => void; save: (event: FormEvent<HTMLFormElement>) => Promise<void>;
 }) {
   type Editor = { group: string; baseline: Settings; opener: HTMLElement };
   const [editorState, setEditorState] = useState<(Editor & { revision: number }) | null>(null);
+  const formId = useId();
   const [shortNameMode, setShortNameMode] = useState<ShortNameMode>("keep"), [shortName, setShortName] = useState("");
   const editor = editorState?.revision === revision ? editorState : null;
   const setEditor = (value: Editor | null) => setEditorState(value ? { ...value, revision } : null);
   const values = editor?.baseline ?? settings;
   const selected = (key: string, value: string) => Array.isArray(values[key]) && values[key].includes(value);
   const summary = (group: string) => group === "bal" ? `${settings.balDay == null ? "Dia não configurado" : days[Number(settings.balDay)]} · revisão ${settings.balReview === "required" ? "obrigatória" : "opcional"}` : group === "science" ? `${settings.scienceRequired === true ? "Ciência exigida" : "Ciência opcional"} · uma pessoa habilitada · expedição familiar sempre registra ciência` : group === "messages" ? `Primeiro lembrete: ${settings.reminderHours} h · repetição: ${settings.reminderRepeatHours} h` : `Arquivamento ${settings.archiveDays} dias após conclusão ou cancelamento`;
-  return <section aria-label="Política do paciente" className="ui-card hca-admin-card hca-policy-card"><div className="hca-section-heading"><div><h2>Política do paciente</h2><p>Documentos existentes preservam a política de emissão. Alterações são versionadas.</p></div></div><div>{groups.map((group) => <article key={group.code} className="hca-policy-row"><div><h3>{group.title}</h3><p>{summary(group.code)}</p></div><ActionButton disabled={locked} aria-label={"Editar " + group.title} onClick={(event) => { onStartEditing(); setShortNameMode("keep"); setShortName(String(settings.patientShortName ?? "")); setEditor({ group: group.code, baseline: settings, opener: event.currentTarget }); }}>Editar</ActionButton></article>)}</div>
-    {editor ? <RecordDrawer title={groups.find((group) => group.code === editor.group)?.title ?? "Editar política"} busy={busy} restoreFocusTo={editor.opener} onClose={() => setEditor(null)}>{error ? <Notice error>{error}</Notice> : null}{message ? <Notice>{message}</Notice> : null}
+  const selectedGroup = groups.find(group => group.code === editor?.group);
+  return <div className="hca-form-stack">
+    <section aria-label="Política da residência" className="hca-residence-admin-section hca-residence-rules">
+      <header><h2>Política da residência</h2></header>
+      <div>{groups.map(group => <button type="button" className="hca-guide-row" key={group.code} disabled={locked}
+        aria-label={"Editar " + group.title} onClick={event => { onStartEditing(); setShortNameMode("keep"); setShortName(String(settings.patientShortName ?? "")); setEditor({ group: group.code, baseline: settings, opener: event.currentTarget }); }}>
+        <span className="hca-guide-row-icon"><Icon name={group.icon} /></span><span className="hca-guide-row-label"><strong>{group.title}</strong><small>{summary(group.code)}</small></span><Icon name="chevron" width={15} height={15} />
+      </button>)}</div>
+    </section>
+    <FeedbackBanner>As regras são versionadas. Fichas já emitidas conservam a política registrada na emissão.</FeedbackBanner>
+    {editor && selectedGroup ? <RecordDrawer title={selectedGroup.title} subtitle="Política da residência" headingIcon={selectedGroup.icon}
+      kicker="Organização da residência" popupClassName="hca-preference-sheet hca-residence-settings-sheet"
+      busy={busy} restoreFocusTo={editor.opener} onClose={() => setEditor(null)} keyboardScrollable exitDialog
+      footer={close => <><ActionButton onClick={close}>Voltar</ActionButton><ActionButton variant="primary" disabled={locked} type="submit" form={formId}>
+        <Icon name="check" />{globalMode ? "Propor regra" : "Registrar política"}</ActionButton></>}>
+      {error ? <Notice error>{error}</Notice> : null}{message ? <Notice>{message}</Notice> : null}
       {recovery}
-      <form key={versionKey} className="hca-form hca-policy-rules-form" onSubmit={async (event) => { if (await save(event)) setEditorState(current => current === editor ? null : current); }}>
+      <form id={formId} key={versionKey} className="hca-form hca-policy-rules-form" onSubmit={save}>
         <fieldset disabled={locked} className="hca-form min-w-0">
         <div hidden={editor.group !== "bal"} className="hca-form">
           <FormField label="Dia do BAL"><SelectField name="balDay" defaultValue={String(values.balDay ?? "")}><option value="">Não configurado</option>{days.map((day, index) => <option key={day} value={index}>{day}</option>)}</SelectField></FormField>
@@ -57,9 +74,8 @@ export function PolicyRules({ settings, directory, busy, locked, recovery, revis
           <ReminderSettings settings={values} directory={directory} />
         </div>
         <div hidden={editor.group !== "archive"} className="hca-form"><FormField label="Arquivar após conclusão ou cancelamento (dias)"><TextInput name="archiveDays" type="number" required min={1} max={365} defaultValue={String(values.archiveDays)} /></FormField></div>
-        <ActionButton variant="primary" disabled={busy} type="submit">Registrar política</ActionButton>
         </fieldset>
       </form>
     </RecordDrawer> : null}
-  </section>;
+  </div>;
 }

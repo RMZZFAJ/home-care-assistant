@@ -1,24 +1,10 @@
 "use client";
 import { useRef, useState } from "react";
+import { ChangeFacts } from "@/components/ui/change-facts";
 import { ActionButton } from "@/components/ui/controls";
 import { Icon } from "@/components/ui/icon";
 import { Dialog } from "@/components/ui/overlays";
 import type { DocumentChange } from "@/lib/documents/document-changes";
-
-export function DocumentChangeFacts({ changes }: {
-  changes: ReadonlyArray<{ id: string; label: string; before?: string; after: string }>;
-}) {
-  return <dl className="hca-document-change-list">
-    {changes.map(change => <div key={change.id}>
-      <dt>{change.label}</dt>
-      <dd>{change.before !== undefined ? <>
-        <del><span className="sr-only">Antes: </span>{change.before}</del>
-        <Icon name="arrow" width={15} height={15} />
-      </> : null}
-        <strong>{change.before !== undefined ? <span className="sr-only">Agora: </span> : null}{change.after}</strong></dd>
-    </div>)}
-  </dl>;
-}
 
 export function DocumentFreshness({ code, changes, loading, editing, onRefresh, onReviewArrival, openedAfterRecovery, onCloseRecovery }: {
   code: string; changes: DocumentChange[]; loading: boolean; editing?: boolean; onRefresh: () => void;
@@ -62,7 +48,7 @@ export function DocumentFreshness({ code, changes, loading, editing, onRefresh, 
           else onRefresh();
         }}>{reviewArrival ? "Revisar chegada" : loading ? "Atualizando…" : "Atualizar agora"}</ActionButton> : null}
       </>}>
-      {changes.length ? <DocumentChangeFacts changes={changes} /> : null}
+      {changes.length ? <ChangeFacts changes={changes} /> : null}
       <p className="hca-document-change-note">{editing
         ? "Seu preenchimento foi preservado. A referência da operação será conferida antes da confirmação."
         : changedArrival

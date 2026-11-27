@@ -205,7 +205,6 @@ test("COM chegada nova começa vazia e a decisão da parcela conserva quantidade
   expect(document.receipts).toHaveLength(2);
   const pending = document.receipts.find((receipt: { state: string }) => receipt.state === "pending"); expect(Number(pending.lines[0].quantity)).toBe(1);
   await login(page, f.patient, "adminA"); await page.goto("/fichas/" + document.id);
-  await selectDocumentSection(page, "workflow");
   const review = await openArrivalReview(page);
   const card = arrivalCard(review, pending.id);
   await expect(card.getByText("1 unidade informados", { exact: true })).toBeVisible(); await expect(card.getByRole("textbox")).toHaveCount(0);

@@ -37,12 +37,98 @@
 .hca-l1 .hca-document-meta dt { display: flex; align-items: center; gap: 6px; }
 .hca-l1 .hca-suggestion-link { display: block; border: 0; padding: 0; background: transparent; color: inherit; text-align: left; }
 .hca-l1 .hca-suggestion-link:hover { text-decoration: underline; text-underline-offset: 3px; }
-.hca-l1 .hca-file-identification { margin: 8px 0 0; padding: 7px 0 0; font-size: 11px; }
-.hca-l1 .hca-file-identification summary { font-size: 11px; min-height: 25px; }
+.hca-l1 .hca-file-details-lead { display: flex; align-items: center; gap: 12px; }
 .hca-l1 .doc-file-list { list-style: none; margin: 0; }
 .hca-l1 .doc-pdf-icon[data-file-kind=PDF] { color: #a64450; border-color: #efdde0; background: #fcf3f4; }
 .hca-l1 .doc-pdf-icon[data-file-kind=IMG] { color: #39774e; background: #edf6eb; }
 .hca-l1 .doc-pdf-icon[data-file-kind=DOC] { color: #286699; background: #edf3fa; }
+.hca-l1 .hca-file-archive-list { display: grid; gap: 12px; padding: 0; margin: 0; list-style: none; }
+.hca-l1 .hca-file-archive-record {
+  min-width: 0;
+  padding: 17px;
+  border: 1px solid #d6e2dd;
+  border-radius: 15px;
+  background: var(--hca-paper);
+  box-shadow: 0 3px 12px #173b3a05;
+}
+.hca-l1 .hca-file-record-heading { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 12px; }
+.hca-l1 .hca-file-record-heading .doc-file-title { display: block; min-width: 0; overflow-wrap: anywhere; }
+.hca-l1 .hca-file-record-heading h3 { margin: 0; font-size: 16px; font-weight: 690; letter-spacing: -.3px; line-height: 1.35; }
+.hca-l1 .hca-file-record-heading p { margin: 4px 0 0; color: var(--hca-muted); font-size: 13px; line-height: 1.5; }
+.hca-l1 .hca-file-record-heading .doc-pdf-icon,
+.hca-l1 .hca-pdf-exemplar .doc-pdf-icon { width: 43px; height: 53px; flex: none; border-radius: 10px; gap: 3px; }
+.hca-l1 .hca-file-record-heading > .doc-pdf-icon { align-self: start; }
+.hca-l1 .hca-file-record-heading .doc-pdf-icon[data-file-kind=PDF],
+.hca-l1 .hca-pdf-exemplar .doc-pdf-icon[data-file-kind=PDF] { color: #b83232; background: #fff5f4; border-color: #f0d3cf; }
+.hca-l1 .doc-pdf-icon[data-file-kind=PDF] small { line-height: 1; }
+.hca-l1 .hca-file-record-heading > .hca-file-record-more {
+  align-self: start; width: 36px; min-height: 36px; padding: 0;
+  border-radius: 50%; background: #f3f7f5; color: #304e48;
+}
+.hca-l1 .hca-file-record-heading > .hca-file-record-more svg { width: 19px; height: 19px; stroke-width: 2.7; }
+.hca-l1 .hca-file-record-meta {
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap;
+  gap: 6px 12px; margin: 16px 0 13px; color: var(--hca-muted); font-size: 13px; line-height: 1.55;
+}
+.hca-l1 .hca-file-record-meta > span { display: inline-flex; align-items: center; gap: 6px; overflow-wrap: anywhere; }
+.hca-l1 .hca-file-record-meta time { font-variant-numeric: tabular-nums; }
+.hca-l1 .hca-file-record-meta p { flex-basis: 100%; margin: 0; }
+.hca-l1 .hca-file-record-footer { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; border-top: 1px solid #edf1ee; padding-top: 12px; }
+.hca-l1 .hca-file-record-facts, .hca-l1 .hca-file-record-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
+.hca-l1 .hca-file-record-facts { color: var(--hca-muted); font-size: 12px; }
+.hca-l1 .hca-file-record-actions { margin-inline-start: auto; }
+.hca-l1 .hca-file-record-actions .hca-control { border-color: #dce7e1; background: #f6f9f7; }
+.hca-l1 .hca-file-record-actions .hca-control-icon { width: 36px; padding: 0; }
+.hca-l1 .hca-file-collection-heading { display: flex; justify-content: space-between; gap: 10px; margin: 8px 0; font-size: 13px; color: var(--hca-muted); }
+.hca-l1 .hca-file-collection-heading strong { color: var(--hca-ink); }
+.hca-l1 .hca-archive-context {
+  display: flex; gap: 11px; padding: 14px; border-radius: 11px;
+  border: 1px solid #d8e4dd; background: #edf3f0; color: #35594f;
+}
+.hca-l1 .hca-archive-context > svg { flex: none; margin-top: 2px; }
+.hca-l1 .hca-archive-context p { margin: 5px 0 0; font-size: 14px; line-height: 1.6; }
+.hca-l1 .hca-exemplar-version-note { padding: 12px 14px; border-inline-start: 3px solid #9aafa5; background: #f3f6f4; color: var(--hca-muted); line-height: 1.65; }
+.hca-l1 .hca-exemplar-complements { display: grid; gap: 8px; margin: 9px 0 0; list-style: none; padding: 0; }
+.hca-l1 .hca-exemplar-complements li { display: flex; align-items: center; gap: 8px; }
+.hca-l1 .hca-pdf-exemplar .hca-modal-footer > :is(a, button) { flex: 1 1 auto; }
+.hca-l1 .hca-pdf-date-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.hca-l1 .hca-pdf-date-fields input { width: 100%; min-width: 0; }
+@container product (max-width: 374px) {
+  .hca-l1 .hca-file-archive-record { padding: 14px; }
+  .hca-l1 .hca-file-record-meta { font-size: 12px; }
+}
+@media (max-width: 374px) {
+  .hca-l1 .hca-pdf-date-fields { grid-template-columns: minmax(0, 1fr); }
+}
+.hca-l1 .hca-attachment-picker {
+  position: relative;
+  display: flex;
+  min-height: 156px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 17px;
+  border: 1px dashed #8db49d;
+  border-radius: 12px;
+  background: #f4f9f5;
+  color: #365848;
+  text-align: center;
+}
+.hca-l1 .hca-attachment-picker[data-selected=true] {
+  min-height: 64px;
+  flex-direction: row;
+  justify-content: flex-start;
+  border-style: solid;
+  padding: 10px 12px;
+  text-align: left;
+}
+.hca-l1 .hca-attachment-picker[data-selected=true] > span:not(.doc-pdf-icon) { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.hca-l1 .hca-attachment-picker svg { flex: none; }
+.hca-l1 .hca-attachment-picker small { display: block; color: var(--hca-muted); }
+.hca-l1 .hca-attachment-picker input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+.hca-l1 .hca-attachment-picker:focus-within { outline: 2px solid var(--hca-teal); outline-offset: 2px; }
+.hca-l1 .hca-attachment-destination { display: flex; align-items: center; gap: 7px; color: var(--hca-muted); }
 .hca-l1 .doc-file-list .doc-help-details p { overflow-wrap: anywhere; }
 .hca-l1 .doc-footnote { display: flex; align-items: flex-start; gap: 7px; color: var(--hca-muted); font-size: 11px; }
 .hca-l1 .doc-footnote svg { flex: none; margin-top: 2px; }
@@ -67,6 +153,7 @@ html:has(.hca-workspace) { scroll-padding-block-start: 65px; }
 .hca-l1 .hca-patient-selector { position: relative; cursor: pointer; }
 .hca-l1 .hca-patient-selector select { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
 .hca-l1 .hca-patient-selector:focus-within { outline: 2px solid #b9ddcf; outline-offset: 3px; }
+.hca-residence-directory-results > .hca-record + .hca-record { border-top: 1px solid var(--line); }
 .hca-l1 .app-header > .notification-bell { margin-left: auto; }
 .hca-l1 .week-day .shift-mark small { display: block; }
 .hca-l1 .hca-profile-trigger { color: #fff; }
@@ -297,6 +384,7 @@ html:has(.hca-workspace) { scroll-padding-block-start: 65px; }
  .hca-workspace :is(button,input,select,textarea,a,summary,[tabindex]) { scroll-margin-block-end: calc(80px + env(safe-area-inset-bottom)); }
  .hca-record-detail:has(.hca-document-compact) .hca-document-tab-list { top: calc(var(--app-header-height) + 44px); }
  .hca-workspace .hca-document-panel :is(a,button,input,select,textarea,summary,[tabindex]) { scroll-margin-block-start: 90px; }
+ .hca-consumption-tools :is(button,input) { scroll-margin-block-start: 12px; }
  .hca-document-tab { scroll-margin-block-start: 60px; }
 }
 @media (max-width: 500px) { .hca-compact-badges { display: none; } }

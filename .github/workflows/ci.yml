@@ -92,18 +92,21 @@ jobs:
             artifact: mobile-2
           - project: ios
             engine: webkit
-            shard: 1/2
+            shard: 1/3
             artifact: ios-1
           - project: ios
             engine: webkit
-            shard: 2/2
+            shard: 2/3
             artifact: ios-2
+          - project: ios
+            engine: webkit
+            shard: 3/3
+            artifact: ios-3
     name: browser (${{ matrix.artifact }})
     runs-on: ubuntu-latest
-    # Desktop and mobile Chromium have both hit the 40-minute job deadline.
-    # WebKit reached only 162/242 cases under the same limit.
-    # Keep the same shards, workers, assertions and retries.
-    timeout-minutes: ${{ matrix.engine == 'webkit' && 70 || 55 }}
+    # The mobile suite can still be running at 55 minutes. Leave room to
+    # finish the cases and upload diagnostics on both phone profiles.
+    timeout-minutes: ${{ matrix.project == 'chromium' && 55 || 70 }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Reserve the local Supabase ports

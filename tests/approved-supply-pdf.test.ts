@@ -52,8 +52,10 @@ it("approved COM omits a restricted balance while preserving parcel facts and th
   writeFileSync("output/pdf/approved/com-restricted.pdf", plan.bytes);
 }, 30000);
 
-it("approved BAL preserves reference, counted quantity and the actual post-application balance separately with no seal", async () => {
-  const source = balance(), before = JSON.stringify(source);
+it("approved BAL preserves the count, post-application stock and uncatalogued findings as distinct facts", async () => {
+  const source = balance();
+  source.payload.balanceExtras = [{ id: id(5), name: "Ponteira avulsa", unit: "caixa", quantity: "2" }];
+  const before = JSON.stringify(source);
   const plan = await composeIssuance(source, "a".repeat(64), emission), text = await plain(plan.bytes);
   expect(JSON.stringify(source)).toBe(before);
   for (const fact of ["Balanço do estoque da equipe", "7,25 un", "8,125 un", "Pessoa que aplicou a contagem", "Observação física original preservada integralmente.", "Revisão facultativa não realizada"])
@@ -61,8 +63,36 @@ it("approved BAL preserves reference, counted quantity and the actual post-appli
   expect(plan.semanticFacts?.["material/0/reference"]).toBe("7,25 un");
   expect(plan.semanticFacts?.["material/0/counted"]).toBe("8,125 un");
   expect(plan.semanticFacts?.["material/0/balance"]).toContain("8,125 un");
+  expect(plan.semanticFacts?.["balance/extra/0"]).toBe("Ponteira avulsa · 2 caixa");
+  expect(text).toContain(compact("Itens extras contados"));
+  expect(text).toContain(compact("Ponteira avulsa · 2 caixa"));
+  expect(Object.keys(plan.semanticFacts ?? {}).filter(key => /^material\/.+\/balance$/.test(key))).toEqual(["material/0/balance"]);
   expect(text).not.toContain(compact("Família ciente")); expect(text).not.toContain(compact("Entrada validada"));
   writeFileSync("output/pdf/approved/bal-controlled.pdf", plan.bytes);
+}, 30000);
+
+it("approved BAL identifies an extra by the reviewed version even after it leaves the current extras", async () => {
+  const source = balance();
+  const extra = { id: id(5), name: "Ponteira da versão revisada", unit: "caixa", quantity: "2" };
+  const recordedAt = "2026-11-11T15:00:00Z";
+  const counter = { id: id(6), name: "Pessoa que contou", source: "count_event", recordedAt };
+  source.balanceReviews = {
+    counter, countVersion: 2, notes: "", legacyApprovals: [],
+    reviews: [{
+      id: id(7), count_version: 1, counter_id: id(6), reviewer_id: id(8), reviewer_name: "Pessoa que revisou",
+      review_group: "family", comment: "", recorded_at: recordedAt, reference_state: "historical",
+      reviewed_document_version: 2,
+      reviewed_snapshot: { counter, notes: null, countVersion: 1, lines: [], extras: [extra], referenceRevision: "5", currentRevision: "6", appliedBeforeReview: true },
+      item_results: [{ lineId: extra.id, result: "difference", forwarding: "recount", comment: "Conferir a segunda caixa." }],
+    }],
+  };
+  source.balanceReviewCorrections = [{ reviewId: id(7), sourceLineId: extra.id, sourceState: "unavailable", acts: [] }];
+  const plan = await composeIssuance(source, "a".repeat(64), emission);
+  const expected = "Ponteira da versão revisada (item extra) · Diferença apontada · Reconto indicado";
+  expect(await plain(plan.bytes)).toContain(compact(expected));
+  expect(plan.semanticFacts?.["review/0/item/0"]).toBe(expected);
+  expect(plan.semanticFacts?.["review/0/itemComment/0"]).toBe("Conferir a segunda caixa.");
+  expect(plan.semanticFacts?.["balance/extra/0"]).toBeUndefined();
 }, 30000);
 
 it("approved BAL distinguishes restricted, unapplied and unavailable balances without turning any state into zero", async () => {

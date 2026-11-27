@@ -1,132 +1,213 @@
 "use client";
 
-import { useRef, useState, type FormEvent, type ReactNode, type RefObject } from "react";
-import { buttonClass, Notice, primaryClass } from "@/components/workspace";
-import { useScopedRead } from "@/lib/use-scoped-read";
-import { useCommandIntent } from "@/lib/client/use-command-intent";
+import { useCallback, useRef, useState } from "react";
+import { DocumentOperationFailureDialog, operationRecoveryLimit } from "@/components/documents/document-operation-failure-dialog";
+import { ActionButton, ActionLink, DefinitionGrid, FormField, Pill, SelectField } from "@/components/ui/controls";
+import { Icon, type IconName } from "@/components/ui/icon";
+import { Dialog } from "@/components/ui/overlays";
+import { useOperationActivity } from "@/components/ui/operation-activity";
+import { Notice } from "@/components/workspace";
+import { environmentLabels, incidentLabels, operationLabels, operationsDiagnostics, type Incident, type OperationComponent, type OperationEnvironment, type OperationsCommand } from "@/lib/operations/contracts";
 import { formatBrazilDate } from "@/lib/receipt";
-import { environmentLabels, incidentLabels, operationLabels, operationPolicy, operationsConfirmed, operationsDiagnostics, operationsHistory, type Diagnostics, type Incident, type OperationEnvironment, type OperationsCommand, type OperationsReceipt } from "@/lib/operations/contracts";
-import type { z } from "zod";
+import { useScopedRead } from "@/lib/use-scoped-read";
 import { RecoveryRunbook } from "./recovery-runbook";
-import { TechnicalTabs } from "./technical-tabs";
+import { stateLabels } from "./technical-history";
+import { TechnicalEvents } from "./technical-events";
+import { TechnicalIncident } from "./technical-incident";
 import { TechnicalNotifications } from "./technical-notifications";
-import { ActionLink, DefinitionGrid, FormField, Pill, SelectField, TextInput } from "@/components/ui/controls";
-import { Dialog, Icon } from "@/components/ui/primitives";
+import { TechnicalPolicy } from "./technical-policy";
+import { TechnicalTabs } from "./technical-tabs";
+import { readTechnicalAttempt, useTechnicalCommand } from "./use-technical-command";
+import "../guides/guides.css";
 import "./operations.css";
 
-const stateLabels = { open: "Aberto", acknowledged: "Em acompanhamento", resolved: "Encerrado" };
-const actionLabels = { opened: "Aberto", observed: "Observação atualizada", acknowledged: "Acompanhamento iniciado", resolved: "Encerrado pelo suporte", recovered: "Condição deixou de ser detectada", configured: "Política configurada", escalated: "Severidade alterada" };
-type History = z.infer<typeof operationsHistory>;
+const componentIcons: Record<OperationComponent, IconName> = {
+  application: "home", database: "box", worker: "clock", outbox: "bell", push: "phone", signature: "file",
+  integrity: "shield", backup: "archive", recovery: "history", security: "lock", legacy: "calendar",
+};
+const componentOrder: OperationComponent[] = [
+  "application", "database", "outbox", "signature", "backup", "recovery", "worker", "push", "integrity", "security", "legacy",
+];
+const observationLabels = { attention: "Requer atenção", unobserved: "Sem observação", observed: "Atividade observada" };
+const operationTitles = { acknowledge: "Acompanhamento registrado", resolve: "Incidente encerrado", configure: "Política técnica atualizada" };
+const operationDescriptions = {
+  acknowledge: "O acompanhamento ficou registrado no histórico do incidente.",
+  resolve: "O motivo e o responsável ficaram registrados no histórico técnico.",
+  configure: "A nova versão ficou registrada no histórico das políticas deste ambiente.",
+};
+class TechnicalResponseError extends Error {}
 
-export function OperationsConsole() {
-  const [environment, setEnvironment] = useState<OperationEnvironment>("shared_database");
-  const [locked, setLocked] = useState(false);
-  return <section aria-label="Monitoramento e suporte" className="hca-operations space-y-5">
-    <header className="hca-operations-heading"><h2>Monitoramento e suporte</h2><p>Acompanhamento de serviços e incidentes, separado da operação familiar.</p></header>
-    <Notice>Observações internas não comprovam disponibilidade contínua. A rotina de backup externo e o monitor externo permanecem sem ativação; estes registros não autorizam retomada operacional.</Notice>
-    <FormField label="Ambiente técnico"><SelectField value={environment} disabled={locked} onChange={event => setEnvironment(event.target.value as OperationEnvironment)}>{Object.entries(environmentLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</SelectField></FormField>
-    <EnvironmentConsole key={environment} environment={environment} setLocked={setLocked} />
-  </section>;
-}
-
-function EnvironmentConsole({ environment, setLocked }: { environment: OperationEnvironment; setLocked: (value: boolean) => void }) {
-  const refreshRef=useRef<HTMLButtonElement>(null);
-  const [page, setPage] = useState(1), [state, setState] = useState("active"), [history, setHistory] = useState<string | null>(null);
-  const read = useScopedRead<{ data: Diagnostics }>(`/api/operations?environment=${environment}&page=${page}&state=${state}`);
-  const command = useCommandIntent<OperationsCommand, OperationsReceipt>(operationsConfirmed);
-  const [error, setError] = useState(""), [message, setMessage] = useState("");
-  const parsed = read.data ? operationsDiagnostics.safeParse(read.data.data) : null;
-  const sameEnvironment = parsed?.success && parsed.data.environment === environment;
-  const busy = command.busy || command.uncertain, data = sameEnvironment ? parsed.data : null;
-  const readFailure = read.error || (parsed && !sameEnvironment ? "Resposta técnica sem confirmação reconhecível. Consulte novamente." : "");
-  async function send(packet: OperationsCommand) {
-    setError(""); setMessage(""); setLocked(true);
-    try {
-      await command.send("/api/operations", packet);
-      setMessage("Alteração técnica confirmada. Nenhuma ciência ou operação do paciente foi registrada."); read.refresh(); setLocked(false);
-      return true;
-    } catch (reason) {
-      setError(reason instanceof Error ? reason.message : "Não foi possível confirmar a alteração.");
-      // A server response below 500 is a definite refusal; a missing/5xx reply
-      // keeps this environment bound until the same command is recovered.
-      if (reason instanceof Error && "status" in reason && typeof reason.status === "number" && reason.status > 0 && reason.status < 500) { setLocked(false); read.refresh(); }
-      return false;
-    }
-  }
-  async function recover() {
-    setError("");
-    try { await command.recover(); setLocked(false); setMessage("Confirmação da mesma alteração recuperada."); read.refresh(); }
-    catch (reason) { setError(reason instanceof Error ? reason.message : "Confirmação ainda indisponível."); }
-  }
-  const commandFeedback = <>
-    {error ? <Notice error>{error}</Notice> : null}{message ? <Notice>{message}</Notice> : null}
-    {command.uncertain ? <Notice error>Resultado incerto. Preserve este ambiente e recupere a mesma tentativa antes de alterar outra condição. <button type="button" className={buttonClass} disabled={command.busy} onClick={() => void recover()}>Recuperar alteração técnica</button></Notice> : null}
-  </>;
-  return <>
-    <div className="hca-toolbar"><FormField label="Incidentes"><SelectField value={state} disabled={busy} onChange={event => { setState(event.target.value); setPage(1); }}><option value="active">Ativos</option><option value="resolved">Encerrados</option><option value="all">Todos</option></SelectField></FormField><button ref={refreshRef} type="button" className={buttonClass} aria-disabled={read.loading || command.busy} onClick={() => { if (!read.loading && !command.busy) read.refresh(); }}>Atualizar monitoramento</button></div>
-    {read.loading ? <p role="status">Consultando observações técnicas…</p> : null}
-    {readFailure ? <Notice error>{readFailure}</Notice> : null}
-    {read.error && data ? <p>Última consulta confirmada preservada. As alterações aguardam uma nova consulta válida.</p> : null}
-    {commandFeedback}
-    {data ? <>
-      <p className="text-sm">Consulta: {formatBrazilDate(data.consultedAt)}. “Observado” indica atividade registrada; não comprova funcionamento contínuo. Componentes sem observação precisam de verificação.</p>
-      <TechnicalTabs>{{ overview: <>
-      <ul className="hca-observation-grid" aria-label="Componentes observados">{data.components.map(component => <li className="ui-card hca-observation-card" key={component.component}><strong>{operationLabels[component.component]}</strong><p className="hca-observation-value">{component.state === "attention" ? "Requer atenção" : component.state === "unobserved" ? "Sem observação" : "Atividade observada"}</p><small>{component.observedAt ? formatBrazilDate(component.observedAt) : "Nenhum registro de atividade"}</small></li>)}</ul>
-      <section aria-label="Incidentes técnicos" className="ui-card hca-technical-list"><header className="hca-technical-cardhead"><h3>Incidentes técnicos · {data.total}</h3></header>{!data.data.length ? <p>Nenhum incidente corresponde a este filtro.</p> : null}{data.data.map(incident => <IncidentCard key={incident.id} incident={incident} environment={environment} busy={busy || read.loading || Boolean(readFailure)} locked={busy} fallbackFocus={refreshRef} feedback={<>{commandFeedback}{readFailure ? <Notice error>{readFailure} <button type="button" className={buttonClass} disabled={read.loading || command.busy} onClick={read.refresh}>Consultar incidente novamente</button></Notice> : null}{read.loading ? <p role="status">Aguardando consulta atual para decidir.</p> : null}</>} send={send} openHistory={() => setHistory(incident.id)} />)}
-        <div className="hca-toolbar"><button type="button" className={buttonClass} disabled={page === 1 || read.loading || busy} onClick={() => setPage(value => value - 1)}>Incidentes anteriores</button><span>Página {page}</span><button type="button" className={buttonClass} disabled={page * data.pageSize >= data.total || read.loading || busy} onClick={() => setPage(value => value + 1)}>Próximos incidentes</button></div>
-      </section>
-      </>, continuity: !read.loading && !readFailure ? <RecoveryRunbook data={data} /> : <p>Roteiro de recuperação aguardando consulta válida deste ambiente.</p>, residences: <section className="ui-card hca-operations-card"><h3>Residências e contas globais</h3><p>Preparação inicial não concede vínculo local nem libera operação com dados reais. Identidades globais e funções locais são administradas separadamente.</p><div className="hca-toolbar mt-4"><ActionLink href="/admin?section=patient">Preparar residência</ActionLink><ActionLink href="/admin?section=profiles">Consultar contas globais</ActionLink></div></section>, events: <>
-      <details className="ui-card hca-operations-card"><summary>Limites e severidades por ambiente</summary><PolicyForm policy={data.policy} environment={environment} busy={busy || read.loading || Boolean(readFailure)} send={send} /><button type="button" className={buttonClass} onClick={() => setHistory("policy")}>Consultar histórico completo de políticas</button></details>
-      <details className="ui-card hca-operations-card"><summary>Eventos técnicos recentes</summary><ul className="space-y-3 mt-4">{data.events.map(event => <li key={event.id}>{formatBrazilDate(event.at)} · {operationLabels[event.component]} · {incidentLabels[event.code]}<p className="text-sm break-all">Correlação: {event.correlationId}</p></li>)}</ul>{!data.events.length ? <p>Nenhum evento persistido neste ambiente.</p> : null}</details>
-      {environment === "shared_database" ? <TechnicalNotifications /> : <Notice>As tentativas de avisos pertencem ao banco compartilhado. Selecione “Banco compartilhado” para consultar essa fonte; o ambiente da aplicação não é presumido.</Notice>}
-      </> }}</TechnicalTabs>
-    </> : null}
-    {history ? <HistoryPanel key={history} environment={environment} incidentId={history === "policy" ? null : history} close={() => setHistory(null)} /> : null}
-  </>;
-}
-
-function IncidentCard({ incident, environment, busy, locked, fallbackFocus, feedback, send, openHistory }: { incident: Incident; environment: OperationEnvironment; busy: boolean; locked: boolean; fallbackFocus: RefObject<HTMLButtonElement | null>; feedback: ReactNode; send: (packet: OperationsCommand) => Promise<boolean>; openHistory: () => void }) {
-  const [open, setOpen] = useState(false);
-  const triggerRef = useRef<HTMLButtonElement>(null);
-  const resolvedRef = useRef(false);
-  const [ackReason, setAckReason] = useState<"investigating" | "waiting_dependency" | "contained">("investigating");
-  const [resolveReason, setResolveReason] = useState<"corrected" | "reviewed_history" | "false_alarm">("corrected");
-  const base = { environment, incidentId: incident.id, expectedVersion: incident.version };
-  async function act(packet: OperationsCommand) { if (await send(packet)) { resolvedRef.current=packet.action==="resolve"; setOpen(false); } }
-  return <article className="hca-technical-record" aria-label={incidentLabels[incident.code]}>
-    <span className="hca-technical-record-icon"><Icon name="alert" /></span><div className="hca-technical-record-main"><h4>{incidentLabels[incident.code]}</h4><p>{operationLabels[incident.component]} · {stateLabels[incident.state]} · versão {incident.version}</p><p>Primeira observação: {formatBrazilDate(incident.firstObservedAt)}. Última: {formatBrazilDate(incident.lastObservedAt)}. Ocorrências: {incident.occurrences}. Contagem: {incident.metricCount}.</p><p>Referência técnica: {incident.id}{incident.correlationId ? ` · Correlação: ${incident.correlationId}` : ""}</p></div>
-    <Pill tone={incident.severity === "critical" ? "danger" : "warning"}>{incident.severity === "critical" ? "Crítico" : "Atenção"}</Pill>
-    <button ref={triggerRef} type="button" className={buttonClass} onClick={() => {resolvedRef.current=false;setOpen(true);}}><Icon name="search" />Investigar incidente</button>
-    <Dialog open={open} title={incidentLabels[incident.code]} onClose={() => setOpen(false)} closeDisabled={locked} finalFocus={()=>!resolvedRef.current&&triggerRef.current?.isConnected?triggerRef.current:fallbackFocus.current??false}>
-    {feedback}
-    <DefinitionGrid items={[{label:"Componente",value:operationLabels[incident.component]},{label:"Situação",value:stateLabels[incident.state]},{label:"Referência técnica",value:incident.id},{label:"Correlação",value:incident.correlationId ?? "Não informada"}]} />
-    {incident.state !== "resolved" ? <fieldset disabled={busy} className="space-y-3"><legend className="font-semibold">Acompanhamento técnico</legend>
-      {incident.state === "open" ? <div className="hca-toolbar"><FormField label="Motivo do acompanhamento"><SelectField value={ackReason} onChange={event => setAckReason(event.target.value as typeof ackReason)}><option value="investigating">Em investigação</option><option value="waiting_dependency">Aguardando dependência</option><option value="contained">Condição contida</option></SelectField></FormField><button type="button" className={buttonClass} onClick={() => void act({ ...base, action: "acknowledge", reason: ackReason, idempotencyKey: crypto.randomUUID() })}>Iniciar acompanhamento</button></div> : null}
-      <div className="hca-toolbar"><FormField label="Motivo do encerramento"><SelectField value={resolveReason} onChange={event => setResolveReason(event.target.value as typeof resolveReason)}><option value="corrected">Correção conferida</option><option value="reviewed_history">Lacuna histórica revisada</option><option value="false_alarm">Alarme indevido conferido</option></SelectField></FormField><button type="button" className={buttonClass} onClick={() => void act({ ...base, action: "resolve", reason: resolveReason, idempotencyKey: crypto.randomUUID() })}>Encerrar incidente técnico</button></div><p className="text-sm">Encerrar registra a revisão do suporte. Não reprocessa envios, recupera períodos nem comprova recuperação operacional.</p>
-    </fieldset> : null}
-    </Dialog>
-    <button type="button" className={buttonClass} onClick={openHistory}>Histórico completo deste incidente</button>
-  </article>;
-}
-
-const thresholdLabels = { heartbeatWarningSeconds: "Atividade: aviso (segundos)", heartbeatCriticalSeconds: "Atividade: crítico (segundos)", jobWarningSeconds: "Fila: aviso (segundos)", jobCriticalSeconds: "Fila: crítico (segundos)", pdfWarningSeconds: "PDF: aviso (segundos)", pdfCriticalSeconds: "PDF: crítico (segundos)", backupWarningSeconds: "Backup: aviso (segundos)", backupCriticalSeconds: "Backup: crítico (segundos)", securityWindowSeconds: "Segurança: janela (segundos)", securityWarningCount: "Segurança: recusas para aviso", securityCriticalCount: "Segurança: recusas para crítico" } as const;
-function PolicyForm({ policy, environment, busy, send }: { policy: Diagnostics["policy"]; environment: OperationEnvironment; busy: boolean; send: (packet: OperationsCommand) => Promise<boolean> }) {
-  const [values, setValues] = useState(policy.values), [error, setError] = useState("");
-  const [referenceVersion, setReferenceVersion] = useState(policy.version);
-  const conflict = referenceVersion !== policy.version;
-  function submit(event: FormEvent) {
-    event.preventDefault(); const parsed = operationPolicy.safeParse(values);
-    if (!parsed.success) { setError("Preencha limites inteiros entre 1 e 2592000."); return; }
-    if (conflict) { setError("Revise a política vigente antes de reenviar sua proposta preservada."); return; }
-    setError(""); void send({ action: "configure", environment, incidentId: null, expectedVersion: referenceVersion, policy: parsed.data, idempotencyKey: crypto.randomUUID() }).then(confirmed => { if (confirmed) setReferenceVersion(referenceVersion + 1); });
-  }
-  return <form onSubmit={submit} className="hca-operations-policy"><fieldset disabled={busy} className="space-y-4"><legend>Política técnica · referência {referenceVersion}</legend>{conflict ? <div className="ui-notice"><p>A política vigente mudou para a versão {policy.version}. Sua proposta foi preservada.</p><dl>{Object.entries(thresholdLabels).map(([key, label]) => <div key={key}><dt>{label} · vigente</dt><dd>{policy.values[key as keyof typeof thresholdLabels]}</dd></div>)}{Object.entries(operationLabels).map(([key, label]) => <div key={key}><dt>{label} · severidade vigente</dt><dd>{policy.values.severity[key as keyof typeof operationLabels] === "critical" ? "Crítico" : "Atenção"}</dd></div>)}</dl><button type="button" className={buttonClass} onClick={() => { setReferenceVersion(policy.version); setError(""); }}>Usar versão vigente como referência</button></div> : null}<div className="hca-compact-grid">{Object.entries(thresholdLabels).map(([key, label]) => <FormField key={key} label={label}><TextInput type="number" required min={1} max={2592000} step={1} value={Number.isFinite(values[key as keyof typeof thresholdLabels]) ? values[key as keyof typeof thresholdLabels] : ""} onChange={event => { const value = event.currentTarget.valueAsNumber; setValues(current => ({ ...current, [key]: value })); }} /></FormField>)}</div><div className="hca-compact-grid">{Object.entries(operationLabels).map(([key, label]) => <FormField key={key} label={"Severidade padrão: " + label}><SelectField value={values.severity[key as keyof typeof operationLabels]} onChange={event => { const value = event.currentTarget.value; setValues(current => ({ ...current, severity: { ...current.severity, [key]: value } })); }}><option value="warning">Atenção</option><option value="critical">Crítico</option></SelectField></FormField>)}</div><p>O limite crítico deve ser maior ou igual ao aviso. Uma nova política preserva a versão anterior e não comprova SLA.</p>{error ? <p role="alert">{error}</p> : null}<button type="submit" className={primaryClass} disabled={conflict}>Guardar política técnica</button></fieldset></form>;
-}
-
-function HistoryPanel({ environment, incidentId, close }: { environment: OperationEnvironment; incidentId: string | null; close: () => void }) {
+export function OperationsConsole({ actorId }: { actorId: string }) {
+  const [environment, setEnvironment] = useState<OperationEnvironment>(() => readTechnicalAttempt(actorId)?.environment ?? "shared_database");
+  const [state, setState] = useState("active");
   const [page, setPage] = useState(1);
-  const read = useScopedRead<{ data: History }>(`/api/operations?environment=${environment}&history=${incidentId ? "incident&incident=" + incidentId : "policy"}&page=${page}`);
-  const parsed = read.data ? operationsHistory.safeParse(read.data.data) : null, data = parsed?.success ? parsed.data : null;
-  const failure = read.error || (parsed && !parsed.success ? "Histórico sem confirmação reconhecível. Consulte novamente." : "");
-  return <section className="ui-card hca-operations-card space-y-3" aria-label="Histórico técnico completo"><h3 className="font-semibold">{incidentId ? "Histórico do incidente" : "Histórico das políticas"}</h3><button type="button" className={buttonClass} onClick={close}>Fechar histórico técnico</button>{read.loading ? <p role="status">Consultando histórico…</p> : null}{failure ? <Notice error>{failure}<button type="button" className={buttonClass} onClick={read.refresh}>Consultar histórico novamente</button></Notice> : null}{data ? <><p>{data.total} registros · página {data.page}</p><ol className="space-y-3">{data.data.map(line => <li key={line.id}>{formatBrazilDate(line.at)} · {actionLabels[line.action]} · {line.operator === "system" ? "Sistema" : "Administrador global"}{line.version ? ` · versão ${line.version}` : ""}{line.reason ? ` · ${({ investigating: "Investigação", waiting_dependency: "Dependência pendente", contained: "Contido", corrected: "Correção conferida", reviewed_history: "Lacuna revisada", false_alarm: "Alarme indevido" })[line.reason]}` : ""}{line.policy ? <details><summary>Política preservada · versão {line.policyVersion}</summary><dl>{Object.entries(thresholdLabels).map(([key, label]) => <div key={key}><dt>{label}</dt><dd>{line.policy![key as keyof typeof thresholdLabels]}</dd></div>)}{Object.entries(operationLabels).map(([key, label]) => <div key={key}><dt>{label}</dt><dd>{line.policy!.severity[key as keyof typeof operationLabels] === "critical" ? "Crítico" : "Atenção"}</dd></div>)}</dl></details> : null}</li>)}</ol><div className="hca-toolbar"><button type="button" className={buttonClass} disabled={page === 1 || read.loading} onClick={() => setPage(value => value - 1)}>Histórico anterior</button><button type="button" className={buttonClass} disabled={page * data.pageSize >= data.total || read.loading} onClick={() => setPage(value => value + 1)}>Próximo histórico</button></div></> : null}</section>;
+  const [editor, setEditor] = useState<{ opener: HTMLElement; incident?: Incident } | null>(null);
+  const [conflict, setConflict] = useState<OperationsCommand | null>(null);
+  const [readAttempts, setReadAttempts] = useState(0);
+  const [dismissedRead, setDismissedRead] = useState<unknown>(null);
+  const refreshRef = useRef<HTMLButtonElement>(null);
+  const decode = useCallback((value: unknown) => {
+    const response = operationsDiagnostics.safeParse((value as { data?: unknown } | null)?.data);
+    if (!response.success || response.data.environment !== environment || response.data.page !== page)
+      throw new TechnicalResponseError("Resposta técnica sem confirmação reconhecível para este ambiente e página.");
+    return response.data;
+  }, [environment, page]);
+  const query = new URLSearchParams({ environment, page: String(page), state });
+  const read = useScopedRead("/api/operations?" + query, "", decode);
+  const command = useTechnicalCommand(actorId, read.refresh, packet => { setConflict(packet); read.refresh(); });
+  const { busy, pending, result, failure } = command;
+  const data = read.errorCause instanceof TechnicalResponseError ? null : read.data;
+  const unavailable = read.loading || Boolean(read.error);
+  const locked = busy || Boolean(pending);
+  useOperationActivity(read.loading && !result && !failure && !editor, { title: "Consultando observações técnicas" });
+
+  function refresh() {
+    if (busy || read.loading) return;
+    setReadAttempts(0);
+    read.refresh();
+  }
+  function selectEnvironment(next: OperationEnvironment) {
+    setEnvironment(next);
+    setPage(1);
+    setReadAttempts(0);
+  }
+  function closeEditor() {
+    setEditor(null);
+    setConflict(null);
+  }
+  function closeResult() {
+    if (result?.confirmed) closeEditor();
+    command.closeResult();
+    requestAnimationFrame(() => refreshRef.current?.focus());
+  }
+
+  return <section aria-label="Central técnica" className="hca-operations hca-form">
+    <section className="ui-card hca-technical-scope hca-form">
+      <FormField label="Ambiente técnico"><SelectField value={environment} disabled={locked || Boolean(editor)} onChange={event => selectEnvironment(event.target.value as OperationEnvironment)}>
+        {Object.entries(environmentLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+      </SelectField></FormField>
+      <p className="hca-technical-scope-hint hca-field-hint"><Icon name="shield" width={15} />Dados técnicos do ambiente. Dados do paciente exigem vínculo local autorizado.</p>
+    </section>
+    {pending && !editor && <section className="ui-card hca-technical-scope hca-form">
+      <h3>Há uma decisão técnica a conferir</h3>
+      <p>Consulte a tentativa em {environmentLabels[pending.environment]} antes de registrar outra decisão.</p>
+      <ActionButton onClick={() => void command.recover()} disabled={busy}><Icon name="search" />Conferir decisão</ActionButton>
+    </section>}
+    {read.error && <Notice error>{data
+      ? "A última consulta deste ambiente continua disponível. Atualize o painel para decidir com a situação atual."
+      : read.error}</Notice>}
+    {data && <TechnicalTabs>{{
+      overview: <>
+        <section className="ui-card hca-technical-list" aria-label="Observações recentes">
+          <header className="hca-technical-cardhead"><h3>Observações recentes</h3></header>
+          <ul className="hca-observation-grid" aria-label="Componentes observados">
+            {componentOrder.flatMap(key => {
+              const component = data.components.find(row => row.component === key);
+              return component ? [<li className="hca-observation-card" key={key} data-state={component.state}>
+                <span className="hca-guide-row-icon"><Icon name={componentIcons[key]} width={17} /></span>
+                <h4>{operationLabels[key]}</h4>
+                <strong>{observationLabels[component.state]}</strong>
+                <small>{component.observedAt ? formatBrazilDate(component.observedAt) : "Sem registro recente"}</small>
+              </li>] : [];
+            })}
+          </ul>
+          <p className="hca-technical-card-hint">Atividade observada indica uma ocorrência registrada. Consulta em {formatBrazilDate(data.consultedAt)}.</p>
+        </section>
+        <section className="ui-card hca-technical-list" aria-label="Incidentes técnicos">
+          <header className="hca-technical-cardhead"><h3>Incidentes · {data.total}</h3>
+            <FormField label="Incidentes"><SelectField value={state} disabled={locked} onChange={event => { setState(event.target.value); setPage(1); }}>
+              <option value="active">Ativos</option><option value="resolved">Encerrados</option><option value="all">Todos</option>
+            </SelectField></FormField>
+          </header>
+          {!data.data.length && <p className="hca-technical-card-hint">Nenhum incidente encontrado neste filtro.</p>}
+          {data.data.map(incident => <article key={incident.id} aria-label={incidentLabels[incident.code]} data-technical-incident={incident.id}>
+            <button type="button" className="hca-guide-row" aria-label={"Investigar incidente — " + incidentLabels[incident.code]}
+              disabled={locked || unavailable} onClick={event => setEditor({ opener: event.currentTarget, incident })}>
+              <span className="hca-guide-row-icon"><Icon name="alert" /></span>
+              <span className="hca-guide-row-label"><strong>{incidentLabels[incident.code]}</strong>
+                <small>{operationLabels[incident.component]} · {incident.occurrences} {incident.occurrences === 1 ? "ocorrência" : "ocorrências"}</small>
+              </span>
+              <Pill tone={incident.state === "resolved" ? "success" : incident.severity === "critical" ? "danger" : "warning"}>{stateLabels[incident.state]}</Pill>
+              <Icon name="chevron" width={16} />
+            </button>
+          </article>)}
+          {data.total > data.pageSize && <div className="hca-toolbar hca-technical-pagination">
+            <ActionButton compact disabled={page === 1 || unavailable || locked} onClick={() => setPage(value => value - 1)}>Incidentes anteriores</ActionButton>
+            <span>Página {page}</span>
+            <ActionButton compact disabled={page * data.pageSize >= data.total || unavailable || locked} onClick={() => setPage(value => value + 1)}>Próximos incidentes</ActionButton>
+          </div>}
+        </section>
+        <section className="ui-card hca-technical-list" aria-label="Administração técnica">
+          <header className="hca-technical-cardhead"><h3>Administração técnica</h3></header>
+          <button type="button" className="hca-guide-row" disabled={locked || unavailable} onClick={event => setEditor({ opener: event.currentTarget })}>
+            <span className="hca-guide-row-icon"><Icon name="settings" /></span>
+            <span className="hca-guide-row-label"><strong>Limites e severidades</strong><small>Regras de observação deste ambiente</small></span>
+            <Icon name="chevron" width={16} />
+          </button>
+          <ActionLink href="/preparar-residencia" className="hca-guide-row hca-technical-route">
+            <span className="hca-guide-row-icon"><Icon name="home" /></span>
+            <span className="hca-guide-row-label"><strong>Criar nova residência</strong><small>Dados essenciais e revisão antes de criar</small></span>
+            <Icon name="chevron" width={16} />
+          </ActionLink>
+          <ActionLink href="/admin?section=profiles" className="hca-guide-row hca-technical-route">
+            <span className="hca-guide-row-icon"><Icon name="users" /></span>
+            <span className="hca-guide-row-label"><strong>Consultar contas globais</strong><small>Identidades e administração global</small></span>
+            <Icon name="chevron" width={16} />
+          </ActionLink>
+        </section>
+      </>,
+      continuity: !unavailable ? <RecoveryRunbook key={environment} data={data} /> : <p>Consulte novamente para ver as evidências deste ambiente.</p>,
+      events: <>
+        {environment === "shared_database" ? <TechnicalNotifications /> :
+          <section className="ui-card hca-operations-card hca-form">
+            <h3>Tentativas de comunicação</h3>
+            <div className="hca-guide-reading"><span><Icon name="bell" /></span><div>
+              <strong>Esta fonte está no banco compartilhado</strong>
+              <p>Os registros de envio pertencem ao banco. A origem na aplicação fica indeterminada quando o registro não a informa.</p>
+            </div></div>
+            <ActionButton variant="primary" disabled={locked || Boolean(editor)} onClick={() => selectEnvironment("shared_database")}>
+              Consultar banco compartilhado<Icon name="arrow" />
+            </ActionButton>
+          </section>}
+        {!unavailable && <TechnicalEvents key={environment} data={data} />}
+      </>,
+    }}</TechnicalTabs>}
+    <footer className="hca-technical-footer">
+      <ActionButton ref={refreshRef} aria-disabled={read.loading || busy} onClick={refresh}><Icon name="refresh" />Atualizar monitoramento</ActionButton>
+    </footer>
+    {editor?.incident && <TechnicalIncident initial={editor.incident} environment={environment}
+      busy={busy} pending={Boolean(pending)} conflictKey={conflict?.incidentId === editor.incident.id ? conflict.idempotencyKey : ""}
+      onAdopt={() => setConflict(null)} send={command.send} recover={() => void command.recover()} close={closeEditor}
+      opener={editor.opener} fallback={refreshRef} />}
+    {editor && !editor.incident && data && <TechnicalPolicy current={data.policy} environment={environment}
+      busy={busy} pending={Boolean(pending)} refreshing={unavailable} conflict={conflict?.action === "configure"}
+      reload={refresh} onAdopt={() => setConflict(null)} send={command.send} recover={() => void command.recover()} close={closeEditor}
+      opener={editor.opener} fallback={refreshRef} />}
+    {failure && !busy && <DocumentOperationFailureDialog {...failure}
+      title={failure.outcome === "uncertain" ? "Resultado da decisão técnica a conferir" : "Não foi possível registrar a decisão técnica"}
+      operation="Registrar decisão técnica" fallbackCode="OPERACAO_TECNICA" attempts={pending?.attempts ?? 0}
+      attemptReference={pending?.idempotencyKey} onClose={command.closeFailure} closeLabel="Voltar"
+      guidance={pending ? "Confira o comprovante da mesma tentativa antes de decidir novamente." : "Confira os dados da operação e a orientação do suporte."}
+      action={pending && pending.attempts < operationRecoveryLimit ? { label: "Conferir resultado", onClick: () => void command.recover() } : undefined}
+      exhaustedMessage={pending && pending.attempts >= operationRecoveryLimit ? "Copie os detalhes e avise o responsável pelo sistema." : undefined} />}
+    {result && <Dialog open success={result.confirmed} headingIcon={result.confirmed ? undefined : "info"}
+      title={result.confirmed ? (result.noop ? "Situação técnica confirmada" : operationTitles[result.attempt.action]) : "Tentativa encerrada sem execução"}
+      subtitle={result.recovered && result.confirmed ? "O comprovante da mesma decisão foi localizado." : undefined}
+      onClose={closeResult} footer={<ActionButton variant="primary" onClick={closeResult}>Voltar à central técnica</ActionButton>}>
+      <div className="hca-form">
+        <p>{result.confirmed ? (result.noop ? "O incidente já estava nessa situação." : operationDescriptions[result.attempt.action])
+          : "A decisão ficou sem registro. O sistema encerrou esta chave para impedir execução tardia."}</p>
+        <DefinitionGrid items={[
+          { label: "Ambiente", value: environmentLabels[result.attempt.environment] },
+          { label: "Referência", value: result.attempt.incidentId ?? result.attempt.idempotencyKey, wide: true },
+        ]} />
+      </div>
+    </Dialog>}
+    {!editor && !result && !failure && !busy && read.error && read.errorCause !== dismissedRead && !read.loading &&
+      <DocumentOperationFailureDialog outcome="rejected" title="Não foi possível consultar o ambiente técnico"
+        description={read.error} cause={read.errorCause} operation="Consultar central técnica" fallbackCode="CENTRAL_TECNICA_CONSULTA"
+        attempts={readAttempts} closeLabel="Voltar" finalFocus={refreshRef} onClose={() => setDismissedRead(read.errorCause)}
+        action={readAttempts < operationRecoveryLimit ? { label: "Consultar novamente", onClick: () => { setReadAttempts(value => value + 1); read.refresh(); } } : undefined}
+        exhaustedMessage={readAttempts >= operationRecoveryLimit ? "Copie os detalhes e avise o responsável pelo sistema." : undefined} />}
+  </section>;
 }

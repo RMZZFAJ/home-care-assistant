@@ -1,28 +1,40 @@
 import { NextResponse } from "next/server";
 import {
   api,
+  ApiError,
   authenticate,
   patientContext,
   readJson,
   rpc,
 } from "@/lib/server/api";
-import { balanceCommandSchema } from "@/lib/validation/balances";
+import { balanceCommandSchema, parseBalanceAgendaRead } from "@/lib/validation/balances";
 export async function GET(request: Request) {
   return api("balances.read", async () => {
     const auth = await authenticate();
+    const params = new URL(request.url).searchParams;
     const patient = await patientContext(
       auth,
-      new URL(request.url).searchParams.get("careRecipientId"),
+      params.get("careRecipientId"),
       "bal.read",
     );
-    const reference =
-      new URL(request.url).searchParams.get("reference") === "true";
-    const data = (await rpc(
+    const reference = params.get("reference") === "true";
+    const agenda = !reference && params.get("view") === "agenda";
+    const readTeam = patient.capabilities["schedule.read.team"] === true;
+    if (agenda && !readTeam && !patient.capabilities["schedule.read.own"])
+      throw new ApiError("FORBIDDEN", "Seu vínculo não permite consultar plantões.", 403);
+    const data = await rpc(
       auth.client,
       reference ? "balance_count_reference" : "balance_workspace",
       { p_patient: patient.id },
-    )) as Record<string, unknown>;
-    return NextResponse.json({ data, careRecipientId: patient.id });
+    );
+    const body = { data, careRecipientId: patient.id };
+    if (!agenda) return NextResponse.json(body);
+    const snapshot = parseBalanceAgendaRead(body, patient.id), eligibility = snapshot.data.eligibility;
+    if (!readTeam && eligibility.assignment?.professional_id !== auth.userId)
+      return NextResponse.json({ careRecipientId: patient.id, data: { eligibility: {
+        assignment: null, admission: null, available: false, documentId: null, dueAt: null,
+      } } });
+    return NextResponse.json(snapshot);
   });
 }
 export async function POST(request: Request) {

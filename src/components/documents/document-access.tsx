@@ -38,7 +38,9 @@ export function DocumentAccessObservation({ id, version, onRecorded }: { id: str
     const schedule = () => {
       cancelAnimationFrame(first); cancelAnimationFrame(second);
       if (document.visibilityState === "visible") first = requestAnimationFrame(() => {
-        second = requestAnimationFrame(() => { void record(); });
+        second = requestAnimationFrame(() => {
+          if (!packetRef.current) void record();
+        });
       });
     };
     schedule(); document.addEventListener("visibilitychange", schedule);

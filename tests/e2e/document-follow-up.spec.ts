@@ -292,7 +292,11 @@ test("REQ resolve a avaliação da família e retorna à conclusão com a observ
   await expect(note).toHaveValue("Resumo fictício para a conclusão da REQ.");
   await expect(confirm).toBeDisabled();
   await assess.click();
-  await assessment.getByRole("textbox", { name: "Justificativa da avaliação" }).fill("O recebido supre a necessidade conferida com a família.");
+  await expect(assessment.getByRole("button", { name: "Fechar diálogo", exact: true })).toBeFocused();
+  const justification = assessment.getByRole("textbox", { name: "Justificativa da avaliação", exact: true });
+  const acceptedReason = "O recebido supre a necessidade conferida com a família.";
+  await justification.fill(acceptedReason);
+  await expect(justification).toHaveValue(acceptedReason);
   await assessment.getByRole("button", { name: "Registrar avaliação", exact: true }).click();
   const approved = page.getByRole("dialog", { name: "Avaliação registrada", exact: true });
   await approved.getByRole("button", { name: "Voltar à ficha", exact: true }).click();

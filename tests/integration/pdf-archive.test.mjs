@@ -124,3 +124,37 @@ test("archive uses current patient authority and is unavailable to anonymous, se
     "42501",
   );
 });
+
+test("the archive filters editions by the actual document version and detects a stale page basis", async () => {
+  const f = await fixture();
+  const previous = [await reserve(f), await reserve(f)];
+  const act = (document, action, client = f.owner) => rpc(client, "supply_document_command", {
+    p_id: document.id, p_action: action, p_version: document.version, p_key: randomUUID(),
+    p_body: { lines: [{ lineId: document.lines[0].id, quantity: "1" }] },
+  });
+  const approved = await act(f.doc, "approve", f.admin);
+  const latest = await rpc(f.owner, "reserve_pdf_issuance", {
+    p_document: f.doc.id, p_key: randomUUID(), p_version: approved.version,
+  });
+  const args = { p_document: f.doc.id, p_limit: 1 };
+  const current = await rpc(f.owner, "pdf_archive_by_revision", { ...args, p_filter: "current" });
+  assert.equal(current.basisVersion, approved.version);
+  assert.equal(current.filter, "current");
+  assert.deepEqual(current.data.map(entry => entry.reference), [latest.id]);
+  assert.equal(current.next, null);
+
+  const olderArgs = { ...args, p_filter: "previous" };
+  const older = await rpc(f.owner, "pdf_archive_by_revision", olderArgs);
+  assert.equal(older.basisVersion, approved.version);
+  assert.ok(older.next);
+  const next = {
+    ...olderArgs, p_basis: older.basisVersion,
+    p_before: older.next.at, p_kind: older.next.kind, p_reference: older.next.reference,
+  };
+  const last = await rpc(f.owner, "pdf_archive_by_revision", next);
+  assert.deepEqual([...older.data, ...last.data].map(entry => entry.reference), previous.reverse().map(entry => entry.id));
+  assert.equal(last.next, null);
+  await act(approved, "purchase");
+  assert.equal((await f.owner.rpc("pdf_archive_by_revision", next)).error?.code, "PT409");
+  assert.equal((await archive(f, null, 1)).data.length, 2);
+});

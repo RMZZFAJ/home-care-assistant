@@ -18,6 +18,7 @@ import { loginDecision } from "./l1-decision-policy";
 import { audit } from "./accessibility-audit";
 import { openDeliveryRecipient, selectReturnRecipient } from "./delivery-recipient";
 import { expectMobileMaterialRow, mobileMaterialReference, selectReadyMaterials } from "./l2-mobile-materials";
+import { pressWorkspaceControl } from "./workspace-controls";
 import type { Custody, SupplyDocument } from "../../src/types/documents";
 import type { TransferPreparation } from "../../src/types/transfers";
 test.setTimeout(180_000);
@@ -76,9 +77,9 @@ const stepButton = (page: Page, name: string) =>
   editor(page).getByRole("navigation", { name: "Etapas da ficha" }).getByRole("button", { name: new RegExp(name + "$") });
 const continueStep = (page: Page) => editor(page).getByRole("button", { name: "Continuar", exact: true }).click();
 const draftReason = "\uFEFF\n Declaração própria preservada entre sessões\u00A0";
-async function login(page: Page, f: Fixture) {
+async function login(page: Page, f: Fixture, email = fixtures.adminA.email) {
   await page.goto("/login");
-  await page.getByLabel("E-mail", { exact: true }).fill(fixtures.adminA.email);
+  await page.getByLabel("E-mail", { exact: true }).fill(email);
   await page.getByLabel("Senha", { exact: true }).fill(fixturePassword);
   await page.getByRole("button", { name: "Entrar", exact: true }).click();
   await expect(
@@ -97,7 +98,7 @@ async function open(page: Page, source: Custody) {
   const control = source === "CARE_TEAM" ? editor(page).getByRole("button", { name: /^(Alterar|Escolher) recebedor$/ }) : recipient(page);
   await expect(page.getByRole("dialog",{name:"Continuar o preenchimento?",exact:true}).or(control).first()).toBeVisible();
 }
-async function fill(page: Page, f: Fixture, amount = "0,") {
+async function fill(page: Page, f: Fixture, amount = "0,", duringMaterialsAdvance?: (advance: () => Promise<void>) => Promise<void>) {
   const reason = "Escolha confirmada com a pessoa que fará a conferência.";
   if (f.source === "CARE_TEAM") await selectReturnRecipient(page, f.recipientId, reason);
   else {
@@ -112,8 +113,13 @@ async function fill(page: Page, f: Fixture, amount = "0,") {
     await picker.getByRole("checkbox", { name: "Vincular " + f.origin.code, exact: true }).check();
     await picker.getByRole("button", { name: "Aplicar vínculos", exact: true }).click();
   }
-  await editor(page).getByRole("button", { name: "Selecionar materiais", exact: true }).click();
   const search = searchField(page, f.source === "CARE_TEAM" ? "CARE_TEAM" : "FAMILY");
+  const advance = async () => {
+    await pressWorkspaceControl(page, editor(page).getByRole("button", { name: "Selecionar materiais", exact: true }));
+    await expect(search).toBeVisible();
+  };
+  if (duringMaterialsAdvance) await duringMaterialsAdvance(advance);
+  else await advance();
   await search.click();
   await search.fill("Material fictício V4 0");
   if (f.source === "CARE_TEAM") {
@@ -520,10 +526,38 @@ for (const source of ["FAMILY", "CARE_TEAM"] as const) {
       source +
       " conserva consulta e descarte privados após perder leitura da origem",
     async ({ page }) => {
-      const f = await declarationDraftFixture(source);
-      await login(page, f);
+      const fixture = await declarationDraftFixture(source);
+      const writer = await shiftWorker(fixture.patient, "admin");
+      const f = { ...fixture, writerId: writer.id };
+      await login(page, f, writer.email);
       await open(page, source);
-      await fill(page, f);
+      if (source === "CARE_TEAM") {
+        let release!: () => void;
+        const gate = new Promise<void>(resolve => { release = resolve; });
+        const savingDraft = editor(page).getByText("Salvando rascunho…", { exact: true });
+        let linkedSaveStarted = false;
+        await page.route("**/api/drafts", async route => {
+          const request = route.request();
+          if (request.method() === "POST" && request.postDataJSON().content?.sources?.length) {
+            linkedSaveStarted = true;
+            await gate;
+          }
+          return route.continue();
+        });
+        try {
+          await fill(page, f, "0,", async advance => {
+            await expect.poll(() => linkedSaveStarted).toBe(true);
+            await expect(savingDraft).toBeVisible();
+            await advance();
+            await expect(stepButton(page, "Materiais")).toHaveAttribute("aria-current", "step");
+            await expect(savingDraft).toBeVisible();
+            release();
+          });
+        } finally {
+          release();
+          await page.unroute("**/api/drafts");
+        }
+      } else await fill(page, f);
       const before = declarationFacts(f),
         packet = await savedDraft(page, f);
       const capability =

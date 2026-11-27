@@ -69,7 +69,7 @@ test("L2 abertura distingue catálogo vazio e inativo e oferece cadastro somente
     body: await page.screenshot({ animations: "disabled", scale: "css" }), contentType: "image/png",
   });
   await page.getByRole("link", { name: "Cadastrar material", exact: true }).click();
-  await expect(page.getByRole("heading", { name: "Catálogo do paciente", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Catálogo", exact: true })).toBeVisible();
   await expect(page.getByRole("button", { name: "Novo item", exact: true })).toBeEnabled();
   await page.goto("/fichas/com");
   await page.getByRole("button", { name: "Planejar com item extra", exact: true }).click();

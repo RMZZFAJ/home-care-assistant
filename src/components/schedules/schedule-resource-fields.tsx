@@ -6,7 +6,7 @@ import {
   TextAreaField,
 } from "@/components/ui/controls";
 import { ScheduleCreationFields } from "./schedule-creation-fields";
-import type { ScheduleResourceFields as Fields } from "@/lib/schedules/resource-preparations";
+import type { ScheduleResourceEntry, ScheduleResourceFields as Fields } from "@/lib/schedules/resource-preparations";
 import type { ScheduleWorkspace } from "@/types/schedules";
 
 /** All conditional branches keep their human fields in the parent preparation. */
@@ -18,6 +18,7 @@ export function ScheduleResourceFields({
   team,
   publishOwn,
   mayPropose,
+  entry,
 }: {
   value: Fields;
   onChange: (value: Fields) => void;
@@ -26,6 +27,7 @@ export function ScheduleResourceFields({
   team: boolean;
   publishOwn: boolean;
   mayPropose: boolean;
+  entry?: ScheduleResourceEntry;
 }) {
   if (f.form === "type")
     return (
@@ -123,7 +125,7 @@ export function ScheduleResourceFields({
   const selected = persons.some((p) => p.id === f.professionalId);
   return (
     <>
-      <FormField label="Operação">
+      {!entry ? <FormField label="Operação">
         <SelectField
           value={f.operation}
           onChange={(e) =>
@@ -142,14 +144,14 @@ export function ScheduleResourceFields({
           ) : null}
           {mayPropose || f.operation === "propose_change" ? (
             <option value="propose_change" disabled={!mayPropose}>
-              Propor alteração
+              Pedir alteração
             </option>
           ) : null}
         </SelectField>
-      </FormField>
+      </FormField> : null}
       {f.operation !== "cancel" ? (
         <>
-          <FormField label="Profissional de destino">
+          {entry !== "time" ? <FormField label={entry === "replace" ? "Novo profissional" : "Profissional de destino"}>
             <SelectField
               name="person"
               required
@@ -168,7 +170,8 @@ export function ScheduleResourceFields({
                 </option>
               ))}
             </SelectField>
-          </FormField>
+          </FormField> : null}
+          {entry !== "replace" ? <>
           <FormField label="Início do plantão">
             <TextInput
               name="start"
@@ -190,6 +193,7 @@ export function ScheduleResourceFields({
           <p className="hca-muted">
             Horários no fuso da referência do plantão.
           </p>
+          </> : null}
           <FormField label="Observações">
             <TextAreaField
               name="notes"
@@ -201,8 +205,8 @@ export function ScheduleResourceFields({
         </>
       ) : (
         <p>
-          Os campos da alteração estão preservados. O cancelamento registra sua
-          justificativa.
+          O cancelamento vale para esta ocorrência. Os outros dias permanecem
+          na agenda, com seus horários e responsáveis.
         </p>
       )}
       <FormField label="Justificativa" required>
@@ -217,7 +221,8 @@ export function ScheduleResourceFields({
       </FormField>
       {f.operation === "propose_change" ? (
         <p>
-          A proposta depende de aprovação; o plantão atual permanece válido.
+          O pedido depende de aprovação. A programação atual permanece válida
+          até a decisão.
         </p>
       ) : null}
     </>

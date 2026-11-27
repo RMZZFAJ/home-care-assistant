@@ -1,112 +1,142 @@
 "use client";
 
+import { useId, useState, type FormEvent } from "react";
 import { RecordDrawer } from "@/components/forms/record-drawer";
 import { ActionButton, DefinitionGrid, FormField, SelectField, TextInput } from "@/components/ui/controls";
-import type { CatalogueOutcome, CatalogueScope, PrecisionFields, UnitFields } from "@/lib/validation/catalogue-preparation";
+import { FeedbackBanner } from "@/components/ui/feedback";
+import { Icon } from "@/components/ui/icon";
+import { Dialog } from "@/components/ui/overlays";
+import { useScopedRead } from "@/lib/use-scoped-read";
+import type { CatalogueScope, PrecisionFields, ReviewedCatalogueProductReference, UnitFields } from "@/lib/validation/catalogue-preparation";
 import type { CatalogProduct } from "@/types/documents";
-import { CatalogueDraftButtons, CataloguePreparationFeedback } from "./catalogue-preparation-controls";
-import { useCatalogueProductReference, type CatalogueComplementaryReference, type MeasurementUnit } from "./catalogue-complementary-reference";
-import { sendPreparedCatalogueCommit, useCataloguePreparation } from "./use-catalogue-preparation";
-import { Notice } from "@/components/workspace";
+import type { CatalogueComplementaryReference, MeasurementUnit } from "./catalogue-complementary-reference";
+import { reviewedCatalogueUrl, type useReviewedCatalogueOperation } from "./reviewed-catalogue-operation";
 
-const dimensions = { count: "Contagem", volume: "Volume", mass: "Massa", package: "Embalagem" };
-const unitLabels = { code: "Código", name: "Nome", dimension: "Dimensão", decimals: "Casas decimais", unit: "Unidade base" };
+export const unitDimensions = { count: "Contagem", volume: "Volume", mass: "Massa", package: "Embalagem" };
 type Fields = UnitFields | PrecisionFields;
-function outcomeText(outcome: CatalogueOutcome) {
-  return "unitId" in outcome ? "Unidade criada e confirmada." : "Unidade base e precisão confirmadas.";
-}
 
-export function UnitPreparationEditor({ scope, userId, products, opener, onClose, onSaved, writable }: {
+export function UnitPreparationEditor({ scope, products, opener, onClose, operation, revision, refreshReference }: {
   scope: CatalogueScope;
-  userId: string;
   products: CatalogProduct[];
   opener: HTMLElement;
   onClose: () => void;
-  onSaved: (message: string) => void;
-  writable: boolean;
+  operation: ReturnType<typeof useReviewedCatalogueOperation>;
+  revision: number;
+  refreshReference: () => void;
 }) {
   const create = scope.purpose === "unit_create";
-  const editor = useCataloguePreparation<Fields, CatalogueComplementaryReference>({
-    scope, userId, separateReference: true,
-    defaultFields: () => create ? { code: "", name: "", dimension: "count", decimals: "0" } : { productId: "", unit: "", decimals: "" },
-    hashFor: reference => reference.hash,
-    sendCommit: attempt => sendPreparedCatalogueCommit(create ? "/api/units" : "/api/catalog/presentations", attempt),
-    onCommit: outcome => { onClose(); onSaved(outcomeText(outcome)); },
-  });
-  const { fields, snapshot } = editor;
-  const selection = fields && "productId" in fields ? fields.productId : "";
-  const selected = useCatalogueProductReference(scope, selection, snapshot?.reference, editor.referenceAttempt);
-  const reference = selected.reference;
-  const hash = editor.reviewedHash ?? reference?.hash ?? null;
-  const changed = !!(reference && hash && hash !== reference.hash);
-  const units = reference?.units ?? snapshot?.reference.units ?? [];
-  function compareFields(values: Fields) {
-    return <DefinitionGrid items={Object.entries(values).map(([key,value]) => ({
-      label: key === "productId" ? "Produto" : unitLabels[key as keyof typeof unitLabels],
-      value: key === "productId" ? products.find(row => row.id === value)?.name ?? value : key === "dimension" ? dimensions[value as keyof typeof dimensions] : value || "Em branco",
-    }))} />;
+  const title = create ? "Nova unidade" : "Precisão do material";
+  const action = create ? "Criar unidade" : "Salvar precisão";
+  const formId = useId();
+  const [fields, setFields] = useState<Fields>(() => create
+    ? { code: "", name: "", dimension: "count", decimals: "0" }
+    : { productId: "", unit: "", decimals: "" });
+  const [previous, setPrevious] = useState<{ reference: CatalogueComplementaryReference; revision: number } | null>(null);
+  const [dismissedRevision, setDismissedRevision] = useState(0);
+  const [unitHistory, setUnitHistory] = useState(false);
+  const selection = "productId" in fields ? fields.productId : "";
+  const reference = useScopedRead<CatalogueComplementaryReference>(
+    create || selection ? reviewedCatalogueUrl(scope, selection) : null, String(revision));
+  const history = useScopedRead<ReviewedCatalogueProductReference>(
+    selection ? reviewedCatalogueUrl({ ...scope, purpose: "edit", targetId: selection }) : null, String(revision));
+  const latest = reference.data;
+  const product = latest?.product;
+  const locked = history.data && "unitLocked" in history.data && history.data.unitLocked;
+  const validUnit = "unit" in fields && (!locked || product?.unit === fields.unit);
+  const fresh = !reference.loading && !reference.error && !history.loading && !history.error;
+  const canReview = !operation.blocked && fresh && !!latest && (create || Boolean(product?.active && validUnit)) && !previous;
+  const scopeLabel = scope.mode === "global" ? "Unidade global" : "Esta residência";
+
+  function save(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!latest || !canReview) return;
+    void operation.submit(scope, { fields, referenceHash: latest.hash }, cause => {
+      if (cause.code === "VERSION_CONFLICT") setPrevious({ reference: latest, revision });
+    });
   }
-  return <RecordDrawer title={create ? "Nova unidade" : "Unidade base e precisão"}
-    onClose={onClose} busy={editor.busy} preventClose={!!editor.pending}
-    hasUnsavedChanges={editor.dirty} restoreFocusTo={opener}>
-    <CataloguePreparationFeedback editor={editor} onClose={onClose} outcomeText={outcomeText} compareFields={compareFields} writable={writable} />
-    {writable && fields && editor.draft?.state !== "consumed" ? <form className="hca-form" onSubmit={event => {
-      event.preventDefault();
-      if (!editor.locked && !changed && !selected.loading && !selected.error)
-        editor.start("commit", hash, { ...fields, decimals: String(Number(fields.decimals)) });
-    }}>
-      {editor.draft?.state === "active" ? <p role="status">Preenchimento privado disponível.</p> : null}
-      {selected.error ? <Notice error>{selected.error} <ActionButton type="button" onClick={selected.refresh}>Consultar referência novamente</ActionButton></Notice> : null}
-      {changed && reference?.product ? <div className="hca-attention">
-        <p>A referência do catálogo mudou. Hoje, {reference.product.name} usa {reference.product.unit} com {reference.product.decimals} casa(s).</p>
-        <ActionButton type="button" disabled={editor.locked} onClick={() => editor.setReviewedHash(reference.hash)}>Usar referência atual</ActionButton>
-      </div> : null}
-      <fieldset className="hca-form" disabled={editor.locked}>
+
+  const comparing = previous && revision > Math.max(previous.revision, dismissedRevision);
+  return <>
+    <RecordDrawer title={title} kicker="Organização da residência" headingIcon="box"
+      modal={create} popupClassName={create ? undefined : "hca-preference-sheet hca-residence-settings-sheet"}
+      onClose={onClose} busy={operation.busy} trackChanges={false} restoreFocusTo={opener}
+      footer={close => <>
+        <ActionButton onClick={close}>Voltar</ActionButton>
+        {operation.pending && !operation.failure ? <ActionButton variant="primary" onClick={operation.openRecovery}>Conferir resultado pendente</ActionButton>
+          : <ActionButton form={formId} type="submit" variant="primary" disabled={!canReview}><Icon name={create ? "plus" : "check"} />{action}</ActionButton>}
+      </>}>
+      <form id={formId} className="hca-form" onSubmit={save}>
         {"code" in fields ? <>
-          <FormField label="Âmbito">
-            <SelectField name="scope" value={scope.mode} disabled>
-              <option value={scope.mode}>{scope.mode === "global" ? "Global" : "Paciente selecionado"}</option>
-            </SelectField>
-          </FormField>
-          <FormField label="Código"><TextInput name="code" required maxLength={30} value={fields.code}
-            onChange={event => editor.setFields({ ...fields, code: event.target.value })} /></FormField>
-          <FormField label="Nome"><TextInput name="name" required minLength={2} maxLength={80} value={fields.name}
-            onChange={event => editor.setFields({ ...fields, name: event.target.value })} /></FormField>
-          <FormField label="Dimensão"><SelectField name="dimension" value={fields.dimension}
-            onChange={event => editor.setFields({ ...fields, dimension: event.target.value as UnitFields["dimension"] })}>
-            {Object.entries(dimensions).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+          <FormField label="Nome"><TextInput required minLength={2} maxLength={80} placeholder="Ex.: Mililitro"
+            value={fields.name} onChange={event => setFields({ ...fields, name: event.currentTarget.value })} /></FormField>
+          <FormField label="Código"><TextInput required maxLength={30} placeholder="Ex.: mL"
+            value={fields.code} onChange={event => setFields({ ...fields, code: event.currentTarget.value })} /></FormField>
+          <FormField label="Dimensão"><SelectField value={fields.dimension}
+            onChange={event => setFields({ ...fields, dimension: event.currentTarget.value as UnitFields["dimension"] })}>
+            {Object.entries(unitDimensions).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
           </SelectField></FormField>
         </> : <>
-          <p className="hca-field-hint">Documentos, estoque e apresentações preservam a unidade registrada.</p>
-          <FormField label="Produto"><SelectField required value={fields.productId} onChange={event => {
-            const productId = event.target.value;
-            const product = products.find(row => row.id === productId);
-            editor.setFields({ productId, unit: product?.unit ?? "", decimals: product ? String(product.quantity_decimals ?? 0) : "" });
-            editor.setReviewedHash(null);
+          <FormField label="Material"><SelectField required value={fields.productId} onChange={event => {
+            const id = event.currentTarget.value;
+            const item = products.find(row => row.id === id);
+            setFields({ productId: id, unit: item?.unit ?? "", decimals: item ? String(item.quantity_decimals ?? 0) : "" });
+            setPrevious(null);
           }}>
             <option value="">Selecione</option>
-            {fields.productId && !products.some(row => row.id === fields.productId) ? <option disabled value={fields.productId}>Produto indisponível</option> : null}
-            {products.map(product => <option key={product.id} value={product.id}>{product.name}</option>)}
+            {products.map(item => <option key={item.id} value={item.id}>{item.name}</option>)}
           </SelectField></FormField>
-          {fields.productId ? <FormField label="Unidade base"><SelectField name="unit" required value={fields.unit}
-            onChange={event => editor.setFields({ ...fields, unit: event.target.value })}>
-            {fields.unit && !units.some(unit => unit.code === fields.unit) ? <option disabled value={fields.unit}>{fields.unit} · indisponível</option> : null}
-            {unitOptions(units, scope.patientId).map(unit => <option key={unit.id} value={unit.code}>{unit.name}</option>)}
-          </SelectField></FormField> : null}
+          {fields.productId ? <FormField label="Unidade base">
+            <SelectField disabled={Boolean(locked)} required value={locked ? product?.unit ?? fields.unit : fields.unit}
+              onChange={event => setFields({ ...fields, unit: event.currentTarget.value })}>
+              {!latest?.units?.some(unit => unit.code === fields.unit) && fields.unit
+                ? <option value={fields.unit}>{fields.unit}</option> : null}
+              {unitOptions(latest?.units ?? [], scope.patientId).map(unit => <option key={unit.id} value={unit.code}>{unit.name}</option>)}
+            </SelectField>
+          </FormField> : null}
         </>}
-        {"code" in fields || fields.productId ? <FormField label={create ? "Casas decimais" : "Precisão do produto"}>
-          <TextInput name="decimals" type="number" min={0} max={6} step={1} required value={fields.decimals}
-            onChange={event => editor.setFields({ ...fields, decimals: event.target.value })} />
+        {create || selection ? <FormField label="Casas decimais">
+          <SelectField required value={fields.decimals} onChange={event => setFields({ ...fields, decimals: event.currentTarget.value })}>
+            {["0", "1", "2", "3", "4", "5", "6"].map(value => <option key={value} value={value}>
+              {value === "0" ? "0 · inteiros" : value === "1" ? "1 casa" : value + " casas"}
+            </option>)}
+          </SelectField>
         </FormField> : null}
-      </fieldset>
-      <div className="hca-toolbar">
-        <ActionButton type="submit" variant="primary" disabled={editor.locked || changed || !hash || selected.loading || !!selected.error || (!create && !reference?.product?.active)}>
-          {create ? "Criar unidade" : "Salvar unidade / precisão"}
-        </ActionButton>
-        <CatalogueDraftButtons editor={editor} hash={hash} />
-      </div>
-    </form> : null}
-  </RecordDrawer>;
+        {create ? <DefinitionGrid items={[{ label: "Âmbito", value: scopeLabel }]} /> : null}
+        {locked ? <ActionButton variant="quiet" onClick={() => setUnitHistory(true)}><Icon name="history" />Unidade preservada pelo histórico</ActionButton> : null}
+        {!create && selection ? <p className="hca-residence-admin-note"><Icon name="history" width={16} height={16} />As quantidades registradas preservam a unidade e a precisão da ocasião.</p> : null}
+        {reference.error || history.error ? <FeedbackBanner tone="error">{reference.error || history.error}
+          <ActionButton onClick={refreshReference}>Consultar referência novamente</ActionButton>
+        </FeedbackBanner> : null}
+        {previous && !comparing ? <FeedbackBanner tone="warning">A referência mudou. Confira os dados atuais antes de revisar.
+          <ActionButton onClick={refreshReference}>Conferir atualização</ActionButton>
+        </FeedbackBanner> : null}
+      </form>
+    </RecordDrawer>
+    {unitHistory && product ? <Dialog open title="Unidade preservada pelo histórico" headingIcon="history"
+      onClose={() => setUnitHistory(false)}
+      footer={<ActionButton variant="primary" onClick={() => setUnitHistory(false)}>Entendi</ActionButton>}>
+      <DefinitionGrid items={[{ label: "Material", value: product.name }, { label: "Unidade registrada", value: product.unit }]} />
+      <p className="hca-field-hint">Para controlar outro material em uma unidade diferente, cadastre um novo item.</p>
+    </Dialog> : null}
+    {comparing ? <Dialog open title="Referência atual da unidade" headingIcon="history"
+      onClose={() => setDismissedRevision(revision)}
+      footer={<><ActionButton onClick={() => setDismissedRevision(revision)}>Voltar</ActionButton>
+        <ActionButton variant="primary" disabled={!fresh || !latest}
+          onClick={() => {
+            if (locked && product && "unit" in fields) setFields({ ...fields, unit: product.unit });
+            setPrevious(null);
+          }}>Usar referência atual</ActionButton></>}>
+      {reference.loading || history.loading ? <p role="status">Consultando referência…</p> : null}
+      {reference.error || history.error ? <FeedbackBanner tone="error">{reference.error || history.error}<ActionButton onClick={refreshReference}>Consultar novamente</ActionButton></FeedbackBanner> : null}
+      {fresh && product ? <DefinitionGrid items={[
+        { label: "Material", value: product.name },
+        { label: "Unidade anterior", value: previous.reference.product?.unit ?? "" },
+        { label: "Unidade atual", value: product.unit },
+        { label: "Casas decimais atuais", value: product.decimals },
+        { label: "Casas decimais informadas", value: fields.decimals },
+      ]} /> : null}
+    </Dialog> : null}
+  </>;
 }
 
 function unitOptions(units: MeasurementUnit[], patientId: string | null) {

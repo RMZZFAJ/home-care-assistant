@@ -1,6 +1,6 @@
 "use client";
 import { ProgressMeter } from "@/components/ui/feedback";
-import { ActionButton, LoadingIndicator } from "@/components/ui/controls";
+import { ActionButton, DefinitionGrid, FormField, LoadingIndicator, TextAreaField } from "@/components/ui/controls";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
@@ -13,7 +13,7 @@ import {
   Workspace,
   type WorkspaceContext,
 } from "@/components/workspace";
-import { StepNavigator } from "@/components/ui/primitives";
+import { Dialog, StepNavigator } from "@/components/ui/primitives";
 import { PatientSupplyWizard } from "@/components/documents/supply-wizard";
 import { SimpleDraftPanel } from "@/components/forms/simple-draft-panel";
 import { useLongDraftAutosave } from "@/components/forms/use-long-draft-autosave";
@@ -29,21 +29,26 @@ import {
 } from "@/components/forms/creation-draft-panel";
 import type { BalanceDraftContent } from "@/lib/validation/creation-drafts";
 import { WizardActions } from "@/components/forms/wizard-actions";
+import { adjacentMaterialCategory, materialCategories, WizardMaterialCategories, type WizardMaterialCategory } from "@/components/forms/supply-wizard-stages";
 import { DocumentActions } from "@/components/documents/document-actions";
 import { BalanceNotice } from "@/components/notifications/balance-notice";
 import { DocumentDeliveryStatus } from "@/components/notifications/document-delivery-status";
 import { BarcodeScanner } from "@/components/catalog/barcode-scanner";
+import { scanBalancePresentation } from "@/lib/client/balance-scan";
 import { formatZonedDate } from "@/lib/schedules/time";
-import { formatQuantity, quantity, validQuantity } from "@/lib/quantity";
+import { quantity, validQuantity } from "@/lib/quantity";
 import type {
   CatalogProduct,
   SupplyDocument,
   SupplyPayload,
 } from "@/types/documents";
-import type { BalanceWorkspace } from "@/types/balances";
-import { parseBalanceCountReference, parseBalanceCountReview } from "@/lib/validation/balances";
+import type { BalanceAssignment, BalanceWorkspace } from "@/types/balances";
+import { balanceCountAdmission, parseBalanceCountReference, parseBalanceCountReview, type BalanceCountAdmission } from "@/lib/validation/balances";
 import { useBalanceWorkspace } from "./use-balance-workspace";
-import { BalanceCountFields, BalanceReviewRows } from "./balance-count-fields";
+import { BalanceCountFields, BalanceExtraFields, BalanceReviewRows } from "./balance-count-fields";
+import { BalanceRecordedExtras } from "./balance-materials";
+import { balanceCatalogueMatches, confirmedBalanceExtras, priorBalanceMaterials } from "@/lib/balances/count-materials";
+import type { BalanceCountExtra } from "@/lib/validation/balance-count-extras";
 import {
   preserveCountCache,
   clearCountCache,
@@ -82,6 +87,8 @@ export function BalanceEntry() {
               context={context}
               documentId={params.get("documentId")}
               recount={params.get("recount") === "true"}
+              assignmentId={params.get("assignmentId")}
+              assignmentVersion={params.get("assignmentVersion")}
             />
           )
         ) : (
@@ -97,15 +104,20 @@ function Mode({
   context,
   documentId,
   recount,
+  assignmentId,
+  assignmentVersion,
 }: {
   context: WorkspaceContext;
   documentId: string | null;
   recount: boolean;
+  assignmentId: string | null;
+  assignmentVersion: string | null;
 }) {
   const { data, error, reload, hasBeenEligible } = useBalanceWorkspace(
     context.patient!.id,
   );
   const [recoverable, setRecoverable] = useState(false);
+  const [openedAssignment, setOpenedAssignment] = useState(false);
   useEffect(() => {
     let active = true;
     void Promise.resolve().then(() => {
@@ -143,6 +155,13 @@ function Mode({
     );
   if (!data)
     return <LoadingIndicator label="Verificando plantão e disponibilidade" />;
+  if ((assignmentId !== null || assignmentVersion !== null) && !openedAssignment) {
+    const current = data.eligibility.assignment;
+    if (!current || assignmentId !== current.id || assignmentVersion !== String(current.version)
+      || documentId !== data.eligibility.documentId)
+      return <Notice error>A atribuição mudou. Volte a Plantões e balanços para consultar a responsabilidade atual.</Notice>;
+    setOpenedAssignment(true);
+  }
   if (
     !data.regime?.activated_at &&
     !data.eligibility.assignment &&
@@ -185,6 +204,10 @@ function ScheduledCount({
   const [step, setStep] = useState(0),
     [fieldErrors, setFieldErrors] = useState<Record<string, string>>({}),
     [reference, setReference] = useState<Record<string, string>>({});
+  const [extras, setExtras] = useState<BalanceCountExtra[]>([]);
+  const [category, setCategory] = useState<WizardMaterialCategory>();
+  const [cataloguePicker, setCataloguePicker] = useState(false);
+  const cataloguePickerButtonRef = useRef<HTMLButtonElement>(null);
   const [editing, setEditing] = useState<SupplyDocument | null>(null),
     [saved, setSaved] = useState<SupplyDocument | null>(null),
     [loading, setLoading] = useState(true),
@@ -209,10 +232,19 @@ function ScheduledCount({
   const formatBrazilDate = (value: string | null) =>
     formatZonedDate(value, initial.regime?.timezone);
   const storageKey = `hca:v2:bal-count:${context.userId}:${context.patient!.id}:${documentId ?? "new"}`;
-  const eligible =
-    balance.eligibility.available &&
+  const [started, setStarted] = useState<{ workspace: BalanceWorkspace; admission: BalanceCountAdmission } | null>(null);
+  const [discardedAdmissionId, setDiscardedAdmissionId] = useState<string | null>(null);
+  const candidate = started?.workspace === balance ? started.admission : balance.eligibility.admission;
+  const candidateMatches = candidate && assignment && candidate.id !== discardedAdmissionId &&
+    candidate.assignmentId === assignment.id && candidate.assignmentVersion === assignment.version &&
+    candidate.documentId === (editing?.id ?? null) && candidate.documentVersion === (editing?.version ?? null);
+  const sameAssignment =
     balance.eligibility.assignment?.id === assignment?.id &&
     balance.eligibility.assignment?.version === assignment?.version;
+  const admission = candidateMatches && sameAssignment && can(context, "bal.count") ? candidate : null;
+  const canStart = sameAssignment && balance.eligibility.available && can(context, "bal.count") &&
+    balance.eligibility.documentId === (editing?.id ?? null);
+  const eligible = admission !== null;
   const [observationTimes, setObservationTimes] = useState<
     Record<string, string | null>
   >({});
@@ -243,6 +275,15 @@ function ScheduledCount({
     balance.referenceRevision !== referenceRevision ||
     !eligible;
   const [draftTouched, setDraftTouched] = useState(false);
+  const recount = assignment?.kind === "recount";
+  const prior = useMemo(() => priorBalanceMaterials(recount ? editing : null, products), [recount, editing, products]);
+  const preservedExtraIds = new Set(prior.extras.map(extra => extra.id));
+  const countedProducts = products.filter(product => !recount || prior.catalogued.has(product.id) || Object.hasOwn(counts, product.id));
+  const activeCategory = category ?? adjacentMaterialCategory(undefined, countedProducts, "next") ?? "medicamentos";
+  const visibleProducts = countedProducts.filter(product => product.category === activeCategory);
+  const countedProductIds = new Set(countedProducts.map(product => product.id));
+  const pickableProducts = cataloguePicker
+    ? products.filter(product => product.category === activeCategory && !countedProductIds.has(product.id)) : [];
   const materialReferences = useWizardMaterialReferences(
     context.patient!.id, "BAL", () => setDraftTouched(true), editing?.id ?? documentId,
   );
@@ -251,6 +292,8 @@ function ScheduledCount({
       counts,
       observationTimes,
       notes,
+      materialCategory: category,
+      ...(extras.length ? { balanceExtras: extras } : {}),
       materials: [
         ...draftMaterials,
         ...products
@@ -270,6 +313,8 @@ function ScheduledCount({
       counts,
       observationTimes,
       notes,
+      category,
+      extras,
       draftMaterials,
       products,
       preservedContext,
@@ -298,6 +343,8 @@ function ScheduledCount({
       setCounts(content.counts);
       setObservationTimes(content.observationTimes);
       setNotes(content.notes);
+      setExtras(content.balanceExtras ?? []);
+      setCategory(content.materialCategory);
       setDraftMaterials(content.materials);
       setStep(stepForNavigation("BAL", draft.navigation));
       setError("");
@@ -305,6 +352,9 @@ function ScheduledCount({
       return true;
     },
     onDiscard: () => {
+      setDiscardedAdmissionId(admission?.id ?? null);
+      setStarted(null);
+      reload();
       setDraftTouched(false);
       try {
         clearIdleCountCache(sessionStorage, storageKey, {
@@ -322,6 +372,8 @@ function ScheduledCount({
       materialReferences.setLinks([]);
       setObservationTimes({});
       setNotes("");
+      setExtras(prior.extras.map(extra => ({ ...extra, quantity: "" })));
+      setCategory(undefined);
       setDraftMaterials([]);
       setPreservedContext(null);
       setPreviousObservations(undefined);
@@ -339,7 +391,7 @@ function ScheduledCount({
   useEffect(() => {
     const controller = new AbortController();
     const load = async () => {
-      const [catalog, state] = await Promise.all([
+      const [catalog, state, stock] = await Promise.all([
         api<{ data: CatalogProduct[]; }>(
           "/api/catalog?careRecipientId=" + context.patient!.id,
           undefined,
@@ -350,6 +402,8 @@ function ScheduledCount({
           undefined,
           controller.signal,
         ),
+        api<unknown>("/api/balances?careRecipientId=" + context.patient!.id + "&reference=true", undefined, controller.signal)
+          .then(value => parseBalanceCountReference(value, context.patient!.id)),
       ]);
       let raw: string | null,
         cachedTarget: string | null = null;
@@ -389,6 +443,11 @@ function ScheduledCount({
       setEditing(doc);
       setAssignment(state.data.eligibility.assignment);
       setReferenceRevision(state.data.referenceRevision);
+      const initialPrior = state.data.eligibility.assignment?.kind === "recount" ? priorBalanceMaterials(doc, catalog.data) : null;
+      setCategory(undefined);
+      setReference(stock.data.revision === state.data.referenceRevision ? stock.data.quantities : {});
+      const persistedExtras = initialPrior ? initialPrior.extras.map(extra => ({ ...extra, quantity: "" })) : doc?.payload.balanceExtras ?? [];
+      setExtras(persistedExtras);
       if (doc?.status === "draft") {
         setCounts(
           Object.fromEntries(doc.lines.map((l) => [l.product_id, l.quantity])),
@@ -413,6 +472,8 @@ function ScheduledCount({
           });
           setCounts(cache.counts ?? {});
           setNotes(cache.notes ?? "");
+          if (cache.content?.materialCategory) setCategory(cache.content.materialCategory);
+          if (cache.content || cache.pending) setExtras(cache.content?.balanceExtras ?? []);
           setObservationTimes(cache.observationTimes ?? {});
           setPreservedContext(
             cache.content?.context ?? {
@@ -437,6 +498,10 @@ function ScheduledCount({
             setMessage(
               "Há uma tentativa pendente. Recupere o resultado antes de continuar.",
             );
+          } else if (cache.navigation) {
+            setStep(stepForNavigation("BAL", cache.navigation));
+          } else if (cache.notes || Object.keys(cache.counts ?? {}).length) {
+            setStep(1);
           }
           setCacheError("");
         } catch {
@@ -477,6 +542,7 @@ function ScheduledCount({
             notes,
             observationTimes,
             content: balanceContent,
+            navigation: navigationForStep("BAL", step),
           },
           intent,
         );
@@ -500,6 +566,7 @@ function ScheduledCount({
     documentId,
     sourceReady,
     balanceContent,
+    step,
   ]);
   function scopeFor(intent: Attempt | null) {
     return {
@@ -522,6 +589,7 @@ function ScheduledCount({
         notes,
         observationTimes,
         content: balanceContent,
+        navigation: navigationForStep("BAL", step),
       },
       intent,
       expected,
@@ -529,19 +597,52 @@ function ScheduledCount({
   }
   function validate() {
     const errors: Record<string, string> = {};
-    for (const p of products)
+    for (const p of countedProducts)
       if (!validQuantity(counts[p.id] ?? "", p.quantity_decimals ?? 0, true))
         errors[p.id] =
           "Informe a quantidade física, inclusive zero, na precisão da unidade.";
     setFieldErrors(errors);
+    if (recount && prior.unresolved.some(({ matches }) => !matches.some(product => Object.hasOwn(counts, product.id)))) {
+      setError("Selecione a identificação de catálogo de cada extra incorporado.");
+      setStep(1);
+      return false;
+    }
     if (Object.keys(errors).length) {
       setError("Confira os campos destacados.");
+      const first = countedProducts.find(product => errors[product.id]);
+      if (first) showProduct(first);
       requestAnimationFrame(() =>
         document.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus(),
       );
       return false;
     }
-    return products.length > 0;
+    if (!countedProducts.length) {
+      setError("Inclua ao menos um material do catálogo para concluir esta contagem.");
+      setStep(1);
+      return false;
+    }
+    return true;
+  }
+  function showProduct(product: CatalogProduct) {
+    const group = materialCategories.find(entry => entry.id === product.category);
+    if (group) setCategory(group.id);
+    setStep(1);
+  }
+  function includeProduct(product: CatalogProduct, extraId?: string) {
+    if (extraId) setExtras(current => current.filter(extra => extra.id !== extraId));
+    setDraftTouched(true);
+    setCounts(current => Object.hasOwn(current, product.id) ? current : { ...current, [product.id]: "" });
+    setCataloguePicker(false);
+    showProduct(product);
+  }
+  function confirmedExtras() {
+    const result = confirmedBalanceExtras(extras, products);
+    if (!result) {
+      setError("Confira o nome, a unidade e a quantidade dos extras. Se o item estiver no catálogo, conte-o em Materiais.");
+      setStep(2);
+      return null;
+    }
+    return result;
   }
   function changeCount(id: string, value: string) {
     setDraftTouched(true);
@@ -560,8 +661,38 @@ function ScheduledCount({
       if (error === "Confira os campos destacados.") setError("");
     }
   }
+  async function confirmAdmission(targetAssignment: BalanceAssignment, target: SupplyDocument | null) {
+    const body = {
+      careRecipientId: context.patient!.id, assignmentId: targetAssignment.id, assignmentVersion: targetAssignment.version,
+      documentId: target?.id ?? null, documentVersion: target?.version ?? null,
+    };
+    const response = await api<{ data: unknown }>("/api/balances/count-admission", body);
+    const confirmed = balanceCountAdmission.parse(response.data);
+    if (confirmed.assignmentId !== body.assignmentId || confirmed.assignmentVersion !== body.assignmentVersion ||
+      confirmed.documentId !== body.documentId || confirmed.documentVersion !== body.documentVersion) {
+      throw new Error("O início confirmado pertence a outra contagem.");
+    }
+    return confirmed;
+  }
+  async function startCount() {
+    if (!assignment || !canStart || busy || privateDraft.blocked || cacheError) return;
+    setBusy(true);
+    setError("");
+    try {
+      const confirmed = await confirmAdmission(assignment, editing);
+      setStarted({ workspace: balance, admission: confirmed });
+      setDiscardedAdmissionId(null);
+      setStep(1);
+      reload();
+    } catch (failure) {
+      setError(failure instanceof Error ? failure.message : "Não foi possível iniciar esta contagem.");
+      reload();
+    } finally {
+      setBusy(false);
+    }
+  }
   async function review() {
-    if (needsReferenceReview || !sourceReady || !validate()) return;
+    if (needsReferenceReview || !sourceReady || !validate() || !confirmedExtras()) return;
     setBusy(true);
     setError("");
     try {
@@ -580,8 +711,10 @@ function ScheduledCount({
         );
       }
       if (
-        !state.data.eligibility.available ||
-        state.data.eligibility.assignment?.id !== assignment?.id
+        !admission ||
+        state.data.eligibility.admission?.id !== admission.id ||
+        state.data.eligibility.assignment?.id !== assignment?.id ||
+        state.data.eligibility.assignment?.version !== assignment?.version
       ) {
         setNeedsRecount(true);
         throw new Error(
@@ -594,12 +727,28 @@ function ScheduledCount({
         throw new Error("O catálogo mudou durante a contagem. Atualize a referência antes de concluir.");
       }
       setReference(stock.data.quantities);
-      setStep(1);
+      setStep(draftFlowStages.BAL.length - 1);
     } catch (reason) {
       setError((reason as Error).message);
     } finally {
       setBusy(false);
     }
+  }
+  function nextStep() {
+    setError("");
+    if (step === 0) setStep(1);
+    if (step === 1) {
+      const nextCategory = adjacentMaterialCategory(activeCategory, countedProducts, "next");
+      if (nextCategory) setCategory(nextCategory);
+      else if (validate()) setStep(2);
+    }
+    if (step === 2 && confirmedExtras()) setStep(3);
+    if (step === 3) void review();
+  }
+  function previousStep() {
+    const previousCategory = step === 1 ? adjacentMaterialCategory(activeCategory, countedProducts, "previous") : undefined;
+    if (previousCategory) setCategory(previousCategory);
+    else setStep(step - 1);
   }
   async function save() {
     if (cacheError || !sourceReady) return;
@@ -610,22 +759,26 @@ function ScheduledCount({
       return;
     if (!pendingRef.current) {
       if (needsReferenceReview || !validate()) return;
-      if (!eligible || !assignment) {
+      const completedExtras = confirmedExtras();
+      if (!completedExtras) return;
+      if (!admission || !assignment) {
         setError(
-          "A contagem exige o plantão ativo e a profissional designada.",
+          "Confirme o início com a atribuição vigente antes de concluir.",
         );
         return;
       }
       const payload: SupplyPayload = {
-        lines: products.map((p) => ({
+        lines: countedProducts.map((p) => ({
           productId: p.id,
           quantity: quantity(counts[p.id]).toFixed(),
         })),
         notes,
+        ...(completedExtras.length ? { balanceExtras: completedExtras } : {}),
         balanceAssignment: {
           id: assignment.id,
           version: assignment.version,
           referenceRevision,
+          admissionId: admission.id,
         },
       };
       const savedDraft = await privateDraft.save(structuredClone(balanceContent));
@@ -721,7 +874,7 @@ function ScheduledCount({
     setBusy(true);
     setError("");
     try {
-      const [catalog, state, documentRead] = await Promise.all([
+      const [catalog, state, documentRead, stock] = await Promise.all([
         api<{ data: CatalogProduct[]; }>(
           "/api/catalog?careRecipientId=" + context.patient!.id,
         ),
@@ -731,10 +884,12 @@ function ScheduledCount({
         editing
           ? api<{ data: SupplyDocument; }>("/api/documents/" + editing.id)
           : Promise.resolve(null),
+        api<unknown>("/api/balances?careRecipientId=" + context.patient!.id + "&reference=true")
+          .then(value => parseBalanceCountReference(value, context.patient!.id)),
       ]);
       if (
-        !state.data.eligibility.available ||
-        !state.data.eligibility.assignment
+        !state.data.eligibility.assignment ||
+        (!state.data.eligibility.available && !state.data.eligibility.admission)
       )
         throw Error(
           "O plantão não está disponível para você. Os valores anteriores foram mantidos.",
@@ -743,12 +898,14 @@ function ScheduledCount({
         documentRead &&
         (documentRead.data.type !== "BAL" ||
           documentRead.data.care_recipient_id !== context.patient!.id ||
-          !["draft", "submitted"].includes(documentRead.data.status))
+          !(["draft", "submitted"].includes(documentRead.data.status) ||
+            documentRead.data.status === "approved" && state.data.eligibility.assignment.kind === "recount"))
       )
         throw Error(
           "Esta ficha não permite outra contagem. Consulte seu acompanhamento; o preenchimento foi preservado.",
         );
       const target = documentRead?.data ?? null;
+      const confirmed = await confirmAdmission(state.data.eligibility.assignment, target);
       const nextContext: BalanceDraftContent["context"] = {
         mode: "scheduled",
         documentId: target?.id ?? null,
@@ -767,6 +924,22 @@ function ScheduledCount({
           quantityDecimals: p.quantity_decimals ?? 0,
         })),
       );
+      const carriedItems = new Set(countedProducts.map(product => product.id));
+      const previousExtras = next.balanceExtras ?? [];
+      next.balanceExtras = previousExtras.filter(extra => {
+        const matches = balanceCatalogueMatches(extra.name, catalog.data);
+        if (matches.length !== 1) return true;
+        carriedItems.add(matches[0].id);
+        return false;
+      });
+      if (state.data.eligibility.assignment.kind === "recount")
+        next.counts = Object.fromEntries(catalog.data.filter(product => carriedItems.has(product.id)).map(product => [product.id, ""]));
+      const currentProducts = state.data.eligibility.assignment.kind === "recount"
+        ? catalog.data.filter(product => carriedItems.has(product.id))
+        : catalog.data;
+      const nextCategory = currentProducts.some(product => product.category === category)
+        ? category : undefined;
+      next.materialCategory = nextCategory;
       preserveCountCache(
         sessionStorage,
         storageKey,
@@ -782,23 +955,29 @@ function ScheduledCount({
           notes: next.notes,
           observationTimes: next.observationTimes,
           content: next,
+          navigation: navigationForStep("BAL", 1),
         },
         null,
       );
       setProducts(catalog.data);
       setEditing(target);
       setAssignment(state.data.eligibility.assignment);
+      setStarted({ workspace: balance, admission: confirmed });
+      setDiscardedAdmissionId(null);
       setReferenceRevision(state.data.referenceRevision);
       setCounts(next.counts);
       setObservationTimes(next.observationTimes);
       setNotes(next.notes);
+      setExtras(next.balanceExtras);
+      setReference(stock.data.revision === state.data.referenceRevision ? stock.data.quantities : {});
       setDraftMaterials(next.materials);
       setPreservedContext(next.context);
       setPreviousObservations(next.previousObservations);
       setNeedsRecount(false);
       setFieldErrors({});
+      setCategory(nextCategory);
       setDraftTouched(true);
-      setStep(0);
+      setStep(1);
       setMessage(
         "Referência atualizada. Confira fisicamente cada material; as observações anteriores continuam preservadas.",
       );
@@ -813,46 +992,14 @@ function ScheduledCount({
     }
   }
   async function scan(code: string) {
-    const result = await api<{
-      data: { product_id: string; name: string; base_quantity: string; }[];
-    }>(
-      "/api/catalog/presentations?careRecipientId=" +
-      context.patient!.id +
-      "&barcode=" +
-      encodeURIComponent(code),
-    );
-    const presentation = result.data[0];
-    if (
-      !presentation ||
-      !products.some((p) => p.id === presentation.product_id)
-    )
-      throw new Error(
-        "Código não encontrado no catálogo ativo. Selecione o material manualmente.",
-      );
-    const product = products.find((p) => p.id === presentation.product_id)!;
-    if (
-      !validQuantity(
-        counts[product.id] || "0",
-        product.quantity_decimals ?? 0,
-        true,
-      )
-    )
-      throw new Error(
-        "Corrija a quantidade deste material antes de acrescentar uma apresentação.",
-      );
-    changeCount(
-      product.id,
-      quantity(counts[product.id] || "0")
-        .plus(presentation.base_quantity)
-        .toFixed(),
-    );
-    setMessage(
-      `${presentation.name}: ${formatQuantity(presentation.base_quantity)} acrescentados à contagem física.`,
-    );
+    const { product, quantity: counted, message } = await scanBalancePresentation(context.patient!.id, code, products, counts);
+    changeCount(product.id, counted);
+    showProduct(product);
+    setMessage(message);
     requestAnimationFrame(() =>
       document
         .querySelector<HTMLElement>(
-          `[data-product="${CSS.escape(presentation.product_id)}"] input`,
+          `[data-product="${CSS.escape(product.id)}"] input`,
         )
         ?.focus(),
     );
@@ -917,7 +1064,7 @@ function ScheduledCount({
       </Notice>
     );
   const referencePanel =
-    needsReferenceReview && !uncertain && !cacheError ? (
+    needsReferenceReview && (eligible || preservedContext || draftTouched || needsRecount) && !uncertain && !cacheError ? (
       <BalanceReferenceReview
         source={balanceContent}
         current={currentContext}
@@ -932,14 +1079,23 @@ function ScheduledCount({
     <SimpleDraftPanel
       draft={privateDraft}
       current={balanceContent}
-      statusInFooter={initial.eligibility.available && !cacheError}
+      statusInFooter={eligible && !cacheError}
       exitHref="/balancos"
       patientName={context.patient!.display_name}
       authorName={context.fullName}
       disabled={busy || uncertain || Boolean(cacheError)}
     />
   );
-  if (!initial.eligibility.available && !uncertain)
+  const shiftType = balance.assignments.find((item) => item.id === assignment?.id)?.type_name;
+  const identity = <DefinitionGrid items={[
+    { label: "Paciente", value: context.patient!.display_name },
+    { label: "Quem preenche", value: context.fullName },
+    { label: "Plantão", value: `${formatBrazilDate(assignment?.starts_at ?? null)} → ${formatBrazilDate(assignment?.ends_at ?? null)}` },
+    ...(shiftType ? [{ label: "Tipo de plantão", value: shiftType }] : []),
+    { label: "Estoque", value: "Equipe" },
+    { label: "Contagem", value: recount ? `Recontagem de ${editing?.code ?? "balanço"}` : "Balanço do plantão" },
+  ]} />;
+  if (!eligible && !uncertain)
     return (
       <div className="hca-form-stack">
         {draftPanel}
@@ -948,17 +1104,24 @@ function ScheduledCount({
         {cacheError ? <Notice error>{cacheError}</Notice> : null}
         <section className="ui-card hca-form-stack">
           {error ? <Notice error>{error}</Notice> : null}
-          <Notice>
-            A contagem é disponibilizada exclusivamente à pessoa designada
-            durante o plantão real. Consulte a programação e o acompanhamento.
-          </Notice>
-          <p>
+          {canStart ? <>
+            <StepNavigator steps={draftFlowStages.BAL.map(stage => stage.label)} active={0} onChange={setStep} disabled compact />
+            <h2 className="font-semibold">Confirme os dados</h2>
+            {identity}
+            <p>Iniciar neste plantão permite concluir a mesma contagem depois do horário.</p>
+            <ActionButton variant="primary" disabled={busy || privateDraft.blocked || Boolean(cacheError)}
+              onClick={() => void startCount()}>Iniciar contagem</ActionButton>
+          </> : <Notice>
+            Uma nova contagem pode ser iniciada pela pessoa designada durante o plantão.
+            Consulte a programação e o acompanhamento.
+          </Notice>}
+          {!canStart ? <p>
             {formatBrazilDate(
               balance.eligibility.assignment?.starts_at ?? null,
             )}{" "}
             →{" "}
             {formatBrazilDate(balance.eligibility.assignment?.ends_at ?? null)}
-          </p>
+          </p> : null}
           <Link
             className="ui-button ui-button-primary"
             href="/balancos"
@@ -969,7 +1132,7 @@ function ScheduledCount({
         </section>
       </div>
     );
-  const progress = products.filter((p) =>
+  const progress = countedProducts.filter((p) =>
     validQuantity(counts[p.id] ?? "", p.quantity_decimals ?? 0, true),
   ).length;
   return (
@@ -980,26 +1143,9 @@ function ScheduledCount({
       {cacheError ? <Notice error>{cacheError}</Notice> : null}
       {error ? <Notice error>{error}</Notice> : null}
       {message ? <Notice>{message}</Notice> : null}
-      <section className="hca-bal-context">
-        <strong>{context.patient!.display_name}</strong>
-        <p>
-          {balance.assignments.find((a) => a.id === assignment?.id)
-            ?.professional_name ?? "Profissional designado"}{" "}
-          ·{" "}
-          {balance.assignments.find((a) => a.id === assignment?.id)?.type_name}
-        </p>
-        <small>
-          {formatBrazilDate(assignment?.starts_at ?? null)} →{" "}
-          {formatBrazilDate(assignment?.ends_at ?? null)}
-        </small>
-      </section>
-      {!eligible && !uncertain ? (
+      {eligible && !balance.eligibility.available && !uncertain ? (
         <Notice>
-          A contagem está indisponível fora do plantão ou para outro
-          responsável. Os dados preenchidos permanecem visíveis.
-          <Link href="/balancos" prefetch={false}>
-            Consultar agendamento e pendências
-          </Link>
+          Esta contagem foi iniciada no plantão e pode ser concluída agora.
         </Notice>
       ) : null}
       {!products.length ? <Notice>O catálogo ativo está vazio.</Notice> : null}
@@ -1030,8 +1176,10 @@ function ScheduledCount({
           ))}
         </Notice>
       ) : null}
+      <div className="hca-supply-wizard-card hca-balance-count-card">
       <StepNavigator
         steps={draftFlowStages.BAL.map((stage) => stage.label)}
+        compact
         active={step}
         disabled={
           busy || uncertain || privateDraft.blocked || Boolean(cacheError)
@@ -1047,54 +1195,74 @@ function ScheduledCount({
           privateDraft.blocked ||
           Boolean(cacheError)
         }
-        className="min-w-0 hca-form-stack"
+        className="hca-supply-wizard-body hca-form-stack"
       >
-        {step === 0 ? (
+        {step === 0 ? <>
+          <h2>Confirme os dados</h2>
+          {identity}
+          <p>A contagem será vinculada a este paciente e a quem está preenchendo.</p>
+        </> : null}
+        {step === 1 ? (
           <>
+            <div><h2>{recount ? "Conte novamente os materiais" : "Conte os materiais"}</h2>
+              <p className="hca-muted">Informe a quantidade física da equipe. Use zero quando o material estiver ausente.</p></div>
+            <WizardMaterialCategories category={activeCategory} onChange={setCategory}
+              selected={countedProducts.filter(product => validQuantity(counts[product.id] ?? "", product.quantity_decimals ?? 0, true))} />
             <div className="hca-toolbar">
               <strong>
-                {progress}/{products.length} materiais contados
+                {progress}/{countedProducts.length} materiais contados
               </strong>
-              <Link href="/balancos" prefetch={false}>
-                Acompanhar / solicitar adiamento
-              </Link>
+              {recount ? <ActionButton ref={cataloguePickerButtonRef} onClick={() => setCataloguePicker(true)}>Incluir item não contado</ActionButton>
+                : <ActionButton onClick={() => { if (validate()) setStep(2); }}>Item extra</ActionButton>}
             </div>
             <ProgressMeter
               value={progress}
-              max={Math.max(products.length, 1)}
+              max={Math.max(countedProducts.length, 1)}
               aria-label="Progresso da contagem física"
             />
-            <p className="hca-muted">
-              Informe o que está fisicamente com a equipe. Registre zero quando
-              o material estiver ausente.
-            </p>
-            <details className="ui-card">
-              <summary>Contar por código de barras</summary>
+            {recount ? prior.unresolved.filter(row => !row.matches.some(product => Object.hasOwn(counts, product.id))).map(row =>
+              <Notice key={row.extra.id}>Selecione a identificação de catálogo de {row.extra.name}.
+                {row.matches.map(product => <ActionButton key={product.id} onClick={() => includeProduct(product)}>{product.name} · {product.unit}</ActionButton>)}
+              </Notice>) : null}
+            <details className="hca-count-scan">
+              <summary className="ui-button ui-button-secondary">Contar por código de barras</summary>
               <BarcodeScanner onRead={scan} />
             </details>
             <BalanceCountFields
               context={context}
-              products={products}
+              products={visibleProducts}
               counts={counts}
               errors={fieldErrors}
-              notes={notes}
+              reference={reference}
               onCount={changeCount}
-              onNotes={value => { setNotes(value); setDraftTouched(true); }}
               onLink={materialReferences.open}
               linkedCount={materialReferences.count}
             />
+            {!visibleProducts.length ? <p className="hca-muted">Nenhum material nesta categoria.</p> : null}
           </>
-        ) : (
+        ) : null}
+        {step === 2 ? <BalanceExtraFields extras={extras} catalogue={products} preservedIds={preservedExtraIds}
+          onChange={value => { setExtras(value); setDraftTouched(true); }} onUseCatalogue={(id, product) => includeProduct(product, id)} /> : null}
+        {step === 3 ? <>
+          <h2>Observações da contagem</h2>
+          <p>Registre algo que ajude a família e a supervisão a entender os números.</p>
+          <FormField label="Observações da contagem">
+            <TextAreaField value={notes} onChange={event => { setNotes(event.currentTarget.value); setDraftTouched(true); }} maxLength={2000} />
+          </FormField>
+        </> : null}
+        {step === 4 ? (
           <>
             <h2>Revisão da contagem</h2>
             <p>Confira as quantidades físicas e as diferenças.</p>
+            <p className="hca-muted">{context.patient!.display_name} · {context.fullName} · estoque da equipe</p>
+            {shiftType ? <p className="hca-muted">{shiftType} · {formatBrazilDate(assignment?.starts_at ?? null)} → {formatBrazilDate(assignment?.ends_at ?? null)}</p> : null}
             {editing?.workflow_data.reviewPolicy &&
               typeof editing.workflow_data.reviewPolicy === "object" &&
               "balReview" in editing.workflow_data.reviewPolicy ? (
               <Notice>
                 {editing.workflow_data.reviewPolicy.balReview === "optional"
                   ? "Ao confirmar, as diferenças desta nova contagem serão conciliadas no estoque da equipe. A revisão é facultativa; a diferença não será registrada como consumo."
-                  : "Esta contagem usa a revisão exigida na política preservada do balanço. A conciliação aguarda os novas revisões; revisões anteriores não aprovam esta contagem."}
+                  : "Esta contagem usa a revisão exigida na política preservada do balanço. A conciliação aguarda as novas revisões. Revisões anteriores não aprovam esta contagem."}
               </Notice>
             ) : (
               <p>
@@ -1103,16 +1271,23 @@ function ScheduledCount({
               </p>
             )}
             <BalanceReviewRows
-              products={products}
+              products={countedProducts}
               counts={counts}
               reference={reference}
             />
+            <BalanceRecordedExtras extras={extras} />
             <BalanceObservationTimes content={balanceContent} />
             {notes ? <p>{notes}</p> : null}
           </>
-        )}
+        ) : null}
       </fieldset>
       {materialReferences.picker}
+      <Dialog open={cataloguePicker} title="Incluir item não contado" onClose={() => setCataloguePicker(false)} finalFocus={cataloguePickerButtonRef}>
+        <p>Selecione um material desta categoria para incluir na recontagem.</p>
+        {pickableProducts.length ? <div className="hca-form-stack">
+          {pickableProducts.map(product => <ActionButton key={product.id} onClick={() => includeProduct(product)}>{product.name} · {product.unit}</ActionButton>)}
+        </div> : <p>Todos os materiais desta categoria já estão na contagem.</p>}
+      </Dialog>
       <fieldset
         disabled={Boolean(cacheError)}
         className="min-w-0"
@@ -1120,7 +1295,7 @@ function ScheduledCount({
       >
         <WizardActions
           step={step}
-          total={2}
+          total={draftFlowStages.BAL.length}
           saving={
             busy || privateDraft.busy || (privateDraft.blocked && !uncertain)
           }
@@ -1131,12 +1306,12 @@ function ScheduledCount({
             !eligible ||
             needsReferenceReview ||
             !sourceReady ||
-            !products.length ||
+            (!countedProducts.length && !recount) ||
             missingMaterials.length > 0 ||
             Boolean(cacheError)
           }
-          onBack={() => setStep(0)}
-          onNext={() => void review()}
+          onBack={previousStep}
+          onNext={nextStep}
           onFinish={() => void save()}
           finishLabel={
             assignment?.kind === "recount"
@@ -1145,6 +1320,7 @@ function ScheduledCount({
           }
         />
       </fieldset>
+      </div>
       {uncertain && step === 0 ? (
         <ActionButton
           disabled={busy || Boolean(cacheError)}

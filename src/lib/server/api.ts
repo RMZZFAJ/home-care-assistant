@@ -21,17 +21,31 @@ export class ApiError extends Error {
       idempotencyKey: string;
       version: number;
     },
+    public retryAt?: number,
   ) {
     super(message);
   }
 }
 
 export function databaseError(
-  error: { code?: string; message?: string; } | null,
+  error: { code?: string; message?: string; details?: string; } | null,
 ): never {
   const message = error?.message ?? "";
+  if (error?.code === "PT409" && message === "stale preference version")
+    throw new ApiError("VERSION_CONFLICT", "A preferência mudou em outra sessão. Confira a versão atual.", 409);
+  if (error?.code === "PT409" && ["stale push device version", "push device attempt differs"].includes(message))
+    throw new ApiError("VERSION_CONFLICT", "A situação deste aparelho mudou. Confira o registro atual antes de confirmar outra ação.", 409);
+  if (error?.code === "PT409" && message === "reviewed residence administrator changed")
+    throw new ApiError("VERSION_CONFLICT", "A conta administradora mudou durante a revisão. Confira o e-mail antes de revisar novamente.", 409);
   if (error?.code === "PT409" && message === "requisition stock reference changed")
     throw new ApiError("REQUEST_STOCK_CHANGED", "O estoque mudou durante o preenchimento. Sua contagem foi preservada para conferência.", 409);
+  if (error?.code === "PT409" && message === "stock reference changed; confirm the reviewed materials again")
+    throw new ApiError("VERSION_CONFLICT", "O estoque mudou. Compare a referência atualizada antes de confirmar a movimentação.", 409);
+  // The application RPC checks the exact event under the stock lock before these guards.
+  if (error?.code === "PT409" && ["stale balance application version", "balance application unavailable; review reference or recount"].includes(message))
+    throw new ApiError("BALANCE_APPLICATION_REFERENCE_CHANGED", "A referência do balanço mudou. Consulte a ficha atual para conferir os dados e a necessidade de recontagem.");
+  if (error?.code === "PT409" && message === "consumption flow already settled")
+    throw new ApiError("INVALID_OPERATION", "Esta sugestão do WhatsApp já foi resolvida. Volte à lista para consultar a situação atual.", 409);
   if (error?.code === "PT409" && message === "operational source material changed")
     throw new ApiError("VERSION_CONFLICT", "Um material deixou de estar disponível na ficha de origem. Confira os vínculos antes de confirmar.", 409);
   if (error?.code === "PT409" && message === "purchase coverage changed")
@@ -62,13 +76,22 @@ export function databaseError(
     throw new ApiError("VALIDATION_ERROR", "Com @todos, escolha Todos com acesso à ficha antes de publicar.", 400);
   if (error?.code === "PT409" && message === "a reminder is already pending for this communication and channel")
     throw new ApiError("VERSION_CONFLICT", "Já existe um pedido em andamento para esta comunicação e canal. Consulte as tentativas antes de enviar outro.", 409);
-  if (error?.code === "PT429" && message === "push test rate limited")
-    throw new ApiError("RATE_LIMITED", "Aguarde um minuto entre testes neste aparelho.", 429);
-  if (error?.code === "PT409" && /^(contingency revision changed|contingency material reference changed)$/.test(message))
+  if (error?.code === "PT429" && message === "push test rate limited") {
+    const retryAt = Date.parse(error.details ?? "");
+    throw new ApiError("RATE_LIMITED", "Ainda é preciso aguardar antes de enviar outro teste neste aparelho.", 429, true, undefined,
+      Number.isFinite(retryAt) ? retryAt : Date.now() + 60_000);
+  }
+  if (error?.code === "PT409" && message === "contingency material reference changed")
+    throw new ApiError("CONTINGENCY_MATERIAL_CHANGED", "A unidade ou a precisão do material mudou. Confira a referência atual do catálogo.", 409);
+  if (error?.code === "PT409" && message === "contingency revision changed")
     throw new ApiError("VERSION_CONFLICT", "A referência da contingência mudou. Compare os registros atuais antes de preparar outra confirmação.", 409);
+  if (error?.code === "PT409" && message === "contingency target revision changed")
+    throw new ApiError("CONTINGENCY_REFERENCE_CHANGED", "A revisão do registro digital mudou. Consulte e escolha a referência atual antes de confirmar.", 409);
   if (error?.code === "PT409" && message === "contingency evidence pending")
     throw new ApiError("ATTACHMENT_PENDING", "Há evidência com envio ainda não confirmado. Consulte a mesma tentativa de anexo antes de vincular o registro.", 409);
-  if (error?.code === "PT409" && /^(contingency already linked|contingency evidence closed)$/.test(message))
+  if (error?.code === "PT409" && message === "contingency already linked")
+    throw new ApiError("CONTINGENCY_ALREADY_LINKED", "O dossiê já foi vinculado. Consulte o resultado e as evidências preservadas.", 409);
+  if (error?.code === "PT409" && message === "contingency evidence closed")
     throw new ApiError("INVALID_OPERATION", "O dossiê já foi vinculado. Consulte o resultado e as evidências preservadas.", 409);
   if (error?.code === "42501" && message === "independent contingency reviewer required")
     throw new ApiError("FORBIDDEN", "A conferência exige outra pessoa com competência local. Quem declarou ou complementou não revisa a própria informação.", 403);
@@ -146,6 +169,22 @@ export function databaseError(
       "O tipo de plantão mudou. Consulte e revise os horários atuais antes de confirmar.",
       409,
     );
+  if (error?.code === "PT409" && /^(schedule residence hours required|configure residence hours before creating a shift type)$/.test(message))
+    throw new ApiError(
+      "VERSION_CONFLICT",
+      "Confira os horários da residência em Configurações de plantões antes de revisar novamente.",
+      409,
+    );
+  if (error?.code === "PT409" && ["stale invitation reference", "administrative invitation intent differs"].includes(message))
+    throw new ApiError("VERSION_CONFLICT", "A referência do convite mudou. Consulte a situação atual antes de decidir.", 409);
+  if (error?.code === "PT409" && message === "stale residence identification")
+    throw new ApiError("VERSION_CONFLICT", "A identificação da residência mudou. Consulte os dados atuais e revise novamente.", 409);
+  if (error?.code === "PT409" && message === "stale residence hours")
+    throw new ApiError(
+      "VERSION_CONFLICT",
+      "Os horários da residência mudaram em outra sessão. Compare os horários atuais antes de confirmar.",
+      409,
+    );
   if (
     /stale document balance preparation reference|balance reference changed during private confirmation/i.test(
       message,
@@ -162,12 +201,15 @@ export function databaseError(
       "A referência administrativa mudou. Compare os dados atuais antes de confirmar. Seu preenchimento foi preservado.",
       409,
     );
-  if (error?.code === "23505" && message === "administrative preparation intent differs")
+  if ((error?.code === "23505" && message === "administrative preparation intent differs") ||
+    (error?.code === "PT409" && message === "membership intent differs"))
     throw new ApiError(
       "IDEMPOTENCY_CONFLICT",
       "Esta tentativa já identifica outra alteração. Consulte o resultado antes de continuar.",
       409,
     );
+  if (error?.code === "PT409" && message === "membership form must be reviewed before submission")
+    throw new ApiError("VERSION_CONFLICT", "Reabra a lista de pessoas e revise o vínculo antes de confirmar.");
   if (error?.code === "PT409" && message === "stale catalogue preparation reference")
     throw new ApiError(
       "VERSION_CONFLICT",
@@ -399,6 +441,24 @@ export function databaseError(
       409,
     );
   if (
+    /balance schedule impact requires family deferral or reassignment|balance schedule target changed/i.test(message)
+  )
+    throw new ApiError(
+      "VERSION_CONFLICT",
+      "Confira novamente o balanço e o plantão de destino. A alteração exige uma decisão válida da família para a contagem.",
+      409,
+    );
+  if (error?.code === "PT409" && message === "stale schedule reference")
+    throw new ApiError(
+      "VERSION_CONFLICT",
+      "A referência da escala mudou. Confira a alteração e o balanço novamente antes de confirmar.",
+      409,
+    );
+  if (error?.code === "PT409" && message === "BAL extras changed since draft review")
+    throw new ApiError("VERSION_CONFLICT", "Os itens extras mudaram após a revisão. Confira o preenchimento antes de emitir.", 409);
+  if (error?.code === "22023" && /^(BAL extra matches patient catalogue|recount requires (previous materials|incorporated extra|previous extras))$/.test(message))
+    throw new ApiError("VALIDATION_ERROR", "Confira os materiais da contagem anterior e os extras que já entraram no catálogo.", 400);
+  if (
     /balance requires family deferral before schedule period change/i.test(
       message,
     )
@@ -564,6 +624,7 @@ export async function api(
         headers: {
           "cache-control": "no-store",
           "x-correlation-id": correlationId,
+          ...(known.retryAt !== undefined ? { "retry-after": new Date(known.retryAt).toUTCString() } : {}),
         },
       },
     );

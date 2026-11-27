@@ -12,7 +12,7 @@ import { sql, sqlLiteral as q } from "../../scripts/test-environment.mjs";
 
 import { whileRowWaits } from "./lock-barrier.mjs";
 
-import { preparationFixture, preparationPurposes } from "./balance-preparation-fixtures.mjs";
+import { preparationFacts, preparationFixture, preparationPurposes } from "./balance-preparation-fixtures.mjs";
 import { balDocumentFixture } from "./bal-document-draft-fixtures.mjs";
 import { regularizationPdfFixture, regularizationLedger } from "./pdf-regularization-fixtures.mjs";
 import { shiftWorker } from "./shift-fixtures.mjs";
@@ -237,6 +237,52 @@ for (const purpose of preparationPurposes) test("BAL workspace " + purpose + " c
   assert.deepEqual(await rpc(f.client, "execute_balance_decision", p), result);
   assert.deepEqual(await rpc(f.client, "settle_balance_decision", { p_patient: f.patient, p_target: f.targetResourceId, p_key: p.p_key }), result);
 });
+
+test("BAL programming observation is optional and recorded separately from the pause reason", async () => {
+  const f = await preparationFixture("configure"), before = preparationFacts(f);
+  const { weekday, shiftTypeId, professionalId, timezone, startsOn } = f.command.body;
+  const settings = { enabled: true, weekday, shiftTypeId, professionalId, timezone, startsOn };
+  async function packet(fields) {
+    const source = await rpc(f.client, "balance_preparation_reference", f.scope);
+    return {
+      p_patient: f.patient,
+      p_target: f.patient,
+      p_key: randomUUID(),
+      p_intention: {
+        domain: "balance_workspace", action: "configure",
+        expectedVersion: source.workspace.regime.version,
+        referenceHash: source.referenceHash,
+        body: { command: { action: "configure", body: { ...settings, ...fields } } },
+      },
+    };
+  }
+  const note = "Conferir o armário da lavanderia.\nAnotar embalagens abertas.";
+  const save = await packet({ observation: note });
+  const saved = await rpc(f.client, "execute_balance_decision", save);
+  assert.equal(saved.result.preparedValues.observation, note);
+  assert.equal(saved.result.preparedValues.reason, undefined);
+  assert.equal(saved.result.nativeResult.updated_by, f.identity.id);
+  assert.equal(saved.result.nativeResult.observation, note);
+  assert.equal(preparationFacts(f).regime.observation, note);
+  assert.deepEqual(await rpc(f.client, "execute_balance_decision", save), saved);
+  const event = JSON.parse(sql(`select jsonb_build_object('reason',reason,'observation',details->'observation','actor',actor_id) from public.bal_cycle_events where care_recipient_id=${q(f.patient)} and event_key=${q("config:" + saved.result.nativeResult.version)};`));
+  assert.deepEqual(event, { reason: "Programação de balanços registrada", observation: note, actor: f.identity.id });
+  assert.equal((await f.client.rpc("execute_balance_decision", await packet({ enabled: false, observation: note }))).error?.code, "22023");
+  assert.equal((await f.client.rpc("execute_balance_decision", await packet({ enabled: false, reason: "\n\t\n" }))).error?.code, "22023");
+  assert.equal((await f.client.rpc("execute_balance_decision", await packet({ observation: "x".repeat(1001) }))).error?.code, "22023");
+  assert.equal((await f.pro.client.rpc("execute_balance_decision", await packet({ observation: "" }))).error?.code, "42501");
+  assert.equal(preparationFacts(f).regime.version, saved.result.nativeResult.version);
+  const paused = await rpc(f.client, "execute_balance_decision", await packet({ enabled: false, reason: "Pausar durante a mudança de escala." }));
+  assert.equal(paused.result.nativeResult.observation, note);
+  assert.equal(paused.result.preparedValues.reason, "Pausar durante a mudança de escala.");
+  const cleared = await rpc(f.client, "execute_balance_decision", await packet({ enabled: false, observation: "" }));
+  assert.equal(cleared.result.nativeResult.observation, null);
+  assert.equal(cleared.result.preparedValues.observation, "");
+  const after = preparationFacts(f);
+  assert.deepEqual(after.ledger, before.ledger);
+  assert.deepEqual(after.documents, before.documents);
+});
+
 test("BAL workspace negative settlement blocks a late original; stale references and lost authority cannot create an outcome", async () => {
   const f = await preparationFixture("configure"), p = { p_patient: f.patient, p_target: f.targetResourceId, p_key: randomUUID(), p_intention: { domain: "balance_workspace", action: f.purpose, expectedVersion: f.content.referenceVersion ?? 0, referenceHash: f.source.referenceHash, body: { command: f.command } } };
   assert.equal((await rpc(f.client, "settle_balance_decision", { p_patient: f.patient, p_target: f.targetResourceId, p_key: p.p_key })).state, "not_applied");

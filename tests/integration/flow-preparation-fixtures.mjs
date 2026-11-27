@@ -1,13 +1,15 @@
 import { randomUUID } from "node:crypto";
 import { setup, rpc, fixtures } from "./v4-fixtures.mjs";
 import { sql, sqlLiteral as q } from "../../scripts/test-environment.mjs";
-export async function flowPreparationFixture(accept = true) {
-  const f = await setup(),
-    target = randomUUID(),
-    session = randomUUID();
+export function seedFlowSuggestion(patient, owner, products, text = "Sugestão original fictícia do Flow", kind = "consumption") {
+  const target = randomUUID(), session = randomUUID();
   sql(
-    `insert into public.flow_sessions(id,care_recipient_id,user_id,token_hash,expires_at) values(${q(session)},${q(f.patient)},${q(fixtures.adminA.id)},encode(extensions.digest(${q(session)},'sha256'),'hex'),now()+interval '10 minutes');insert into public.flow_submissions(id,session_id,care_recipient_id,user_id,body) values(${q(target)},${q(session)},${q(f.patient)},${q(fixtures.adminA.id)},${q(JSON.stringify({ kind: "consumption", text: "Sugestão original fictícia do Flow", products: [f.products[0]] }))}::jsonb);`,
+    `insert into public.flow_sessions(id,care_recipient_id,user_id,token_hash,expires_at) values(${q(session)},${q(patient)},${q(owner)},encode(extensions.digest(${q(session)},'sha256'),'hex'),now()+interval '10 minutes');insert into public.flow_submissions(id,session_id,care_recipient_id,user_id,body) values(${q(target)},${q(session)},${q(patient)},${q(owner)},${q(JSON.stringify({ kind, text, products }))}::jsonb);`,
   );
+  return target;
+}
+export async function flowPreparationFixture(accept = true) {
+  const f = await setup(), target = seedFlowSuggestion(f.patient, fixtures.adminA.id, [f.products[0]]);
   const scope = {
     p_patient: f.patient,
     p_purpose: "flow_review",

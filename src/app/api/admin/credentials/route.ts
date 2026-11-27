@@ -24,6 +24,7 @@ export async function POST(request: Request) {
       p_outcome: input.outcome, p_note: input.note, p_key: input.idempotencyKey,
     });
     if (error?.code === "PT409") throw new ApiError("VERSION_CONFLICT", "Os dados ou a intenção da conferência mudaram. Consulte a versão atual antes de registrar outra conferência.", 409);
+    if (error?.code === "PT410") throw new ApiError("INVALID_OPERATION", "A tentativa foi encerrada sem registrar uma conferência.", 410);
     if (error) databaseError(error);
     return NextResponse.json({ data: credentialReviewResult.parse(data) }, { headers: { "Cache-Control": "private, no-store" } });
   });

@@ -4,6 +4,7 @@ import { appOrigin } from "@/lib/server/app-origin";
 import { z } from "zod";
 import { governanceKinds, governanceQuerySchema } from "@/lib/validation/governance";
 import { parseGovernanceListRead } from "@/lib/validation/governance-list";
+import { parsePermissionSnapshot } from "@/lib/validation/permission-snapshot";
 import {
   api,
   authenticate,
@@ -26,10 +27,20 @@ const schema = z
     decision: z.enum(["approve", "reject"]).optional(),
   })
   .strict();
+const permissionQuery = z.object({ careRecipientId: uuid, permissionPerson: uuid }).strict();
 export async function GET(request: Request) {
   return api("settings.read", async () => {
     const auth = await authenticate();
     const params = new URL(request.url).searchParams;
+    if (params.has("permissionPerson")) {
+      const query = parseQuery(permissionQuery, {
+        careRecipientId: params.getAll("careRecipientId").length === 1 ? params.get("careRecipientId") : null,
+        permissionPerson: params.getAll("permissionPerson").length === 1 ? params.get("permissionPerson") : null,
+      });
+      if (!auth.isGlobalAdmin) await patientContext(auth, query.careRecipientId, "manage");
+      const result = await rpc(auth.client, "patient_permission_snapshot", { p_patient: query.careRecipientId, p_subject: query.permissionPerson });
+      return NextResponse.json(parsePermissionSnapshot(result, query.careRecipientId, query.permissionPerson), { headers: { "cache-control": "private, no-store" } });
+    }
     const requested = params.get("careRecipientId");
     const query = parseQuery(governanceQuerySchema, Object.fromEntries(["status", "kind", "query", "page", "pageSize"].filter(key => params.has(key)).map(key => [key, params.get(key)])));
     const readChanges = async (patientId: string) => {
@@ -39,7 +50,7 @@ export async function GET(request: Request) {
     };
     if (auth.isGlobalAdmin && uuid.safeParse(requested).success) {
       const page = await readChanges(requested!);
-      if (params.get("changesOnly") === "true") return NextResponse.json(page);
+      if (params.get("changesOnly") === "true") return NextResponse.json(page, { headers: { "cache-control": "private, no-store" } });
       return NextResponse.json({ ...await rpc(auth.client, "patient_governance", { p_patient: requested }) as object, changes: page.changes, changePage: { ...page, changes: undefined } });
     }
     const patient = await patientContext(
@@ -48,7 +59,7 @@ export async function GET(request: Request) {
     );
     if (params.get("changesOnly") === "true") {
       await patientContext(auth, patient.id, "manage");
-      return NextResponse.json(await readChanges(patient.id));
+      return NextResponse.json(await readChanges(patient.id), { headers: { "cache-control": "private, no-store" } });
     }
     const settings = await auth.client
       .from("patient_settings")

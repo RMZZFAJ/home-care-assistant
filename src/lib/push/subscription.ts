@@ -51,15 +51,28 @@ export const pushEnrollment = z
     label: z.string().trim().min(1).max(80),
     consent: z.literal(true),
     contextReference: pushContextReference.optional(),
+    idempotencyKey: z.uuid().optional(),
   })
   .strict();
-export const pushDeviceCommand = z
-  .object({
-    id: z.string().uuid(),
-    action: z.enum(["revoke", "pause", "resume"]),
-    contextReference: pushContextReference.optional(),
-  })
-  .strict();
+const commandDevice = z.object({
+  id: z.uuid(),
+  idempotencyKey: z.uuid().optional(),
+  expectedVersion: z.iso.datetime({ offset: true }).optional(),
+  contextReference: pushContextReference.optional(),
+});
+export const pushDeviceCommand = z.discriminatedUnion("action", [
+  commandDevice.extend({ action: z.enum(["revoke", "pause", "resume"]) }).strict(),
+  commandDevice.extend({
+    action: z.literal("rename"),
+    label: z.string().trim().min(1).max(80),
+    idempotencyKey: z.uuid(),
+    expectedVersion: z.iso.datetime({ offset: true }),
+  }).strict(),
+]).refine(value => Boolean(value.idempotencyKey) === Boolean(value.expectedVersion));
+export const pushDeviceReceipt = z.object({
+  id: z.uuid(),
+  action: z.enum(["enroll", "rename", "pause", "resume", "revoke"]),
+}).strict();
 export const pushDevice = z
   .object({
     id: z.string().uuid(),
@@ -80,11 +93,13 @@ export const pushTestRequest = z.object({
   idempotencyKey: z.uuid(),
   contextReference: pushContextReference,
 }).strict();
+export const pushTestLookup = pushTestRequest.omit({ contextReference: true });
 export const pushTestReceipt = z.object({
   id: z.uuid(),
   state: z.enum(["pending", "processing", "accepted", "expired", "failed", "uncertain"]),
   requestedAt: z.iso.datetime({ offset: true }),
   code: z.string().nullable(),
+  retryAt: z.iso.datetime({ offset: true }).optional(),
 }).strict();
 
 export function pushDestination(value: unknown): string {

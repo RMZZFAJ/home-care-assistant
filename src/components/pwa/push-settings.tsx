@@ -1,131 +1,170 @@
 "use client";
+
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { z } from "zod";
 import { api, ApiError } from "@/lib/client/api";
-import { pushContextReference, pushDevice, pushDevices, pushTestReceipt } from "@/lib/push/subscription";
-import { useWorkspaceState } from "@/components/layout/workspace-context";
+import { pushContextReference, pushDeviceReceipt, pushDevices } from "@/lib/push/subscription";
+import { DocumentOperationFailureDialog, operationRecoveryLimit } from "@/components/documents/document-operation-failure-dialog";
 import { SettingsSection } from "@/components/forms/settings-section";
-import { Icon } from "@/components/ui/primitives";
+import { useWorkspaceState } from "@/components/layout/workspace-context";
+import { ActionButton, FormField, TextInput } from "@/components/ui/controls";
+import { Icon } from "@/components/ui/icon";
+import { Dialog } from "@/components/ui/overlays";
+import { PersonalPushTest } from "./personal-push-test";
+import { DeviceCard, DevicePanel, PushPanel, pushStatusLabel, type DeviceAction, type PushDevice, type PushStatus } from "./push-device-panels";
 import { usePwa } from "./pwa-provider";
 
-const receipt = z
-  .object({
-    devices: pushDevices,
-    userId: z.uuid(),
-    contextReference: pushContextReference,
-    available: z.boolean(),
-    deliveryEnabled: z.boolean(),
-    publicKey: z.string().nullable(),
-  })
-  .strict();
+const path = "/api/push/devices";
+const devicesRead = z.object({
+  devices: pushDevices,
+  userId: z.uuid(),
+  contextReference: pushContextReference,
+  available: z.boolean(),
+  deliveryEnabled: z.boolean(),
+  publicKey: z.string().nullable(),
+}).strict();
+type DeviceRead = z.infer<typeof devicesRead>;
+type Change = z.infer<typeof pushDeviceReceipt>;
+type Attempt = { key: string; action: Change["action"]; id?: string; checks: number; cause?: unknown };
+type View = { kind: "push" } | { kind: "device"; id: string; source: "devices" | "notices"; thisBrowser: boolean };
+type Confirmation = { action: "enroll" } | { action: DeviceAction; device: PushDevice; label?: string };
+
+const words: Record<Change["action"], { title: string; explanation: string; button: string; success: string; result: string }> = {
+  enroll: {
+    title: "Ativar avisos neste aparelho?", explanation: "O navegador poderá pedir permissão. A inscrição será vinculada a esta conta e à sessão atual.",
+    button: "Continuar ativação", success: "Inscrição confirmada", result: "Os avisos foram vinculados a esta conta e sessão neste aparelho.",
+  },
+  rename: {
+    title: "Alterar o nome do aparelho", explanation: "O novo nome identifica este aparelho na lista da sua conta.",
+    button: "Salvar nome", success: "Nome do aparelho atualizado", result: "O novo nome está registrado na sua lista de aparelhos.",
+  },
+  pause: {
+    title: "Pausar avisos por 8 horas?", explanation: "Os avisos deste aparelho ficam pausados por oito horas. As tarefas e os avisos internos continuam disponíveis.",
+    button: "Pausar por 8 horas", success: "Avisos pausados", result: "Você pode retomar os avisos antes do fim da pausa.",
+  },
+  resume: {
+    title: "Retomar os avisos?", explanation: "Os próximos eventos poderão gerar avisos neste aparelho.",
+    button: "Retomar avisos", success: "Avisos retomados", result: "A pausa foi removida para os próximos avisos.",
+  },
+  revoke: {
+    title: "Revogar esta inscrição?", explanation: "A inscrição deixa de receber novos avisos. Uma mensagem já aceita pelo serviço ainda pode chegar. Suas tarefas e ciências permanecem.",
+    button: "Revogar inscrição", success: "Inscrição revogada", result: "A inscrição foi revogada. A central do sistema continua disponível.",
+  },
+};
+
 function keyBytes(value: string): Uint8Array<ArrayBuffer> {
-  const text = atob(
-    value
-      .replaceAll("-", "+")
-      .replaceAll("_", "/")
-      .padEnd(Math.ceil(value.length / 4) * 4, "="),
-  );
-  return Uint8Array.from(text, (char) => char.charCodeAt(0));
+  const base64 = value.replaceAll("-", "+").replaceAll("_", "/").padEnd(Math.ceil(value.length / 4) * 4, "=");
+  return Uint8Array.from(atob(base64), char => char.charCodeAt(0));
 }
-async function currentFingerprint() {
-  const registration = await navigator.serviceWorker.getRegistration("/");
-  const subscription = await registration?.pushManager?.getSubscription();
-  if (!subscription) return null;
-  return fingerprintOf(subscription.endpoint);
-}
+
 async function fingerprintOf(endpoint: string) {
-  const digest = await crypto.subtle.digest(
-    "SHA-256",
-    new TextEncoder().encode(endpoint),
-  );
-  return Array.from(new Uint8Array(digest), (byte) =>
-    byte.toString(16).padStart(2, "0"),
-  ).join("");
+  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(endpoint));
+  return Array.from(new Uint8Array(digest), byte => byte.toString(16).padStart(2, "0")).join("");
 }
-export type PushSettingsSections = { consent: ReactNode; devices: ReactNode };
-export function PushSettings({ renderSections }: { renderSections?: (sections: PushSettingsSections) => ReactNode } = {}) {
+
+async function nativeSubscription() {
+  const registration = await navigator.serviceWorker.getRegistration("/");
+  return { registration, subscription: await registration?.pushManager?.getSubscription() };
+}
+
+function confirmedChange(value: unknown, attempt: Attempt) {
+  const result = pushDeviceReceipt.parse(value);
+  if (result.action !== attempt.action || attempt.id && attempt.id !== result.id)
+    throw new Error("O comprovante recebido não corresponde ao aparelho ou à ação.");
+  return result;
+}
+
+function errorText(reason: unknown, fallback: string) {
+  return reason instanceof ApiError ? reason.message : fallback;
+}
+
+type Sections = { consent: (visible: boolean) => ReactNode; devices: (visible: boolean) => ReactNode };
+type RenderSections = (sections: Sections) => ReactNode;
+export function PushSettings({ renderSections }: { renderSections: RenderSections }) {
   const userId = useWorkspaceState().data?.userId;
-  const [ownerId, setOwnerId] = useState<string | null>(userId ?? null);
+  const [ownerId, setOwnerId] = useState(userId ?? null);
   if (userId && ownerId !== userId) setOwnerId(userId);
-  // The caller's personal form must survive a denied context read. Remember
-  // only its mounted owner; live authority still gates every Push section.
-  const mountedUserId = userId ?? ownerId;
-  return mountedUserId ? <PersonalPushSettings key={mountedUserId} userId={mountedUserId} active={userId === mountedUserId} renderSections={renderSections} /> : null;
+  const owner = userId ?? ownerId;
+  return owner ? <PersonalPushSettings key={owner} userId={owner} active={userId === owner} renderSections={renderSections} /> : null;
 }
-function PersonalPushSettings({ userId, active, renderSections }: { userId: string; active: boolean; renderSections?: (sections: PushSettingsSections) => ReactNode }) {
+
+function PersonalPushSettings({ userId, active, renderSections }: { userId: string; active: boolean; renderSections: RenderSections }) {
   const pwa = usePwa();
-  const [data, setData] = useState<z.infer<typeof receipt> | null>(null);
-  const [capable, setCapable] = useState<boolean | null>(null),
-    [permission, setPermission] = useState<NotificationPermission>("default");
+  const [data, setData] = useState<DeviceRead>();
+  const [capable, setCapable] = useState<boolean>();
+  const [permission, setPermission] = useState<NotificationPermission>("default");
   const [fingerprint, setFingerprint] = useState<string | null>(null);
-  const [name, setName] = useState("");
-  const [busy, setBusy] = useState(false),
-    [reading, setReading] = useState(true);
+  const [lastFingerprint, setLastFingerprint] = useState<string>();
   const [checkedAt, setCheckedAt] = useState(0);
-  const [testPending, setTestPending] = useState(false);
-  const [error, setError] = useState(""),
-    [message, setMessage] = useState("");
-  const generationRef = useRef(0),
-    abortRef = useRef<AbortController | null>(null);
+  const [reading, setReading] = useState(true);
+  const [readError, setReadError] = useState("");
+  const [view, setView] = useState<View>();
+  const [confirmation, setConfirmation] = useState<Confirmation>();
+  const [accepted, setAccepted] = useState(false);
+  const [enrollmentName, setEnrollmentName] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [pending, setPending] = useState<Attempt>();
+  const [feedback, setFeedback] = useState<{ action: Change["action"]; details?: string; uncertain?: false; success?: boolean; cause?: unknown } | { uncertain: true }>();
+  const generationRef = useRef(0);
+  const readControllerRef = useRef<AbortController | null>(null);
   const lifecycleRef = useRef<AbortController | null>(null);
-  const testIntentRef = useRef<{ deviceId: string; idempotencyKey: string } | null>(null);
-  const load = useCallback(async (signal?: AbortSignal) => {
+  const busyRef = useRef(false);
+  const pushTriggerRef = useRef<HTMLButtonElement>(null);
+  const deviceTriggerRef = useRef<HTMLButtonElement>(null);
+  const focusPendingRef = useRef<HTMLButtonElement>(null);
+
+  const load = useCallback(async () => {
     const generation = ++generationRef.current;
-    abortRef.current?.abort();
-    if (!active) { setData(null); setFingerprint(null); setReading(false); setBusy(false); return; }
-    setReading(true);
+    readControllerRef.current?.abort();
+    const lifecycle = lifecycleRef.current?.signal;
+    if (!active || !lifecycle || lifecycle.aborted) return;
     const controller = new AbortController();
-    abortRef.current = controller;
-    const lifecycle = signal ?? lifecycleRef.current?.signal;
+    readControllerRef.current = controller;
     const cancel = () => controller.abort();
-    lifecycle?.addEventListener("abort", cancel, { once: true });
-    if (lifecycle?.aborted) controller.abort();
-    const support =
-      isSecureContext &&
-      typeof Notification !== "undefined" &&
-      typeof PushManager !== "undefined" &&
-      !!navigator.serviceWorker;
+    lifecycle.addEventListener("abort", cancel, { once: true });
+    setReading(true);
+    const support = isSecureContext && typeof Notification !== "undefined" &&
+      typeof PushManager !== "undefined" && Boolean(navigator.serviceWorker);
     try {
-      const next = receipt.parse(
-        await api("/api/push/devices?context=consent", undefined, controller.signal),
-      );
+      const next = devicesRead.parse(await api(path + "?context=consent", undefined, controller.signal));
+      const alive = () => generation === generationRef.current && !controller.signal.aborted;
+      if (!alive()) return;
       if (next.userId !== userId) {
-        if (generation === generationRef.current && !controller.signal.aborted) { setData(null); setFingerprint(null); }
-        throw new Error("A conta ou sessão mudou. Atualize esta página antes de confirmar os avisos.");
+        setData(undefined);
+        setFingerprint(null);
+        setLastFingerprint(undefined);
+        throw new ApiError("A conta ou sessão mudou. Atualize a página e confirme novamente.", 403, "SESSION_EXPIRED");
       }
-      const current = support ? await currentFingerprint() : null;
-      if (generation !== generationRef.current || controller.signal.aborted)
-        return;
+      const native = support ? (await nativeSubscription()).subscription : null;
+      const fp = native ? await fingerprintOf(native.endpoint) : null;
+      if (!alive()) return;
       setCapable(support);
       if (support) setPermission(Notification.permission);
-      setError("");
+      setReadError("");
       setCheckedAt(Date.now());
       setData(next);
-      setFingerprint(current);
+      setFingerprint(fp);
+      if (fp) setLastFingerprint(fp);
+      return { data: next, fingerprint: fp };
     } catch (reason) {
-      if (generation === generationRef.current && !controller.signal.aborted) {
-        if (reason instanceof ApiError && [401, 403].includes(reason.status)) { setData(null); setFingerprint(null); }
-        setError(
-          reason instanceof Error
-            ? reason.message
-            : "Não foi possível consultar seus aparelhos.",
-        );
+      if (generation !== generationRef.current || controller.signal.aborted) return;
+      if (reason instanceof ApiError && [401, 403].includes(reason.status)) {
+        setData(undefined);
+        setFingerprint(null);
+        setLastFingerprint(undefined);
       }
+      setReadError(errorText(reason, "Não foi possível consultar os aparelhos agora."));
     } finally {
-      lifecycle?.removeEventListener("abort", cancel);
-      if (generation === generationRef.current && !controller.signal.aborted)
-        setReading(false);
+      lifecycle.removeEventListener("abort", cancel);
+      if (generation === generationRef.current && !controller.signal.aborted) setReading(false);
     }
-  }, [userId, active]);
+  }, [active, userId]);
+
   useEffect(() => {
     const lifecycle = new AbortController();
     lifecycleRef.current = lifecycle;
-    queueMicrotask(() => {
-      if (!lifecycle.signal.aborted) void load(lifecycle.signal);
-    });
-    const refresh = () => {
-      void load();
-    };
+    const refresh = () => { if (!lifecycle.signal.aborted) void load(); };
+    queueMicrotask(refresh);
     window.addEventListener("focus", refresh);
     navigator.serviceWorker?.addEventListener("message", refresh);
     return () => {
@@ -134,267 +173,263 @@ function PersonalPushSettings({ userId, active, renderSections }: { userId: stri
       navigator.serviceWorker?.removeEventListener("message", refresh);
     };
   }, [load]);
-  const current = data?.devices.find(
-    (device) => device.fingerprint === fingerprint,
-  );
-  const enrolled =
-    current?.state === "active" && current.currentSession && current.enabled;
-  const paused = !!current?.mutedUntil && Date.parse(current.mutedUntil) > checkedAt;
-  async function testPush() {
-    const lifecycle = lifecycleRef.current?.signal;
-    if (!active || busy || reading || !enrolled || !current || !data || !data.deliveryEnabled || paused || permission !== "granted" || !pwa.pushTestReady || !pwa.readyRegistration() || !lifecycle || lifecycle.aborted) return;
-    if (testIntentRef.current?.deviceId !== current.id)
-      testIntentRef.current = { deviceId: current.id, idempotencyKey: crypto.randomUUID() };
-    const intent = testIntentRef.current!;
-    setTestPending(true);
-    setBusy(true); setError(""); setMessage("");
-    try {
-      const result = await api<{ data: unknown }>("/api/push/test", { ...intent, contextReference: data.contextReference }, lifecycle);
-      if (lifecycle.aborted) return;
-      const test = pushTestReceipt.parse(result.data);
-      setMessage(test.state === "accepted"
-        ? "O serviço aceitou o teste para este aparelho. Confira a notificação de teste no sistema do celular; esta resposta ainda não comprova que ela apareceu."
-        : test.state === "pending" || test.state === "processing"
-          ? "O teste ainda está em andamento. Você pode consultar a mesma tentativa sem reenviar."
-          : test.state === "expired"
-            ? "A inscrição ou sessão deste aparelho não está mais disponível. Consulte os aparelhos e confirme a ativação novamente."
-            : test.state === "uncertain"
-              ? "Não foi possível confirmar o resultado do envio. Nenhum teste será reenviado automaticamente."
-              : "O serviço não aceitou este teste. Confira a conexão e tente um novo teste após um minuto.");
-      if (test.state !== "pending" && test.state !== "processing") { testIntentRef.current = null; setTestPending(false); }
-      await load();
-    } catch (reason) {
-      if (!lifecycle.aborted) {
-        if (reason instanceof ApiError && reason.status === 429) { testIntentRef.current = null; setTestPending(false); }
-        setError(reason instanceof Error ? reason.message : "Não foi possível confirmar o teste. Consulte a mesma tentativa antes de iniciar outro.");
-      }
-    } finally { if (!lifecycle.aborted) setBusy(false); }
+
+  useEffect(() => {
+    const next = data?.devices.flatMap(device => device.mutedUntil ? [Date.parse(device.mutedUntil)] : [])
+      .filter(until => until > checkedAt);
+    if (!next?.length) return;
+    const timer = setTimeout(() => setCheckedAt(Date.now()), Math.max(1, Math.min(...next) - Date.now() + 20));
+    return () => clearTimeout(timer);
+  }, [data, checkedAt]);
+
+  const current = data?.devices.find(device => device.fingerprint === fingerprint);
+  const selected = view?.kind === "device" ? data?.devices.find(device => device.id === view.id) : undefined;
+  const isPaused = (device?: PushDevice) => Boolean(device?.mutedUntil && Date.parse(device.mutedUntil) > checkedAt && device.state === "active");
+  const enrolled = current?.state === "active" && current.currentSession && current.enabled;
+  const unavailable = Boolean(readError || !data?.available);
+  const canAct = Boolean(active && data && !reading && !readError && !pwa.offline && !busy && !pending);
+  const canEnroll = canAct && Boolean(data?.available && capable && permission !== "denied") &&
+    pwa.worker === "ready" && pwa.runtime === "ready";
+  const status: PushStatus = reading && !data ? "loading"
+    : capable === false ? "unsupported"
+    : permission === "denied" ? "blocked"
+    : pending?.action === "enroll" ? "unconfirmed"
+    : unavailable ? "unavailable"
+    : enrolled && permission === "granted" ? isPaused(current) ? "paused" : data?.deliveryEnabled ? "active" : "prepared"
+    : permission === "granted" ? "unconfirmed"
+    : "inactive";
+
+  function closeView() {
+    if (view?.kind === "device" && view.source === "notices") setView({ kind: "push" });
+    else setView(undefined);
   }
-  async function enroll() {
-    const registration = pwa.readyRegistration(), lifecycle = lifecycleRef.current?.signal;
-    if (!active || busy || reading || !data?.publicKey || !capable || permission === "denied" || !registration || !lifecycle || lifecycle.aborted) return;
-    const alive = () => !lifecycle.aborted;
-    // Permission request starts synchronously within the user's click gesture.
-    const permissionPromise = Notification.permission === "granted"
-      ? Promise.resolve("granted" as const) : Notification.requestPermission();
-    setBusy(true); setError(""); setMessage("");
-    try {
-      const granted = await permissionPromise;
-      if (!alive()) return;
-      setPermission(granted);
-      if (granted !== "granted") {
-        setMessage("Permissão não concedida. Suas pendências continuam na central de notificações.");
-        return;
-      }
-      if (pwa.readyRegistration() !== registration) throw new Error("A preparação do aplicativo mudou. Consulte o aplicativo neste aparelho antes de tentar novamente.");
-      let subscription = await registration.pushManager.getSubscription();
-      if (!alive()) return;
-      const key = keyBytes(data.publicKey);
-      if (subscription?.options.applicationServerKey && Array.from(new Uint8Array(subscription.options.applicationServerKey)).join() !== Array.from(key).join()) {
-        await subscription.unsubscribe();
-        if (!alive()) return;
-        subscription = null;
-      }
-      subscription ??= await registration.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: key });
-      if (!alive()) return;
-      await api("/api/push/devices", {
-        subscription: subscription.toJSON(), label: name.trim() || "Este aparelho", consent: true,
-        contextReference: data.contextReference,
-      }, lifecycle);
-      if (!alive()) return;
-      setMessage("Avisos vinculados a esta conta neste aparelho. Isso não confirma entrega, ciência ou recebimento físico.");
-      await load();
-    } catch (reason) {
-      if (alive()) setError((reason instanceof Error ? reason.message : "Não foi possível confirmar a inscrição.") + " Consulte os aparelhos antes de tentar novamente.");
-    } finally { if (alive()) setBusy(false); }
+
+  function goToDevices() {
+    const url = new URL(window.location.href);
+    url.searchParams.set("profileTab", "devices");
+    setView(undefined);
+    window.history.pushState(null, "", url.pathname + url.search + url.hash);
+    void load();
   }
-  async function command(device: z.infer<typeof pushDevice>, action: "revoke" | "pause" | "resume") {
-    const lifecycle = lifecycleRef.current?.signal;
-    if (!active || busy || reading || !data || !lifecycle || lifecycle.aborted) return;
-    const alive = () => !lifecycle.aborted;
-    setBusy(true); setError(""); setMessage("");
-    try {
-      await api("/api/push/devices", { id: device.id, action, contextReference: data.contextReference }, lifecycle, "PATCH");
-      if (!alive()) return;
-      if (action === "revoke" && device.fingerprint === fingerprint) {
-        const registration = await navigator.serviceWorker.getRegistration("/");
-        if (!alive()) return;
-        const subscription = await registration?.pushManager?.getSubscription();
-        if (!alive()) return;
-        const actualFingerprint = subscription ? await fingerprintOf(subscription.endpoint) : null;
-        if (!alive()) return;
-        if (subscription && actualFingerprint === device.fingerprint) {
+
+  function askEnrollment() {
+    if (!canEnroll) return;
+    setEnrollmentName(current?.label ?? "");
+    setAccepted(false);
+    setConfirmation({ action: "enroll" });
+  }
+
+  async function settle(change: Change, signal: AbortSignal) {
+    let detail = words[change.action].result;
+    setPending(undefined);
+    const refreshed = await load();
+    if (signal.aborted) return;
+    const revoked = refreshed?.data.devices.find(device => device.id === change.id);
+    if (change.action === "revoke" && revoked?.state === "revoked" && revoked.currentSession && revoked.fingerprint === refreshed?.fingerprint) {
+      try {
+        const { registration, subscription } = await nativeSubscription();
+        if (!signal.aborted && subscription && await fingerprintOf(subscription.endpoint) === revoked.fingerprint) {
           await subscription.unsubscribe();
-          if (!alive()) return;
-          const notifications = await registration?.getNotifications();
-          if (!alive()) return;
-          for (const notification of notifications ?? []) notification.close();
+          for (const notification of await registration?.getNotifications() ?? []) notification.close();
+          await load();
         }
+      } catch {
+        detail = "A revogação no sistema foi confirmada. Confira a permissão do navegador caso o aparelho ainda mostre avisos.";
       }
-      setMessage(action === "revoke"
-        ? "Avisos desativados para este aparelho. Mensagens já aceitas pelo serviço podem chegar; suas pendências internas permanecem."
-        : action === "pause" ? "Avisos pausados por oito horas. Suas pendências internas permanecem."
-        : "Pausa removida para os próximos avisos. Suas pendências internas permanecem.");
-      await load();
-    } catch (reason) {
-      if (alive()) setError((reason instanceof Error ? reason.message : "Não foi possível confirmar a alteração.") + " Consulte o estado atual antes de repetir.");
-    } finally { if (alive()) setBusy(false); }
+    }
+    if (!signal.aborted) setFeedback({ action: change.action, details: detail, success: true });
   }
-  const feedback = <>
-      {error ? <p role="alert">{error}</p> : null}
-      {message ? <p role="status">{message}</p> : null}
-      {reading ? <p role="status">Consultando aparelhos…</p> : null}
-  </>;
-  const consent = (
-    <SettingsSection
-      title="Avisos neste aparelho"
-      summary="Permissão, privacidade e aparelhos da sua conta"
-    >
-      <p>
-        Ative somente em aparelhos de uso autorizado. Avisos podem aparecer na
-        tela bloqueada e terão conteúdo genérico, sem dados do paciente. Tocar
-        um aviso exige acesso vigente no aplicativo.
-      </p>
-      <p>
-        Desativar ou pausar avisos não remove pendências nem altera ciência,
-        decisões ou recebimentos. Ao sair, esta sessão deixa de receber novos
-        avisos.
-      </p>
-      {feedback}
-      {!reading && enrolled ? <div className="ui-notice" role="status">
-        <p>{paused ? "Avisos registrados, mas pausados neste aparelho." : permission !== "granted" ? "Inscrição registrada, mas falta permitir os avisos nas configurações do navegador." : "Avisos ativados nesta conta e sessão, neste aparelho."}</p>
-        <p>O cadastro foi confirmado no sistema. Use o teste abaixo para conferir o recebimento no celular.</p>
-        <button type="button" className="ui-button ui-button-primary" disabled={busy || pwa.offline || !data?.deliveryEnabled || permission !== "granted" || paused || !pwa.pushTestReady || pwa.worker !== "ready" || pwa.runtime !== "ready"} onClick={() => void testPush()}>{busy ? "Conferindo teste…" : testPending ? "Consultar teste de aviso" : "Enviar aviso de teste neste aparelho"}</button>
-        {!pwa.pushTestReady ? <p>Atualize o aplicativo neste aparelho antes de enviar o teste de avisos.</p> : null}
-        {paused ? <p>Remova a pausa em Aparelhos com avisos antes de testar.</p> : null}
-      </div> : null}
-      {capable === false ? (
-        <p>
-          Este navegador não oferece avisos neste modo. Continue usando a
-          central de notificações. No iPhone, confira a disponibilidade no
-          aplicativo adicionado à tela inicial.
-        </p>
-      ) : null}
-      {permission === "denied" ? (
-        <p>
-          O navegador bloqueou os avisos. Para mudar essa escolha, consulte as
-          permissões deste site nas configurações do navegador. Não faremos
-          novos pedidos automaticamente.
-        </p>
-      ) : null}
-      {data && !data.available ? (
-        <p>
-          Os avisos neste aparelho ainda não foram disponibilizados. Suas
-          pendências continuam na central.
-        </p>
-      ) : null}
-      {data?.available && !data.deliveryEnabled ? (
-        <p>
-          Inscrições podem ser preparadas, mas o envio externo de avisos ainda
-          não foi disponibilizado. Consulte suas pendências diretamente no
-          aplicativo.
-        </p>
-      ) : null}
-      {data?.available && capable && (!enrolled || permission !== "granted") ? (
-        <div className="space-y-3">
-          <label className="ui-label">
-            Nome do aparelho (opcional)
-            <input
-              className="ui-input"
-              maxLength={80}
-              value={name}
-              onChange={(event) => setName(event.target.value)}
-              placeholder="Este aparelho"
-            />
-          </label>
-          <button
-            type="button"
-            className="ui-button ui-button-primary"
-            disabled={busy || reading || pwa.offline || permission === "denied" || pwa.worker !== "ready" || pwa.runtime !== "ready"}
-            onClick={() => void enroll()}
-          >
-            {busy ? "Confirmando…" : "Ativar avisos neste aparelho"}
-          </button>
-          {pwa.worker !== "ready" || pwa.runtime !== "ready" ? <p role="status">Aguarde a preparação do aplicativo neste aparelho antes de ativar avisos. Consulte a seção Aplicativo neste aparelho para verificar ou recuperar essa preparação.</p> : null}
-        </div>
-      ) : null}
-      <button type="button" className="ui-button ui-button-secondary" disabled={reading || busy || pwa.offline} onClick={() => void load()}>
-        Consultar aparelhos novamente
-      </button>
-    </SettingsSection>
-  );
-  const devices = (
-    <SettingsSection title="Aparelhos com avisos" summary="Inscrições da sua conta, pausas e desativação">
-      {feedback}
-      <button
-        type="button"
-        className="ui-button ui-button-secondary"
-        disabled={reading || busy || pwa.offline}
-        onClick={() => void load()}
-      >
-        Consultar aparelhos novamente
-      </button>
-      {data?.devices.length === 0 ? (
-        <p>Nenhum aparelho vinculado a esta conta.</p>
-      ) : null}
-      <ul className="hca-profile-devices">
-        {data?.devices.map((device) => {
-          const paused =
-            device.mutedUntil && Date.parse(device.mutedUntil) > checkedAt;
-          return (
-            <li key={device.id} className="hca-profile-device">
-              <Icon name="phone" />
-              <div>
-              <h3>
-                <span>{device.label}</span>
-                {device.fingerprint === fingerprint ? " · Este aparelho" : ""}
-              </h3>
-              <p>
-                {device.state === "revoked"
-                  ? "Desativado"
-                  : device.state === "expired"
-                    ? "Inscrição expirada ou sessão encerrada"
-                    : paused
-                      ? "Pausado por preferência"
-                      : "Ativo"}
-              </p>
-              {device.fingerprint === fingerprint &&
-              !device.currentSession &&
-              device.state === "active" ? (
-                <p>
-                  Confirme a ativação para vincular este aparelho à sessão
-                  atual.
-                </p>
-              ) : null}
-              </div>
-              {device.state === "active" ? (
-                <div className="hca-profile-device-actions">
-                  <button
-                    type="button"
-                    className="ui-button ui-button-secondary"
-                    disabled={busy || pwa.offline}
-                    onClick={() =>
-                      void command(device, paused ? "resume" : "pause")
-                    }
-                  >
-                    {paused ? "Remover pausa" : "Pausar por oito horas"}
-                  </button>
-                  <button
-                    type="button"
-                    className="ui-button ui-button-secondary"
-                    disabled={busy || pwa.offline}
-                    onClick={() => void command(device, "revoke")}
-                  >
-                    Desativar avisos de {device.label}
-                  </button>
-                </div>
-              ) : null}
-            </li>
-          );
-        })}
-      </ul>
-    </SettingsSection>
-  );
-  const sections = { consent: active ? consent : null, devices: active ? devices : null };
-  return renderSections ? renderSections(sections) : <>{sections.consent}{sections.devices}</>;
+
+  function fail(attempt: Attempt, cause: unknown, requested: boolean) {
+    if (!requested || cause instanceof ApiError && cause.status >= 400 && cause.status < 500 && ![408, 429].includes(cause.status)) {
+      setFeedback({ action: attempt.action, cause, details: errorText(cause, "A ação não foi concluída. Confira o aparelho antes de continuar.") });
+      void load();
+    } else {
+      setPending({ ...attempt, cause });
+      setFeedback({ uncertain: true });
+    }
+  }
+
+  async function confirmAction(choice = confirmation) {
+    const signal = lifecycleRef.current?.signal;
+    if (!active || !data || !choice || !canAct || !signal || signal.aborted || busyRef.current) return;
+    const action = choice.action;
+    const registration = action === "enroll" ? pwa.readyRegistration() : null;
+    if (action === "enroll" && (!accepted || !registration || !data.publicKey || !capable || Notification.permission === "denied")) return;
+    const attempt: Attempt = { action, key: crypto.randomUUID(), checks: 0, id: "device" in choice ? choice.device.id : undefined };
+    const contextReference = data.contextReference;
+    let requested = false;
+    busyRef.current = true;
+    setBusy(true);
+    setConfirmation(undefined);
+    try {
+      let response: { data: unknown };
+      if (choice.action === "enroll" && registration && data.publicKey) {
+        const granted = Notification.permission === "granted" ? "granted" : await Notification.requestPermission();
+        if (signal.aborted) return;
+        setPermission(granted);
+        if (granted !== "granted") return;
+        if (pwa.readyRegistration() !== registration) throw new ApiError("A preparação do aplicativo mudou. Confira o aplicativo antes de ativar os avisos.", 400, "CLIENT_RUNTIME_BLOCKED");
+        let subscription = await registration.pushManager.getSubscription();
+        const key = keyBytes(data.publicKey);
+        if (subscription?.options.applicationServerKey &&
+          new Uint8Array(subscription.options.applicationServerKey).join() !== key.join()) {
+          await subscription.unsubscribe();
+          subscription = null;
+        }
+        if (signal.aborted) return;
+        subscription ??= await registration.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: key });
+        if (signal.aborted) return;
+        requested = true;
+        response = await api(path, {
+          subscription: subscription.toJSON(), label: enrollmentName.trim() || "Este aparelho",
+          consent: true, contextReference, idempotencyKey: attempt.key,
+        }, signal);
+      } else if ("device" in choice) {
+        requested = true;
+        response = await api(path, {
+          id: choice.device.id, action, contextReference,
+          expectedVersion: choice.device.updatedAt, idempotencyKey: attempt.key,
+          ...(action === "rename" ? { label: choice.label } : {}),
+        }, signal, "PATCH");
+      } else return;
+      if (!signal.aborted) await settle(confirmedChange(response.data, attempt), signal);
+    } catch (cause) {
+      if (!signal.aborted) fail(attempt, cause, requested);
+    } finally {
+      busyRef.current = false;
+      if (!signal.aborted) setBusy(false);
+    }
+  }
+
+  async function recover() {
+    const signal = lifecycleRef.current?.signal;
+    if (!active || !pending || !signal || signal.aborted || pwa.offline || busyRef.current || pending.checks >= operationRecoveryLimit) return;
+    busyRef.current = true;
+    const next = { ...pending, checks: pending.checks + 1 };
+    setPending(next);
+    setBusy(true);
+    try {
+      const response = await api<{ data: unknown }>(path + "?attempt=" + next.key, undefined, signal);
+      if (signal.aborted) return;
+      if (response.data !== null) await settle(confirmedChange(response.data, next), signal);
+    } catch (cause) {
+      if (!signal.aborted) setPending({ ...next, cause });
+    } finally {
+      busyRef.current = false;
+      if (!signal.aborted) setBusy(false);
+    }
+  }
+
+  const showAttempt = <ActionButton ref={focusPendingRef} onClick={() => setFeedback({ uncertain: true })}><Icon name="refresh" />Conferir alteração dos avisos</ActionButton>;
+  const closeFeedback = () => setFeedback(undefined);
+  const exhausted = Boolean(pending && pending.checks >= operationRecoveryLimit);
+  function closeRecovery() {
+    closeFeedback();
+    if (exhausted) {
+      setPending(undefined);
+      void load();
+    }
+  }
+  const feedbackDialog = busy ? <Dialog open title="Conferindo os avisos" headingIcon="clock" closeDisabled onClose={() => {}}>
+    <p role="status">Aguarde a confirmação do aparelho.</p>
+  </Dialog> : feedback?.uncertain && pending ? <DocumentOperationFailureDialog
+    title="O resultado dos avisos ainda não foi confirmado"
+    description="Consulte a mesma tentativa para verificar se o aparelho foi alterado."
+    outcome="uncertain" operation={words[pending.action].title} fallbackCode="PUSH_DEVICE_UNCONFIRMED"
+    cause={pending.cause} attempts={pending.checks} attemptReference={pending.key}
+    exhaustedMessage={exhausted ? "Copie os detalhes e avise o responsável pelo sistema." : undefined}
+    action={!pwa.offline && !exhausted ? { label: "Conferir resultado", onClick: () => void recover() } : undefined}
+    onClose={closeRecovery} closeLabel={exhausted ? "Fechar e atualizar aparelhos" : "Voltar"} finalFocus={focusPendingRef}
+  /> : feedback && "action" in feedback ? feedback.success
+    ? <Dialog open title={words[feedback.action].success} subtitle={feedback.details} success onClose={closeFeedback}
+      footer={<ActionButton variant="primary" onClick={closeFeedback}>Concluir</ActionButton>}>{null}</Dialog>
+    : <DocumentOperationFailureDialog title="Não foi possível concluir a alteração dos avisos"
+      description={feedback.details ?? "Confira novamente a situação do aparelho."} outcome="rejected"
+      operation={words[feedback.action].title} fallbackCode="PUSH_DEVICE_REJECTED" cause={feedback.cause}
+      attempts={0} onClose={closeFeedback} closeLabel="Voltar" />
+    : null;
+  const confirmDialog = confirmation ? <Dialog open title={words[confirmation.action].title} kicker="Avisos e aplicativo"
+    subtitle={words[confirmation.action].explanation} headingIcon="bell" onClose={() => setConfirmation(undefined)}
+    footer={<>
+      <ActionButton onClick={() => setConfirmation(undefined)}>Agora não</ActionButton>
+      <ActionButton variant={confirmation.action === "revoke" ? "danger" : "primary"}
+        disabled={!canAct || confirmation.action === "enroll" && !accepted} onClick={() => void confirmAction()}>
+        {words[confirmation.action].button}
+      </ActionButton>
+    </>}>
+    {confirmation.action === "enroll" ? <div className="hca-push-confirm-fields">
+      <FormField label="Nome do aparelho (opcional)">
+        <TextInput value={enrollmentName} maxLength={80} placeholder="Este aparelho" onChange={event => setEnrollmentName(event.target.value)} />
+      </FormField>
+      <label><input type="checkbox" checked={accepted} onChange={event => setAccepted(event.target.checked)} /> Quero receber avisos do Home Care Assistant neste aparelho.</label>
+      <p>A tela bloqueada recebe avisos genéricos. Abrir um aviso exige acesso vigente.</p>
+    </div> : "device" in confirmation ? <p>{confirmation.device.label}</p> : null}
+  </Dialog> : null;
+
+  const renderView = (source: "notices" | "devices") => {
+    if (!active) return null;
+    const viewSource = view?.kind === "device" ? view.source : "notices";
+    if (view ? viewSource !== source : source !== "devices") return null;
+    const panel = view?.kind === "push"
+      ? <PushPanel status={status} activationAvailable={!pending && Boolean(data?.available)} readError={readError}
+        pausedUntil={current?.mutedUntil ?? undefined} disabled={reading || busy || pwa.offline ||
+          (status === "inactive" || status === "unconfirmed" && !pending) && !canEnroll}
+        needsPreparation={pwa.worker !== "ready" || pwa.runtime !== "ready"}
+        recovery={pending && pending.action !== "enroll" ? showAttempt : undefined}
+        onClose={closeView} finalFocus={pushTriggerRef} onConfirm={askEnrollment}
+        onRead={() => pending ? setFeedback({ uncertain: true }) : void load()}
+        onOpenTest={() => { if (current) setView({ kind: "device", id: current.id, source: "notices", thisBrowser: true }); }}
+        onDevices={goToDevices} />
+      : view?.kind === "device" && selected
+        ? <DevicePanel device={selected} current={view.thisBrowser} paused={isPaused(selected)}
+          readyForRename={selected.currentSession} busy={!canAct} canReactivate={canEnroll} onClose={closeView}
+          recovery={pending ? showAttempt : undefined}
+          finalFocus={source === "notices" ? pushTriggerRef : deviceTriggerRef}
+          onAction={(action, label) => {
+            const choice = { action, device: selected, label };
+            if (action === "rename") void confirmAction(choice);
+            else setConfirmation(choice);
+          }}
+          onReactivate={() => { if (canEnroll) askEnrollment(); }}
+          test={view.thisBrowser ? <PersonalPushTest key={selected.id} deviceId={selected.id}
+            shown={Boolean(selected.state === "active" && selected.currentSession && selected.enabled && !isPaused(selected))}
+            contextReference={data?.contextReference}
+            eligible={Boolean(canAct && enrolled && current?.id === selected.id && !isPaused(selected) && permission === "granted" && data?.deliveryEnabled && pwa.pushTestReady)}
+            active offline={pwa.offline} readyRegistration={pwa.readyRegistration} refreshDevice={() => { void load(); }} /> : undefined}
+        /> : null;
+    return <>{panel}{confirmDialog}{feedbackDialog}</>;
+  };
+
+  const consent = (visible: boolean) => active && <section aria-label="Avisos neste aparelho">
+    <button type="button" className="hca-push-entry" ref={pushTriggerRef} onClick={() => setView({ kind: "push" })}>
+      <span className="hca-push-glyph"><Icon name="bell" /></span>
+      <span><strong>Avisos do aplicativo</strong><small>{pushStatusLabel(status)}</small></span>
+      <Icon name="chevron" />
+    </button>
+    {visible && pending && !view ? showAttempt : null}
+    {visible ? renderView("notices") : null}
+  </section>;
+
+  const devices = (visible: boolean) => active && <SettingsSection title="Aparelhos com avisos" summary="Gerencie os aparelhos que recebem os avisos da sua conta.">
+    {readError ? <p role="alert">{readError}</p> : null}
+    {reading ? <p role="status">Consultando aparelhos…</p> : null}
+    {visible && pending && !view ? showAttempt : null}
+    {data?.devices.length === 0 ? <p>Nenhum aparelho vinculado a esta conta.</p> : null}
+    {data?.devices.length ? <ul className="hca-push-device-list">
+      {[...data.devices].sort((first, second) => Number(second.id === current?.id) - Number(first.id === current?.id)).map(device => {
+        const thisBrowser = device.fingerprint === fingerprint ||
+          device.fingerprint === lastFingerprint && device.currentSession && device.state !== "active";
+        return <li key={device.id}><DeviceCard device={device} current={thisBrowser} paused={isPaused(device)} onClick={button => {
+          deviceTriggerRef.current = button;
+          setView({ kind: "device", id: device.id, source: "devices", thisBrowser });
+        }} /></li>;
+      })}
+    </ul> : null}
+    <p><Icon name="shield" width={16} height={16} /> Pausar os avisos mantém suas tarefas e os registros de ciência.</p>
+    <ActionButton compact disabled={reading || pwa.offline} onClick={() => void load()}><Icon name="refresh" />Atualizar dispositivos</ActionButton>
+    {visible ? renderView("devices") : null}
+  </SettingsSection>;
+
+  return renderSections({ consent, devices });
 }

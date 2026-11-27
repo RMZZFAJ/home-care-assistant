@@ -8,6 +8,7 @@ export const supplyWizardCopy = {
   COM: { label: "Compra", title: "Nova compra", description: "Organize a aquisição de materiais da residência.", finish: "Emitir compra", reviewTitle: "Revise antes de emitir", destination: "Família · aquisição de materiais" },
   ENT: { label: "Entrega", title: "Nova entrega", description: "Transfira materiais da família para a equipe.", finish: "Expedir entrega", reviewTitle: "Revise antes de expedir", destination: "Estoque da equipe" },
   DEV: { label: "Devolução", title: "Nova devolução", description: "Registre o retorno de materiais para a família.", finish: "Expedir devolução", reviewTitle: "Revise antes de expedir", destination: "Estoque da família" },
+  CON: { label: "Consumo do plantão", title: "Registrar consumo", description: "Informe os materiais utilizados pela equipe.", finish: "Registrar consumo", reviewTitle: "Revise o consumo", destination: "Estoque da equipe" },
 } as const;
 export type SupplyWizardKind = keyof typeof supplyWizardCopy;
 // The private navigation IDs for older categories, notes and review keep their positions.

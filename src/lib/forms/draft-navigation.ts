@@ -66,7 +66,10 @@ export const draftFlowStages = {
     { id: "extras", label: "Itens extras" },
   ],
   BAL: [
-    { id: "count", label: "Contagem" },
+    { id: "bal_confirmation", label: "Confirmação" },
+    { id: "count", label: "Materiais" },
+    { id: "bal_extras", label: "Itens extras" },
+    { id: "bal_notes", label: "Observações" },
     { id: "review", label: "Revisão" },
   ],
   RECEIVE: [{ id: "receipt", label: "Conferência pessoal" }],
@@ -156,7 +159,10 @@ export const draftStageIds = [
   "extras",
   "notes",
   "review",
+  "bal_confirmation",
   "count",
+  "bal_extras",
+  "bal_notes",
   "receipt",
   "divergence",
   "approval",
@@ -309,7 +315,8 @@ export function navigationAllowed(
   return (
     navigation.version === 1 &&
     flow !== null &&
-    draftFlowStages[flow].some((entry) => entry.id === navigation.stage)
+    (draftFlowStages[flow].some((entry) => entry.id === navigation.stage) ||
+      (kind === "BAL" && flow === "SUPPLY" && draftFlowStages.BAL.some((entry) => entry.id === navigation.stage)))
   );
 }
 /** Old drafts resume at the established first step; their missing stage stays explicit. */

@@ -5,6 +5,7 @@ import { fixtures,setup } from "../integration/v4-fixtures.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { sql,sqlLiteral } from "../../scripts/test-environment.mjs";
 import { selectContext } from "./auth-context";
+import { openFlowSuggestions } from "./navigation";
 import { audit } from "./accessibility-audit";
 test.setTimeout(180_000);
 test.beforeEach(async({page})=>{await page.addInitScript(()=>{
@@ -31,48 +32,115 @@ function flow(patient:string,user:string,text:string){
 }
 async function widths(page:Page,label:string){for(const width of [320,390,768,1440]){await page.setViewportSize({width,height:900});await page.evaluate(()=>window.scrollTo({top:0,left:0,behavior:"instant"}));await audit(page,label+" "+width);}}
 
-test("D3 preparação global salva antes do cadastro e recupera criação inativa sem duplicar ou conceder vínculo ao criador",async({page,browser})=>{
-  await login(page,"global",null);const before=Number(sql("select count(*) from public.care_recipients;"));
-  const denied=await page.request.post("/api/admin",{data:{action:"recipient",id:null,displayName:"Cadastro inativo fictício rejeitado no legado",isActive:false,isDevelopment:true,initialAdministratorEmail:fixtures.family.email}});
-  expect(denied.status()).toBe(400);expect(Number(sql("select count(*) from public.care_recipients;"))).toBe(before);
-  await page.goto("/preparar-residencia");await page.getByRole("button",{name:"Nova preparação",exact:true}).click();
-  const panel=page.getByRole("region",{name:"Preparação da residência",exact:true}),name="Residência fictícia navegador "+randomUUID().slice(0,8);
-  await panel.getByLabel("Nome da residência",{exact:true}).fill(name);await panel.getByRole("combobox",{name:"Estado inicial",exact:true}).selectOption("false");await choose(page,"Fuso de referência da residência","America/Sao_Paulo");
-  await panel.getByLabel("Cadastro de desenvolvimento com dados fictícios",{exact:true}).check();
-  await panel.getByRole("button",{name:"Continuar preparação",exact:true}).click();await expect(panel.getByLabel("E-mail da conta administradora inicial",{exact:true})).toBeVisible();
-  expect(Number(sql("select count(*) from public.care_recipients;"))).toBe(before);
-  await panel.getByLabel("E-mail da conta administradora inicial",{exact:true}).fill(fixtures.family.email);await choose(page,"Titular da continuidade",nameOf("global"));await choose(page,"Substituto da continuidade",nameOf("adminA"));
-  await panel.getByLabel("Prazo de resposta em minutos",{exact:true}).fill("60");await panel.getByRole("button",{name:"Salvar e retomar",exact:true}).click();
-  await expect(panel.getByText("Etapa de preparação salva.",{exact:false})).toBeVisible();await expect(panel.getByRole("button",{name:"Salvar e retomar",exact:true})).toBeEnabled();
-  const another=await browser.newContext();try{const peer=await another.newPage();await login(peer,"global",null);await peer.goto("/preparar-residencia");await peer.getByLabel("Buscar preparação pelo nome",{exact:true}).fill(name);await peer.getByRole("button",{name:"Buscar preparações",exact:true}).click();await peer.getByRole("button",{name:"Retomar preparação "+name,exact:true}).click();const editor=peer.getByRole("region",{name:"Preparação da residência",exact:true});await expect(editor.getByLabel("E-mail da conta administradora inicial",{exact:true})).toHaveValue(fixtures.family.email);await editor.getByLabel("Prazo de resposta em minutos",{exact:true}).fill("90");await editor.getByRole("button",{name:"Salvar e retomar",exact:true}).click();await expect(editor.getByRole("button",{name:"Salvar e retomar",exact:true})).toBeEnabled();
-    await panel.getByLabel("Prazo de resposta em minutos",{exact:true}).fill("75");await panel.getByRole("button",{name:"Salvar e retomar",exact:true}).click();const comparison=panel.getByRole("region",{name:"Comparação de revisões",exact:true});await expect(comparison.getByText("Servidor: 90 minutos",{exact:true})).toBeVisible();await expect(panel.getByLabel("Prazo de resposta em minutos",{exact:true})).toHaveValue("75");await comparison.getByRole("button",{name:"Manter meus valores para nova revisão",exact:true}).click();await panel.getByRole("button",{name:"Salvar e retomar",exact:true}).click();await expect(panel.getByRole("button",{name:"Salvar e retomar",exact:true})).toBeEnabled();
-  }finally{await another.close();}
-  const packets:Record<string,unknown>[]=[];
-  await page.route("**/api/residence-preparations",async route=>{
-    if(route.request().method()!=="POST"||route.request().postDataJSON().action!=="create")return route.continue();
-    packets.push(route.request().postDataJSON());if(packets.length===1){const response=await route.fetch();expect(response.ok()).toBe(true);return route.abort("failed");}return route.continue();
+test("E12-03 cria direto da revisão e recupera a mesma residência sem vínculo implícito", async ({ page, browser }) => {
+  await login(page, "global", null);
+  const before = Number(sql("select count(*) from public.care_recipients;"));
+  const denied = await page.request.post("/api/admin", {
+    data: { action: "recipient", id: null, displayName: "Cadastro inativo fictício rejeitado no legado",
+      isActive: false, isDevelopment: true, initialAdministratorEmail: fixtures.family.email },
   });
-  await panel.getByRole("button",{name:"Revisar criação da residência",exact:true}).click();const review=page.getByRole("dialog",{name:"Revisar criação da residência",exact:true});
-  await expect(review.locator("input,textarea,select")).toHaveCount(0);await expect(review.getByText("Inativo",{exact:true})).toBeVisible();await review.getByRole("button",{name:"Confirmar criação da residência",exact:true}).click();
-  await expect(review.getByRole("button",{name:"Recuperar a mesma preparação",exact:true})).toBeEnabled();await expect(review.getByRole("button",{name:"Voltar à preparação",exact:true})).toBeDisabled();
-  await review.getByRole("button",{name:"Recuperar a mesma preparação",exact:true}).click();await expect(review).toHaveCount(0);expect(packets).toHaveLength(2);expect(packets[0]).toEqual(packets[1]);await expect(panel.getByRole("alert")).toHaveCount(0);
-  const patient=sql(`select id from public.care_recipients where display_name=${sqlLiteral(name)};`);expect(Number(sql("select count(*) from public.care_recipients;"))).toBe(before+1);
-  expect(sql(`select is_active from public.care_recipients where id=${sqlLiteral(patient)};`)).toBe("f");expect(sql(`select count(*) from public.care_recipient_memberships where care_recipient_id=${sqlLiteral(patient)} and user_id=${sqlLiteral(fixtures.global.id)};`)).toBe("0");
-  await panel.getByRole("button",{name:"5. Escalas e BAL",exact:true}).click();
-  await expect(panel.locator("input,textarea,select")).toHaveCount(0);
-  await expect(panel.getByRole("link",{name:"Preparar escalas",exact:true})).toHaveAttribute("href","/escalas?careRecipientId="+patient);
-  await expect(panel.getByRole("link",{name:"Preparar regime BAL",exact:true})).toHaveAttribute("href","/balancos?careRecipientId="+patient);
-  await panel.getByRole("button",{name:"6. Comunicação e contingência",exact:true}).click();
-  await expect(panel.locator("input,textarea,select")).toHaveCount(0);
-  await expect(panel.getByRole("link",{name:"Abrir regras e comunicação",exact:true})).toHaveAttribute("href","/configuracoes?careRecipientId="+patient);
-  await expect(panel.getByRole("link",{name:"Consultar orientação de contingência",exact:true})).toHaveAttribute("href","/guias");
-  await widths(page,"D3 residence preparation");
-  const second=await browser.newContext();try{const family=await second.newPage();await login(family,"family",patient);expect((await family.request.get("/api/residence-preparations")).status()).toBe(403);const inactive=await family.request.post("/api/documents",{data:{careRecipientId:patient,type:"COM",payload:{origin:"purchase",lines:[{productId:"inactive-fixture-product",quantity:"1"}]},idempotencyKey:randomUUID(),draft:false}});expect(inactive.status()).toBe(409);expect(await inactive.json()).toMatchObject({code:"PATIENT_INACTIVE"});expect(sql(`select count(*) from public.operational_documents where care_recipient_id=${sqlLiteral(patient)};`)).toBe("0");await family.goto("/preparar-residencia");await expect(family.getByText("Somente a administração global inicia uma preparação.",{exact:false})).toBeVisible();await expect(family.getByRole("button",{name:"Nova preparação",exact:true})).toHaveCount(0);}finally{await second.close();}
+  expect(denied.status()).toBe(400);
+  const name = "Residência fictícia de criação direta " + randomUUID().slice(0, 8);
+  const drafts = () => sql(`select count(*) from private.residence_preparations where content->>'displayName'=${sqlLiteral(name)} and state='draft';`);
+  await page.goto("/preparar-residencia");
+  const panel = page.getByRole("form", { name: "Preparação da residência", exact: true });
+  const residenceName = panel.getByRole("textbox", { name: "Nome da residência", exact: true });
+  await residenceName.fill(name);
+  await panel.getByRole("combobox", { name: "Estado inicial", exact: true }).selectOption("false");
+  await choose(page, "Fuso da residência", "America/Manaus");
+  const email = panel.getByRole("textbox", { name: "E-mail da conta administradora inicial", exact: true });
+  await email.fill("sem-conta-" + randomUUID() + "@example.test");
+  await expect(panel.getByRole("combobox", { name: "Titular da continuidade", exact: true })).toBeEnabled({ timeout: 90_000 });
+  await choose(page, "Titular da continuidade", nameOf("global"));
+  await choose(page, "Substituto da continuidade", nameOf("adminA"));
+  await panel.getByRole("spinbutton", { name: "Prazo de resposta, em minutos", exact: true }).fill("75");
+  const reviewButton = panel.getByRole("button", { name: "Revisar criação", exact: true });
+  await reviewButton.click();
+  const conflict = page.getByRole("dialog", { name: "Conta administradora a conferir", exact: true });
+  await expect(conflict).toContainText("ativa e confirmada");
+  await conflict.getByRole("button", { name: "Voltar ao preenchimento", exact: true }).click();
+  await expect(residenceName).toHaveValue(name);
+  await email.fill(fixtures.family.email);
+  await reviewButton.click();
+  const review = page.getByRole("dialog", { name: "Confira antes de criar", exact: true });
+  await expect(review.locator("input,textarea,select")).toHaveCount(0);
+  await expect(review.getByText("Inativo", { exact: true })).toBeVisible();
+  await expect(review.getByText("America/Manaus", { exact: true })).toBeVisible();
+  await expect(review.getByText(nameOf("family"), { exact: true })).toBeVisible();
+  expect(Number(sql("select count(*) from public.care_recipients;"))).toBe(before);
+  expect(drafts()).toBe("0");
+
+  const packets: Array<{ idempotencyKey: string }> = [];
+  const consulted: string[] = [];
+  await page.route("**/api/residence-preparations**", async route => {
+    const req = route.request();
+    if (req.method() === "GET") {
+      consulted.push(new URL(req.url()).searchParams.get("attempt") ?? "");
+      if (consulted.length <= 2) return route.fulfill({ status: 503, json: { error: "Consulta temporariamente indisponível" } });
+      return route.continue();
+    }
+    if (req.postDataJSON().action !== "create") return route.continue();
+    packets.push(req.postDataJSON());
+    const recorded = await route.fetch();
+    expect(recorded.ok(), await recorded.text()).toBe(true);
+    return route.abort("failed");
+  });
+  await review.getByRole("button", { name: "Criar residência", exact: true }).click();
+  const pending = page.getByRole("dialog", { name: "Criação ainda sem confirmação", exact: true });
+  await expect(pending).toBeVisible();
+  const hint = await page.evaluate(() => {
+    const key = Object.keys(sessionStorage).find(item => item.startsWith("hca:residence-creation:"));
+    return key ? JSON.parse(sessionStorage.getItem(key) ?? "null") : null;
+  });
+  expect(hint).toEqual({ key: packets[0].idempotencyKey, retries: 0 });
+  await page.reload();
+  await expect(pending).toBeVisible();
+  await pending.getByText("Ajuda para resolver", { exact: true }).click();
+  await expect(pending).toContainText(packets[0].idempotencyKey);
+  await pending.getByRole("button", { name: "Conferir resultado", exact: true }).click();
+  await expect(pending).toBeVisible();
+  await pending.getByRole("button", { name: "Conferir resultado", exact: true }).click();
+  const success = page.getByRole("dialog", { name: "Residência criada", exact: true });
+  await expect(success).toBeVisible();
+  await success.getByRole("button", { name: "Acompanhar tarefas locais", exact: true }).click();
+  await expect(page.getByRole("region", { name: "Cadastro confirmado", exact: true })).toContainText(nameOf("global"));
+  expect(consulted).toEqual(Array(3).fill(packets[0].idempotencyKey));
+  expect(packets).toHaveLength(1);
+  const patient = sql(`select id from public.care_recipients where display_name=${sqlLiteral(name)};`);
+  expect(Number(sql("select count(*) from public.care_recipients;"))).toBe(before + 1);
+  expect(drafts()).toBe("0");
+  expect(sql(`select count(*) from public.care_recipient_memberships where care_recipient_id=${sqlLiteral(patient)} and user_id=${sqlLiteral(fixtures.global.id)};`)).toBe("0");
+
+  const tasks = page.getByRole("region", { name: "Próximos passos", exact: true });
+  await expect(tasks.getByRole("button")).toHaveCount(6);
+  await tasks.getByRole("button", { name: "Escalas e responsabilidades" }).click();
+  const local = page.getByRole("dialog", { name: "Continue no vínculo local", exact: true });
+  await expect(local).toContainText(name);
+  await expect(local.getByRole("link")).toHaveCount(0);
+  await local.getByRole("button", { name: "Voltar", exact: true }).click();
+
+  const second = await browser.newContext();
+  try {
+    const family = await second.newPage();
+    await login(family, "family", patient);
+    expect((await family.request.get("/api/residence-preparations?attempt=" + packets[0].idempotencyKey)).status()).toBe(403);
+    const inactive = await family.request.post("/api/documents", {
+      data: { careRecipientId: patient, type: "COM", payload: { origin: "purchase", lines: [{ productId: "inactive-fixture-product", quantity: "1" }] },
+        idempotencyKey: randomUUID(), draft: false },
+    });
+    expect(inactive.status()).toBe(409);
+    expect(await inactive.json()).toMatchObject({ code: "PATIENT_INACTIVE" });
+    expect(sql(`select count(*) from public.operational_documents where care_recipient_id=${sqlLiteral(patient)};`)).toBe("0");
+    await family.goto("/preparar-residencia");
+    await expect(family.getByText("Somente a administração global inicia uma residência.", { exact: false })).toBeVisible();
+    await expect(family.getByRole("form", { name: "Preparação da residência" })).toHaveCount(0);
+  } finally { await second.close(); }
 });
 
 test("C-FINAL023 guia não mantém tarefa recusada nem pede editar resultado e recupera foco na consulta", async ({ page }) => {
   const f = await setup(); await login(page, "adminA", f.patient); await page.goto("/guias");
-  const panel = guide(page), forward = panel.getByRole("button", { name: "Próxima etapa do guia", exact: true });
+  const panel = guide(page), forward = panel.getByRole("button", { name: "Concluir orientação", exact: true });
+  const readFailure = page.getByRole("dialog", { name: "Não foi possível consultar o guia", exact: true });
   await expect(forward).toBeVisible();
   const initial = (await (await page.request.get("/api/guides")).json()).data;
   const official = sql(`select jsonb_build_object('members',(select jsonb_agg(to_jsonb(m) order by user_id) from public.care_recipient_memberships m where care_recipient_id=${sqlLiteral(f.patient)}),'documents',(select count(*) from public.operational_documents where care_recipient_id=${sqlLiteral(f.patient)}),'ledger',(select count(*) from public.stock_movements where care_recipient_id=${sqlLiteral(f.patient)}));`);
@@ -80,17 +148,35 @@ test("C-FINAL023 guia não mantém tarefa recusada nem pede editar resultado e r
   page.on("request", request => { if (new URL(request.url()).pathname === "/api/guides" && request.method() !== "GET") writes++; });
   await page.route("**/api/guides", route => route.request().method() === "GET" ? route.fulfill({ status: 403, contentType: "application/json", body: JSON.stringify({ error: "Consulta fictícia de guia indisponível", code: "READ_UNAVAILABLE" }) }) : route.continue(), { times: 2 });
   await panel.getByRole("button", { name: /^(Desabilitar|Habilitar) apresentação inicial$/ }).click();
-  await expect(panel.getByRole("alert")).toContainText("Consulta fictícia de guia indisponível");
-  await expect(forward).toHaveCount(0); await expect(panel.locator('[aria-invalid="true"]')).toHaveCount(0);
+  await page.getByRole("dialog", {name:"Apresentação atualizada"}).getByRole("button", {name:"Concluir",exact:true}).click();
+  await expect(readFailure).toContainText("Consulta fictícia de guia indisponível");
+  await expect(panel.locator("nav")).toHaveCount(0); await expect(panel.locator('[aria-invalid="true"]')).toHaveCount(0);
+  await expect(readFailure.getByRole("button", { name: "Consultar guia novamente", exact: true })).toHaveCount(0);
   await page.unroute("**/api/guides");
   const refresh = panel.getByRole("button", { name: "Consultar guia novamente", exact: true });
-  await refresh.focus(); await refresh.press("Enter"); await expect(forward).toBeVisible(); await expect(refresh).toBeFocused();
-  for (const fault of [503, 200]) {
-    await page.route("**/api/guides", route => route.fulfill({ status: fault, contentType: "application/json", body: JSON.stringify(fault === 200 ? { data: null } : { error: "Consulta fictícia de guia indisponível", code: "READ_UNAVAILABLE" }) }), { times: 1 });
-    await refresh.press("Enter"); await expect(panel.getByRole("alert")).toBeVisible();
-    await expect(forward).toHaveCount(0); await expect(panel.locator('[aria-invalid="true"]')).toHaveCount(0);
-    await expect(refresh).toBeFocused(); await refresh.press("Enter"); await expect(forward).toBeVisible(); await expect(refresh).toBeFocused();
-  }
+  await readFailure.getByRole("button",{name:"Voltar ao guia",exact:true}).click();
+  await expect(refresh).toBeFocused();
+  await expect(refresh).toHaveAttribute("aria-disabled","true");
+  await page.reload(); await expect(forward).toBeVisible();
+  let reads = 0;
+  await page.route("**/api/guides", route => {
+    reads++;
+    return route.fulfill({
+      status: reads === 2 ? 200 : 503,
+      json: reads === 2 ? { data: null } : { error: "Consulta fictícia de guia indisponível", code: "READ_UNAVAILABLE" },
+    });
+  });
+  await page.reload();
+  const queryAgain = readFailure.getByRole("button", {name:"Consultar guia novamente",exact:true});
+  await queryAgain.click();
+  await queryAgain.click();
+  await expect(readFailure.getByRole("button", {name:"Copiar detalhes",exact:true})).toBeVisible();
+  await expect(queryAgain).toHaveCount(0);
+  expect(reads).toBe(3);
+  await expect(panel.locator("nav")).toHaveCount(0);
+  await page.unroute("**/api/guides");
+  await page.reload();
+  await expect(forward).toBeVisible();
   const current = (await (await page.request.get("/api/guides")).json()).data;
   expect(current.progress).toEqual(initial.progress); expect(current.showOnFirstAccess).toBe(!initial.showOnFirstAccess);
   expect(writes).toBe(1);
@@ -104,18 +190,30 @@ test("D3 guia pode ser pulado recuperado reaberto e configurado sem ciência ou 
   const before=sql(`select jsonb_build_object('events',(select count(*) from public.document_events where document_id in(select id from public.operational_documents where care_recipient_id=${sqlLiteral(f.patient)})),'members',(select jsonb_agg(to_jsonb(m) order by user_id) from public.care_recipient_memberships m where care_recipient_id=${sqlLiteral(f.patient)}));`);
   let corrupted=false;const packets:unknown[]=[];
   await page.route("**/api/guides",async route=>{if(route.request().method()!=="POST")return route.continue();packets.push(route.request().postDataJSON());if(!corrupted){corrupted=true;const response=await route.fetch();expect(response.ok()).toBe(true);const actual=await response.json();return route.fulfill({response,json:{data:{...actual.data,scope:randomUUID()}}});}return route.continue();});
-  const banner=page.getByRole("region",{name:"Apresentação opcional",exact:true});await banner.getByRole("button",{name:"Pular apresentação",exact:true}).click();await banner.getByRole("button",{name:"Recuperar minha escolha",exact:true}).click();await expect(banner).toHaveCount(0);expect(packets[0]).toEqual(packets[1]);
-  await page.goto("/perfil?careRecipientId="+f.patient);await selectProfileSection(page, "help");await expect(guide(page).getByRole("heading",{name:"Administrador do paciente",exact:true})).toBeVisible();
-  await guide(page).getByRole("button",{name:"Próxima etapa do guia",exact:true}).click();await expect(guide(page).getByText("Etapa 2 de 6",{exact:true})).toBeVisible();
-  await guide(page).getByRole("button",{name:"Desabilitar apresentação inicial",exact:true}).click();await expect(guide(page).getByRole("button",{name:"Habilitar apresentação inicial",exact:true})).toBeVisible();
-  const second=await browser.newContext();try{const pro=await second.newPage();await login(pro,"professional",f.patient);const data=(await(await pro.request.get("/api/guides")).json()).data;expect(data.role).toBe("professional");expect(data.showOnFirstAccess).toBe(false);expect(data.progress.revision).toBe(0);await pro.goto("/guias");await expect(guide(pro).getByRole("heading",{name:"Profissional",exact:true})).toBeVisible();expect((await pro.request.post("/api/guides",{data:{action:"configure",careRecipientId:f.patient,expectedRevision:1,showOnFirstAccess:true,idempotencyKey:randomUUID()}})).status()).toBe(403);}finally{await second.close();}
+  const banner=page.getByRole("region",{name:"Apresentação opcional",exact:true});
+  await banner.getByRole("button",{name:"Conhecer o guia",exact:true}).click();
+  await page.getByRole("dialog",{name:"Conheça sua rotina no sistema"}).getByRole("button",{name:"Pular apresentação",exact:true}).click();
+  await page.getByRole("dialog",{name:"Orientação ainda sem confirmação"}).getByRole("button",{name:"Consultar resultado",exact:true}).click();
+  await expect(banner).toHaveCount(0);expect(packets[0]).toEqual(packets[1]);
+  expect((await(await page.request.get("/api/guides")).json()).data.progress).toMatchObject({revision:1,status:"skipped"});
+  await page.goto("/perfil?careRecipientId="+f.patient);await selectProfileSection(page, "help");await expect(guide(page).getByText("Administrador do paciente",{exact:true})).toBeVisible();
+  await guide(page).getByRole("button",{name:"Contexto e responsabilidades"}).click();
+  const topic = page.getByRole("dialog",{name:"Contexto e responsabilidades"});
+  await expect(topic).toBeVisible();
+  await topic.getByRole("button",{name:"Voltar aos guias",exact:true}).click();
+  expect((await(await page.request.get("/api/guides")).json()).data.progress).toMatchObject({revision:2,status:"started"});
+  await guide(page).getByRole("button",{name:"Desabilitar apresentação inicial",exact:true}).click();
+  await page.getByRole("dialog", {name:"Apresentação atualizada"}).getByRole("button", {name:"Concluir",exact:true}).click();
+  await expect(guide(page).getByRole("button",{name:"Habilitar apresentação inicial",exact:true})).toBeVisible();
+  const second=await browser.newContext();try{const pro=await second.newPage();await login(pro,"professional",f.patient);const data=(await(await pro.request.get("/api/guides")).json()).data;expect(data.role).toBe("professional");expect(data.showOnFirstAccess).toBe(false);expect(data.progress.revision).toBe(0);await pro.goto("/guias");await expect(guide(pro).getByText("Profissional",{exact:true})).toBeVisible();expect((await pro.request.post("/api/guides",{data:{action:"configure",careRecipientId:f.patient,expectedRevision:1,showOnFirstAccess:true,idempotencyKey:randomUUID()}})).status()).toBe(403);}finally{await second.close();}
   await widths(page,"D3 personal guide");expect(sql(`select jsonb_build_object('events',(select count(*) from public.document_events where document_id in(select id from public.operational_documents where care_recipient_id=${sqlLiteral(f.patient)})),'members',(select jsonb_agg(to_jsonb(m) order by user_id) from public.care_recipient_memberships m where care_recipient_id=${sqlLiteral(f.patient)}));`)).toBe(before);
 });
 
 test("D3 duas sessões atualizam consumo sem apagar edição e resposta antiga não atravessa a troca de paciente",async({page,browser})=>{
   const f=await setup(),other=await setup(),second=await browser.newContext();let release!:()=>void;let held:BrowserRequest|null=null;
   try{const pro=await second.newPage();await login(page,"adminA",f.patient);await login(pro,"professional",f.patient);await page.goto("/consumo?careRecipientId="+f.patient);await page.bringToFront();
-    await page.getByRole("button",{name:"Registrar ocorrência",exact:true}).click();const drawer=page.getByRole("dialog",{name:"Registrar relato",exact:true});await drawer.getByLabel("Custódia",{exact:true}).selectOption("FAMILY");await drawer.getByRole("textbox",{name:"O que aconteceu?",exact:true}).fill("Rascunho próprio preservado enquanto outra sessão registra");
+    await page.getByRole("button",{name:"Mais opções de consumo",exact:true}).click();
+    await page.getByRole("menuitem",{name:"Relatos anteriores",exact:true}).click();const drawer=page.getByRole("dialog",{name:"Registrar relato",exact:true});await drawer.getByLabel("Custódia",{exact:true}).selectOption("FAMILY");await drawer.getByRole("textbox",{name:"O que aconteceu?",exact:true}).fill("Rascunho próprio preservado enquanto outra sessão registra");
     const text="Nova falta fictícia da segunda sessão "+randomUUID().slice(0,8);await post(pro,"/api/consumption",{action:"report",careRecipientId:f.patient,kind:"shortage",location:"CARE_TEAM",text,lines:[],idempotencyKey:randomUUID()});await page.evaluate(()=>window.dispatchEvent(new Event("online")));
     const list=page.locator('section[aria-label="Relatos registrados"]');await expect(list.getByText(text,{exact:true})).toHaveCount(1);await expect(drawer.getByRole("textbox",{name:"O que aconteceu?",exact:true})).toHaveValue("Rascunho próprio preservado enquanto outra sessão registra");
     let entered!:()=>void;const gate=new Promise<void>(r=>{release=r;}),arrived=new Promise<void>(r=>{entered=r;});let hold=true;
@@ -130,13 +228,14 @@ test("D3 Flow acompanha ingresso controlado e revisão em outra sessão preserva
   const f=await setup(),other=await setup(),second=await browser.newContext();let release!:()=>void;let held:BrowserRequest|null=null;
   const first=flow(f.patient,fixtures.professional.id,"Primeira sugestão fictícia para conferência"),hidden=flow(f.patient,fixtures.family.id,"Sugestão privada de outro titular");
   try{const peer=await second.newPage();await login(page,"professional",f.patient);await login(peer,"professional",f.patient);await page.goto("/consumo?careRecipientId="+f.patient);await page.bringToFront();
+    await openFlowSuggestions(page);
     const panel=page.locator('section[aria-label="Relatos recebidos por Flow"]');await panel.getByRole("button",{name:"Conferir sugestão",exact:true}).click();const editor=page.getByRole("dialog",{name:"Revisão do Flow",exact:true});await expect.poll(()=>panel.evaluate(el=>Boolean(el.closest('[aria-hidden="true"],[inert]')))).toBe(true);await editor.getByRole("textbox",{name:"Descrição conferida",exact:true}).fill("Minha conferência ainda não enviada");
     const text="Outra sugestão fictícia recebida "+randomUUID().slice(0,8);flow(f.patient,fixtures.professional.id,text);
     await post(peer,"/api/whatsapp/flows/submissions",{id:first,accept:false,kind:"shortage",text:"Descartada pelo titular na segunda sessão",lines:[]});const own=(await(await peer.request.get("/api/whatsapp/flows/submissions?careRecipientId="+f.patient)).json()).data;expect(own.some((row:{id:string})=>row.id===hidden)).toBe(false);
     const items=panel.getByRole("region",{name:"Sugestões pendentes do Flow",exact:true,includeHidden:true}).locator("ul");await page.evaluate(()=>window.dispatchEvent(new Event("online")));await expect(items.getByText(text,{exact:true})).toHaveCount(1);await expect(items.getByText("Primeira sugestão fictícia para conferência",{exact:true})).toHaveCount(0);await expect(editor.getByRole("textbox",{name:"Descrição conferida",exact:true})).toHaveValue("Minha conferência ainda não enviada");
     let entered!:()=>void;const gate=new Promise<void>(r=>{release=r;}),arrived=new Promise<void>(r=>{entered=r;});let hold=true;
     await page.evaluate(()=>{(window as unknown as {hcaIgnoreReadAbort:boolean}).hcaIgnoreReadAbort=true;});await page.route("**/api/whatsapp/flows/submissions?*",async route=>{if(hold&&new URL(route.request().url()).searchParams.get("careRecipientId")===f.patient){hold=false;held=route.request();const response=await route.fetch();entered();await gate;return route.fulfill({response});}return route.continue();});
-    await page.evaluate(()=>window.dispatchEvent(new Event("hca:data-changed")));await arrived;const lateResponse=page.waitForResponse(response=>response.request()===held);await post(page,"/api/context",{careRecipientId:other.patient});await page.evaluate(id=>{const url=new URL(window.location.href);url.searchParams.set("careRecipientId",id);window.history.replaceState(null,"",url);window.dispatchEvent(new Event("online"));},other.patient);await expect(editor).toHaveCount(0);await expect(panel.getByText("Nenhuma sugestão pendente de confirmação.",{exact:true})).toBeVisible();release();await(await lateResponse).finished();await page.evaluate(()=>new Promise<void>(resolve=>requestAnimationFrame(()=>requestAnimationFrame(()=>resolve()))));await expect(panel.getByText(text,{exact:true})).toHaveCount(0);await expect(editor.getByLabel("Descrição conferida",{exact:true})).toHaveCount(0);
+    await page.evaluate(()=>window.dispatchEvent(new Event("hca:data-changed")));await arrived;const lateResponse=page.waitForResponse(response=>response.request()===held);await post(page,"/api/context",{careRecipientId:other.patient});await page.evaluate(id=>{const url=new URL(window.location.href);url.searchParams.set("careRecipientId",id);window.history.replaceState(null,"",url);window.dispatchEvent(new Event("online"));},other.patient);await expect(editor).toHaveCount(0);await expect(panel).toHaveCount(0);await openFlowSuggestions(page);await expect(panel.getByText("Nenhuma sugestão pendente de confirmação.",{exact:true})).toBeVisible();release();await(await lateResponse).finished();await page.evaluate(()=>new Promise<void>(resolve=>requestAnimationFrame(()=>requestAnimationFrame(()=>resolve()))));await expect(panel.getByText(text,{exact:true})).toHaveCount(0);await expect(editor.getByLabel("Descrição conferida",{exact:true})).toHaveCount(0);
     expect(sql(`select count(*) from public.consumption_reports where care_recipient_id=${sqlLiteral(f.patient)};`)).toBe("0");
   }finally{release?.();await second.close();}
 });
@@ -170,7 +269,7 @@ test("D3 Flow permite alcançar a sugestão mais antiga entre101 pendências sem
   await login(page,"professional",f.patient);const ids:string[]=[];
   for(const number of [1,2,3]){const response=await page.request.get(`/api/whatsapp/flows/submissions?careRecipientId=${f.patient}&page=${number}&pageSize=50`);expect(response.ok()).toBe(true);const data=await response.json();expect(data.total).toBe(101);expect(data.data).toHaveLength(number===3?1:50);ids.push(...data.data.map((row:{id:string})=>row.id));}
   expect(ids).toEqual(oracle);expect(new Set(ids).size).toBe(101);const bounded=await(await page.request.get(`/api/whatsapp/flows/submissions?careRecipientId=${f.patient}&pageSize=999`)).json();expect(bounded.pageSize).toBe(100);expect(bounded.data).toHaveLength(100);
-  await page.goto("/consumo?careRecipientId="+f.patient);const panel=page.locator('section[aria-label="Relatos recebidos por Flow"]');
+  await page.goto("/consumo?careRecipientId="+f.patient);await openFlowSuggestions(page);const panel=page.locator('section[aria-label="Relatos recebidos por Flow"]');
   for(let number=1;number<=5;number++){await expect(panel.getByText(`Página ${number} de 6 · 101 sugestões`,{exact:true})).toBeVisible();await panel.getByRole("button",{name:"Próxima página de sugestões",exact:true}).click();}
   await expect(panel.getByText("Sugestão antiga paginada 101",{exact:true})).toBeVisible();await panel.getByRole("button",{name:"Conferir sugestão",exact:true}).click();await expect(page.getByRole("dialog",{name:"Revisão do Flow",exact:true}).getByRole("textbox",{name:"Descrição conferida",exact:true})).toHaveValue("Sugestão antiga paginada 101");
   expect(sql(`select count(*) from public.consumption_reports where care_recipient_id=${sqlLiteral(f.patient)};`)).toBe("0");

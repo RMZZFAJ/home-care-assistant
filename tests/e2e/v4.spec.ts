@@ -1,9 +1,9 @@
-import { selectProfileSection } from "./profile-sections";
 import { selectDocumentSection } from "./document-sections";
 import { test, expect, type Page } from "@playwright/test";
-import { readFileSync } from "node:fs";
+import { generateStandardPdf } from "./generated-pdf";
 import { randomUUID } from "node:crypto";
-import { fixtureFile, sql } from "../../scripts/test-environment.mjs";
+import { setup as seedPatient, fixtures } from "../integration/v4-fixtures.mjs";
+import { shiftWorker } from "../integration/shift-fixtures.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { selectContext } from "./auth-context";
 
@@ -11,10 +11,9 @@ test.setTimeout(180_000);
 test.afterEach(async ({ page }) => {
   await page.unrouteAll({ behavior: "wait" });
 });
-const fixtures = () => JSON.parse(readFileSync(fixtureFile, "utf8"));
-async function login(page: Page, role: string, patient: string | null) {
+async function login(page: Page, account: { email: string }, patient: string | null) {
   await page.goto("/login");
-  await page.getByLabel("E-mail", { exact: true }).fill(fixtures()[role].email);
+  await page.getByLabel("E-mail", { exact: true }).fill(account.email);
   await page.getByLabel("Senha", { exact: true }).fill(fixturePassword);
   await page.getByRole("button", { name: "Entrar", exact: true }).click();
   await expect(
@@ -28,43 +27,11 @@ async function post(page: Page, path: string, data: unknown) {
   return response.json();
 }
 async function setup(page: Page) {
-  await login(page, "global", null);
-  const patient = (
-    await post(page, "/api/admin", {
-      action: "recipient",
-      id: null,
-      displayName: "Paciente V4 visual " + randomUUID().slice(0, 8),
-      isActive: true,
-      isDevelopment: true,
-      initialAdministratorEmail: fixtures().adminA.email,
-    })
-  ).data.id as string;
-  for (const role of ["family", "professional", "reader"])
-    sql(
-      "insert into public.care_recipient_memberships(care_recipient_id,user_id,role) values('" +
-        patient +
-        "','" +
-        fixtures()[role].id +
-        "','" +
-        role +
-        "')",
-    );
-  await page.getByLabel("Menu do usuário", { exact: true }).click();
-  await page.getByRole("menuitem", { name: "Sair", exact: true }).click();
-  await expect(page).toHaveURL(/\/login$/);
-  await login(page, "adminA", patient);
-  const product = (
-    await post(page, "/api/admin", {
-      action: "product",
-      careRecipientId: patient,
-      id: null,
-      name: "Material V4 visual",
-      category: "higiene",
-      unit: "unidade",
-      aliases: [],
-      isActive: true,
-    })
-  ).data.product_id as string;
+  const { patient, products: [product] } = await seedPatient({
+    catalogue: [{ name: "Material V4 visual", category: "higiene", unit: "unidade", aliases: [] }],
+  });
+  const administrator = await shiftWorker(patient, "admin");
+  await login(page, administrator, patient);
   return { patient, product };
 }
 
@@ -73,6 +40,8 @@ test("V4: dois usuários ao vivo, duplicidade contextual, ciência dialogada e c
   browser,
 }) => {
   const { patient, product } = await setup(page);
+  const familyUser = await shiftWorker(patient, "family");
+  const professional = await shiftWorker(patient);
   const settings = (
     await (
       await page.request.get("/api/patient-settings?careRecipientId=" + patient)
@@ -123,18 +92,22 @@ test("V4: dois usuários ao vivo, duplicidade contextual, ciência dialogada e c
         },
       });
     });
-    await login(family, "family", patient);
+    await login(family, familyUser, patient);
     await family.goto("/perfil?careRecipientId=" + patient);
-    await selectProfileSection(family, "notices");
-    await family.getByRole("combobox", { name: "Modalidade pessoal", exact: true }).selectOption("dialog");
-    await family.getByRole("checkbox", { name: "Confirmo expressamente esta preferência pessoal.", exact: true }).check();
-    await family.getByRole("button", { name: "Revisar preferência", exact: true }).click();
-    await family.getByRole("dialog", { name: "Revisar preferência de ciência", exact: true }).getByRole("button", { name: "Confirmar preferência", exact: true }).click();
-    await expect(
-      family.getByText("Preferência salva.", { exact: false }),
-    ).toBeVisible();
+    await family.bringToFront();
+    const noticesTab = family.getByRole("tab", { name: "Avisos e aplicativo", exact: true });
+    await noticesTab.press("Enter");
+    await expect(noticesTab).toHaveAttribute("aria-selected", "true");
+    await family.getByRole("button", { name: "Editar preferência de ciência", exact: true }).click();
+    const preference = family.getByRole("dialog", { name: "Ciência de requisições", exact: true });
+    await preference.getByRole("radio", { name: /^Diálogo antes de abrir/ }).check();
+    await preference.getByRole("button", { name: "Revisar consentimento", exact: true }).click();
+    const confirmation = family.getByRole("dialog", { name: "Confirmar minha preferência", exact: true });
+    await confirmation.getByRole("checkbox", { name: "Compreendi e concordo com esta forma de registrar minha ciência.", exact: true }).check();
+    await confirmation.getByRole("button", { name: "Confirmar preferência", exact: true }).click();
+    await expect(family.getByRole("dialog", { name: "Preferência salva", exact: true })).toBeVisible();
     await family.goto("/historico?careRecipientId=" + patient);
-    await login(pro, "professional", patient);
+    await login(pro, professional, patient);
     const receipt = (
       await post(pro, "/api/requisitions", {
         careRecipientId: patient,
@@ -156,9 +129,8 @@ test("V4: dois usuários ao vivo, duplicidade contextual, ciência dialogada e c
       exact: true,
     });
     await expect(duplicate).toBeVisible();
-    await duplicate
-      .getByRole("button", { name: receipt.code, exact: true })
-      .click();
+    const consult = duplicate.getByRole("button", { name: receipt.code, exact: true });
+    await consult.click();
     const related = pro.getByRole("dialog", {
       name: receipt.code,
       exact: true,
@@ -169,22 +141,26 @@ test("V4: dois usuários ao vivo, duplicidade contextual, ciência dialogada e c
     await related
       .getByRole("button", { name: "Fechar diálogo", exact: true })
       .click();
+    await expect(related).toHaveCount(0);
+    await expect(consult).toBeFocused();
     const justification = duplicate.getByLabel(
       "Justificativa da nova requisição",
     );
-    await justification.fill("Necessidade revisada após consulta contextual");
+    const reason = "Necessidade revisada após consulta contextual";
+    const keep = duplicate.getByRole("button", { name: "Manter nova requisição", exact: true });
+    await justification.fill(reason);
+    await expect(keep).toBeEnabled();
+    await expect(justification).toHaveValue(reason);
+    await family.bringToFront();
     await family.getByRole("link").filter({ hasText: receipt.code }).click();
     await family.getByRole("dialog", { name: "Ciência antes de abrir a requisição", exact: true }).getByRole("button", { name: "Confirmar ciência e abrir", exact: true }).click();
     await selectDocumentSection(family, "overview");
     await expect(
       family.getByText("Confirmação em diálogo antes de abrir", { exact: false }),
     ).toBeVisible({ timeout: 15000 });
-    await expect(justification).toHaveValue(
-      "Necessidade revisada após consulta contextual",
-    );
-    await duplicate
-      .getByRole("button", { name: "Manter nova requisição", exact: true })
-      .click();
+    await pro.bringToFront();
+    await expect(justification).toHaveValue(reason);
+    await keep.click();
     await expect(
       pro.getByRole("checkbox", { name: /Material V4 visual/ }),
     ).toBeChecked();
@@ -198,11 +174,16 @@ test("V4: dois usuários ao vivo, duplicidade contextual, ciência dialogada e c
       pro.getByRole("list", { name: "Materiais requisitados", exact: true }).getByRole("button", { name: /^Detalhes de Material V4 visual/ }),
     ).toHaveCount(1);
     await selectDocumentSection(family, "files");
-    await family.getByRole("button", { name: "Gerar PDF", exact: true }).click();
+    await generateStandardPdf(family);
+    const identification = family.getByRole("dialog", { name: "Ficha", exact: true });
+    const more = family.getByRole("list", { name: "Exemplares registrados" })
+      .getByRole("listitem").filter({ has: family.getByRole("link", { name: "Visualizar", exact: true }) }).first()
+      .getByRole("button", { name: "Identificação do exemplar", exact: true });
+    await more.click();
     await expect(
-      family.getByRole("button", { name: "Compartilhar PDF", exact: true }),
+      identification.getByRole("button", { name: "Compartilhar PDF", exact: true }),
     ).toBeEnabled({ timeout: 15000 });
-    await family
+    await identification
       .getByRole("button", { name: "Compartilhar PDF", exact: true })
       .click();
     await expect
@@ -221,6 +202,7 @@ test("V4: dois usuários ao vivo, duplicidade contextual, ciência dialogada e c
             .header,
       ),
     ).toBe("%PDF-");
+    await identification.getByRole("button", { name: "Voltar aos arquivos", exact: true }).click();
     await expect(
       family.getByText("Documento salvo.", { exact: false }).first(),
     ).toBeVisible({ timeout: 12000 });
@@ -242,9 +224,11 @@ test("V4: dois usuários ao vivo, duplicidade contextual, ciência dialogada e c
     );
     await family.clock.install();
     await family.reload();
+    await more.click();
     await expect(
-      family.getByRole("button", { name: "Compartilhar PDF", exact: true }),
+      identification.getByRole("button", { name: "Compartilhar PDF", exact: true }),
     ).toBeEnabled();
+    await identification.getByRole("button", { name: "Voltar aos arquivos", exact: true }).click();
     await expect.poll(() => trackingRequests).toBeGreaterThan(0);
     await family.clock.runFor(11_000);
     await expect(
@@ -291,31 +275,20 @@ test("V4: matrizes móveis, múltiplos canais no contrato visual e proposta glob
   });
   await page.goto("/configuracoes?careRecipientId=" + patient);
   await page
-    .getByRole("navigation", { name: "Áreas da configuração", exact: true }).getByRole("link", { name: "Notificações", exact: true }).click();
-  const channel = page.getByRole("checkbox", {
-    name: "Requisição emitida · Familiar · WhatsApp (contrato visual)",
-    exact: true,
-  });
-  await channel.check();
-  await expect(channel).toBeChecked();
-  await expect(
-    page.getByRole("heading", {
-      name: "Arquivamento manual justificado",
-      exact: true,
-    }),
-  ).toBeVisible();
-  await expect(
-    page.getByRole("checkbox", {
-      name: "Arquivamento manual justificado · Familiar · WhatsApp (contrato visual)",
-      exact: true,
-    }),
-  ).toHaveCount(0);
-  await expect(
-    page.getByRole("checkbox", {
-      name: "Requisição emitida · Familiar · Aplicativo",
-      exact: true,
-    }),
-  ).toBeChecked();
+    .getByRole("navigation", { name: "Áreas da configuração", exact: true }).getByRole("link", { name: "Avisos", exact: true }).click();
+  const rules = page.getByRole("region", { name: "Regras de avisos", exact: true });
+  await rules.getByRole("combobox", { name: "Função nas notificações", exact: true }).selectOption("family");
+  await rules.getByRole("button", { name: /^Arquivamento manual justificado/ }).click();
+  const unavailable = page.getByRole("dialog", { name: "Arquivamento manual justificado", exact: true });
+  await expect(unavailable.getByRole("switch", { name: /WhatsApp/ })).toHaveCount(0);
+  await expect(unavailable.getByText(/WhatsApp.*Canal indisponível/)).toBeVisible();
+  await unavailable.getByRole("button", { name: "Voltar", exact: true }).click();
+  await rules.getByRole("button", { name: /^Requisição emitida/ }).click();
+  const notice = page.getByRole("dialog", { name: "Requisição emitida", exact: true });
+  await expect(notice.getByRole("switch", { name: "Aplicativo", exact: true })).toBeChecked();
+  await notice.getByRole("switch", { name: "WhatsApp (contrato visual)", exact: true }).check();
+  await notice.getByRole("button", { name: "Salvar regra", exact: true }).click();
+  await page.getByRole("dialog", { name: "Regra de aviso registrada", exact: true }).getByRole("button", { name: "Concluir", exact: true }).click();
   await expect
     .poll(async () => {
       const response = await page.request.get(
@@ -328,8 +301,7 @@ test("V4: matrizes móveis, múltiplos canais no contrato visual e proposta glob
       return row?.channels?.length;
     })
     .toBe(2);
-  await page
-    .getByRole("navigation", { name: "Áreas da configuração", exact: true }).getByRole("link", { name: "Permissões", exact: true }).click();
+  await page.goto("/configuracoes?area=permissions&careRecipientId=" + patient);
   await expect(
     page.getByRole("region", { name: "Matriz de permissões", exact: true }),
   ).toBeVisible();
@@ -343,22 +315,21 @@ test("V4: matrizes móveis, múltiplos canais no contrato visual e proposta glob
   const other = await browser.newContext();
   try {
     const global = await other.newPage();
-    await login(global, "global", null);
+    await login(global, fixtures.global, null);
     await global.goto("/configuracoes?careRecipientId=" + patient);
-    await global.getByRole("button", { name: "Editar Encerramento e histórico", exact: true }).click();
+    await global.getByRole("button", { name: "Editar Arquivamento", exact: true }).click();
     await global.getByLabel("Arquivar após conclusão ou cancelamento (dias)").fill("9");
     await global
-      .getByRole("button", { name: "Registrar política", exact: true })
+      .getByRole("button", { name: "Propor regra", exact: true })
       .click();
-    await expect(
-      global.getByRole("status").filter({ hasText: "Proposta global registrada." }),
-    ).toBeVisible();
+    await global.getByRole("dialog", { name: "Proposta registrada", exact: true }).getByRole("button", { name: "Concluir", exact: true }).click();
     await page
       .getByRole("navigation", { name: "Áreas da configuração", exact: true }).getByRole("link", { name: "Pessoas e propostas", exact: true }).click();
-    await expect(
-      page.getByRole("button", { name: "Aprovar proposta", exact: true }),
-    ).toBeVisible({ timeout: 20000 });
-    await page
+    const list = page.getByRole("region", { name: "Propostas de configuração", exact: true });
+    await list.getByRole("article").filter({ hasText: "Regras do paciente" }).getByRole("button").click();
+    await page.getByRole("dialog", { name: "Conferir proposta", exact: true })
+      .getByRole("button", { name: "Aprovar proposta", exact: true }).click();
+    await page.getByRole("dialog", { name: "Aprovar esta proposta?", exact: true })
       .getByRole("button", { name: "Aprovar proposta", exact: true })
       .click();
     await expect

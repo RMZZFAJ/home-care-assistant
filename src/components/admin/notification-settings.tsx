@@ -8,31 +8,8 @@ import "./operations.css";
 import { formatBrazilDate } from "@/lib/receipt";
 import { panelClass } from "@/components/workspace";
 
-import { AdministrativePreparationEditor } from "./administrative-preparation-editor";
-import type { AdministrativeOutcome } from "@/lib/validation/administrative-preparation";
-
 type Row = Record<string,unknown>;
 type Execute = (payload: Row, success: string) => Promise<unknown>;
-export function NotificationSettings({ rows, members, patientId, userId, globalMode, onConfirmed }: {
-  rows: Row[]; members: Row[]; patientId: string; userId: string; globalMode: boolean;
-  onConfirmed: (outcome: AdministrativeOutcome) => void;
-}) {
-  return <section className={panelClass}>
-    <h2 className="font-bold">Destinatários de notificações</h2>
-    <p className="mt-2 text-sm">Selecione contas com vínculo autorizado neste paciente. Canais externos dependem de configuração do provedor.</p>
-    <AdministrativePreparationEditor
-      scope={{patientId,mode:globalMode ? "global" : "patient",purpose:"notificationRecipient",targetId:null}}
-      userId={userId} people={members} onConfirmed={onConfirmed}
-    />
-    <ul className="mt-5 space-y-3">
-      {rows.map(row => <li key={String(row.id)} className="ui-card p-3 text-sm">
-        <p className="wrap-anywhere">{String(members.find(member => member.user_id===row.recipient_user_id)?.full_name ?? "Conta autorizada")} · {String(row.recipient_group)} · {String(row.channel)}</p>
-        <p>{String(row.destination ?? "Interno")} · {row.is_enabled ? "Habilitado" : "Desabilitado"}</p>
-      </li>)}
-    </ul>
-    {rows.length===0 ? <p className="mt-3 text-sm">Nenhum destinatário configurado.</p> : null}
-  </section>;
-}
 
 export function NotificationQueue({ rows, execute, isGlobalAdmin, queried = true, blocked = false }: { rows: Row[]; execute: Execute; isGlobalAdmin: boolean; queried?: boolean; blocked?: boolean }) {
   return <section className={panelClass + " hca-operations-card hca-notification-queue"} aria-label="Acompanhamento de notificações">

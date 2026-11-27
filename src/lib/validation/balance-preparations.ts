@@ -19,6 +19,7 @@ export const balancePreparationPurposeSchema = z.enum(
 export const balancePreparationFieldsSchema = z
   .object({
     reason: field,
+    observation: field,
     enabled: field,
     weekday: field,
     shiftTypeId: field,
@@ -235,6 +236,7 @@ export const balancePreparationReferenceSchema = z
           shift_type_id: id,
           designated_professional_id: id.nullable(),
           starts_on: z.iso.date(),
+          observation: z.string().max(1000).nullish(),
           version,
         })
         .nullable(),
@@ -243,6 +245,7 @@ export const balancePreparationReferenceSchema = z
           id,
           name: z.string(),
           starts_local: z.string(),
+          rest_hours: z.number().int().min(0).max(32767).nullish(),
           duration_minutes: z.number().int().positive(),
           is_active: z.boolean(),
         }),
@@ -397,7 +400,8 @@ function preparationValuesMatchCommand(
   let matches = "reason" in c.body && f.reason?.trim() === c.body.reason;
   if (c.action === "configure")
     matches =
-      matches &&
+      (f.reason?.trim() || undefined) === c.body.reason &&
+      f.observation?.trim() === c.body.observation &&
       f.enabled === String(c.body.enabled) &&
       f.weekday === String(c.body.weekday) &&
       f.timezone === c.body.timezone &&
@@ -468,7 +472,9 @@ export function parseBalancePreparationReceipt(
       n.shift_type_id === c.body.shiftTypeId &&
       (n.designated_professional_id ?? null) ===
         (c.body.professionalId ?? null) &&
-      n.starts_on === c.body.startsOn;
+      n.starts_on === c.body.startsOn &&
+      (c.body.observation === undefined ||
+        n.observation === (c.body.observation || null));
   if (c.action === "assign")
     nativeMatches =
       n.assignmentId === r.resourceId && c.body.cycleId === r.targetResourceId;

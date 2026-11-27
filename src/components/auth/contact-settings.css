@@ -1,0 +1,71 @@
+.hca-contact-sheet > .hca-modal-content {
+  display: flex;
+  flex-direction: column;
+  gap: .8rem;
+}
+
+.hca-contact-sheet > .hca-modal-content > * { flex-shrink: 0; }
+.hca-contact-sheet .hca-modal-footer > button { flex: 1; }
+
+.hca-contact-section {
+  border: 1px solid var(--hca-line);
+  border-radius: 1rem;
+  padding: .85rem;
+  background: var(--hca-paper);
+  min-width: 0;
+}
+
+.hca-contact-section > h3 {
+  margin: -.85rem -.85rem 0;
+  border-radius: 1rem 1rem 0 0;
+  border-bottom: 1px solid var(--hca-line);
+  padding: .8rem .85rem;
+  background: #f7faf8;
+  font-size: .86rem;
+  font-weight: 700;
+}
+
+.hca-contact-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: .55rem;
+  padding-block: .65rem;
+}
+
+.hca-contact-glyph, .hca-contact-provider > svg {
+  display: grid;
+  width: 1.85rem;
+  height: 1.85rem;
+  place-items: center;
+  border-radius: .55rem;
+  color: var(--hca-teal);
+  background: var(--hca-tint);
+}
+
+.hca-contact-glyph--pending { color: #765614; background: #f8f3e8; }
+.hca-contact-row strong, .hca-contact-row small { display: block; overflow-wrap: anywhere; }
+.hca-contact-row strong { font-size: .84rem; font-weight: 700; }
+.hca-contact-row small, .hca-contact-pending p, .hca-contact-caption { color: var(--hca-muted); font-size: .75rem; }
+.hca-contact-pending { padding-bottom: .65rem; margin-bottom: .55rem; border-top: 1px solid var(--hca-line); }
+.hca-contact-caption { margin-bottom: .5rem; }
+.hca-contact-section > .hca-contact-row + .hca-control { margin-top: .45rem; }
+.hca-contact-section > .hca-contact-google { margin-top: .45rem; }
+.hca-contact-form { display: grid; gap: .85rem; min-width: 0; }
+
+.hca-contact-hint {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  gap: .5rem;
+  padding: .65rem .7rem;
+  border: 1px solid var(--hca-line);
+  border-radius: .75rem;
+  background: var(--hca-tint);
+  color: var(--hca-muted);
+  font-size: .78rem;
+}
+
+.hca-contact-hint svg { color: var(--hca-teal); }
+.hca-contact-provider { display: grid; justify-items: center; gap: .45rem; padding: .7rem; text-align: center; }
+.hca-contact-provider > svg { padding: .3rem; background: transparent; }

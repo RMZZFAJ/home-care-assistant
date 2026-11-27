@@ -28,6 +28,8 @@ test("global identity cannot move stock without its active local membership; an 
 test("delegated catalogue and audit authority stays separate from local administration", async () => {
   const { patient, admin } = await setup();
   const other = await setup();
+  await rpc(other.admin, "configure_patient_access", { p_patient: other.patient, p_kind: "settings",
+    p_change: { reminderHours: 3 }, p_key: randomUUID(), p_version: 1 });
   const professional = await actor("professional", patient);
   const adopt = { p_care_recipient_id: patient, p_product_id: "fralda" };
   assert.ok((await professional.rpc("admin_adopt_product", adopt)).error);
@@ -37,7 +39,7 @@ test("delegated catalogue and audit authority stays separate from local administ
     const version = (await rpc(admin, "patient_governance", { p_patient: patient })).data.version;
     await rpc(admin, "configure_patient_access", {
       p_patient: patient, p_kind: "capability",
-      p_change: { capability, subjectUser: fixtures.professional.id, enabled },
+      p_change: { capability, subjectUser: fixtures.professional.id, enabled, ...(enabled ? { reviewedRole: "professional", confirmIndividual: true } : {}) },
       p_key: randomUUID(), p_version: version,
     });
   }
@@ -48,18 +50,21 @@ test("delegated catalogue and audit authority stays separate from local administ
   const adopted = await rpc(professional, "admin_adopt_product", adopt);
   assert.equal(adopted.product_id, "fralda");
   assert.equal(adopted.care_recipient_id, patient);
-  const audit = await professional.from("audit_events").select("metadata").eq("metadata->>care_recipient_id", patient);
+  const auditId = scope => sql(`select id from public.audit_events where metadata->>'care_recipient_id'=${sqlLiteral(scope)}
+    order by created_at desc, id desc limit 1;`);
+  const localEvent = auditId(patient), otherEvent = auditId(other.patient);
+  const audit = await professional.from("audit_events").select("metadata").eq("id", localEvent).maybeSingle();
   assert.ifError(audit.error);
-  assert.ok(audit.data.length > 0);
-  const isolated = await professional.from("audit_events").select("id").eq("metadata->>care_recipient_id", other.patient);
+  assert.equal(audit.data?.metadata.care_recipient_id, patient);
+  const isolated = await professional.from("audit_events").select("id").eq("id", otherEvent).maybeSingle();
   assert.ifError(isolated.error);
-  assert.equal(isolated.data.length, 0);
+  assert.equal(isolated.data, null);
   assert.ok((await professional.rpc("admin_upsert_membership", { p_care_recipient_id: patient, p_user_id: fixtures.reader.id, p_role: "admin", p_can_manage_stock: true, p_can_count_stock: true })).error);
   await configure("catalog.manage", false);
   await configure("audit.read", false);
   await actor("professional", patient);
   assert.ok((await professional.rpc("admin_adopt_product", { ...adopt, p_product_id: "luvas" })).error);
-  const revoked = await professional.from("audit_events").select("id").eq("metadata->>care_recipient_id", patient);
+  const revoked = await professional.from("audit_events").select("id").eq("id", localEvent).maybeSingle();
   assert.ifError(revoked.error);
-  assert.equal(revoked.data.length, 0);
+  assert.equal(revoked.data, null);
 });

@@ -1,0 +1,19 @@
+.hca-preference-body, .hca-preference-choices { display: grid; gap: 12px; min-width: 0; }
+.hca-preference-choices { padding: 0; }
+.hca-preference-choices legend { margin-bottom: 14px; color: var(--hca-muted); font-size: 13px; }
+.hca-preference-option { display: flex; align-items: flex-start; gap: 12px; padding: 13px; border: 1px solid var(--hca-line); border-radius: 12px; cursor: pointer; }
+.hca-preference-option:has(input:checked) { border-color: var(--hca-teal); background: var(--hca-tint); }
+.hca-preference-option input { flex: 0 0 auto; accent-color: var(--hca-teal); }
+.hca-preference-option span, .hca-preference-channel span { display: grid; gap: 4px; min-width: 0; overflow-wrap: anywhere; }
+.hca-preference-option small, .hca-preference-channel small { color: #586d61; font-size: 12px; }
+.hca-preference-channel { display: flex; flex-direction: row-reverse; align-items: center; justify-content: space-between; gap: 15px; padding-block: 9px; cursor: pointer; }
+.hca-preference-channel input { flex: 0 0 auto; appearance: none; width: 38px; height: 22px; margin: 0; border: 1px solid var(--hca-muted); border-radius: 14px; background: var(--hca-paper); cursor: pointer; }
+.hca-preference-channel input::before { content: ""; display: block; width: 14px; height: 14px; margin: 2px; border-radius: 50%; background: var(--hca-muted); }
+.hca-preference-channel input:checked { border-color: var(--hca-teal); background: var(--hca-teal); }
+.hca-preference-channel input:checked::before { transform: translateX(18px); background: var(--hca-paper); }
+.hca-preference-hint { display: flex; align-items: flex-start; gap: 8px; padding: 11px; border-radius: 10px; background: var(--hca-tint); font-size: 13px; }
+.hca-preference-hint svg { flex: 0 0 auto; color: var(--hca-teal); }
+.hca-channel-note { padding-inline: 0; color: #586d61; background: transparent; }
+.hca-preference-details { padding: 12px; border: 1px solid var(--hca-line); border-radius: 10px; }
+.hca-preference-details summary { cursor: pointer; font-weight: 650; }
+.hca-preference-details p { margin-top: 8px; color: var(--hca-muted); font-size: 13px; }

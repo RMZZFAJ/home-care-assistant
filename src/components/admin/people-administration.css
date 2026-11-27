@@ -1,0 +1,42 @@
+.hca-people-navigation { display: grid; gap: 16px; color: var(--hca-muted); font-size: 14px; }
+.hca-people-navigation .hca-document-tab-list { margin-block: 0; }
+.hca-people-navigation .hca-document-tab[aria-current="page"] { border-bottom-color: var(--hca-teal); color: var(--hca-teal); font-weight: 700; }
+.hca-people-count { padding: 0 5px; border-radius: 8px; background: var(--hca-tint); color: var(--hca-teal); font-size: 10px; font-weight: 700; }
+.hca-people-card { overflow: hidden; border: 1px solid var(--hca-line); border-radius: 16px; background: var(--hca-paper); }
+.hca-people-card > header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; padding: 15px 16px; border-bottom: 1px solid var(--hca-line); background: #f8faf8; }
+.hca-people-card h2 { font-size: 15px; font-weight: 700; line-height: 1.4; }
+.hca-people-body { padding: 16px; }
+.hca-people-body .hca-guide-row { min-height: 78px; padding: 12px; }
+.hca-people-body li:first-child > .hca-guide-row { border-top: 0; }
+.hca-people-body .hca-guide-row-label { gap: 5px; }
+.hca-people-body .hca-status { justify-self: start; }
+.hca-people-body .hca-avatar { width: 40px; height: 40px; flex: none; border-radius: 12px; border: 1px solid var(--hca-line); }
+.hca-people-hint { display: flex; align-items: flex-start; gap: 9px; margin-top: 12px; color: var(--hca-muted); font-size: 12px; line-height: 1.55; }
+.hca-people-hint > svg { width: 16px; height: 16px; flex: none; color: var(--hca-teal); }
+.hca-invitation-form, .hca-invitation-content { display: grid; gap: 16px; }
+.hca-invitation-form .hca-people-hint, .hca-invitation-content .hca-people-hint { margin-top: 0; }
+.hca-invitation-footer { display: flex; flex-wrap: wrap; gap: 8px; }
+.hca-invitation-result .hca-modal-content p { overflow-wrap: anywhere; }
+.hca-member-panel { display: grid; gap: 16px; }
+.hca-linked-people { border-radius: 15px; border-color: #dbe6df; background: #fff; }
+.hca-linked-people > header { background: #fcfdfb; border-bottom-color: #dbe6df; }
+.hca-linked-people > header > h2 { font-size: 14px; }
+.hca-linked-people > header > button { min-height: 36px; padding: 4px 10px; font-size: 12px; }
+.hca-linked-people .hca-input-adornment > input.hca-text-input { padding-inline-start: 38px; }
+.hca-member-policy-link { margin-top: 16px; max-width: 100%; white-space: normal; }
+.hca-member-list .hca-guide-row { gap: 12px; min-height: 0; padding: 16px 14px; border-top: 0; border-bottom: 1px solid #dbe6df; }
+.hca-member-list li:last-child .hca-guide-row { border-bottom: 0; }
+.hca-member-list .hca-guide-row-label { display: flex; flex-direction: column; gap: 4px; }
+.hca-member-list .hca-guide-row-label strong { letter-spacing: -.2px; }
+.hca-member-list .hca-avatar { width: 41px; height: 41px; border-radius: 13px; background: #e8f0ea; color: #41685b; border-color: #d5e2d8; }
+@media (max-width: 375px) {
+  .hca-member-list .hca-guide-row { gap: 10px; padding: 14px 12px; }
+  .hca-member-list .hca-guide-row-label strong { font-size: 13px; }
+}
+.hca-member-panel h3 { font-size: 14px; font-weight: 700; }
+.hca-member-hero { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; border: 1px solid var(--hca-line); border-radius: 16px; padding: 16px; background: var(--hca-tint); overflow-wrap: anywhere; }
+.hca-member-hero > div:not(.hca-avatar) { min-width: 0; flex: 1; }
+.hca-member-hero p { color: var(--hca-muted); font-size: 13px; }
+.hca-member-actions { padding: 8px 12px 0; border: 1px solid var(--hca-line); border-radius: 16px; }
+.hca-member-actions > h3 { padding: 6px 0; }
+.hca-member-actions .hca-guide-row[data-danger] strong { color: var(--hca-red); }

@@ -1,8 +1,190 @@
 # D-B — acompanhamento por funcionalidades e etapas
 
+O [quadro de fechamento de D-B](docs/audits/D/D-B/FECHAMENTO_D_B.md) reúne
+as decisões em aberto, as lacunas de L1 a L4, a revisão da PR 8 e as
+condições para começar D-C.
+
 O [fechamento A–D da PR 7](docs/audits/FECHAMENTO_PR7.md) reúne os critérios
 e as pendências para a próxima etapa. Este acompanhamento conserva o
 histórico dos incrementos de D-B.
+
+**27/11 — Última CI concluída.** O commit `56432679` passou em Linux, Windows,
+na integração de banco e no SonarCloud. Os sete jobs de navegador
+passaram, com quatro retentativas registradas.
+O Preview confirmou as leituras de L4 com contas fictícias, incluindo a
+matriz de permissões e a negativa de acesso da família. As 46 discussões em
+linha estão resolvidas. [Evidências e pendências atuais](docs/audits/D/D-B/FECHAMENTO_D_B.md#condições-para-o-merge).
+
+**27/11 — Candidato da PR 8.** `effbd935` reúne os quatro ajustes de teste
+e a atualização das ferramentas de lint. Linux, Windows e banco passaram,
+com zero vulnerabilidades na instalação. Os navegadores seguem em execução.
+[CI de effbd935](https://github.com/RMZZFAJ/home-care-assistant/actions/runs/45983780325).
+
+**26/11 — Resultado da CI da revisão.** A CI de `4fc30699` aprovou banco,
+Linux e Windows. Dois testes falharam nas duas tentativas em iOS, e quatro
+testes passaram em retentativa. SonarCloud e Preview passaram nesse mesmo
+commit. O [registro de fechamento](docs/audits/D/D-B/LOTES_EXECUCAO.md#ci-de-4fc30699-e-condições-de-fechamento)
+identifica os casos e as condições que ainda faltam para a etapa 19.
+
+**26/11 — Preparação final da PR 8.** A revisão da D-B reúne L3 e L4.
+O Supabase compartilhado de testes tem 385 migrations aplicadas. A CI de
+`138ad822` passou com seis retentativas registradas. A revisão do Codex
+identificou a comparação de maiúsculas em e-mails. O ajuste usa o mesmo
+formato na solicitação e na recuperação. A CI e o Preview do commit final
+continuam sendo condições da integração.
+[Estado da PR 8](docs/audits/D/D-B/LOTES_EXECUCAO.md#preparação-final-da-pr-8).
+
+**24/11 — Matriz de permissões.** As cinco funções e a consulta individual
+usam todas as capacidades vigentes. A lista pessoal identifica a origem no
+banco. A revisão exige confirmação para ampliar o acesso ou alterar
+`access.manage`. O Supabase local registra o efeito e o histórico e aplica
+a decisão à administração da residência, a compras, regularização, estoque,
+balanço e consumo. As contraprovas locais verificaram a preservação de
+plantão, custódia e revisão independente.
+[Registro de L4](docs/audits/D/D-B/LOTES_EXECUCAO.md#e10-04--matriz-de-perfis-e-consulta-individual).
+
+**24/11 — Central técnica.** Incidentes e política consultam versões reais e
+recuperam a decisão pela mesma chave. Continuidade e envios abrem evidências
+e tentativas por fonte. O Preview publicado responde com as variáveis
+previstas. O avanço depende da transição dos quatro contratos no banco
+compartilhado e da validação do SHA candidato. O L4 ainda tem pendências
+de autorização e paridade em E10/E11.
+[Registro de L4](docs/audits/D/D-B/LOTES_EXECUCAO.md#e12-07--central-técnica-e-decisões).
+
+**24/11 — Dossiê de contingência.** A busca por referência ou descrição
+filtra o conjunto autorizado antes de paginar. Fatos, Materiais e Histórico
+abrem em um painel com autoria, registro digital e evidências confirmadas.
+A migration está aplicada no Supabase local e pendente no remoto.
+[Registro de L4](docs/audits/D/D-B/LOTES_EXECUCAO.md#e12-04--consulta-do-dossiê-de-contingência).
+
+**24/11 — Preparação local.** As áreas da residência abrem painéis com
+dados do vínculo e a data da consulta. O retorno do catálogo, do estoque
+e dos demais destinos reabre a área de origem. A lista móvel rola acima
+do rodapé.
+[Registro de L4](docs/audits/D/D-B/LOTES_EXECUCAO.md#e12-02--preparação-local-e-retorno-à-tarefa).
+
+**24/11 — Criação de residência.** A revisão confere a conta administradora.
+A confirmação registra o cadastro, o vínculo inicial, a configuração do
+guia e o comprovante juntos. Após perda da resposta, a consulta recupera
+a mesma tentativa. Os próximos passos dependem de vínculo local. A migration
+está aplicada no Supabase local e pendente no remoto.
+[Registro de L4](docs/audits/D/D-B/LOTES_EXECUCAO.md#e12-03--criação-de-residência).
+
+**24/11 — Guias e ajuda na tarefa.** A lista por perfil abre os assuntos em
+painéis da v2. Na conferência de entrega, a ajuda mantém o formulário e
+devolve o foco ao controle de origem. O progresso e a configuração da
+apresentação usam o contrato de guia por vínculo.
+[Registro de L4](docs/audits/D/D-B/LOTES_EXECUCAO.md#e12-01--guias-e-ajuda-na-tarefa).
+
+**24/11 — início de L4.** E10–E12 seguem o laboratório v2 aprovado.
+O Preview do commit `1ba95e4c` está pronto, com contrato do Supabase
+compatível. A branch continua no PR 8 em rascunho.
+[Registro de L4](docs/audits/D/D-B/LOTES_EXECUCAO.md#l4).
+
+**23/11 — emissão e recuperação de PDF.** A emissão manual usa os
+diálogos e o carregamento da v4. A confirmação perdida recupera a mesma
+referência, sem duplicar o exemplar. A confirmação mostra ficha, modalidade
+e revisão.
+[Registro L1–L4](docs/audits/D/D-B/LOTES_EXECUCAO.md#emissão-e-recuperação-de-pdf).
+
+**23/11 — consulta de consumo e faltas.** A lista usa carregamento simples,
+diálogo de recuperação e filtros em modal. O período continua disponível.
+As verificações em Chromium, Android e iOS emulados incluíram paginação de
+102 relatos, recusa de acesso e recuperação sem escrita.
+[Registro L1–L4](docs/audits/D/D-B/LOTES_EXECUCAO.md#consulta-e-filtros-de-relatos).
+
+**23/11 — resultado do envio de anexo.** O diálogo **Anexo disponível**
+confirma a gravação ou a recuperação da mesma tentativa. Nove verificações
+passaram em Chromium, Android e iOS emulados.
+[Registro L1–L4](docs/audits/D/D-B/LOTES_EXECUCAO.md#resultado-do-envio-de-anexo).
+
+**23/11 — aplicação do balanço e validação no iOS.** A confirmação mostra o
+efeito no estoque da equipe. O carregamento acompanha a gravação e a
+conferência do recibo. A recuperação usa a tentativa preservada. A CI de
+`e349a92d` encerrou com uma falha e uma retentativa bem-sucedida no iOS-1.
+[Registro L1–L4](docs/audits/D/D-B/LOTES_EXECUCAO.md#aplicação-da-contagem-ao-estoque).
+
+**23/11 — emissão de consumo.** O carregamento dinâmico acompanha a
+preparação, a baixa e a consulta do relato. A recuperação confere o
+mesmo recibo e o resultado abre a ficha. Nove casos passaram em Chromium,
+Android e iOS emulados.
+[Registro L1–L4](docs/audits/D/D-B/LOTES_EXECUCAO.md#emissão-e-recuperação-do-consumo).
+
+**23/11 — falha de consulta no estoque.** O carregamento simples e o
+diálogo da v4 usam a consulta real. A recusa retira saldos e a falha
+transitória mantém a última leitura válida daquela custódia. Passaram
+quinze testes dirigidos em Chromium, Android e iOS emulados.
+[Registro L1–L4](docs/audits/D/D-B/LOTES_EXECUCAO.md#falha-de-consulta-no-estoque).
+
+**23/11 — falha de consulta em Arquivos.** Gerados e Anexos compartilham
+o diálogo, com nova consulta, retorno de foco e diagnóstico de suporte.
+As seis verificações finais passaram em Chromium, Android e iOS emulados.
+[Registro L1–L4](docs/audits/D/D-B/LOTES_EXECUCAO.md#falha-de-consulta-em-arquivos).
+
+**23/11 — Preview de L3 e correções de CI.** O PR 8 está em rascunho.
+O Preview de `e349a92d` respondeu no login, na consulta pública e na
+verificação de compatibilidade do Supabase. A retomada de plantão após
+revogação de escrita e a comparação de chegada da COM passaram em seis
+testes dirigidos. O resultado da validação desse commit está no registro.
+[Registro L1–L4](docs/audits/D/D-B/LOTES_EXECUCAO.md#leitura-privada-de-plantão-e-atualização-da-chegada-de-com).
+
+**23/11 — acervo de Arquivos.** Gerados e Anexos seguem os cartões da v4.
+O menu preserva a identificação e o compartilhamento do exemplar.
+O rodapé do formulário Gerar PDF mantém as ações à vista. O ensaio comparou
+os arquivos pela impressão SHA-256, com capturas em 360 e 412 px.
+[Registro L1–L4](docs/audits/D/D-B/LOTES_EXECUCAO.md#cartões-e-identificação-dos-arquivos-da-ficha).
+
+**23/11 — histórico de balanços.** A aba Histórico mostra os cartões compactos
+da v4 com situação e autoria preservada. Os filtros ficam em um diálogo e
+voltam ao sair da ficha. A migration está aplicada nos bancos local e remoto,
+com 362 versões conferidas.
+[Registro L1–L4](docs/audits/D/D-B/LOTES_EXECUCAO.md#histórico-de-balanços).
+
+**23/11 — entregas e devoluções em trânsito.** O painel separa os dois
+percursos, mostra o ato de expedição e exibe os valores da ficha sem
+confundir o recebido com o que ainda aguarda decisão. Local e remoto
+registram 361 migrations. [Registro L1–L4](docs/audits/D/D-B/LOTES_EXECUCAO.md#entregas-e-devoluções-em-trânsito).
+
+**23/11 — revisão e recibo da movimentação familiar.** A v4 exige que a
+pessoa aceite a referência atualizada antes de confirmar. O autor consegue
+conferir a mesma tentativa com acesso de leitura, sem gerar movimento novo.
+A migration está aplicada localmente e no remoto, que registra 360 versões.
+[Registro L1–L4](docs/audits/D/D-B/LOTES_EXECUCAO.md#conferência-do-estoque-familiar-e-recuperação-do-recibo).
+
+**23/11 — lembretes de entregas bilaterais.** O agendador registra
+os fatos da transferência com autoria de sistema. O teste confirmou
+um único lembrete em duas execuções e estoque preservado. Local e
+remoto registram 352 migrations.
+[Registro L1–L4](docs/audits/D/D-B/LOTES_EXECUCAO.md#l3--estoque-plantões-e-verificação).
+
+**23/11 — encerramento de tentativas de programação sem confirmação.**
+O sistema recupera o recibo gravado ou encerra a revisão anterior
+preservando o rascunho. O encerramento pode ser consultado após recarregar.
+Local e remoto registram 351 migrations.
+[Registro L1–L4](docs/audits/D/D-B/LOTES_EXECUCAO.md#l3--estoque-plantões-e-verificação).
+
+**23/11 — horários da residência obrigatórios para programar plantões.**
+A agenda orienta a configuração, conserva a data consultada na volta e
+mantém o histórico acessível. A migration está aplicada localmente e no
+remoto. Ambos registram 350 versões.
+[Registro L1–L4](docs/audits/D/D-B/LOTES_EXECUCAO.md#l3--estoque-plantões-e-verificação).
+
+**23/11 — continuidade de consumo do WhatsApp.** A sugestão abre o
+assistente de consumo. A equipe revisa materiais e quantidades, e o
+registro vincula sugestão e baixa na mesma transação. Local e remoto
+registram 349 migrations.
+[Registro L1–L4](docs/audits/D/D-B/LOTES_EXECUCAO.md#l3--estoque-plantões-e-verificação).
+
+**23/11 — painel de material no consumo e na falta.** A ficha abre os
+saldos e efeitos do material com os movimentos de baixa, correção e
+compensação identificados por ato. Local e remoto registram 348 migrations.
+O [registro L1–L4](docs/audits/D/D-B/LOTES_EXECUCAO.md#l3--estoque-plantões-e-verificação)
+reúne os testes e as lacunas abertas.
+
+**22/11 — início de L3.** A branch `feat/phase-d-continuation` recebeu
+o commit `fab595c7` por avanço direto. A ordem e o laboratório v4
+organizam o lote em estoque e consumo, plantões e balanços, e arquivos
+e verificação. [Registro L1–L4](docs/audits/D/D-B/LOTES_EXECUCAO.md#l3--estoque-plantões-e-verificação).
 
 **21/11 — revisão e recuperação dos cancelamentos de L2.** REQ e COM
 recebem a justificativa na própria revisão. REQ exige a escolha de ajuste

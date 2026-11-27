@@ -40,6 +40,7 @@ it("rejects absent, orphan, foreign, future and contradictory correction facts i
   for (const balanceReviewCorrections of alternatives) await expect(composeIssuance({ ...source, balanceReviewCorrections }, "a".repeat(64), { ...fidelityEmission, rendererRevision: 16 })).rejects.toMatchObject({ code: "CONTENT_INVALID" });
   const missing = { ...source }; delete missing.balanceReviewCorrections;
   await expect(composeIssuance(missing, "a".repeat(64), { ...fidelityEmission, rendererRevision: 16 })).rejects.toMatchObject({ code: "CONTENT_INVALID" });
+  expect(balanceCorrectionFacts.safeParse([{ ...entry, sourceLineId: act.line.id }]).success).toBe(false);
 });
 it("refuses a missing correction source in the consolidated layout",async()=>{
  const source=currentPdfFixture(sourceFixture());delete source.balanceReviewCorrections;

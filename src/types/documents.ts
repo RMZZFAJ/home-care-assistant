@@ -1,6 +1,7 @@
 import type { BalanceReviewItem } from "@/lib/validation/balance-review-items";
 import type { BalanceApplicationFacts } from "@/lib/validation/balance-application";
 import type { PendingPurchaseExtra } from "@/lib/validation/pending-purchase-extras";
+import type { BalanceCountExtra } from "@/lib/validation/balance-count-extras";
 
 export type DocumentType = "REQ" | "COM" | "ENT" | "BAL";
 export type DocumentKind = DocumentType | "DEV";
@@ -42,6 +43,7 @@ export type DraftLine = {
 export type SupplyPayload = {
   lines: DraftLine[];
   pendingExtras?: PendingPurchaseExtra[];
+  balanceExtras?: BalanceCountExtra[];
   sources?: import("@/lib/validation/supply-sources").SupplySourceLink[];
   notes?: string;
   observations?: string[];
@@ -57,6 +59,7 @@ export type SupplyPayload = {
     id: string;
     version: number;
     referenceRevision: string;
+    admissionId?: string;
   };
   balanceContext?: {
     cycleId: string;
@@ -155,6 +158,7 @@ export type BalanceReviewRecord = {
       SupplyLine,
       "id" | "name_snapshot" | "quantity" | "unit_snapshot"
     >[];
+    extras?: BalanceCountExtra[];
     referenceRevision: string | null;
     currentRevision: string;
     appliedBeforeReview: boolean;
@@ -539,6 +543,7 @@ export type DocumentSummary = {
   status: string;
   created_at: string;
   recipient_id: string | null;
+  balanceCounterName?: string | null;
   task?: { code: string; label: string; } | null;
   document_lines?: {
     id: string;

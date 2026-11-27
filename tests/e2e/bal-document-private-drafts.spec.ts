@@ -9,7 +9,7 @@ for (const purpose of ["review_family", "review_supervisor", "assign_recount"] a
   const f = await balDocumentFixture(purpose), writes = noPrivateWrites(page), before = balDocumentFacts(f), count = privateFormCount(f.patient);
   await loginDecision(page, f.identity.email, f.patient);
   if (purpose === "assign_recount") await page.goto(`/balancos?careRecipientId=${f.patient}&recountDocumentId=${f.document.id}`);
-  else { await page.goto("/fichas/" + f.document.id); await selectDocumentSection(page, "workflow"); await page.getByRole("button", { name: balanceDocumentLabels[purpose], exact: true }).click(); }
+  else { await page.goto("/fichas/" + f.document.id); await selectDocumentSection(page, "reviews"); await page.getByRole("button", { name: balanceDocumentLabels[purpose], exact: true }).click(); }
   await expect(page.getByRole("button", { name: "Salvar preenchimento privado", exact: true })).toHaveCount(0);
   await page.getByRole("textbox", { name: purpose === "assign_recount" ? /^Sua justificativa para o reconto/ : /^Sua revisão sobre a contagem/ }).fill("Conferência independente sem decisão em preparação.");
   if (purpose === "assign_recount") { const field = page.getByRole("combobox", { name: /^Plantão para o reconto/ }); await field.fill(f.target.professional_name); await field.press("ArrowDown"); await page.getByRole("option").filter({ hasText: f.target.professional_name }).click(); }

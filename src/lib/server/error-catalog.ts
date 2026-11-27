@@ -49,6 +49,11 @@ const reconciliation = {
 export const errorCatalog = {
   PDF_ANNOTATIONS_UNSUPPORTED: { ...validation, recommendedAction: "Exporte uma cópia com as anotações e campos incorporados às páginas; confira o conteúdo e envie a cópia." },
   ATTACHMENT_PENDING: { ...conflict, recommendedAction: "Recupere a mesma tentativa. Resultado pendente impede abandonar o envio." },
+  CONTINGENCY_MATERIAL_CHANGED: { ...conflict, recommendedAction: "Compare a referência atual e reconfirme a quantidade física do material." },
+  CONTINGENCY_REFERENCE_CHANGED: { ...conflict, recommendedAction: "Compare a revisão atual do registro digital e confirme a referência novamente." },
+  CONTINGENCY_REFERENCE_UNAVAILABLE: { ...conflict, recommendedAction: "Escolha um registro acessível do mesmo paciente e processo." },
+  CONTINGENCY_ALREADY_LINKED: conflict,
+  BALANCE_APPLICATION_REFERENCE_CHANGED: conflict,
   PUSH_NOT_CONFIGURED: configuration,
   PUSH_RESULT_UNCONFIRMED: reconciliation,
   PDF_BYTES_DIVERGE: {
@@ -95,6 +100,18 @@ export const errorCatalog = {
     status: 401,
     retryable: false,
     recommendedAction: "Entre novamente com sua conta.",
+  },
+  RECENT_SESSION_REQUIRED: {
+    category: "authentication",
+    status: 403,
+    retryable: false,
+    recommendedAction: "Confirme novamente que é você.",
+  },
+  MFA_REQUIRED: {
+    category: "authentication",
+    status: 403,
+    retryable: false,
+    recommendedAction: "Verifique esta sessão com o aplicativo autenticador.",
   },
   FORBIDDEN: {
     category: "authorization",

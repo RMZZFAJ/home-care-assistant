@@ -1,7 +1,17 @@
 import { DefinitionGrid } from "@/components/ui/controls";
 import { Notice } from "@/components/workspace";
 import { formatZonedDate } from "@/lib/schedules/time";
-import type { BalanceDeferral } from "@/types/balances";
+import type { BalanceAssignment, BalanceDeferral } from "@/types/balances";
+
+export function DeferralAssignmentFacts({ assignment, timezone }: {
+  assignment: BalanceAssignment;
+  timezone?: string;
+}) {
+  return <DefinitionGrid items={[
+    { label: "Responsável", value: assignment.professional_name ?? "Profissional designado" },
+    { label: "Prazo atual", value: formatZonedDate(assignment.ends_at, timezone) },
+  ]} />;
+}
 
 export function DeferralFacts({
   deferral,
@@ -16,7 +26,7 @@ export function DeferralFacts({
     value ? formatZonedDate(value, timezone) : "Não preservado";
   return (
     <div className="hca-form-stack hca-balance-facts">
-      <p>Solicitação original: {deferral.reason}</p>
+      <blockquote className="hca-schedule-impact whitespace-pre-wrap wrap-anywhere">{deferral.reason}</blockquote>
       <div aria-label="Destino congelado da solicitação">
         <h3 className="font-semibold">Plantão proposto na solicitação</h3>
         <DefinitionGrid items={[
@@ -24,6 +34,7 @@ export function DeferralFacts({
           { label: "Período proposto", value: format(deferral.target_snapshot.starts_at) + " → " + format(deferral.target_snapshot.ends_at) },
           { label: "Versão proposta", value: deferral.target_shift_version },
           { label: "Prazo da atribuição original", value: format(context?.sourceDeadline ?? null) },
+          { label: "Prazo solicitado", value: format(deferral.target_snapshot.ends_at) },
         ]} />
       </div>
       {deferral.status === "pending" &&
@@ -57,6 +68,9 @@ export function DeferralFacts({
             { label: "Decisão registrada por", value: deferral.decision_snapshot.actor.name },
             { label: "Instante da decisão", value: format(deferral.decision_snapshot.recordedAt) },
             { label: "Motivo próprio da decisão", value: deferral.decision_snapshot.reason, wide: true },
+            ...(deferral.decision_snapshot.deadlineChanged ? [
+              { label: "Prazo autorizado neste pedido", value: format(deferral.target_snapshot.ends_at) },
+            ] : []),
           ]} />
           <p>
             {deferral.decision_snapshot.deadlineChanged

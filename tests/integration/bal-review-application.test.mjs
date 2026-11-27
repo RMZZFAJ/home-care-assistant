@@ -88,6 +88,38 @@ test("item opinions are explicit, frozen and scoped; an indicated difference nev
   assert.equal(applicationRows(d.id).length, 0);
 });
 
+test("extra reviews freeze the examined count and respect scope, authority, idempotency and stock policy", async () => {
+  const checked = { id: randomUUID(), name: "Conector fora do catálogo", unit: "caixa", quantity: "2" };
+  const omitted = { id: randomUUID(), name: "Adaptador sem cadastro", unit: "unidade", quantity: "1" };
+  const f = await legacyBalance({ quantity: "1", balanceExtras: [checked, omitted] });
+  const other = await legacyBalance({ balanceExtras: [{ ...checked, id: randomUUID() }] });
+  const family = await actor("family", f.patient), d = await get(family, f.document.id);
+  const opinion = { lineId: checked.id, result: "difference", forwarding: "recount", comment: "Conferir a segunda caixa." };
+  const body = { group: "family", items: [opinion], reviewReference: d.balanceReview.referenceHash };
+  const key = randomUUID(), before = balState(d.id);
+  assert.equal((await balCommand(family, d, { ...body, items: [{ ...opinion, lineId: other.payload.balanceExtras[0].id }] })).error?.code, "22023");
+  assert.ok((await balCommand(f.admin, d, body)).error);
+  assert.equal((await balCommand(family, { ...d, version: d.version + 1 }, body)).error?.code, "PT409");
+  assert.equal(balState(d.id), before);
+
+  const result = await balCommand(family, d, body, key);
+  assert.ifError(result.error);
+  const resultReview = result.data.balanceReview.reviews[0];
+  assert.deepEqual(resultReview.item_results, [opinion]);
+  assert.deepEqual(resultReview.reviewed_snapshot.extras, [checked, omitted]);
+  assert.equal(resultReview.reviewer_id, fixtures.family.id);
+  assert.equal(resultReview.reviewed_document_version, d.version);
+  assert.equal(result.data.balanceReview.hasItemDifferences, true);
+  assert.deepEqual(result.data.balanceReview.applicationGroups, []);
+  assert.equal((await family.rpc("supply_document_command", packet(result.data))).error?.code, "PT409");
+  assert.deepEqual(JSON.parse(balState(d.id)).ledger, JSON.parse(before).ledger);
+  const replay = await balCommand(family, d, body, key);
+  assert.ifError(replay.error);
+  assert.deepEqual(replay.data.balanceReview.reviews, [resultReview]);
+  const frozen = JSON.parse(balState(d.id)).events.at(-1).body.balanceReviews.reviews[0];
+  assert.deepEqual(frozen.reviewed_snapshot.extras, [checked, omitted]);
+});
+
 test("a historical required opinion is permitted without validating later stock or allowing its application", async () => {
   const f = await legacyBalance({ quantity: "1" }), family = await actor("family", f.patient);
   await receiveBalanceMaterials(f);

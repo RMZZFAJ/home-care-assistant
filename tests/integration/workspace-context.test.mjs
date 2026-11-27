@@ -26,8 +26,13 @@ async function exactSelected(client, patient) {
 }
 function metadata(view) {
   return view.patients.map((row) => {
+    assert.equal(typeof row.canReportFamilyConsumption, "boolean");
+    if (view.activeContext?.mode !== "patient" || row.id !== view.activeContext.care_recipient_id) {
+      assert.equal(row.canReportFamilyConsumption, false);
+    }
     const value = { ...row };
     delete value.capabilities;
+    delete value.canReportFamilyConsumption;
     return value;
   });
 }
@@ -60,6 +65,7 @@ test("workspace keeps the complete ordered directory and changes only native cap
   const view = await exactSelected(f.admin, f.patient);
   assert.equal(view.isGlobalAdmin, false);
   assert.deepEqual(metadata(view), expectedMetadata(fixtures.adminA.id));
+  assert.equal(selected(view, f.patient).canReportFamilyConsumption, true);
   assert.equal(selected(view, other.patient).role, "admin");
   assert.deepEqual(selected(view, other.patient).capabilities, {});
   const before = sql(

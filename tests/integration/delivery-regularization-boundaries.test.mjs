@@ -51,6 +51,35 @@ const propose = async (f, body = proposalBody(f)) =>
     p_version: f.document.version,
   });
 
+test("an individually authorized reader can independently review ENT and loses the action on withdrawal", async () => {
+  const f = await unavailableDelivery();
+  const reader = await actor("reader", f.patient);
+  const body = proposalBody(f, { reviewerId: fixtures.reader.id });
+  assert.equal((await command(f.admin, f.document, "propose_regularization", body)).error?.code, "42501");
+  async function adjust(enabled) {
+    const policy = await rpc(f.admin, "patient_governance", { p_patient: f.patient });
+    await rpc(f.admin, "configure_patient_access", {
+      p_patient: f.patient, p_kind: "capability", p_key: randomUUID(), p_version: policy.data.version,
+      p_change: { capability: "ent.regularize", subjectUser: fixtures.reader.id,
+        reviewedRole: "reader", enabled, ...(enabled ? { confirmIndividual: true } : {}) },
+    });
+  }
+  await adjust(true);
+  const proposed = await propose(f, body);
+  const review = { caseId: currentCase(proposed).id, accept: true, reason: "Conferência independente da devolução." };
+  assert.equal((await command(f.admin, proposed, "review_regularization", review)).error?.code, "42501");
+  await adjust(null);
+  const before = ledger(f);
+  assert.equal((await command(reader, proposed, "review_regularization", review)).error?.code, "42501");
+  assert.equal(ledger(f), before);
+  await adjust(true);
+  const result = await command(reader, proposed, "review_regularization", review);
+  assert.ifError(result.error);
+  assert.equal(result.data.workflow_data.acceptedBy, fixtures.professional.id);
+  assert.equal(sql(`select performed_by from public.stock_movements where reference_type='delivery_regularization'
+    and reference_id=${sqlLiteral(review.caseId)};`), fixtures.reader.id);
+});
+
 test("P05 malformed and impersonated proposals preserve all facts, including NULL, extra fields and incomplete partitions", async () => {
   const f = await unavailableDelivery(),
     before = ledger(f),

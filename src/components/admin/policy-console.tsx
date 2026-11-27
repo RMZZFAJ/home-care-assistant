@@ -1,6 +1,6 @@
 "use client";
 import { ActionButton } from "@/components/ui/controls";
-import { useEffect, useRef, useState, type FormEvent } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type FormEvent } from "react";
 import {
   api,
   ApiError,
@@ -15,6 +15,11 @@ import {
 import { PermissionMatrix } from "./permission-matrix";
 import { NotificationMatrix } from "./notification-matrix";
 import { PolicyRules } from "./policy-rules";
+import { ScheduleResidenceSettings } from "./schedule-residence-settings";
+import { BalanceRegimeSettings, canManageBalanceRegime } from "@/components/balances/balance-regime-settings";
+import { PatientSchedule } from "@/components/schedules/schedule-console";
+import { canConfigureResidenceHours } from "@/components/schedules/schedule-residence-requirement";
+import Link from "next/link";
 import { Icon, type IconName } from "@/components/ui/primitives";
 import "./administration.css";
 
@@ -22,9 +27,16 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { roles } from "./admin-fields";
 import { useLiveRevision } from "@/lib/use-live-revision";
 import { shortNameChange } from "@/lib/validation/governance";
+import type { ResidenceRuleResult } from "@/lib/validation/reviewed-residence-rule";
 import { useCommandIntent } from "@/lib/client/use-command-intent";
 import { GovernanceProposals } from "./governance-proposals";
 import { governanceCommandConfirmed } from "@/lib/validation/governance";
+import { residencePolicyDefaults } from "@/lib/governance-presentation";
+import { ResidenceRuleSettings } from "./residence-rule-settings";
+import { FeedbackBanner } from "@/components/ui/feedback";
+import { ResidenceRuleFeedback, useResidenceRuleOperation } from "./residence-rule-operation";
+
+const ruleAreas = ["rules", "notifications", "thresholds"];
 type ConfigurationPacket = { careRecipientId: string; kind: string; change: Record<string, unknown>; idempotencyKey: string; expectedVersion: number; requestId?: string; decision?: string };
 type ConfigurationResult = { data: { id: string; status: string }; invitationUrl?: string; invitationRecovery?: { invitationId: string; notice: string } };
 type PolicyData = {
@@ -46,31 +58,37 @@ type PolicyData = {
     resolution?: { invitationId?: string };
   }[];
 };
-const defaults: Record<string, unknown> = {
-  balDay: null,
-  balReview: "optional",
-  balApprovers: ["family", "supervisor"],
-  balRequirement: "any",
-  whatsappSimpleAcceptance: false,
-  scienceRequired: true,
-  scienceRoles: ["admin", "family"],
-  scienceRequirement: "any",
-  scienceByDispatch: true,
-  scienceAutomatic: false,
-  archiveDays: 7,
-  reminderHours: 2,
-  reminderRepeatHours: 24,
-  shareWaitSeconds: 10,
-  patientShortName: "",
-};
 export function PolicyConsole() {
+  const params = useSearchParams();
+  const scheduleArea = params.get("area") === "schedules";
+  const permissionArea = params.get("area") === "permissions";
+  const peopleArea = params.get("area") === "people";
+  const day = params.get("day");
   return (
-    <Workspace title="Permissões, comunicação e regras" administration>
+    <Workspace title={scheduleArea ? "Configurações de plantões" : permissionArea ? "Permissões" : peopleArea ? "Pessoas e propostas" : "Regras e avisos"}
+      eyebrow={permissionArea ? "Organização da residência" : undefined} administration>
       {(context) =>
-        context.patient &&
+        context.patient && scheduleArea ? (
+          <div className="hca-form-stack">
+            {can(context, "access.manage") || context.activeContext?.mode === "global" ? (
+              <PolicyNavigation tab="schedules" scheduleAccess={can(context, "schedule.types.manage")} />
+            ) : null}
+            <Link className="ui-button ui-button-secondary" prefetch={false}
+              href={"/escalas?" + new URLSearchParams({
+                careRecipientId: context.patient.id,
+                ...(day && /^\d{4}-\d{2}-\d{2}$/.test(day) ? { day } : {}),
+              })}>Voltar à agenda</Link>
+            {canConfigureResidenceHours(context)
+              ? <ScheduleResidenceSettings key={context.patient.id} patientId={context.patient.id} /> : null}
+            <PatientSchedule key={`schedule:${context.userId}:${context.patient.id}`} context={context} settings />
+            {canManageBalanceRegime(context) && can(context, "bal.read") ? (
+              <BalanceRegimeSettings key={`balance-regime:${context.userId}:${context.patient.id}`} context={context} patientId={context.patient.id} />
+            ) : null}
+          </div>
+        ) : context.patient &&
         (can(context, "access.manage") ||
           context.activeContext?.mode === "global") ? (
-          <Policies key={context.patient.id} context={context} />
+          <Policies key={`${context.userId}:${context.patient.id}:${context.activeContext?.mode}`} context={context} />
         ) : (
           <Notice>Selecione um paciente que você administra.</Notice>
         )
@@ -78,6 +96,56 @@ export function PolicyConsole() {
     </Workspace>
   );
 }
+
+function PolicyNavigation({ tab, scheduleAccess }: { tab: string; scheduleAccess: boolean }) {
+  const params = useSearchParams();
+  const router = useRouter();
+  const navigationRef = useRef<HTMLElement | null>(null);
+  useLayoutEffect(() => {
+    const navigation = navigationRef.current;
+    const current = navigation?.querySelector<HTMLAnchorElement>('a[aria-current="page"]');
+    if (!navigation || !current) return;
+
+    const revealCurrent = () => {
+      const viewport = navigation.getBoundingClientRect();
+      const bounds = current.getBoundingClientRect();
+      if (bounds.left < viewport.left) {
+        navigation.scrollLeft += Math.floor(bounds.left - viewport.left);
+      } else if (bounds.right > viewport.right) {
+        navigation.scrollLeft += Math.ceil(bounds.right - viewport.right);
+      }
+    };
+
+    revealCurrent();
+    const observer = new ResizeObserver(revealCurrent);
+    observer.observe(navigation);
+    for (const link of navigation.querySelectorAll("a")) observer.observe(link);
+    return () => observer.disconnect();
+  }, [tab, scheduleAccess]);
+  const rules = ruleAreas.includes(tab);
+  const areas: [string, string, IconName][] = rules ? [
+    ["rules", "Regras", "settings"], ["notifications", "Avisos", "bell"], ["thresholds", "Estoque", "box"],
+  ] : [
+    ["rules", "Regras", "settings"], ["permissions", "Permissões", "shield"],
+    ["notifications", "Avisos", "bell"], ["people", "Pessoas e propostas", "users"],
+  ];
+  if (!rules && (scheduleAccess || tab === "schedules")) areas.push(["schedules", "Plantões", "calendar"]);
+  return <nav ref={navigationRef} aria-label="Áreas da configuração" className="hca-configuration-tabs hca-document-tab-list">
+    {areas.map(([area, label, icon]) => {
+      const query = new URLSearchParams(params.toString());
+      query.set("area", area);
+      const href = "/configuracoes?" + query;
+      return <a key={area} className="hca-configuration-tab hca-document-tab" href={href}
+        aria-current={tab === area ? "page" : undefined} onClick={event => {
+          if (!event.ctrlKey && !event.metaKey && !event.shiftKey && !event.altKey && event.button === 0) {
+            event.preventDefault();
+            router.replace(href, { scroll: false });
+          }
+        }}><Icon name={icon} />{label}</a>;
+    })}
+  </nav>;
+}
+
 function Policies({ context }: { context: WorkspaceContext }) {
   const patientId = context.patient!.id;
   const liveRevision = useLiveRevision();
@@ -91,12 +159,15 @@ function Policies({ context }: { context: WorkspaceContext }) {
   const [reviewing, setReviewing] = useState(false);
   const [confirming, setConfirming] = useState(false);
   const [conflict, setConflict] = useState(false);
-  const busy = command.busy || invitationBusy || reviewing || confirming;
-  const locked = busy || command.uncertain || conflict;
   const params = useSearchParams();
-  const router = useRouter();
-  const tab = ["rules", "permissions", "notifications", "people"].includes(params.get("area") ?? "") ? params.get("area")! : "rules";
-  const setTab = (area: string) => { const query = new URLSearchParams(params.toString()); query.set("area", area); router.replace("/configuracoes?" + query, { scroll: false }); };
+  const tab = [...ruleAreas, "permissions", "people"].includes(params.get("area") ?? "") ? params.get("area")! : "rules";
+  const rulesArea = ruleAreas.includes(tab);
+  const mode = context.activeContext?.mode === "global" ? "global" : "patient";
+  const policyOperation = useResidenceRuleOperation(context.userId, { patientId, mode, purpose: "settings" });
+  const noticeOperation = useResidenceRuleOperation(context.userId, { patientId, mode, purpose: "notification_rule" });
+  const busy = command.busy || invitationBusy || reviewing || confirming || policyOperation.busy || noticeOperation.busy;
+  const reviewedConflict = policyOperation.versionConflict || noticeOperation.versionConflict;
+  const locked = busy || command.uncertain || conflict || policyOperation.blocked || noticeOperation.blocked || reviewedConflict;
   const savingRef = useRef(false);
   const currentVersionRef = useRef<number | null>(null);
   const [invitationUrl, setInvitationUrl] = useState("");
@@ -120,14 +191,23 @@ function Policies({ context }: { context: WorkspaceContext }) {
       })
       .catch((reason) => {
         if (!controller.signal.aborted) {
-          if (reason instanceof ApiError && [401, 403, 404].includes(reason.status)) setData(null);
-          setError(reason.message);
+          const accessLost = reason instanceof ApiError && [401, 403, 404].includes(reason.status);
+          if (accessLost) setData(null);
+          setError(previous => accessLost ? reason.message : previous || reason.message);
         }
       });
     return () => controller.abort();
   }, [patientId, readAttempt, liveRevision]);
-  async function confirmed(result: ConfigurationResult) {
+  async function refreshConfirmed() {
     setConfirming(true);
+    try {
+      const authoritative = await api<PolicyData>("/api/patient-settings?careRecipientId=" + patientId);
+      if (authoritative.data.version >= (currentVersionRef.current ?? 0)) { currentVersionRef.current = authoritative.data.version; setData(authoritative); }
+      await context.refresh();
+    } catch (reason) { setError("A ação foi confirmada, mas a consulta posterior falhou. " + (reason instanceof Error ? reason.message : "Atualize esta seção.")); }
+    finally { setEditingVersion(null); setConfirming(false); setAttempt(value => value + 1); }
+  }
+  async function confirmed(result: ConfigurationResult) {
     setInvitationUrl(result.invitationUrl ?? "");
     setInvitationRecovery(result.invitationRecovery ?? null);
     setMessage(result.data.status === "awaiting_acceptance"
@@ -135,24 +215,31 @@ function Policies({ context }: { context: WorkspaceContext }) {
       : result.data.status === "pending"
         ? "Proposta global registrada. Referência: " + result.data.id + ". Um administrador local distinto deve aprovar."
         : "Configuração aplicada no paciente.");
-    setEditingVersion(null);
-    try {
-      const authoritative = await api<PolicyData>("/api/patient-settings?careRecipientId=" + patientId);
-      if (authoritative.data.version >= (currentVersionRef.current ?? 0)) { currentVersionRef.current = authoritative.data.version; setData(authoritative); }
-      await context.refresh();
-    } catch (reason) { setError("A ação foi confirmada, mas a consulta posterior falhou. " + (reason instanceof Error ? reason.message : "Atualize esta seção.")); }
-    finally { setConfirming(false); setAttempt(value => value + 1); }
+    await refreshConfirmed();
     return true;
   }
   async function reviewCurrent() {
     if (busy) return;
     setReviewing(true); setError("");
+    policyOperation.closeFailure(); noticeOperation.closeFailure();
     try {
       const authoritative = await api<PolicyData>("/api/patient-settings?careRecipientId=" + patientId);
       if (authoritative.data.version >= (currentVersionRef.current ?? 0)) { currentVersionRef.current = authoritative.data.version; setData(authoritative); }
       setEditingVersion(null); setAttempt(value => value + 1); setConflict(false);
+      policyOperation.clearVersionConflict(); noticeOperation.clearVersionConflict();
     } catch (reason) { setError(reason instanceof Error ? reason.message : "Não foi possível consultar a configuração vigente. Sua edição continua preservada."); }
     finally { setReviewing(false); }
+  }
+  async function configureVersioned(kind: "settings" | "notification_rule", change: Record<string, unknown>, expectedVersion: number) {
+    if (locked || savingRef.current) return;
+    const operation = kind === "settings" ? policyOperation : noticeOperation;
+    savingRef.current = true;
+    setError(""); setMessage("");
+    try {
+      await operation.submit({ change, expectedVersion });
+    } finally {
+      savingRef.current = false;
+    }
   }
   function failed(reason: unknown) {
     if (reason instanceof ApiError && reason.status === 409) setConflict(true);
@@ -166,6 +253,7 @@ function Policies({ context }: { context: WorkspaceContext }) {
     change: Record<string, unknown>,
     requestId?: string,
     decision?: string,
+    reviewedVersion?: number,
   ) {
     if (!data || savingRef.current || locked) return false;
     savingRef.current = true;
@@ -176,10 +264,10 @@ function Policies({ context }: { context: WorkspaceContext }) {
         kind,
         change,
         idempotencyKey: crypto.randomUUID(),
-        expectedVersion:
+        expectedVersion: reviewedVersion ?? (
           kind === "settings"
             ? (editingVersion ?? data.data.version)
-            : (currentVersionRef.current ?? data.data.version),
+            : (currentVersionRef.current ?? data.data.version)),
         ...(requestId ? { requestId, decision } : {}),
       });
       return await confirmed(result);
@@ -199,8 +287,9 @@ function Policies({ context }: { context: WorkspaceContext }) {
     } catch (reason) { setError(reason instanceof Error ? reason.message : "Não foi possível reemitir o convite."); }
     finally { savingRef.current = false; setInvitationBusy(false); }
   }
-  function saveSettings(event: FormEvent<HTMLFormElement>) {
+  async function saveSettings(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (!data || locked) return;
     const form = new FormData(event.currentTarget);
     const change: Record<string, unknown> = {};
     for (const key of [
@@ -237,9 +326,9 @@ function Policies({ context }: { context: WorkspaceContext }) {
     catch (reason) {
       setError(reason instanceof Error ? reason.message : "Confira o nome curto.");
       const input = event.currentTarget.elements.namedItem("patientShortName"); if (input instanceof HTMLElement) input.focus();
-      return Promise.resolve(false);
+      return;
     }
-    return configure("settings", change);
+    await configureVersioned("settings", change, editingVersion ?? data.data.version);
   }
   if (!data)
     return (
@@ -248,20 +337,30 @@ function Policies({ context }: { context: WorkspaceContext }) {
         {error ? <ActionButton onClick={() => { setError(""); setReadAttempt(value => value + 1); }}>Consultar configuração novamente</ActionButton> : null}
       </Notice>
     );
-  const settings = { ...defaults, ...data.data.settings };
+  const settings = { ...residencePolicyDefaults, ...data.data.settings };
   const recovery = command.uncertain ? <Notice error>O resultado da alteração ainda não foi confirmado. O conteúdo e a chave da tentativa estão preservados. <ActionButton disabled={busy} onClick={async () => { setError(""); try { await confirmed(await command.recover()); } catch (reason) { failed(reason); } }}>Recuperar mesma alteração</ActionButton></Notice>
     : conflict ? <Notice error>Revise a configuração vigente antes de preparar outra intenção. <ActionButton disabled={busy} onClick={() => void reviewCurrent()}>Revisar configuração vigente</ActionButton></Notice> : null;
+  const reviewVersioned = () => void reviewCurrent();
+  const versionedRecovery = reviewedConflict && !policyOperation.failure && !noticeOperation.failure
+    ? <ActionButton disabled={busy} onClick={reviewVersioned}>Revisar configuração vigente</ActionButton> : null;
+  const finishVersioned = (state: ResidenceRuleResult["state"]) => {
+    if (state === "recorded") void refreshConfirmed();
+  };
   return (
     <div className="space-y-5">
-      <p className="text-sm text-(--muted)">
+      {rulesArea ? <>
+        <p className="text-sm text-(--muted)">Ajustes da residência com o efeito de cada escolha.</p>
+        {mode === "global" ? <FeedbackBanner heading="Mudanças sujeitas à decisão local">Você registra propostas. Outro administrador da residência decide quando serão aplicadas.</FeedbackBanner> : null}
+      </> : tab === "permissions" ? <p className="text-sm text-(--muted)">Perfis da residência e exceções de cada pessoa.</p> : <p className="text-sm text-(--muted)">
         {context.activeContext?.mode === "global"
           ? "Atuação global: mudanças neste paciente geram propostas para aprovação local."
           : "Atuação local: alterações autorizadas são aplicadas imediatamente."}{" "}
         · Política v{data.data.version}
-      </p>
+      </p>}
       {error ? <Notice error>{error}{!command.uncertain && !conflict ? <ActionButton onClick={() => { setError(""); setReadAttempt(value => value + 1); }}>Consultar configuração novamente</ActionButton> : null}</Notice> : null}
       {message ? <Notice>{message}</Notice> : null}
       {recovery}
+      {versionedRecovery}
       {invitationRecovery ? <Notice>{invitationRecovery.notice}{context.activeContext?.mode === "patient" && context.patient?.role === "admin" ? <button className={buttonClass} disabled={busy} onClick={() => void reissueInvitation(invitationRecovery.invitationId)}>Reemitir convite e invalidar link anterior</button> : <p>Um administrador local deve reemitir o convite.</p>}</Notice> : null}
       {invitationUrl ? (
         <Notice>
@@ -275,39 +374,50 @@ function Policies({ context }: { context: WorkspaceContext }) {
           />
         </Notice>
       ) : null}
-      <nav aria-label="Áreas da configuração" className="hca-configuration-tabs hca-document-tab-list">{([
-        ["rules", "Regras", "settings"], ["permissions", "Permissões", "shield"],
-        ["notifications", "Notificações", "bell"], ["people", "Pessoas e propostas", "users"],
-      ] satisfies [string, string, IconName][]).map(([area, label, icon]) => {
-        const query = new URLSearchParams(params.toString()); query.set("area", area);
-        return <a key={area} className="hca-configuration-tab hca-document-tab" href={"/configuracoes?" + query} aria-current={tab === area ? "page" : undefined} onClick={(event) => {
-          if (!event.ctrlKey && !event.metaKey && !event.shiftKey && event.button === 0) { event.preventDefault(); setTab(area); }
-        }}><Icon name={icon} />{label}</a>;
-      })}</nav>
+      <PolicyNavigation tab={tab} scheduleAccess={can(context, "schedule.types.manage")} />
       <div hidden={tab !== "rules"}>
-        <PolicyRules key={patientId} revision={attempt} settings={settings} directory={data.directory} busy={busy} locked={locked} recovery={recovery} error={error} message={message} versionKey={patientId + ":" + (editingVersion ?? data.data.version) + ":" + attempt} onStartEditing={() => { setMessage(""); setEditingVersion(data.data.version); }} save={saveSettings} />
+        <PolicyRules key={patientId} revision={attempt} settings={settings} directory={data.directory} busy={busy} locked={locked} recovery={versionedRecovery} error={error} message={message} globalMode={mode === "global"} versionKey={patientId + ":" + (editingVersion ?? data.data.version) + ":" + attempt} onStartEditing={() => { setMessage(""); setError(""); setEditingVersion(data.data.version); }} save={saveSettings} />
       </div>
       {tab === "permissions" ? (
         <PermissionMatrix
+          key={`${patientId}:${params.get("person") ?? ""}`}
+          initialPersonId={params.get("person") ?? ""}
+          patientId={patientId}
+          patientName={context.patient!.display_name}
+          version={data.data.version}
+          revision={liveRevision}
+          globalMode={context.activeContext?.mode === "global"}
           definitions={data.definitions}
           overrides={data.overrides}
           directory={data.directory}
           busy={locked}
-          configure={configure}
+          configure={(change, version) => configure("capability", change, undefined, undefined, version)}
         />
       ) : null}
       {tab === "notifications" ? (
+        <>
+        <ResidenceRuleSettings userId={context.userId} scope={{ patientId, mode, purpose: "notificationRecipient" }} />
         <NotificationMatrix
           patientId={patientId}
           version={data.data.version}
-          busy={locked}
-          recovery={recovery}
-          configure={configure}
+          formRevision={attempt}
+          busy={busy}
+          locked={locked}
+          recovery={versionedRecovery}
+          globalMode={mode === "global"}
+          configure={(change, version) => configureVersioned("notification_rule", change, version)}
           configurationError={error}
         />
+        <FeedbackBanner>A configuração não comprova que uma mensagem foi entregue. Destino verificado, consentimento e autorização continuam necessários.</FeedbackBanner>
+        </>
       ) : null}
+      {tab === "thresholds" ? <ResidenceRuleSettings key="thresholds" userId={context.userId} scope={{ patientId, mode, purpose: "alertRule" }} /> : null}
+      {rulesArea ? <Link className="hca-control hca-control--secondary" prefetch={false} href={`/admin?careRecipientId=${patientId}`}><Icon name="back" />Voltar à administração</Link> : null}
       {tab === "people" ? (
         <>
+          <GovernanceProposals key={context.userId + ":" + patientId} context={context} directory={data.directory}
+            version={data.data.version} revision={attempt + liveRevision} busy={locked}
+            refreshConfiguration={() => { setReadAttempt(value => value + 1); void context.refresh(); }} />
           <section className="ui-card">
             <h2 className="font-semibold">Função no paciente</h2>
             <form
@@ -346,9 +456,10 @@ function Policies({ context }: { context: WorkspaceContext }) {
               </button>
             </form>
           </section>
-          <GovernanceProposals context={context} directory={data.directory} version={data.data.version} revision={attempt + liveRevision} busy={locked} configure={configure} reissue={reissueInvitation} />
         </>
       ) : null}
+      <ResidenceRuleFeedback operation={policyOperation} purpose="settings" onFinish={finishVersioned} onReview={reviewVersioned} />
+      <ResidenceRuleFeedback operation={noticeOperation} purpose="notification_rule" onFinish={finishVersioned} onReview={reviewVersioned} />
     </div>
   );
 }

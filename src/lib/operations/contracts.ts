@@ -20,15 +20,24 @@ export const technicalEvent = z.object({ environment: operationEnvironment, comp
 export type TechnicalEvent = z.infer<typeof technicalEvent>;
 export type OperationEnvironment = z.infer<typeof operationEnvironment>;
 export type OperationComponent = z.infer<typeof operationComponent>;
+const commandScope = { environment: operationEnvironment, idempotencyKey: z.uuid(), expectedActorId: z.uuid().optional() };
 export const operationsCommand = z.discriminatedUnion("action", [
-  z.object({ action: z.literal("configure"), environment: operationEnvironment, incidentId: z.null(), expectedVersion: z.number().int().positive(), policy: operationPolicy, idempotencyKey: z.uuid() }).strict(),
-  z.object({ action: z.literal("acknowledge"), environment: operationEnvironment, incidentId: z.uuid(), expectedVersion: z.number().int().positive(), reason: z.enum(["investigating", "waiting_dependency", "contained"]), idempotencyKey: z.uuid() }).strict(),
-  z.object({ action: z.literal("resolve"), environment: operationEnvironment, incidentId: z.uuid(), expectedVersion: z.number().int().positive(), reason: z.enum(["corrected", "reviewed_history", "false_alarm"]), idempotencyKey: z.uuid() }).strict(),
+  z.object({ ...commandScope, action: z.literal("configure"), incidentId: z.null(), expectedVersion: z.number().int().positive(), policy: operationPolicy }).strict(),
+  z.object({ ...commandScope, action: z.literal("acknowledge"), incidentId: z.uuid(), expectedVersion: z.number().int().positive(), reason: z.enum(["investigating", "waiting_dependency", "contained"]) }).strict(),
+  z.object({ ...commandScope, action: z.literal("resolve"), incidentId: z.uuid(), expectedVersion: z.number().int().positive(), reason: z.enum(["corrected", "reviewed_history", "false_alarm"]) }).strict(),
 ]);
 export type OperationsCommand = z.infer<typeof operationsCommand>;
+export const operationsRecovery = z.object({ ...commandScope, expectedActorId: z.uuid(), action: z.literal("recover") }).strict();
+export const operationAttempt = z.object({
+  expectedActorId: z.uuid(), environment: operationEnvironment, idempotencyKey: z.uuid(),
+  action: z.enum(["configure", "acknowledge", "resolve"]), incidentId: z.uuid().nullable(),
+  expectedVersion: z.number().int().positive(), attempts: z.number().int().nonnegative(),
+}).strict();
+export type OperationAttempt = z.infer<typeof operationAttempt>;
 const action = z.enum(["opened", "observed", "acknowledged", "resolved", "recovered", "configured", "escalated"]);
 const historyLine = z.object({ action, at: instant, version: z.number().int().positive().nullable(), reason: reason.nullable(), operator: z.enum(["system", "global"]) }).strict();
 export const incident = z.object({ id: z.uuid(), component: operationComponent, code: operationCode, severity, state: z.enum(["open", "acknowledged", "resolved"]), version: z.number().int().positive(), policyVersion: z.number().int().positive(), firstObservedAt: instant, lastObservedAt: instant, occurrences: z.number().int().positive(), metricCount: z.number().int().nonnegative(), acknowledgedAt: instant.nullable(), resolvedAt: instant.nullable(), correlationId: z.uuid().nullable(), history: z.array(historyLine).max(12) }).strict();
+export const operationIncident = z.object({ environment: operationEnvironment, incident }).strict();
 export const operationsDiagnostics = z.object({
   environment: operationEnvironment, consultedAt: instant,
   policy: z.object({ version: z.number().int().positive(), values: operationPolicy }).strict(),
@@ -40,12 +49,21 @@ export const operationsDiagnostics = z.object({
 }).strict();
 export const operationsHistory = z.object({ environment: operationEnvironment, incidentId: z.uuid().nullable(), total: z.number().int().nonnegative(), page: z.number().int().positive(), pageSize: z.number().int().min(1).max(50), data: z.array(historyLine.extend({ id: z.uuid(), policyVersion: z.number().int().positive().nullable(), policyHash: z.string().regex(/^[a-f0-9]{64}$/).nullable(), policy: operationPolicy.nullable() }).strict()).max(50) }).strict();
 export const operationsReceipt = z.object({ environment: operationEnvironment, action: z.enum(["configure", "acknowledge", "resolve"]), incidentId: z.uuid().nullable(), version: z.number().int().positive(), idempotencyKey: z.uuid(), recorded: z.literal(true), noop: z.boolean() }).strict();
+export const operationsOutcome = z.discriminatedUnion("recorded", [
+  operationsReceipt,
+  z.object({ environment: operationEnvironment, idempotencyKey: z.uuid(), recorded: z.literal(false) }).strict(),
+]);
 export type Diagnostics = z.infer<typeof operationsDiagnostics>;
 export type Incident = z.infer<typeof incident>;
-export type OperationsReceipt = { data: z.infer<typeof operationsReceipt> };
-export function operationsConfirmed(value: unknown, packet: OperationsCommand) {
-  const parsed = z.object({ data: operationsReceipt }).safeParse(value);
-  return parsed.success && parsed.data.data.environment === packet.environment && parsed.data.data.action === packet.action && parsed.data.data.incidentId === packet.incidentId && parsed.data.data.idempotencyKey === packet.idempotencyKey && parsed.data.data.version >= packet.expectedVersion;
+export function parseOperationsOutcome(value: unknown, attempt: OperationAttempt) {
+  const outcome = operationsOutcome.parse(value);
+  if (outcome.environment !== attempt.environment || outcome.idempotencyKey !== attempt.idempotencyKey
+    || outcome.recorded && (outcome.action !== attempt.action || outcome.incidentId !== attempt.incidentId
+      || outcome.version !== attempt.expectedVersion + (outcome.noop ? 0 : 1)
+      || outcome.noop && attempt.action === "configure")) {
+    throw new Error("O resultado técnico não corresponde a esta tentativa.");
+  }
+  return outcome;
 }
 export const deliveryImpact = z.object({ delayedNotices: z.number().int().nonnegative(), unconfirmedNotices: z.number().int().nonnegative(), recoverableOwnPdfs: z.number().int().nonnegative(), acknowledgementCreated: z.literal(false) }).strict();
 export const operationLabels: Record<OperationComponent, string> = { application: "Aplicação", database: "Banco", worker: "Processamento", outbox: "Fila de avisos", push: "Fila Web Push", signature: "Emissão e assinatura", integrity: "Integridade documental", backup: "Cópias de segurança", recovery: "Ensaios de recuperação", security: "Segurança de acesso", legacy: "Agendamentos e lembretes" };

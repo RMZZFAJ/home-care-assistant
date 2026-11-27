@@ -10,6 +10,22 @@ const intentions = new WeakMap<
   APIRequestContext,
   Map<string, { key: string; issuance?: string }>
 >();
+
+export async function finishGeneratedPdf(page: Page, recovered = false) {
+  const confirmation = page.getByRole("dialog", { name: recovered ? "Exemplar recuperado" : "Exemplar disponível", exact: true });
+  await expect(confirmation).toBeVisible({ timeout: 75_000 });
+  await confirmation.getByRole("button", { name: "Concluir", exact: true }).click();
+  await expect(confirmation).toBeHidden();
+}
+
+export async function generateStandardPdf(page: Page, confirm = true) {
+  await page.getByRole("button", { name: "Gerar PDF", exact: true }).click();
+  const options = page.getByRole("dialog", { name: "Gerar PDF", exact: true });
+  await options.getByRole("radio", { name: "Ficha", exact: true }).check();
+  await options.getByRole("button", { name: "Gerar PDF", exact: true }).click();
+  if (confirm) await finishGeneratedPdf(page);
+}
+
 /** A test's explicit PDF-generation action. Subsequent reads recover its exact issuance. */
 export async function generatedPdf(page: Page, legacyUrl: string, reserveLegacy?: (key: string, version: number) => Promise<unknown>) {
   const url = new URL(legacyUrl, "http://local.test"),

@@ -1,7 +1,20 @@
 import { z } from "zod";
 const id = z.uuid(), reason = z.string().trim().min(3).refine(value=>value.length<=1000,"A justificativa permite até 1.000 caracteres.");
+const programmingObservation = z.string().trim().max(1000);
 export const balanceCommandSchema = z.object({ careRecipientId: id, idempotencyKey: id, expectedVersion: z.number().int().positive().nullable().default(null), command: z.discriminatedUnion("action", [
-  z.object({ action: z.literal("configure"), body: z.object({ enabled: z.boolean(), timezone: z.string().min(1).max(80), weekday: z.number().int().min(0).max(6), shiftTypeId: id, professionalId: id.nullable().optional(), startsOn: z.iso.date(), reason }).strict() }).strict(),
+  z.object({
+    action: z.literal("configure"),
+    body: z.object({
+      enabled: z.boolean(),
+      timezone: z.string().min(1).max(80),
+      weekday: z.number().int().min(0).max(6),
+      shiftTypeId: id,
+      professionalId: id.nullable().optional(),
+      startsOn: z.iso.date(),
+      observation: programmingObservation.optional(),
+      reason: reason.optional(),
+    }).strict(),
+  }).strict(),
   z.object({ action: z.literal("refresh"), body: z.object({}).strict() }).strict(),
   z.object({ action: z.enum(["request_deferral", "defer"]), body: z.object({ assignmentId: id, targetShiftId: id, reason }).strict() }).strict(),
   z.object({ action: z.literal("decide_deferral"), body: z.object({ id, approve: z.boolean(), reason }).strict() }).strict(),
@@ -11,6 +24,20 @@ export const balanceCommandSchema = z.object({ careRecipientId: id, idempotencyK
 export type BalanceCommand = z.infer<typeof balanceCommandSchema>["command"];
 
 const revision = z.string().regex(/^\d{1,20}$/);
+const admissionScope = {
+  assignmentId: id,
+  assignmentVersion: z.number().int().positive().max(2147483647),
+  documentId: id.nullable(),
+  documentVersion: z.number().int().positive().max(2147483647).nullable(),
+};
+export const balanceCountAdmissionRequest = z.object({ careRecipientId: id, ...admissionScope }).strict()
+  .refine(value => (value.documentId === null) === (value.documentVersion === null));
+export const balanceCountAdmission = z.object({
+  ...admissionScope,
+  id,
+  admittedAt: z.iso.datetime({ offset: true }),
+}).strict();
+export type BalanceCountAdmission = z.infer<typeof balanceCountAdmission>;
 const countReferenceRead = z.object({
   careRecipientId: id,
   data: z.object({
@@ -22,9 +49,52 @@ const countReviewRead = z.object({
   careRecipientId: id,
   data: z.object({
     referenceRevision: revision,
-    eligibility: z.object({ available: z.boolean(), assignment: z.object({ id }).nullable() }),
+    eligibility: z.object({
+      available: z.boolean(),
+      assignment: z.object({ id, version: admissionScope.assignmentVersion }).nullable(),
+      admission: balanceCountAdmission.nullish(),
+    }),
   }),
 });
+const dateTime = z.iso.datetime({ offset: true });
+const agendaBalanceRead = z.object({
+  careRecipientId: id,
+  data: z.object({
+    eligibility: z.object({
+      assignment: z.object({
+        id,
+        care_recipient_id: id,
+        shift_id: id,
+        shift_version: admissionScope.assignmentVersion,
+        professional_id: id,
+        starts_at: dateTime,
+        ends_at: dateTime,
+        status: z.literal("active"),
+        version: admissionScope.assignmentVersion,
+        kind: z.enum(["scheduled", "transfer", "deferred", "recount"]),
+      }).nullable(),
+      admission: balanceCountAdmission.nullish(),
+      available: z.boolean(),
+      documentId: id.nullable(),
+      dueAt: dateTime.nullable(),
+    }),
+  }),
+});
+
+export function parseBalanceAgendaRead(value: unknown, patientId: string) {
+  const result = agendaBalanceRead.safeParse(value);
+  if (result.success && result.data.careRecipientId === patientId) {
+    const { assignment, admission, available } = result.data.data.eligibility;
+    if (assignment
+      ? assignment.care_recipient_id === patientId
+        && Date.parse(assignment.ends_at) > Date.parse(assignment.starts_at)
+        && (!admission || (admission.assignmentId === assignment.id && admission.assignmentVersion === assignment.version))
+      : !admission && !available) return result.data;
+  }
+  throw new Error("Não foi possível conferir o balanço vinculado ao plantão.");
+}
+export type BalanceAgendaEligibility = ReturnType<typeof parseBalanceAgendaRead>["data"]["eligibility"];
+
 export function parseBalanceCountReference(value: unknown, patientId: string) {
   const result = countReferenceRead.safeParse(value);
   if (!result.success || result.data.careRecipientId !== patientId) {

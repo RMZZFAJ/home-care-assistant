@@ -175,11 +175,20 @@ async function delivery(
   });
 }
 
+async function adjustCapability(admin, patient, change) {
+  const policy = await rpc(admin, "patient_governance", { p_patient: patient });
+  return rpc(admin, "configure_patient_access", {
+    p_patient: patient, p_kind: "capability", p_change: change,
+    p_key: randomUUID(), p_version: policy.data.version,
+  });
+}
+
 export {
   env,
   fixtures,
   actor,
   rpc,
+  adjustCapability,
   setup,
   issue,
   delivery,

@@ -17,6 +17,8 @@ import { formatBrazilDate } from "@/lib/receipt";
 import { formatQuantity, quantity } from "@/lib/quantity";
 import { purchaseArrivalVariance } from "@/lib/documents/purchase";
 import { pendingPurchaseItems } from "@/lib/documents/pending-purchase-items";
+import { issuedBalanceExtras } from "@/lib/validation/balance-count-extras";
+import { reviewedBalanceMaterial } from "@/lib/validation/balance-review-items";
 
 const name = (line: Record<string, unknown>) => String(line.name_snapshot ?? line.product_name_snapshot ?? line.custom_name ?? "Material não identificado");
 const unit = (line: Record<string, unknown>) => String(line.unit_snapshot ?? "Unidade não preservada");
@@ -197,6 +199,11 @@ export async function renderApprovedSupplyPdf(snapshot: DocumentSnapshot, emissi
       const reference = (line.metadata as { expectedQuantity?: unknown; } | undefined)?.expectedQuantity;
       return { category: category(line), cells: [{ text: String(index + 1).padStart(2, "0") }, { text: name(line) + "\n" + unit(line), key: "material/" + index + "/name", strong: true }, { text: amount(reference, unit(line)), key: "material/" + index + "/reference" }, { text: amount(line.quantity, unit(line)), key: "material/" + index + "/counted" }, { text: after + (application?.state === "applied" ? "\n" + formatBrazilDate(application.appliedAt) : ""), key: "material/" + index + "/balance" }] };
     })));
+    const extras = issuedBalanceExtras.parse(snapshot.payload.balanceExtras ?? []);
+    if (extras.length) {
+      layout.heading("Itens extras contados", "Quantidades encontradas com a equipe, aguardando identificação no catálogo.");
+      extras.forEach((extra, index) => layout.paragraph(extra.name + " · " + amount(extra.quantity, extra.unit), "balance/extra/" + index));
+    }
     if (snapshot.balanceReviews?.counter) layout.paragraph("Contagem registrada por " + (snapshot.balanceReviews.counter.name ?? "Nome não preservado") + " · " + formatBrazilDate(countAt), "balance/counter", { size: 9.5 });
     if (snapshot.balanceReviews?.notes && snapshot.balanceReviews.notes !== snapshot.payload.notes) {
       layout.heading("Observações desta contagem");
@@ -212,8 +219,9 @@ export async function renderApprovedSupplyPdf(snapshot: DocumentSnapshot, emissi
       layout.paragraph(review.count_version !== snapshot.balanceReviews?.countVersion ? "Registro de contagem anterior; não é revisão vigente da contagem atual." : eligible.includes(review) ? "Revisão da contagem atual. Não aplica nem corrige estoque." : "Revisão preservada; elegibilidade para a contagem atual não comprovada por este contexto.", prefix + "/scope", { size: 9.5 });
       layout.paragraph(review.comment || "Sem comentário adicional.", prefix + "/comment");
       for (const [itemIndex, item] of (review.item_results ?? []).entries()) {
-        const line = review.reviewed_snapshot.lines.find(value => value.id === item.lineId);
-        layout.paragraph((line?.name_snapshot ?? "Material não identificado") + " · " + (item.result === "confirmed" ? "Confirmado" : "Diferença apontada") + " · " + ({ none: "Sem encaminhamento", recount: "Reconto indicado", adjustment: "Ajuste autorizado indicado" }[item.forwarding]), prefix + "/item/" + itemIndex, { strong: true });
+        const material = reviewedBalanceMaterial(review.reviewed_snapshot, item.lineId);
+        const name = material ? material.name + (material.extra ? " (item extra)" : "") : "Material não identificado";
+        layout.paragraph(name + " · " + (item.result === "confirmed" ? "Confirmado" : "Diferença apontada") + " · " + ({ none: "Sem encaminhamento", recount: "Reconto indicado", adjustment: "Ajuste autorizado indicado" }[item.forwarding]), prefix + "/item/" + itemIndex, { strong: true });
         if (item.comment) layout.paragraph(item.comment, prefix + "/itemComment/" + itemIndex, { size: 9.5 });
       }
     }
@@ -227,9 +235,10 @@ export async function renderApprovedSupplyPdf(snapshot: DocumentSnapshot, emissi
       layout.heading("Atos posteriores vinculados ao material");
       for (const [actIndex, act] of correction.acts.entries()) {
         const prefix = "correction/" + index + "/" + actIndex;
-        layout.paragraph("Reconto · " + act.line.name + " · " + amount(act.line.quantity, act.line.unit), prefix + "/count", { strong: true });
+        const stillExtra = act.line.id === correction.sourceLineId;
+        layout.paragraph("Reconto · " + act.line.name + (stillExtra ? " (item extra)" : "") + " · " + amount(act.line.quantity, act.line.unit), prefix + "/count", { strong: true });
         layout.paragraph((act.actorName ?? "Nome não preservado") + " · " + formatBrazilDate(act.recordedAt), prefix + "/actor", { size: 9.5 });
-        layout.paragraph(act.application.state === "not_applied" ? "Reconto não aplicado ao estoque." : act.application.state === "unavailable" ? "Resultado da aplicação não disponível no registro." : "Aplicado por " + act.application.actorName + " · " + formatBrazilDate(act.application.appliedAt), prefix + "/application", { size: 9.5 });
+        layout.paragraph(stillExtra ? "Item contado como extra, sem movimentação de estoque." : act.application.state === "not_applied" ? "Reconto não aplicado ao estoque." : act.application.state === "unavailable" ? "Resultado da aplicação não disponível no registro." : "Aplicado por " + act.application.actorName + " · " + formatBrazilDate(act.application.appliedAt), prefix + "/application", { size: 9.5 });
         if (act.application.state === "applied") layout.paragraph("Saldo após este reconto: " + (act.application.lines[0].state === "restricted" ? "Acesso restrito" : amount(act.application.lines[0].quantity, act.line.unit)), prefix + "/balance");
       }
     }

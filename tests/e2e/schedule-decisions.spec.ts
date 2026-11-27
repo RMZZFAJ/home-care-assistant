@@ -93,6 +93,7 @@ test("C-FINAL023 escala recupera leitura e preserva foco sem validar fuso propos
   const original = sql(
     `select to_jsonb(s) from public.scheduled_shifts s where id=${sqlLiteral(f.shift.id)};`,
   );
+  await page.getByLabel("Visualização", { exact: true }).selectOption("week");
   let writes = 0;
   page.on("request", (request) => {
     if (
@@ -116,7 +117,7 @@ test("C-FINAL023 escala recupera leitura e preserva foco sem validar fuso propos
   );
   await page
     .getByRole("group", { name: "Período da escala", exact: true })
-    .getByRole("button", { name: /Próxima semana|Próximo mês/ })
+    .getByRole("button", { name: "Próxima semana", exact: true })
     .click();
   await expect(
     page
@@ -448,20 +449,16 @@ test("a decisão expõe o BAL vigente e exige o processo familiar antes de mudar
   await page
     .getByRole("button", { name: "Aprovar alteração", exact: true })
     .click();
-  await page
-    .getByRole("dialog", { name: "Aprovação de alteração", exact: true })
-    .getByRole("button", { name: "Revisar alteração", exact: true })
-    .click();
   const dialog = page.getByRole("dialog", {
-    name: "Revisar escala",
+    name: "Aprovação de alteração",
     exact: true,
   });
   await expect(
-    dialog.getByRole("region", { name: "Consequências para o BAL" }),
-  ).toContainText("Existe BAL designado com janela vigente");
-  await expect(dialog).toContainText("esta aprovação não pode adiar o prazo");
+    dialog.getByText("Este plantão tem um balanço designado. A família precisa encaminhar a contagem antes de confirmar a alteração.", { exact: true }),
+  ).toBeVisible();
   await expect(
-    dialog.getByRole("button", { name: "Aprovar proposta", exact: true }),
+    dialog.getByRole("button", { name: "Revisar alteração", exact: true }),
   ).toBeDisabled();
+  await expect(dialog.getByRole("button", { name: "Aprovar proposta", exact: true })).toHaveCount(0);
   await audit(page, "D1 schedule decision with active BAL");
 });

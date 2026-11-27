@@ -156,6 +156,9 @@ export function scheduleResourceFieldsMatchCommand(
   try {
     if (f.form === "shift") {
       valid &&= c.action === f.operation && timezone !== null;
+      valid &&= "balanceImpact" in c.body && c.body.balanceImpact
+        ? equal(c.body.balanceImpact, f.balanceImpact && { ...f.balanceImpact, reason: f.balanceImpact.reason.trim() })
+        : !f.balanceImpact;
       if (c.action === "change" || c.action === "propose_change")
         valid &&=
           c.body.professionalId === f.professionalId &&

@@ -1,1 +1,153 @@
 .hca-contingency,.hca-contingency-facts,.hca-contingency-rows{display:grid;gap:20px;min-width:0}.hca-contingency article,.hca-contingency>section{min-width:0}.hca-contingency .hca-toolbar{align-items:end}.hca-contingency-facts>p{margin:0}.hca-contingency-rows .ui-card{display:grid;gap:14px}.hca-contingency-rows h3{margin:0}@media(max-width:850px){.hca-contingency .hca-toolbar>.hca-field{width:100%}}
+.hca-contingency-content { display: grid; align-content: start; gap: 16px; min-width: 0; }
+.hca-contingency-content h2 { font-size: 15px; font-weight: 700; }
+.hca-contingency-patient { color: var(--hca-muted); margin: 5px 0 0; font-size: 13px; }
+.hca-contingency-intro { display: grid; gap: 16px; }
+.hca-contingency-list.ui-card { padding: 0 16px 16px; }
+.hca-contingency-list > .hca-section-heading {
+  padding: 10px 16px;
+  margin-inline: -16px;
+  border-radius: 14px 14px 0 0;
+  border-bottom: 1px solid var(--hca-line);
+  background: #f8fbf9;
+}
+.hca-contingency-list > .hca-section-heading h2 { margin: 0; }
+.hca-contingency-lead { display: flex; gap: 12px; align-items: flex-start; }
+.hca-contingency-lead p, .hca-contingency-empty p { color: var(--hca-muted); font-size: 13px; }
+.hca-contingency-search { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 8px; margin: 16px 0 8px; }
+.hca-contingency-empty { display: grid; justify-items: center; text-align: center; padding: 20px 8px; }
+.hca-contingency-pages { justify-content: space-between; }
+.hca-contingency-dossier-navigation { background: var(--hca-paper); }
+.hca-contingency-dossier-under-review { visibility: hidden; }
+.hca-contingency-state {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-inline: 16px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--hca-line);
+}
+.hca-contingency-state > span:last-child { color: var(--hca-muted); font-size: 12px; }
+.hca-contingency-dossier .hca-modal-context-head h2 { overflow-wrap: anywhere; }
+.hca-contingency-dossier-navigation .hca-document-tab-list { margin: 14px 16px 0; }
+:is(.hca-contingency-dossier-navigation, .hca-contingency-editor) .hca-document-tab-list {
+  position: static;
+  gap: 18px;
+  background: transparent;
+}
+:is(.hca-contingency-dossier-navigation, .hca-contingency-editor) .hca-document-tab { padding-inline: 0; }
+.hca-contingency-view [role="tabpanel"]:not([hidden]) { display: grid; gap: 12px; min-width: 0; }
+.hca-contingency-view :is(p, h3) { margin: 0; }
+.hca-contingency-view .hca-contingency-lead h3 { font-weight: 650; }
+.hca-contingency-view .hca-contingency-technical-id { color: var(--hca-muted); font-size: 12px; }
+.hca-contingency-material { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--hca-line); }
+.hca-contingency-linked { display: grid; gap: 8px; margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--hca-line); }
+.hca-contingency-linked > a { justify-self: start; }
+.hca-contingency > .hca-guide-actions { justify-content: space-between; }
+.hca-contingency > .hca-guide-actions > button { flex: 0 1 auto; }
+
+.hca-contingency-editor :is(h3, p), .hca-contingency-editor .hca-contingency-facts { margin-block: 0; }
+.hca-contingency-editor h3 { font-size: 15px; font-weight: 700; }
+.hca-contingency-editor .hca-contingency-facts { gap: 12px; }
+.hca-contingency-editor .hca-contingency-lead { align-items: center; }
+.hca-contingency-editor .hca-modal-context-head > div { flex: 1; min-width: 0; }
+.hca-contingency-editor .hca-document-tab-list { margin: 0; }
+.hca-contingency-editor .hca-contingency-facts > .hca-contingency-lead { align-items: flex-start; }
+.hca-contingency-editor .hca-contingency-facts > .hca-contingency-lead p { color: var(--hca-muted); }
+.hca-contingency-summary { padding-bottom: 12px; border-bottom: 1px solid var(--hca-line); }
+.hca-contingency-hint { display: flex; align-items: flex-start; gap: 8px; color: var(--hca-muted); font-size: 13px; }
+.hca-contingency-hint > svg { flex: none; margin-top: 3px; }
+
+.hca-overlay:has(.hca-contingency-link-confirmation) > :is(.hca-modal-backdrop, .hca-modal-viewport),
+.hca-overlay:has(.hca-contingency-dossier-under-review) > .hca-modal-backdrop {
+  position: fixed;
+  inset: var(--app-header-height) 0 0;
+}
+.hca-overlay:has(.hca-contingency-link-confirmation) > .hca-modal-backdrop { backdrop-filter: none; }
+.hca-overlay:has(.hca-contingency-link-confirmation) > .hca-modal-viewport { padding: clamp(12px, 4vw, 20px); }
+/* WebKit can miss the drawer when backdrop-filter samples across the dialog portals. */
+.hca-contingency-editor-under-confirmation { filter: blur(3px); }
+.hca-contingency-link-confirmation { width: min(390px, 100%); max-height: 100%; border-radius: 17px; }
+.hca-contingency-link-confirmation > :is(.hca-modal-head, .hca-modal-footer) { background: #f8faf8; }
+.hca-contingency-link-confirmation > .hca-modal-head {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 9px;
+  padding: 13px 15px;
+}
+.hca-contingency-link-confirmation .hca-modal-heading-icon {
+  display: grid;
+  place-items: center;
+  width: 33px;
+  height: 34px;
+  border: 1px solid var(--hca-line);
+  border-radius: 9px;
+  background: var(--hca-tint);
+  color: var(--hca-teal);
+}
+.hca-contingency-link-confirmation .hca-modal-head > .hca-control-icon {
+  width: 36px;
+  min-width: 36px;
+  min-height: 36px;
+}
+.hca-contingency-link-confirmation > .hca-modal-content { padding: 17px 15px; }
+.hca-contingency-link-confirmation .hca-contingency-hint {
+  margin: 12px 0 0;
+  padding-top: 12px;
+  border-top: 1px solid var(--hca-line);
+}
+.hca-contingency-link-confirmation > .hca-modal-footer { padding-inline: 15px; }
+.hca-contingency-link-confirmation > .hca-modal-footer > button {
+  gap: 6px;
+  min-width: 0;
+  padding-inline: 8px;
+  white-space: normal;
+}
+.hca-contingency-link-confirmation > .hca-modal-footer > button > svg { flex: none; width: 14px; height: 14px; }
+.hca-contingency-editor-card, .hca-contingency-disclosure {
+  border: 1px solid var(--hca-line);
+  border-radius: 12px;
+  background: var(--hca-paper);
+}
+.hca-contingency-editor-card { padding: 12px; }
+.hca-contingency-disclosure > summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 12px;
+  color: var(--hca-ink);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 650;
+}
+.hca-contingency-disclosure > summary::-webkit-details-marker { display: none; }
+.hca-l1 .hca-contingency-editor .hca-contingency-disclosure > summary::after { content: none; }
+.hca-contingency-disclosure[open] > summary > svg { transform: rotate(180deg); }
+.hca-contingency-disclosure > .hca-form { padding: 0 12px 12px; }
+.hca-contingency-known { display: grid; gap: 4px; min-width: 0; font-size: 13px; }
+
+@media (max-width: 850px) {
+  .hca-overlay:has(.hca-contingency-link-confirmation) > :is(.hca-modal-backdrop, .hca-modal-viewport),
+  .hca-overlay:has(.hca-contingency-dossier-under-review) > .hca-modal-backdrop {
+    inset-block-start: 58px;
+  }
+  .hca-drawer-viewport > :is(.hca-contingency-editor, .hca-contingency-dossier).hca-guide-topic-sheet {
+    max-height: min(92dvh, 740px);
+  }
+  .hca-contingency-dossier .hca-modal-footer:has(> .hca-control--primary:nth-child(3)) {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .hca-contingency-dossier .hca-modal-footer > .hca-control--primary:nth-child(3) { grid-column: 1 / -1; }
+}
+@media (max-width: 500px) {
+  .hca-contingency-editor > .hca-modal-footer > button[type="submit"][form] {
+    flex: 0 0 auto;
+    padding-inline: 10px;
+    white-space: nowrap;
+  }
+}

@@ -19,6 +19,7 @@ import {
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { selectContext } from "./auth-context";
 import { audit } from "./accessibility-audit";
+import { balanceStage, finishBalanceMaterials } from "./balance-wizard-stages";
 
 test.setTimeout(180_000);
 const button = (page: Page, name: string) =>
@@ -41,7 +42,7 @@ async function login(page: Page, patient: string, email: string) {
   await selectContext(page, patient);
   await page.goto("/fichas/bal");
   const steps = page.getByRole("navigation", { name: /^(Etapas da ficha|Etapas da BAL)$/ });
-  await expect(steps.or(panel(page)).first()).toBeVisible();
+  await expect(steps.or(panel(page)).or(button(page, "Iniciar contagem")).first()).toBeVisible();
 }
 async function stockChange(
   f:
@@ -84,13 +85,16 @@ test("BAL local scheduled fields survive a stock change,reload and explicit fres
 }, info) => {
   const f = await balanceSetup();
   await login(page, f.patient, f.pro.email);
-  await expect(button(page, "Revisar")).toBeEnabled();
-  await page
-    .getByLabel("Material fictício V4 0 · unidade", { exact: true })
-    .fill("1,");
+  await button(page, "Iniciar contagem").click();
+  await expect(button(page, "Avançar")).toBeEnabled();
+  for (const [index] of f.products.entries())
+    await page.getByLabel(`Material fictício V4 ${index} · unidade`, { exact: true }).fill("0");
+  await finishBalanceMaterials(page);
   await page
     .getByLabel("Observações da contagem", { exact: true })
     .fill("Notas anteriores que não podem sumir");
+  await balanceStage(page, "Materiais").click();
+  await page.getByLabel("Material fictício V4 0 · unidade", { exact: true }).fill("1,");
   const key = `hca:v2:bal-count:${f.pro.id}:${f.patient}:new`;
   await expect
     .poll(
@@ -120,9 +124,6 @@ test("BAL local scheduled fields survive a stock change,reload and explicit fres
   await expect(
     page.getByLabel("Material fictício V4 0 · unidade", { exact: true }),
   ).toHaveValue("");
-  await expect(
-    page.getByLabel("Observações da contagem", { exact: true }),
-  ).toHaveValue(old.notes);
   await expect(page.getByText("Último rascunho salvo.", { exact: true })).toBeVisible();
   const saved = await rpc(f.pro.client, "creation_draft_context", {
     p_patient: f.patient,
@@ -130,6 +131,7 @@ test("BAL local scheduled fields survive a stock change,reload and explicit fres
     p_target: null,
   });
   expect(saved.content.counts).toEqual({});
+  expect(saved.content.notes).toEqual(old.notes);
   expect(saved.content.observationTimes).toEqual({});
   expect(saved.content.previousObservations).toEqual([old]);
   expect(saved.content.context.referenceRevision).not.toBe(
@@ -183,8 +185,7 @@ test("BAL private optional observations survive reference change,new entry and a
   await button(page, "Atualizar referência e iniciar nova conferência").click();
   await expect(review(page)).toHaveCount(0);
   await button(page, "Avançar").click();
-  await button(page, "Avançar").click();
-  const input = page.getByLabel("Quantidade — Material fictício V4 0", {
+  const input = page.getByLabel("Material fictício V4 0 · unidade", {
     exact: true,
   });
   await expect(input).toHaveValue("");
@@ -208,7 +209,7 @@ test("BAL private optional observations survive reference change,new entry and a
       .click();
     await expect(review(other)).toHaveCount(0);
     await expect(
-      other.getByLabel("Quantidade — Material fictício V4 0", { exact: true }),
+      other.getByLabel("Material fictício V4 0 · unidade", { exact: true }),
     ).toHaveValue("2");
     const history = other
       .getByRole("region", {
@@ -230,7 +231,8 @@ test("BAL scheduled failed source read preserves the exact local copy and recove
 }) => {
   const f = await balanceSetup();
   await login(page, f.patient, f.pro.email);
-  await expect(button(page, "Revisar")).toBeEnabled();
+  await button(page, "Iniciar contagem").click();
+  await expect(button(page, "Avançar")).toBeEnabled();
   await page
     .getByLabel("Material fictício V4 0 · unidade", { exact: true })
     .fill("7");
@@ -254,7 +256,7 @@ test("BAL scheduled failed source read preserves the exact local copy and recove
   await expect(
     page.getByLabel("Material fictício V4 0 · unidade", { exact: true }),
   ).toHaveValue("7");
-  await expect(button(page, "Revisar")).toBeEnabled();
+  await expect(button(page, "Avançar")).toBeEnabled();
 });
 
 test("BAL private document version and reassigned shift keep old observations without authorizing another count", async ({
@@ -337,6 +339,9 @@ test("BAL private document version and reassigned shift keep old observations wi
       id: shift.id,
       professionalId: other.id,
       reason: "Substituição real no mesmo período de teste",
+      balanceImpact: { decision: "assign", assignmentId: assignment.id, assignmentVersion: assignment.version,
+        sourceVersion: shift.version, targetShiftId: shift.id, targetShiftVersion: shift.version,
+        reason: "Família encaminhou a contagem para o substituto" },
     },
     shift.version,
   );

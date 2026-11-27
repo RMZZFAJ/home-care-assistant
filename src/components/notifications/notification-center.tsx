@@ -1,190 +1,187 @@
 "use client";
-import { CheckboxField, Pill } from "@/components/ui/controls";
-import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
-import { api, buttonClass, Notice, Workspace } from "../workspace";
+
+import { useSearchParams } from "next/navigation";
+import { useEffect, useId, useRef, useState } from "react";
+import { ActionButton, Pill, SelectField, TextInput } from "@/components/ui/controls";
+import { Dialog } from "@/components/ui/overlays";
+import { Icon } from "@/components/ui/icon";
+import { api, ApiError } from "@/lib/client/api";
 import { formatBrazilDate } from "@/lib/receipt";
 import { deliveryLabels } from "@/lib/notifications/presentation";
 import { documentEventLabel } from "@/lib/notifications/event-labels";
-import { Icon } from "@/components/ui/primitives";
-import "./notification-center.css";
-
-import { notificationHref,notificationTargetLabel } from "@/lib/notifications/navigation";
+import { inboxKind, inboxSearchLimit, type InboxKind, type InboxNotification } from "@/lib/notifications/inbox";
+import { inboxKinds, inboxNoticeIcon } from "@/lib/notifications/inbox-presentation";
 import { useInbox } from "@/lib/notifications/use-inbox";
+import { Notice, Workspace } from "../workspace";
 import { PushArrival } from "./push-arrival";
 import { DeliveryImpact } from "./delivery-impact";
+import { InboxNoticeDetails } from "./inbox-notice-details";
+import "./notification-center.css";
+
 export function NotificationCenter() {
-  return (
-    <Workspace title="Central de notificações">
-      {(context) => (
-        <><PushArrival />{context.activeContext?.mode === "patient" && context.patient ? <DeliveryImpact key={context.patient.id} patientId={context.patient.id} /> : null}<Center
-          key={`${context.activeContext?.mode}:${context.patient?.id ?? "none"}`}
-          patientId={context.activeContext?.mode === "patient" ? context.patient?.id : undefined}
-        /></>
-      )}
-    </Workspace>
-  );
+  return <Workspace title="Avisos" eyebrow="Central de atualizações" heading={context => <div className="page-heading">
+    <div>
+      <p className="eyebrow">Central de atualizações</p>
+      <h1>Avisos</h1>
+      <p className="hca-inbox-patient">{context.patient?.display_name}</p>
+    </div>
+  </div>}>
+    {context => <>
+      <PushArrival />
+      <Center key={[context.userId, context.activeContext?.mode, context.patient?.id].join(":")}
+        patientId={context.activeContext?.mode === "patient" ? context.patient?.id : undefined}
+        patientName={context.patient?.display_name}
+      />
+      {context.activeContext?.mode === "patient" && context.patient ? <div className="mt-5">
+        <DeliveryImpact key={context.patient.id} patientId={context.patient.id} />
+      </div> : null}
+    </>}
+  </Workspace>;
 }
-function Center({ patientId }: { patientId?: string }) {
-  const params = useSearchParams(), router = useRouter();
-  const urlPage = Math.max(1, Math.min(100_000, Number.parseInt(params.get("page") ?? "1", 10) || 1));
-  const urlUnread = params.get("unread") === "true", queryKey = JSON.stringify([urlPage, urlUnread]);
-  const [selection, setSelection] = useState({ queryKey, page: urlPage, unread: urlUnread });
-  if (selection.queryKey !== queryKey) {
-    // Restore Back/Forward without remounting the focused control.
-    setSelection({ queryKey, page: urlPage, unread: urlUnread });
+
+type NoticeFilter = "all" | "unread" | "tasks";
+
+function updateInboxUrl(updates: Record<string, string | null>, replace = false) {
+  const address = new URL(window.location.href);
+  for (const [key, value] of Object.entries(updates)) {
+    if (value === null) address.searchParams.delete(key);
+    else address.searchParams.set(key, value);
   }
-  const { page, unread } = selection.queryKey === queryKey ? selection : { page: urlPage, unread: urlUnread };
+  const path = address.pathname + address.search + address.hash;
+  if (path !== window.location.pathname + window.location.search + window.location.hash) {
+    if (replace) window.history.replaceState(null, "", path);
+    else window.history.pushState(null, "", path);
+  }
+}
+
+function Center({ patientId, patientName }: { patientId?: string; patientName?: string }) {
+  const params = useSearchParams();
+  const page = Math.max(1, Math.min(100_000, Number.parseInt(params.get("page") ?? "1", 10) || 1));
+  const search = (params.get("q") ?? "").trim().slice(0, inboxSearchLimit);
+  const kind = inboxKind.safeParse(params.get("kind")).data ?? null;
+  const filter: NoticeFilter = params.get("tasks") === "true" ? "tasks" : params.get("unread") === "true" ? "unread" : "all";
+  const [input, setInput] = useState({ search, text: search });
+  if (input.search !== search) setInput({ search, text: search });
+  const searchText = input.search === search ? input.text : search;
+  useEffect(() => {
+    if (searchText.trim() === search) return;
+    const timer = window.setTimeout(() => updateInboxUrl({ page: "1", q: searchText.trim() || null }, true), 250);
+    return () => window.clearTimeout(timer);
+  }, [search, searchText]);
+
   const [writeError, setWriteError] = useState("");
-  const inbox = useInbox({ patientId, page, unread });
-  const navigate = (nextPage: number, nextUnread = unread) => {
-    // Controlled fields and the read scope change in the same event.
-    setSelection({ queryKey, page: nextPage, unread: nextUnread });
-    const next = new URLSearchParams(params.toString());
-    next.set("page", String(nextPage)); next.set("unread", String(nextUnread));
-    router.push("/notificacoes?" + next, { scroll: false });
-  };
+  const [noticeId, setNoticeId] = useState<string | null>(null);
+  const noticeTriggerRef = useRef<HTMLButtonElement>(null);
+  const searchRef = useRef<HTMLInputElement>(null);
+  const [proposedKind, setProposedKind] = useState<InboxKind | "" | null>(null);
+  const [dismissedError, setDismissedError] = useState<string | null>(null);
+  const inbox = useInbox({ patientId, page, kind, search, unread: filter === "unread", tasks: filter === "tasks" });
   const rows = inbox.data?.data ?? [], total = inbox.data?.total ?? 0;
-  return (
-    <section className="hca-inbox" aria-label="Acompanhamento pessoal">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2 className="font-semibold">Acompanhamento pessoal</h2>
-        <button
-          className={buttonClass}
-          type="button"
-          disabled={inbox.loading || inbox.scopeRequired}
-          onClick={inbox.refresh}
-        >
-          Atualizar
-        </button>
+  const activeError = inbox.errorKey && inbox.errorKey !== dismissedError && !noticeId && proposedKind === null;
+  const changeFilter = (next: NoticeFilter) => updateInboxUrl({ page: "1", unread: String(next === "unread"), tasks: next === "tasks" ? "true" : null });
+  const navigatePage = (next: number) => updateInboxUrl({ page: String(next), unread: String(filter === "unread") });
+  const markSeen = async (id: string) => {
+    setWriteError("");
+    try {
+      await api("/api/notifications", { id });
+      inbox.invalidate();
+    } catch (reason) {
+      if (reason instanceof ApiError && [401, 403, 404, 409].includes(reason.status)) inbox.invalidate();
+      setWriteError(reason instanceof Error ? reason.message : "Não foi possível confirmar a marcação como vista. Consulte novamente para conferir.");
+    }
+  };
+
+  return <section className="hca-inbox" aria-label="Acompanhamento pessoal">
+    {inbox.scopeRequired ? <Notice>Selecione um vínculo com paciente em Mudar perfil para consultar suas notificações.</Notice> : <>
+      <div className="hca-inbox-summary">
+        <span><strong>{inbox.fresh ? inbox.data?.unreadCount : "–"}</strong><small>não vistos</small></span>
+        <span><strong>{inbox.fresh ? inbox.data?.actionCount : "–"}</strong><small>com ação pendente</small></span>
       </div>
-      <p className="hca-inbox-help">Abra a tarefa certa e acompanhe os avisos desta residência.</p>
-      <div className="hca-toolbar"><CheckboxField
-          checked={unread}
-          label="Somente não vistas"
-          onChange={controlEvent => { const controlValue = controlEvent.currentTarget.checked;
-            navigate(1, controlValue === true);
-           }}
-        /></div>
-      {inbox.scopeRequired ? <Notice>Selecione um vínculo com paciente em Mudar perfil para consultar suas notificações.</Notice> : null}
-      {inbox.error ? <Notice error>{inbox.error} <button type="button" className={buttonClass} onClick={inbox.refresh}>Consultar notificações novamente</button></Notice> : null}
-      {writeError ? <Notice error>{writeError}</Notice> : null}
-      {inbox.loading ? (
-        <p className="my-3 text-sm" role="status">
-          Consultando notificações…
-        </p>
-      ) : null}
-      {rows.length > 0 && !inbox.fresh ? <p className="my-3 text-sm text-(--muted)">Última consulta confirmada{inbox.receivedAt ? " em " + formatBrazilDate(inbox.receivedAt) : ""}; aguardando atualização.</p> : null}
-      <ul className="hca-inbox-list" aria-label="Avisos consultados">
-        {rows.map((row) => (
-          <li
-            key={row.id}
-            data-notification-id={row.id}
-            className={
-              "hca-inbox-row " +
-              (row.seen_at
-                ? ""
-                : "hca-inbox-unread")
-            }
-          >
-            <span className="hca-inbox-icon"><Icon name="bell" /></span>
-            <div className="hca-inbox-content">
-            <h3>
-              <span>{row.operational_documents?.code ?? "Atualização operacional"}</span>
-              {!row.seen_at ? <Pill className="ml-3"  tone="neutral">Não vista</Pill> : null}
-            </h3>
-            <p className="mt-1 text-sm">
-              {documentEventLabel(row.event_key ?? row.document_events?.action)}
-            </p>
-            <p className="mt-1 text-xs text-(--muted)">
-              {formatBrazilDate(row.created_at)} ·{" "}
-              {row.channel === "internal"
-                ? "Disponível no aplicativo"
-                : (row.channel === "whatsapp" ? "WhatsApp" : "E-mail") +
-                  " · " +
-                  (deliveryLabels[row.state] ?? "Aguardando atualização")}
-            </p>
-            </div>
-            <div className="hca-inbox-actions">
-              {row.document_id ||
-              row.requisition_id ||
-              row.reminder_id ||
-              row.consumption_report_id ||
-              row.alert_event_id ? (
-                <Link className={buttonClass} href={notificationHref(row)}>
-                  {notificationTargetLabel(row)}
-                </Link>
-              ) : null}
-              {!row.seen_at ? (
-                <button
-                  className={buttonClass}
-                  type="button"
-                  disabled={!inbox.fresh}
-                  onClick={async () => {
-                    setWriteError("");
-                    try {
-                      await api("/api/notifications", { id: row.id });
-                      inbox.refresh();
-                    } catch (reason) {
-                      setWriteError(
-                        reason instanceof Error
-                          ? reason.message
-                          : "Não foi possível confirmar a marcação como vista. Consulte novamente para conferir.",
-                      );
-                    }
-                  }}
-                >
-                  Marcar como vista
-                </button>
-              ) : (
-                <span className="ui-badge ui-badge-neutral">
-                  Vista no aplicativo
-                </span>
-              )}
-            </div>
-          </li>
-        ))}
-      </ul>
-      {inbox.fresh && !rows.length ? (
-        <p className="hca-inbox-empty">
-          Nenhuma notificação neste filtro.
-        </p>
-      ) : null}
-      {total > 20 ? (
-        <nav
-          className="mt-5 flex items-center justify-between gap-3"
-          aria-label="Páginas das notificações"
-        >
-          <button
-            className={buttonClass}
-            type="button"
-            disabled={page === 1 || !inbox.fresh}
-            onClick={() => {
-              navigate(page - 1);
-            }}
-          >
-            Anterior
-          </button>
-          <span className="text-sm">
-            {page} / {Math.ceil(total / 20)}
-          </span>
-          <button
-            className={buttonClass}
-            type="button"
-            disabled={page * 20 >= total || !inbox.fresh}
-            onClick={() => {
-              navigate(page + 1);
-            }}
-          >
-            Próxima
-          </button>
-        </nav>
-      ) : null}
-      <p className="mt-4 text-xs leading-5 text-(--muted)">
-        Vista no aplicativo é independente da entrega ou leitura confirmada pelo
-        provedor externo e não registra ciência ou aceite do documento.
-      </p>
-    </section>
-  );
+      <div className="hca-inbox-search">
+        <TextInput ref={searchRef} type="search" leading={<Icon name="search" width={17} height={17} />} placeholder="Buscar aviso ou ficha"
+          aria-label="Buscar aviso ou ficha" maxLength={inboxSearchLimit} value={searchText}
+          onChange={event => setInput({ search, text: event.currentTarget.value })} />
+        <ActionButton aria-label="Filtrar avisos" onClick={() => setProposedKind(kind ?? "")}><Icon name="filter" /></ActionButton>
+      </div>
+      <div className="hca-inbox-filters" role="group" aria-label="Estado dos avisos">
+        <button type="button" aria-pressed={filter === "unread"} onClick={() => changeFilter("unread")}>
+          Não vistos{inbox.fresh && inbox.data ? <span aria-hidden="true">{inbox.data.unreadCount}</span> : null}
+        </button>
+        <button type="button" aria-pressed={filter === "all"} onClick={() => changeFilter("all")}>Todos</button>
+        <button type="button" aria-pressed={filter === "tasks"} onClick={() => changeFilter("tasks")}>Com ação</button>
+      </div>
+      {kind ? <div className="hca-inbox-applied">
+        <Pill tone="info">{inboxKinds[kind]}</Pill>
+        <ActionButton compact variant="quiet" onClick={() => updateInboxUrl({ page: "1", kind: null })}>Limpar filtro</ActionButton>
+      </div> : null}
+      <div className="hca-inbox-query">
+        {inbox.receivedAt ? <span><Icon name={inbox.fresh ? "check-circle" : "clock"} width={15} height={15} />
+          {inbox.fresh ? "Atualizado em" : "Última consulta confirmada em"} {formatBrazilDate(inbox.receivedAt)}</span> : <span />}
+        <ActionButton compact disabled={inbox.loading} onClick={inbox.refresh}><Icon name="refresh" width={16} height={16} />Atualizar</ActionButton>
+      </div>
+    </>}
+    {inbox.error && !activeError && !inbox.loading ? <Notice error>{inbox.error} <ActionButton compact onClick={inbox.refresh}>Consultar notificações novamente</ActionButton></Notice> : null}
+    {writeError ? <Notice error>{writeError}</Notice> : null}
+    {inbox.loading ? <p className="my-3 text-sm" role="status">Consultando notificações…</p> : null}
+    <ul className="hca-inbox-list" aria-label="Avisos consultados">
+      {rows.map(row => <InboxRow key={row.id} row={row} fresh={inbox.fresh} onOpen={opener => {
+        noticeTriggerRef.current = opener;
+        setNoticeId(row.id);
+      }} onSeen={() => { void markSeen(row.id); }} />)}
+    </ul>
+    {inbox.fresh && !rows.length ? <div className="hca-inbox-empty">
+      <p>{search || kind ? "Nenhum aviso encontrado" : "Nenhuma notificação neste filtro."}</p>
+      {search || kind ? <ActionButton compact onClick={() => { setInput({ search, text: "" }); updateInboxUrl({ page: "1", q: null, kind: null }); }}>Limpar filtros</ActionButton> : null}
+    </div> : null}
+    {total > 20 ? <nav className="mt-5 flex items-center justify-between gap-3" aria-label="Páginas das notificações">
+      <ActionButton disabled={page === 1 || !inbox.fresh} onClick={() => navigatePage(page - 1)}>Anterior</ActionButton>
+      <span className="text-sm">{page} / {Math.ceil(total / 20)}</span>
+      <ActionButton disabled={page * 20 >= total || !inbox.fresh} onClick={() => navigatePage(page + 1)}>Próxima</ActionButton>
+    </nav> : null}
+    {!inbox.scopeRequired ? <p className="hca-inbox-note"><Icon name="eye" width={16} height={16} />Visto organiza sua leitura. A tarefa continua na ficha.</p> : null}
+    {patientId && noticeId ? <InboxNoticeDetails key={noticeId} patientId={patientId} patientName={patientName} noticeId={noticeId}
+      onClose={() => setNoticeId(null)} onUnavailable={inbox.invalidate}
+      finalFocus={() => noticeTriggerRef.current?.isConnected ? noticeTriggerRef.current : searchRef.current} /> : null}
+    {proposedKind !== null ? <Dialog open title="Filtrar avisos" kicker="Central de avisos" headingIcon="filter" onClose={() => setProposedKind(null)}
+      footer={<><ActionButton onClick={() => setProposedKind(null)}>Cancelar</ActionButton><ActionButton variant="primary" onClick={() => {
+        updateInboxUrl({ page: "1", kind: proposedKind || null }); setProposedKind(null);
+      }}><Icon name="check" />Aplicar filtro</ActionButton></>}>
+      <label className="grid gap-2 text-sm">Tipo de ficha
+        <SelectField value={proposedKind} onChange={event => setProposedKind(inboxKind.safeParse(event.currentTarget.value).data ?? "")}>
+          <option value="">Todos os tipos</option>
+          {Object.entries(inboxKinds).map(([value, label]) => <option value={value} key={value}>{label}</option>)}
+        </SelectField>
+      </label>
+    </Dialog> : null}
+    {activeError ? <Dialog open failure="rejected" title="Não foi possível consultar os avisos"
+      onClose={() => setDismissedError(inbox.errorKey)}
+      footer={<>
+        <ActionButton onClick={() => setDismissedError(inbox.errorKey)}>Voltar aos avisos</ActionButton>
+        <ActionButton variant="primary" onClick={inbox.refresh}><Icon name="refresh" />Consultar notificações novamente</ActionButton>
+      </>}>
+      <p role="alert">{inbox.error}</p>
+      {inbox.receivedAt ? <p className="mt-2">Última consulta confirmada em {formatBrazilDate(inbox.receivedAt)}.</p> : null}
+    </Dialog> : null}
+  </section>;
+}
+
+function InboxRow({ row, fresh, onOpen, onSeen }: { row: InboxNotification; fresh: boolean; onOpen: (opener: HTMLButtonElement) => void; onSeen: () => void }) {
+  const title = documentEventLabel(row.event_key ?? row.document_events?.action);
+  const titleId = useId();
+  return <li data-notification-id={row.id} className={"hca-inbox-row" + (row.seen_at ? "" : " hca-inbox-unread")}>
+    <button type="button" className="hca-inbox-open" onClick={event => onOpen(event.currentTarget)} aria-label={"Ver aviso de " + (row.reference_code ?? title)} aria-describedby={titleId}>
+      <span className="hca-inbox-icon"><Icon name={inboxNoticeIcon(row)} width={19} height={19} /></span>
+      <span className="hca-inbox-content">
+        <span className="hca-inbox-meta"><strong>{row.reference_code ?? "Atualização operacional"}</strong><time dateTime={row.created_at}>{formatBrazilDate(row.created_at)}</time></span>
+        <span id={titleId} className="hca-inbox-title">{title}</span>
+        {row.document_events?.actorName ? <span>{row.document_events.actorName}</span> : null}
+        {row.channel !== "internal" ? <small>{row.channel === "whatsapp" ? "WhatsApp" : "E-mail"} · {deliveryLabels[row.state] ?? "Aguardando atualização"}</small> : null}
+      </span>
+      {row.seen_at ? <Icon name="chevron" width={16} height={16} /> : <span className="hca-inbox-unseen" aria-label="Não vista" />}
+    </button>
+    <div className="hca-inbox-actions">
+      {row.task && fresh ? <Pill tone="warning">Ação pendente</Pill> : <span />}
+      {row.seen_at ? <Pill tone="neutral">Vista no aplicativo</Pill> : <ActionButton compact disabled={!fresh} onClick={onSeen}><Icon name="eye" width={16} height={16} />Marcar como vista</ActionButton>}
+    </div>
+  </li>;
 }

@@ -99,18 +99,24 @@ export async function stockMovementOrigin(
       movement.destination_location !== "FAMILY" || !material || !quantity(material.quantity).eq(movement.quantity)) return unavailable();
     return { ...base, kind: "unlinked_arrival", arrival, material: { name: material.name, unit: material.unit } };
   }
-  if (movement.reference_type === "consumption") {
-    const { data, error } = await client
+  if (movement.reference_type === "consumption" || movement.reference_type === "consumption_operation") {
+    let reportId: string | null;
+    if (movement.reference_type === "consumption_operation") {
+      reportId = await rpc(client, "team_consumption_movement_origin", { p_patient: patientId, p_movement: movement.id }) as string | null;
+    } else {
+      const { data, error } = await client
       .from("consumption_reports")
       .select("id")
       .eq("id", movement.reference_id)
       .eq("care_recipient_id", patientId)
       .eq("location", movement.source_location)
       .maybeSingle();
-    if (error) databaseError(error);
-    if (!data) return unavailable();
-    const report = (await rpc(client, "consumption_report", {
-      p_id: data.id,
+      if (error) databaseError(error);
+      reportId = data?.id ?? null;
+    }
+    if (!reportId) return unavailable();
+    const report = (await rpc(client, "consumption_record_detail", {
+      p_id: reportId,
     })) as ConsumptionReport;
     if (!report.movements.some((row) => row.id === movement.id))
       return unavailable(

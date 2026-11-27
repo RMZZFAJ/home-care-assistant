@@ -16,7 +16,7 @@ export async function POST(request: Request) {
     const v = await readJson(request, progressPreparationCommitSchema),
       auth = await authenticate();
     await patientContext(auth, v.careRecipientId);
-    const value = await rpc(auth.client, "progress_preparation_recovery", {
+    const value = await rpc(auth.client, "recover_record_progress_preparation", {
       p_patient: v.careRecipientId,
       p_purpose: v.purpose,
       p_target: v.targetResourceId,

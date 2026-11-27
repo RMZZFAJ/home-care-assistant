@@ -111,6 +111,7 @@ export const consumptionPreparationFieldsSchema = z
     text: text(2000),
     reason: text(1000),
     reminderId: z.union([id, z.literal("")]),
+    flowSubmissionId: id.optional(),
     lines: z
       .array(
         z

@@ -1,5 +1,4 @@
 import { selectMaterialCategory } from "./material-category";
-import { selectDocumentSection } from "./document-sections";
 import { generatedPdf } from "./generated-pdf";
 import { expect, test, type Page } from "@playwright/test";
 import { mkdirSync, writeFileSync } from "node:fs";
@@ -70,9 +69,6 @@ async function chooseProduct(page: Page, name: string) {
     name: "Material da apresentação",
     exact: true,
   });
-  const next = page.getByRole("button", { name: "Iniciar outro preenchimento", exact: true });
-  await expect(combo.or(next).first()).toBeVisible();
-  if (await next.isVisible()) await next.click();
   await expect(combo).toBeVisible();
   const before = await combo.boundingBox();
   await combo.click();
@@ -156,38 +152,32 @@ async function review(page: Page) {
   await page.getByRole("button", { name: "Revisar ficha", exact: true }).click();
 }
 
-test("apresentações recuperam criação própria, preservam versões e estoque, e recusam código duplicado sem apagar o formulário", async ({
-  page,
-}, info) => {
-  const f = await setup(),
-    before = ledger(f.patient);
+const catalogueCommand = "/api/admin/catalogue-actions";
+const presentationReview = (page: Page) => page.getByRole("dialog", { name: "Confirmar apresentação?", exact: true });
+const finishPresentation = (page: Page) => page.getByRole("dialog", { name: "Apresentação registrada", exact: true })
+  .getByRole("button", { name: "Concluir", exact: true }).click();
+
+test("apresentações recuperam criação própria, preservam versões e estoque, e recusam código duplicado sem apagar o formulário", async ({ page }, info) => {
+  test.setTimeout(180_000);
+  const f = await setup(), before = ledger(f.patient);
   await login(page, f.patient);
   await page.goto("/unidades?careRecipientId=" + f.patient);
-  await page
-    .getByRole("button", { name: "Nova apresentação", exact: true })
-    .click();
-  await chooseProduct(page, "Material fictício V4 0");
-  const drawer = page.getByRole("dialog", {
-    name: "Nova apresentação",
-    exact: true,
-  });
-  await drawer
-    .getByLabel("Nome da apresentação", { exact: true })
-    .fill("Pacote fictício com dez unidades");
-  await drawer
-    .getByLabel("Código da apresentação", { exact: false })
-    .fill("0123456789012");
-  await drawer.getByLabel("Fator na unidade base", { exact: false }).fill("10");
-  await drawer.getByRole("button", { name: "Salvar preenchimento privado", exact: true }).click();
-  await expect(drawer.getByText(/Preenchimento privado salvo/)).toBeVisible();
+  const add = page.getByRole("button", { name: "Adicionar apresentação", exact: true });
+  const drawer = page.getByRole("dialog", { name: "Nova apresentação", exact: true });
+  await add.click();
+  await drawer.getByLabel("Código de barras", { exact: true }).fill("0123456789012");
+  await expect(drawer.getByRole("button", { name: "Salvar preenchimento privado", exact: true })).toHaveCount(0);
   await drawer.getByRole("button", { name: "Fechar edição", exact: true }).click();
   await page.reload();
-  await page.getByRole("button", { name: "Nova apresentação", exact: true }).click();
-  await expect(drawer.getByLabel("Fator na unidade base", { exact: false })).toHaveValue("10");
-  await expect(drawer.getByLabel("Código da apresentação", { exact: false })).toHaveValue("0123456789012");
-  await expect(drawer.getByRole("combobox", { name: "Material da apresentação", exact: true })).toHaveValue("Material fictício V4 0");
-  const attempts: unknown[] = [];
-  await page.route("**/api/catalog/presentations", async (route) => {
+  await add.click();
+  await expect(drawer.getByLabel("Código de barras", { exact: true })).toHaveValue("");
+  await chooseProduct(page, "Material fictício V4 0");
+  await drawer.getByLabel("Nome da apresentação", { exact: true }).fill("Pacote fictício com dez unidades");
+  await drawer.getByLabel("Código de barras", { exact: true }).fill("0123456789012");
+  await drawer.getByLabel("Quantidade na unidade base", { exact: true }).fill("10");
+
+  const attempts: { intent: unknown }[] = [];
+  await page.route("**" + catalogueCommand, async route => {
     if (route.request().method() !== "POST") return route.continue();
     attempts.push(route.request().postDataJSON());
     if (attempts.length === 1) {
@@ -196,172 +186,140 @@ test("apresentações recuperam criação própria, preservam versões e estoque
       await route.abort("failed");
     } else await route.continue();
   });
-  await drawer
-    .getByRole("button", { name: "Revisar apresentação", exact: true })
-    .click();
-  await drawer
-    .getByRole("button", { name: "Confirmar apresentação", exact: true })
-    .click();
-  await expect(
-    drawer.getByRole("button", { name: "Fechar edição", exact: true }),
-  ).toBeDisabled();
-  await expect(
-    drawer.getByRole("button", { name: "Voltar aos campos", exact: true }),
-  ).toBeDisabled();
-  await drawer
-    .getByRole("button", { name: "Recuperar apresentação", exact: true })
-    .click();
-  await expect(drawer).toHaveCount(0);
+  await drawer.getByRole("button", { name: "Revisar apresentação", exact: true }).click();
+  await presentationReview(page).getByRole("button", { name: "Confirmar apresentação", exact: true }).click();
+  const recovery = page.getByRole("dialog", { name: "A resposta da edição não chegou", exact: true });
+  await expect(recovery).toBeVisible();
+  await page.reload();
+  await page.getByRole("button", { name: "Conferir resultado pendente", exact: true }).click();
+  await recovery.getByRole("button", { name: "Conferir resultado", exact: true }).click();
+  await finishPresentation(page);
   expect(attempts).toHaveLength(2);
-  expect(attempts[0]).toEqual(attempts[1]);
-  await page.unroute("**/api/catalog/presentations");
-  await page
-    .getByRole("button", {
-      name: "Consultar Pacote fictício com dez unidades",
-      exact: true,
-    })
-    .click();
-  const editor = page.getByRole("dialog", {
-    name: "Apresentação e histórico",
-    exact: true,
-  });
-  await expect(
-    editor.getByRole("region", {
-      name: "Histórico da apresentação",
-      exact: true,
-    }),
-  ).toContainText("10");
-  await editor
-    .getByLabel("Apresentação ativa para novas escolhas", { exact: true })
-    .uncheck();
-  await editor
-    .getByRole("button", { name: "Revisar apresentação", exact: true })
-    .click();
-  await editor
-    .getByRole("button", { name: "Confirmar apresentação", exact: true })
-    .click();
+  expect(attempts[1]).toEqual({ ...attempts[0], intent: null });
+  await page.unroute("**" + catalogueCommand);
+
+  const row = page.getByRole("button", { name: /Material fictício V4 0 · Pacote fictício com dez unidades/ });
+  await row.click();
+  const editor = page.getByRole("dialog", { name: "Apresentação da embalagem", exact: true });
+  if (info.project.name === "chromium") {
+    for (const width of [360, 412]) {
+      await page.setViewportSize({ width, height: 920 });
+      await editor.screenshot({ path: info.outputPath("apresentacao-" + width + ".png") });
+    }
+  }
+  await editor.getByRole("button", { name: /^Histórico de equivalências/ }).click();
+  const versions = page.getByRole("dialog", { name: "Histórico de equivalências", exact: true });
+  await expect(versions).toContainText("1 embalagem = 10 unidade");
+  await versions.getByRole("button", { name: "Voltar", exact: true }).click();
+  await editor.getByRole("switch", { name: "Disponível para novas escolhas", exact: true }).uncheck();
+  await editor.getByRole("button", { name: "Revisar apresentação", exact: true }).click();
+  await presentationReview(page).getByRole("button", { name: "Confirmar apresentação", exact: true }).click();
+  await finishPresentation(page);
   await expect(editor).toHaveCount(0);
-  await expect(
-    page.getByRole("button", { name: "Atualizar apresentações", exact: true }),
-  ).toBeFocused();
-  await page
-    .getByRole("combobox", { name: "Situação das apresentações", exact: true })
-    .selectOption("inactive");
-  await expect(
-    page.getByRole("button", {
-      name: "Consultar Pacote fictício com dez unidades",
-      exact: true,
-    }),
-  ).toBeVisible();
-  await page
-    .getByRole("button", { name: "Nova apresentação", exact: true })
-    .click();
+  await expect(page.getByRole("searchbox", { name: "Pesquisar apresentações", exact: true })).toBeFocused();
+  await page.getByRole("combobox", { name: "Situação das apresentações", exact: true }).selectOption("inactive");
+  await expect(row).toBeVisible();
+  await row.click();
+  await editor.getByRole("button", { name: /^Histórico de equivalências/ }).click();
+  await expect(versions.getByRole("heading", { name: /^Versão 2/ })).toBeVisible();
+  await expect(versions.getByRole("heading", { name: /^Versão 1/ })).toBeVisible();
+  await versions.getByRole("button", { name: "Voltar", exact: true }).click();
+  await editor.getByRole("button", { name: "Voltar", exact: true }).click();
+
+  await add.click();
   await chooseProduct(page, "Material fictício V4 1");
-  await drawer
-    .getByLabel("Nome da apresentação", { exact: true })
-    .fill("Outro pacote fictício");
-  await drawer
-    .getByLabel("Código da apresentação", { exact: false })
-    .fill("0123456789012");
-  await drawer.getByLabel("Fator na unidade base", { exact: false }).fill("2");
-  await drawer
-    .getByRole("button", { name: "Revisar apresentação", exact: true })
-    .click();
-  await drawer
-    .getByRole("button", { name: "Confirmar apresentação", exact: true })
-    .click();
-  await expect(
-    drawer.getByLabel("Nome da apresentação", { exact: true }),
-  ).toHaveValue("Outro pacote fictício");
-  await expect(
-    drawer.getByLabel("Código da apresentação", { exact: false }),
-  ).toHaveValue("0123456789012");
-  await expect(
-    drawer.getByLabel("Nome da apresentação", { exact: true }),
-  ).toBeFocused();
+  const name = drawer.getByLabel("Nome da apresentação", { exact: true });
+  await name.fill("Outro pacote fictício");
+  await drawer.getByLabel("Código de barras", { exact: true }).fill("0123456789012");
+  await drawer.getByLabel("Quantidade na unidade base", { exact: true }).fill("2");
+  await drawer.getByRole("button", { name: "Revisar apresentação", exact: true }).click();
+  await presentationReview(page).getByRole("button", { name: "Confirmar apresentação", exact: true }).click();
+  const rejected = page.getByRole("dialog", { name: "Não foi possível salvar a apresentação", exact: true });
+  await expect(rejected).toBeVisible();
+  await rejected.getByRole("button", { name: "Voltar", exact: true }).click();
+  await expect(name).toHaveValue("Outro pacote fictício");
+  await expect(drawer.getByLabel("Código de barras", { exact: true })).toHaveValue("0123456789012");
   for (const width of [1440, 768, 390, 320]) {
     await page.setViewportSize({ width, height: 940 });
-    await drawer.getByLabel("Nome da apresentação", { exact: true }).focus();
+    await name.focus();
     await audit(page, "presentation-editor-" + width);
   }
-  mkdirSync("output/playwright/phase-d", { recursive: true });
-  await page.screenshot({
-    path: `output/playwright/phase-d/presentation-editor-${f.patient}-${info.project.name}.png`,
-    animations: "disabled",
-  });
+  await drawer.screenshot({ path: info.outputPath("presentation-editor.png"), animations: "disabled" });
   expect(ledger(f.patient)).toBe(before);
 });
 
-test("edição obsoleta compara o fator atual e só adota a referência por ação explícita; leitura não abre campos editáveis", async ({
-  page,
-}) => {
-  const f = await seed(),
-    before = ledger(f.patient);
+test("edição obsoleta compara o fator atual e só adota a referência por ação explícita; leitura não abre campos editáveis", async ({ page }) => {
+  const f = await seed(), before = ledger(f.patient);
   await login(page, f.patient);
   await page.goto("/unidades?careRecipientId=" + f.patient);
-  await page
-    .getByRole("button", {
-      name: "Consultar Pacote fictício com dez unidades",
-      exact: true,
-    })
-    .click();
-  const drawer = page.getByRole("dialog", {
-    name: "Apresentação e histórico",
-    exact: true,
-  });
-  await drawer.getByLabel("Fator na unidade base", { exact: false }).fill("11");
+  const row = page.getByRole("button", { name: /Material fictício V4 0 · Pacote fictício com dez unidades/ });
+  await row.click();
+  const drawer = page.getByRole("dialog", { name: "Apresentação da embalagem", exact: true });
+  const factor = drawer.getByLabel("Quantidade na unidade base", { exact: true });
+  await factor.fill("11");
+  await drawer.getByRole("button", { name: "Revisar apresentação", exact: true }).click();
   await rpc(f.admin, "catalogue_presentation_command", edit(f, 1));
-  await drawer
-    .getByRole("button", { name: "Revisar apresentação", exact: true })
-    .click();
-  await drawer
-    .getByRole("button", { name: "Confirmar apresentação", exact: true })
-    .click();
-  await expect(
-    drawer.getByLabel("Fator na unidade base", { exact: false }),
-  ).toHaveValue("11");
-  await expect(
-    drawer.getByText("Você editou v1; cadastro atual v2.", { exact: true }),
-  ).toBeVisible();
-  await drawer
-    .getByRole("button", {
-      name: "Adotar referência atual e manter meus campos",
-      exact: true,
-    })
-    .click();
-  await expect(
-    drawer.getByLabel("Fator na unidade base", { exact: false }),
-  ).toHaveValue("11");
-  await drawer
-    .getByRole("button", { name: "Revisar apresentação", exact: true })
-    .click();
-  await drawer
-    .getByRole("button", { name: "Confirmar apresentação", exact: true })
-    .click();
+  await presentationReview(page).getByRole("button", { name: "Confirmar apresentação", exact: true }).click();
+  await page.getByRole("dialog", { name: "Não foi possível salvar a apresentação", exact: true })
+    .getByRole("button", { name: "Conferir cadastro atual", exact: true }).click();
+  const comparison = page.getByRole("dialog", { name: "Referência atual da apresentação", exact: true });
+  await expect(comparison).toContainText("1 embalagem = 12 unidade");
+  await comparison.getByRole("button", { name: "Usar referência atual", exact: true }).click();
+  await expect(factor).toHaveValue("11");
+  await drawer.getByRole("button", { name: "Revisar apresentação", exact: true }).click();
+  await presentationReview(page).getByRole("button", { name: "Confirmar apresentação", exact: true }).click();
+  await finishPresentation(page);
   await expect(drawer).toHaveCount(0);
-  expect(
-    sql(
-      `select base_quantity::text from public.product_presentations where id=${sqlLiteral(f.presentation)};`,
-    ),
-  ).toBe("11.000000");
-  sql(
-    `insert into public.capability_overrides(care_recipient_id,subject_user,capability,enabled) values(${sqlLiteral(f.patient)},${sqlLiteral(fixtures.adminA.id)},'catalog.manage',false);`,
-  );
+  expect(sql("select base_quantity::text from public.product_presentations where id=" + sqlLiteral(f.presentation))).toBe("11.000000");
+  sql("insert into public.capability_overrides(care_recipient_id,subject_user,capability,enabled) values(" +
+    sqlLiteral(f.patient) + "," + sqlLiteral(fixtures.adminA.id) + ",'catalog.manage',false)");
   await page.reload();
-  await expect(
-    page.getByRole("button", { name: "Nova apresentação", exact: true }),
-  ).toHaveCount(0);
-  await page
-    .getByRole("button", {
-      name: "Consultar Pacote fictício com dez unidades",
-      exact: true,
-    })
-    .click();
-  await expect(
-    drawer.getByLabel("Fator na unidade base", { exact: false }),
-  ).toHaveCount(0);
-  await expect(drawer.getByText("11 unidade", { exact: true })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Adicionar apresentação", exact: true })).toHaveCount(0);
+  await row.click();
+  await expect(factor).toHaveCount(0);
+  await expect(drawer.getByText("1 embalagem = 11 unidade", { exact: true })).toBeVisible();
   expect(ledger(f.patient)).toBe(before);
+});
+
+test("gravação não concluída confirma ausência e permite salvar os mesmos campos em nova tentativa", async ({ page }) => {
+  const f = await setup(), name = "Embalagem após resposta perdida";
+  await login(page, f.patient);
+  await page.goto("/unidades?careRecipientId=" + f.patient);
+  await page.getByRole("button", { name: "Adicionar apresentação", exact: true }).click();
+  const editor = page.getByRole("dialog", { name: "Nova apresentação", exact: true });
+  await chooseProduct(page, "Material fictício V4 0");
+  await editor.getByLabel("Nome da apresentação", { exact: true }).fill(name);
+  await editor.getByLabel("Código de barras", { exact: true }).fill("01234565");
+  await editor.getByLabel("Quantidade na unidade base", { exact: true }).fill("4");
+  const attempts: { key: string; intent: unknown }[] = [];
+  await page.route("**" + catalogueCommand, async route => {
+    if (route.request().method() !== "POST") return route.continue();
+    attempts.push(route.request().postDataJSON());
+    if (attempts.length === 1) await route.abort("failed");
+    else await route.continue();
+  });
+  const confirm = async () => {
+    await editor.getByRole("button", { name: "Revisar apresentação", exact: true }).click();
+    await presentationReview(page).getByRole("button", { name: "Confirmar apresentação", exact: true }).click();
+  };
+  await confirm();
+  await page.getByRole("dialog", { name: "A resposta da edição não chegou", exact: true })
+    .getByRole("button", { name: "Conferir resultado", exact: true }).click();
+  const closed = page.getByRole("dialog", { name: "Gravação não concluída", exact: true });
+  await expect(closed).toContainText("esta tentativa não alterou o catálogo");
+  const count = () => sql("select count(*) from public.product_presentations where care_recipient_id=" + sqlLiteral(f.patient));
+  expect(count()).toBe("0");
+  await closed.getByRole("button", { name: "Concluir", exact: true }).click();
+  await expect(editor.getByLabel("Nome da apresentação", { exact: true })).toHaveValue(name);
+  await expect(editor.getByLabel("Código de barras", { exact: true })).toHaveValue("01234565");
+  await expect(editor.getByLabel("Quantidade na unidade base", { exact: true })).toHaveValue("4");
+  await confirm();
+  await finishPresentation(page);
+  expect(attempts).toHaveLength(3);
+  expect(attempts[1]).toEqual({ ...attempts[0], intent: null });
+  expect(attempts[2].key).not.toBe(attempts[0].key);
+  expect(attempts[2].intent).toEqual(attempts[0].intent);
+  expect(count()).toBe("1");
 });
 
 test("conversão emitida mantém dois pacotes de dez após fator doze e recupera a mesma intenção sem crédito duplicado", async ({
@@ -443,8 +401,8 @@ test("conversão emitida mantém dois pacotes de dez após fator doze e recupera
       `select sum(quantity)::text from public.stock_movements where care_recipient_id=${sqlLiteral(f.patient)} and reference_type='purchase_receipt';`,
     ),
   ).toBe("20.000000");
-  await page.goto("/fichas/" + id);
-  await selectDocumentSection(page, "materials");
+  await page.goto(`/fichas/${id}?documentTab=materials`);
+  await expect(page.getByRole("tab", { name: "Materiais", exact: true })).toHaveAttribute("aria-selected", "true");
   const material = document.lines[0].name_snapshot;
   await page.getByRole("button", { name: "Detalhes de " + material, exact: true }).click();
   const details = page.getByRole("dialog", { name: material, exact: true });

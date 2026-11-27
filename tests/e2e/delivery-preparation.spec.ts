@@ -125,7 +125,7 @@ test("P06 escolha manual exige motivo, revisa quem recebe e recupera uma única 
   const attempts: unknown[] = [];
   let saved: SupplyDocument | undefined;
   let attemptedPdf: { id: string; issuanceId: string } | undefined;
-  let pdfVerificationReads = 0;
+  let pdfWrites = 0;
   const releasePdfResponse = Promise.withResolvers<void>();
   const releaseNoticeResponse = Promise.withResolvers<void>();
   const noticeResponses: { noticesPrepared: boolean; noticesNeedAttention: boolean; issuanceId: string | null }[] = [];
@@ -137,10 +137,8 @@ test("P06 escolha manual exige motivo, revisa quem recebe e recupera uma única 
     await route.fulfill({ response });
   });
   await page.route("**/api/documents/*/issuances/initial", async route => {
-    if (route.request().method() !== "POST") {
-      if (attemptedPdf) pdfVerificationReads += 1;
-      return route.continue();
-    }
+    if (route.request().method() !== "POST") return route.continue();
+    pdfWrites++;
     const response = await route.fetch({ timeout: 65_000 });
     expect(response.status(), await response.text()).toBe(200);
     attemptedPdf = await response.json();
@@ -168,6 +166,12 @@ test("P06 escolha manual exige motivo, revisa quem recebe e recupera uma única 
   const uncertain = page.getByRole("dialog", { name: "Resultado ainda não confirmado", exact: true });
   await expect(uncertain).toBeVisible();
   await expect(uncertain.getByText(/Seu rascunho está salvo/)).toHaveCount(0);
+  const recoveredPdf = page.waitForResponse(async response => {
+    if (!saved || !attemptedPdf || !response.ok() || response.request().method() !== "GET" ||
+      new URL(response.url()).pathname !== `/api/documents/${saved.id}/issuances/initial`) return false;
+    const recovered = await response.json().catch(() => null);
+    return recovered?.id === attemptedPdf.id && recovered.issuanceId === attemptedPdf.issuanceId && recovered.state === "ready";
+  }, { timeout: 150_000 });
   try {
     await uncertain.getByRole("button", { name: "Consultar resultado", exact: true }).click();
     const processingNotices = page.getByRole("dialog", { name: "Processando os avisos da emissão", exact: true });
@@ -193,7 +197,8 @@ test("P06 escolha manual exige motivo, revisa quem recebe e recupera uma única 
   const href = `/api/documents/${saved!.id}/pdf?issuance=${attemptedPdf!.issuanceId}`;
   await expect(emitted.getByRole("link", { name: "Baixar PDF", exact: true })).toHaveAttribute("href", href);
   await expect(emitted.getByRole("button", { name: "Recuperar PDF", exact: true })).toHaveCount(0);
-  expect(pdfVerificationReads).toBe(1);
+  expect((await recoveredPdf).ok()).toBe(true);
+  expect(pdfWrites).toBe(1);
   const file = await page.request.get(href);
   expect(file.ok()).toBe(true);
   const text = (await PDF.load(await file.body())).extractText().flatMap(p =>

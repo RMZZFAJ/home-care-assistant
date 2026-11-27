@@ -146,7 +146,7 @@ export function SupplyWizardStep({
   step: number;
   onCategoryChange: (category: string) => void;
   onEditStage: (stage: 2 | 3) => void;
-  type: SupplyType;
+  type: Exclude<SupplyType, "BAL">;
   purchaseApproval?: "automatic" | "required";
   context: WorkspaceContext;
   form: WizardState;
@@ -174,7 +174,7 @@ export function SupplyWizardStep({
 }) {
   const category = materialCategories[step - 1]?.id;
   const extras = new Set(form.extraProductIds);
-  const isExtraStep = type !== "BAL" && step === supplyExtrasStep;
+  const isExtraStep = step === supplyExtrasStep;
   const [searchByCategory, setSearchByCategory] = useState<
     Record<string, string>
   >({});
@@ -244,7 +244,7 @@ export function SupplyWizardStep({
       return next;
     });
   }
-  const reviewRows = step === 5 && type !== "BAL" ? selected.map(product => ({
+  const reviewRows = step === 5 ? selected.map(product => ({
     id: product.id, name: product.name, category: product.category,
     consult: <MaterialConsultButton context={context} material={product} menu />,
     details: <><small>{form.quantities[product.id] ? formatQuantity(form.quantities[product.id], product.unit) : "Quantidade pendente"}</small>{form.presentationSelections?.[product.id]?.map(row => <small key={row.id}>{presentationCaption(row)}</small>)}
@@ -285,13 +285,11 @@ export function SupplyWizardStep({
     <>
       {step === 0 ? (
         <>
-          {type !== "BAL" ? <SupplyWizardIdentity context={context} kind={type} /> : null}
+          <SupplyWizardIdentity context={context} kind={type} />
           <p className="hca-wizard-intro">
             {type === "COM"
               ? "Organize os materiais a adquirir. A família registra a compra ou a doação quando ela acontecer."
-              : type === "ENT"
-                ? "A entrega vai da família para a equipe. Indique quem vai receber e conferir os materiais."
-                : "Conte todos os produtos sob responsabilidade familiar que estão com a equipe. Materiais de terceiros ficam fora deste controle."}
+              : "A entrega vai da família para a equipe. Indique quem vai receber e conferir os materiais."}
           </p>
           {type === "ENT" ? (
             <div className="hca-form-stack">
@@ -323,17 +321,15 @@ export function SupplyWizardStep({
       ) : null}
       {category || isExtraStep ? (
         <>
-          {category && type !== "BAL" ? <>
+          {category ? <>
             <WizardMaterialCategories category={category} selected={selected.filter(item => !extras.has(item.id))} onChange={onCategoryChange} />
           </> : null}
           {isExtraStep ? extraControl : null}
           {category ? <>
             <WizardMaterialToolbar count={selected.length + pendingExtras.length} matches={search.trim() ? visibleProducts.length : undefined}>
-            {type !== "BAL" ? <>
               <ActionButton ref={barcodeTriggerRef} compact variant="quiet"
                 onClick={() => setBarcodeOpen(true)}><Icon name="camera" />Ler código</ActionButton>
               {extraControl}
-            </> : null}
             </WizardMaterialToolbar>
             <WizardMaterialSearch value={search} onChange={value => setSearchByCategory(current => ({ ...current, [category]: value }))} />
           </> : null}
@@ -343,10 +339,9 @@ export function SupplyWizardStep({
               {isExtraStep ? "Nenhum item extra incluído." : "Nenhum material nesta busca. Ajuste ou limpe o filtro; suas seleções continuam preservadas."}
             </Notice>
           ) : null}
-          <div ref={materialListRef} className={type === "BAL" || isExtraStep ? "space-y-3" : "hca-wizard-material-list"}>
+          <div ref={materialListRef} className={isExtraStep ? "space-y-3" : "hca-wizard-material-list"}>
             {visibleProducts.map((product) => {
-              const checked =
-                type === "BAL" || Object.hasOwn(form.quantities, product.id);
+              const checked = Object.hasOwn(form.quantities, product.id);
               const linkedNeeds = links[product.id]?.length ?? 0;
               const sourceCounts = checked ? purchaseSources?.byProduct.get(product.id) : undefined;
               const assessmentHelpId = `ent-assessment-${encodeURIComponent(product.id)}`;
@@ -357,13 +352,13 @@ export function SupplyWizardStep({
                 <MaterialChoice
                   selected={checked}
                   quantity
-                  className={type === "BAL" ? "product-choice" : "product-choice hca-wizard-material"}
+                  className="product-choice hca-wizard-material"
                   key={product.id}
                   materialId={product.id}
                 >
                   <div className="hca-wizard-material-head">
                   <label className="hca-material-choice-heading">
-                    {type !== "BAL" && !isExtraStep ? (
+                    {!isExtraStep ? (
                       <input
                         type="checkbox"
                         className="hca-wizard-include-switch"
@@ -371,7 +366,7 @@ export function SupplyWizardStep({
                         onChange={(event) => selectProduct(product.id, event.currentTarget.checked)}
                       />
                     ) : null}
-                    {type !== "BAL" ? <span className="hca-wizard-material-icon"><Icon name={materialCategories.find(entry => entry.id === product.category)?.icon ?? "box"} /></span> : null}
+                    <span className="hca-wizard-material-icon"><Icon name={materialCategories.find(entry => entry.id === product.category)?.icon ?? "box"} /></span>
                     <span className="hca-material-choice-copy">
                       <strong>{product.name}</strong>
                       <small>
@@ -390,11 +385,11 @@ export function SupplyWizardStep({
                       ) : null}
                     </span>
                   </label>
-                  {type !== "BAL" ? <MaterialConsultButton context={context} material={product} menu
+                  <MaterialConsultButton context={context} material={product} menu
                     onLink={openMaterialSources ? returnFocus => openMaterialSources(product, returnFocus) : undefined}
                     onEditPresentations={checked
                       ? returnFocus => setPresentationEditor({ productId: product.id, returnFocus }) : undefined}
-                    presentationErrorId={presentationErrorId} /> : null}
+                    presentationErrorId={presentationErrorId} />
                   </div>
                   {sourceCounts?.length ? <PurchaseSourceCounts sources={sourceCounts}
                     familyStock={purchaseSources?.familyStock?.[product.id]} unit={product.unit} /> : null}
@@ -417,14 +412,10 @@ export function SupplyWizardStep({
                       setForm={setForm} error={fieldErrors[product.id + ":shared"]} /> : null}
                   </div> : null}
                   {checked && !usesPresentations ? (
-                    <label className={type === "BAL" ? "product-quantity text-xs font-semibold" : "hca-wizard-stock-field text-xs font-semibold"}>
-                      <span>{type === "BAL"
-                        ? "Contagem física"
-                        : type === "COM"
-                          ? "Quantidade a adquirir"
-                          : "Quantidade a entregar"}</span>
+                    <label className="hca-wizard-stock-field text-xs font-semibold">
+                      <span>{type === "COM" ? "Quantidade a adquirir" : "Quantidade a entregar"}</span>
                       <WizardQuantityInput
-                        unit={type === "BAL" ? undefined : product.unit}
+                        unit={product.unit}
                         inputMode={product.quantity_decimals ? "decimal" : "numeric"}
                         value={form.quantities[product.id] ?? ""}
                         aria-label={"Quantidade — " + product.name}
@@ -452,7 +443,7 @@ export function SupplyWizardStep({
                       ) : null}
                     </label>
                   ) : null}
-                  {checked && type !== "BAL" && usesPresentations ? (
+                  {checked && usesPresentations ? (
                     <div className="col-span-full text-sm" aria-live="polite">
                       <p>Quantidade total calculada: <strong>{form.quantities[product.id]
                         ? formatQuantity(form.quantities[product.id], product.unit)
@@ -490,9 +481,9 @@ export function SupplyWizardStep({
       ) : null}
       {step === 4 ? (
         <>
-          {type === "BAL" || form.notes ? (
+          {form.notes ? (
           <label className="block text-sm font-semibold">
-            {type === "BAL" ? "Observações e contexto" : "Observação do preenchimento anterior"}
+            Observação do preenchimento anterior
             <textarea
               className={inputClass}
               rows={4}
@@ -505,33 +496,25 @@ export function SupplyWizardStep({
             />
           </label>
           ) : null}
-          {type !== "BAL" ? <IssuanceObservationsEditor observations={form.observations ?? []}
-            onChange={observations => setForm(previous => ({ ...previous, observations }))} errors={fieldErrors} /> : null}
-          {type === "BAL" ? <p className="text-xs leading-5 text-(--muted)">
-            Fotos e anexos poderão ser adicionados no detalhamento após salvar a
-            ficha.
-          </p> : null}
+          <IssuanceObservationsEditor observations={form.observations ?? []}
+            onChange={observations => setForm(previous => ({ ...previous, observations }))} errors={fieldErrors} />
         </>
       ) : null}
       {step === 5 ? (
         <>
-          {type === "BAL" ? <div className="rounded-xl bg-(--background) p-4 text-sm">
-            <strong>{context.patient?.display_name}</strong>
-            <p className="mt-1 text-xs text-(--muted)">Responsável: {context.fullName}</p>
-          </div> : <SupplyWizardReviewIdentity context={context} kind={type}
+          <SupplyWizardReviewIdentity context={context} kind={type}
             destination={type === "ENT" && form.source === "CARE_TEAM" ? "Estoque da família" : undefined}
             additional={type === "ENT" ? [
               { label: "Percurso", value: form.source === "FAMILY" ? "Família → Equipe" : "Equipe → Família" },
               { label: "Recebedor físico", value: recipientContext?.people.find(person => person.id === form.recipientId)?.name ?? people.find(person => person.id === form.recipientId)?.name ?? "Pessoa não disponível na referência atual" },
             ] : undefined}
-          />}
+          />
           {type === "ENT" && recipientContext ? <div className="mt-3 space-y-2">
             <DeliveryRecipientReference data={recipientContext} />
             {form.recipientReason ? <p className="whitespace-pre-wrap">
               Justificativa da escolha: {form.recipientReason}
             </p> : null}
           </div> : null}
-          {type !== "BAL" ? <>
             <WizardCatalogueReview rows={reviewRows.filter(row => !extras.has(row.id))} onEdit={(category, materialId) => {
               setSearchByCategory(current => ({ ...current, [category]: "" }));
               onCategoryChange(category);
@@ -547,43 +530,15 @@ export function SupplyWizardStep({
                 ...pendingExtras.map(pendingExtraReviewRow),
               ]} /> : <p className="hca-field-help">Nenhum item extra incluído.</p>}
             </section>
-          </> : <ul className="divide-y divide-(--line)">
-            {selected.map((product) => (
-              <li
-                key={product.id}
-                className="flex items-start justify-between gap-4 py-3 text-sm"
-              >
-                <span
-                  className="min-w-0 flex-1"
-                  style={{ overflowWrap: "anywhere" }}
-                >
-                  {product.name}
-                  {form.presentationSelections?.[product.id]?.map((row) => (
-                    <small className="mt-2 block wrap-break-word" key={row.id}>
-                      {presentationCaption(row)}
-                    </small>
-                  ))}
-                </span>
-                <strong className="shrink-0">
-                  {form.quantities[product.id]
-                    ? formatQuantity(form.quantities[product.id], product.unit)
-                    : "Quantidade pendente"}
-                </strong>
-              </li>
-            ))}
-          </ul>}
-          {type !== "BAL" ? <section className="hca-document-summary">
+          <section className="hca-document-summary">
             <div className="hca-issuance-observation-heading">
               <h3>Observações</h3>
               <ActionButton compact variant="quiet" aria-label="Editar observações" onClick={() => onEditStage(3)}>Editar</ActionButton>
             </div>
             <IssuanceObservationList observations={issuanceObservations(form).map(note => note.trim()).filter(Boolean)} />
-          </section> : form.notes ? (
-            <p className="whitespace-pre-wrap text-sm">{form.notes}</p>
-          ) : null}
+          </section>
           {type === "ENT" ? <Notice>Ao concluir, as quantidades serão expedidas e aguardarão recebimento. Confira origem, destinatário e materiais.</Notice>
-            : type === "BAL" ? <Notice>Ao concluir, os ajustes seguirão a política de aprovação do paciente. Confira todas as contagens.</Notice>
-              : purchaseApproval && selected.length ? <div className="hca-form-stack">
+            : purchaseApproval && selected.length ? <div className="hca-form-stack">
                 {purchaseApproval === "automatic" ? <>
                   <p className="hca-purchase-administrator"><Icon name="shield" />Administração · aprovação automática</p>
                   <FeedbackBanner tone="success" heading="Sua autorização já acompanha esta compra">

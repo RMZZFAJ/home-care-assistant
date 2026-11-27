@@ -1,11 +1,22 @@
 import { z } from "zod";
 
+export const phoneContact = z.string().regex(/^\+[1-9]\d{7,14}$/, "Use +, código do país, DDD e número.");
+export const emailContact = z.string().trim().email("Informe um endereço de e-mail válido.").max(254).toLowerCase();
+const contactStatus = z.object({
+  emailConfirmed: z.boolean(),
+  pendingEmail: emailContact.nullable(),
+  pendingPhone: phoneContact.nullable(),
+  recent: z.boolean(),
+  repeatSignIn: z.boolean(),
+});
+
 const profileRead = z.object({
   data: z.object({
     full_name: z.string().min(1), professional_registration: z.string().nullable(),
     professional_state: z.string().nullable(), professional_category: z.string().nullable(),
     notification_preferences: z.record(z.string(), z.boolean()), avatar: z.string().nullable(),
-    email: z.string().email(), phone: z.string().nullable(), providers: z.array(z.string()),
+    email: emailContact, phone: z.string().nullable(), providers: z.array(z.string()),
+    contactStatus: contactStatus.optional(),
   }),
   memberships: z.array(z.object({
     care_recipient_id: z.string().uuid(), role: z.string(), status: z.string(),

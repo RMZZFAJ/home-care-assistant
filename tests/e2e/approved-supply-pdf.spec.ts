@@ -1,4 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
+import { generateStandardPdf } from "./generated-pdf";
 import { randomUUID, createHash } from "node:crypto";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { PDF } from "@libpdf/core";
@@ -23,7 +24,7 @@ async function login(page: Page, patient: string) {
 async function issueFromUi(page: Page, id: string, label: string) {
   await page.goto("/documentos/" + id); await selectDocumentSection(page, "files");
   const pending = page.waitForResponse(response => new URL(response.url()).pathname === `/api/documents/${id}/issuances` && response.request().method() === "POST", { timeout: 60_000 });
-  await page.getByRole("button", { name: "Gerar PDF", exact: true }).click();
+  await generateStandardPdf(page);
   const created = await pending; expect(created.status(), await created.text()).toBe(200); const row = await created.json();
   expect(row).toMatchObject({ rendererRevision: 16, state: "ready", validation: { accepted: true, wholeFile: true, profile: "PAdES-B-T", signerTrust: "internal", timestampTrust: "internal" } });
   const url = `/api/documents/${id}/pdf?issuance=${row.id}`;

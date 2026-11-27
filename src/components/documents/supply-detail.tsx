@@ -16,7 +16,7 @@ import { DocumentTimeline } from "./document-timeline";
 import { DeliveryRecipientFacts } from "./delivery-recipient";
 import { DeliveryReassignment, DeliveryReassignmentResult } from "./delivery-reassignment";
 import { DeliveryRegularization } from "./delivery-regularization";
-import { BalanceReview } from "./balance-review";
+import { BalanceCounts, BalanceReview } from "./balance-review";
 import { TransferDetails } from "./transfer-details";
 import {
   documentPatientName,
@@ -80,13 +80,15 @@ import type { DocumentDecisionIntention } from "@/lib/validation/document-decisi
 import { DocumentHeader, DocumentMoreButton, DocumentMoreLink } from "./document-header";
 import { DocumentIssuanceResult } from "./document-issuance-result";
 import { canRecordFamilyReview, FamilyFulfillmentReview, type OpenPendingFamilyReview } from "./family-fulfillment-review";
-import { DocumentChangeFacts, DocumentFreshness } from "./document-freshness";
+import { ChangeFacts } from "@/components/ui/change-facts";
+import { DocumentFreshness } from "./document-freshness";
 import { DocumentFamilyDecisionNotice } from "./document-family-decision-notice";
 import { supplyChanges } from "@/lib/documents/document-changes";
 import { useDocumentCopy } from "@/lib/documents/use-document-copy";
 import {
   DocumentTabs,
   DocumentPanel,
+  DocumentFileSections,
   DocumentAuditAccess,
   useDocumentTabs,
 } from "@/components/documents/document-tabs";
@@ -138,6 +140,23 @@ type ArrivalReadIntent = { scope: string; attempt: number; retries: number; befo
 type ArrivalReadFailure = { cause: unknown; retries: number; open: boolean };
 
 const supplyCopyIdentity = (value: SupplyDocument) => JSON.stringify([value.version, value.status, value.workflow_data, value.lines, value.receipts, value.deliveryCancellation?.referenceHash, value.balanceReview?.referenceHash]);
+
+function BalanceShiftFacts({ context, draft }: { context: SupplyDocument["payload"]["balanceContext"]; draft?: boolean }) {
+  if (!context) return null;
+  return <section className="ui-card">
+    <h3>Plantão e contagem física</h3>
+    <DefinitionGrid items={[
+      { label: "Profissional", value: context.professionalName },
+      { label: "Tipo de plantão", value: context.shiftType },
+      { label: "Plantão", value: `${formatBrazilDate(context.startsAt)} → ${formatBrazilDate(context.endsAt)}` },
+      { label: "Contagem atual", value: formatBrazilDate(context.countedAt) },
+      { label: "Semanas vinculadas", value: context.weeks.map(week => week.split("-").reverse().join("/")).join(", ") },
+    ]} />
+    <p className="hca-muted">A contagem atual regulariza as semanas vinculadas e preserva seus prazos e atrasos.</p>
+    {draft ? <Notice>Rascunho: a obrigação ainda não foi concluída.</Notice> : null}
+  </section>;
+}
+
 export function SupplyDocumentContent({
   id,
   context,
@@ -146,7 +165,6 @@ export function SupplyDocumentContent({
   context: WorkspaceContext;
 }) {
   const liveRevision = useLiveRevision();
-  const tabs = useDocumentTabs(can(context, "audit.read"));
   const fabRef = useRef<HTMLButtonElement>(null);
   const reviewControlRef = useRef<(opener: HTMLButtonElement | null) => void>(null);
   const returnToCompletionRef = useRef<(() => void) | null>(null);
@@ -155,6 +173,8 @@ export function SupplyDocumentContent({
     useState<HTMLDivElement | null>(null);
   const editingRef = useRef(false);
   const { data, observedData, setData, acceptRead, stale } = useDocumentCopy<SupplyDocument>(supplyCopyIdentity);
+  const showBalanceTabs = data?.type === "BAL" && data.status !== "draft";
+  const tabs = useDocumentTabs(can(context, "audit.read"), showBalanceTabs);
   const [people, setPeople] = useState<PatientPerson[]>([]);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
@@ -333,6 +353,8 @@ export function SupplyDocumentContent({
     )
       .then(async (result) => {
         if (controller.signal.aborted) return;
+        // Keep an available explicit retry and its comparison baseline after a background refresh.
+        if (arrivalRead?.failed && arrivalRead.retries < arrivalRefreshRetryLimit) return;
         setReadDenied(false);
         setReadFailed(false);
         setArrivalReadFailure(null);
@@ -342,7 +364,7 @@ export function SupplyDocumentContent({
             setOpenRecoveredComparison(true);
           }
         }
-        const preserveCopy = editingRef.current || Boolean(arrivalRead && (arrivalRead.retries || arrivalRead.failed));
+        const preserveCopy = editingRef.current || Boolean(arrivalRead?.retries || arrivalRead?.failed);
         acceptRead(result.data, id + ":" + attempt, preserveCopy);
         setError("");
         if (result.data.type !== "COM" && result.data.care_recipient_id === patientId) {
@@ -713,7 +735,7 @@ export function SupplyDocumentContent({
   const pendingArrivalIds = data?.type === "COM" && activeContext && !archived && canReviewPurchaseArrivals(context)
     ? data.receipts.filter(receipt => receipt.state === "pending" && receipt.submitted_by !== context.userId).map(receipt => receipt.id)
     : [];
-  const patientAdmin = Boolean(activeContext && context.patient?.role === "admin" && can(context, "access.manage"));
+  const patientAdmin = Boolean(activeContext && can(context, "access.manage"));
   const canReviewCompletion = Boolean(activeContext && !archived && data?.protocol && data.type !== "BAL"
     && !purchaseIdentificationPending
     && !followUpTerminal && data.status !== "rejected" && data.status !== "administratively_closed"
@@ -1233,9 +1255,7 @@ export function SupplyDocumentContent({
                 label={
                   followUpStep
                     ? followUpStep.label
-                    : data.type === "BAL"
-                      ? "Contagem e revisão"
-                      : "Atendimento e decisões"
+                    : "Atendimento e decisões"
                 }
                 heading={followUpStep?.heading}
                 description={followUpStep?.description}
@@ -1386,6 +1406,10 @@ export function SupplyDocumentContent({
                 {canReviewCompletion ? <DocumentMoreButton
                   icon="check" disabled={busy || operationOpen} onClick={() => reviewControlRef.current?.(moreTriggerRef.current)}
                 >Revisar conclusão</DocumentMoreButton> : null}
+                {showBalanceTabs ? <>
+                  <DocumentMoreButton icon="check-circle" onClick={() => tabs.select("reviews", true)}>Consultar revisões</DocumentMoreButton>
+                  <DocumentMoreButton icon="history" onClick={() => tabs.select("counts", true)}>Contagens anteriores</DocumentMoreButton>
+                </> : null}
                 {data.type === "BAL" && data.payload.balanceContext ? (
                   <DocumentMoreLink
                     icon="calendar" href="/balancos"
@@ -1437,6 +1461,7 @@ export function SupplyDocumentContent({
                 : data.status
             }
             statusLabel={archive ? documentArchiveLabel(archive) : followUpState === "reopened" ? "Acompanhamento reaberto" : followUpState === "completed" ? "Acompanhamento concluído" : followUpStep?.statusLabel}
+            statusTone={archive || followUpState ? undefined : balanceStep?.statusTone}
             protocol={data.protocol}
             version={data.version}
             createdAt={data.created_at}
@@ -1515,11 +1540,26 @@ export function SupplyDocumentContent({
             key={`${context.userId}:${data.id}`} data={data} revision={`${data.version}:${liveRevision}:${attempt}`} /> : null}
           <DocumentTabs
             rootRef={tabs.rootRef}
-            type={data.type}
+            showBalanceTabs={showBalanceTabs}
             value={tabs.value}
             onSelect={tabs.select}
             auditAllowed={can(context, "audit.read")}
           >
+            {showBalanceTabs ? <>
+              <DocumentPanel value="reviews">
+                <BalanceReview
+                  data={data}
+                  context={context}
+                  onRefresh={() => setAttempt(value => value + 1)}
+                  onEditingChange={setBalanceReviewEditing}
+                />
+              </DocumentPanel>
+              <DocumentPanel value="counts">
+                <BalanceCounts data={data}>
+                  <BalanceShiftFacts context={data.payload.balanceContext} />
+                </BalanceCounts>
+              </DocumentPanel>
+            </> : null}
             <DocumentPanel value="progress">
               <DocumentProgress
                 code={data.code ?? data.protocol ?? "Rascunho"}
@@ -1648,46 +1688,7 @@ export function SupplyDocumentContent({
                 <PurchaseArrivalCorrections key={`${data.id}:${context.userId}:${context.patient?.id}`} data={data} context={context} readOnly={archived}
                   onUpdated={updated => { setData(updated); setAttempt(value => value + 1); }} />
               ) : null}
-              {data.type === "BAL" && data.status !== "draft" ? (
-                <BalanceReview
-                  data={data}
-                  context={context}
-                  onRefresh={() => setAttempt(value => value + 1)}
-                  onEditingChange={setBalanceReviewEditing}
-                />
-              ) : null}
-              {data.type === "BAL" && data.payload.balanceContext ? (
-                <section className="ui-card">
-                  <h2>Plantão e contagem física</h2>
-                  <strong>
-                    {data.payload.balanceContext.professionalName} ·{" "}
-                    {data.payload.balanceContext.shiftType}
-                  </strong>
-                  <p>
-                    {formatBrazilDate(data.payload.balanceContext.startsAt)} →{" "}
-                    {formatBrazilDate(data.payload.balanceContext.endsAt)}
-                  </p>
-                  <p>
-                    Contagem atual:{" "}
-                    {formatBrazilDate(data.payload.balanceContext.countedAt)}
-                  </p>
-                  <p>
-                    Semanas vinculadas:{" "}
-                    {data.payload.balanceContext.weeks
-                      .map((week) => week.split("-").reverse().join("/"))
-                      .join(", ")}
-                  </p>
-                  <p className="hca-muted">
-                    Semanas anteriores são regularizadas pela contagem atual,
-                    preservando seus prazos e atrasos históricos.
-                  </p>
-                  {data.status === "draft" ? (
-                    <Notice>
-                      Rascunho: a obrigação ainda não foi concluída.
-                    </Notice>
-                  ) : null}
-                </section>
-              ) : null}
+              {data.type === "BAL" && !showBalanceTabs ? <BalanceShiftFacts context={data.payload.balanceContext} draft /> : null}
               {!operationFromCompletion && !countingDelivery && !reassigningDelivery && !reconcilingDelivery && !reviewingDirectCancellation && !reviewingCancellation && (actions.length || action) ? (
                 <section className="ui-card">
                   <h2>
@@ -1708,11 +1709,13 @@ export function SupplyDocumentContent({
             <DocumentPanel value="communications">
               <DocumentDeliveryStatus id={data.id} version={data.version} />
             </DocumentPanel>
-            <DocumentPanel value="files">
-              {data.protocol ? (
+            <DocumentFileSections value={tabs.value} onSelect={tabs.select} generated={
+              data.protocol ? (
                 <DocumentActions
+                  active={tabs.value === "files"}
                   generationBlocked={stale || Boolean(arrivalReadFailure)}
                   readOnly={archived}
+                  consolidatedId={archive?.issuanceId}
                   actionTarget={fileActionTarget}
                   onAction={() => tabs.select("files")}
                   id={id}
@@ -1724,12 +1727,13 @@ export function SupplyDocumentContent({
                   Esta declaração ou rascunho ainda não tem emissão documental
                   definitiva.
                 </Notice>
-              )}
-            </DocumentPanel>
-            <DocumentPanel value="attachments">
+              )
+            } attachments={
               <Attachments
                 patientId={data.care_recipient_id}
                 documentId={data.id}
+                documentCode={data.protocol ?? undefined}
+                active={tabs.value === "attachments"}
                 writable={
                   activeContext && !archived &&
                   (data.created_by === context.userId ||
@@ -1738,7 +1742,7 @@ export function SupplyDocumentContent({
                 }
                 onChange={() => setAttempt((value) => value + 1)}
               />
-            </DocumentPanel>
+            } />
             <DocumentPanel value="history">
               {data?.protocol && activeContext ? <DocumentAccessObservation key={`${context.userId}:${data.id}:${data.version}`} id={data.id} version={data.version} onRecorded={setAccessRevision} /> : null}
               <DocumentAccessHistory id={id} refreshKey={`${data.version}:${accessRevision}`} authorized={can(context, "document.access.read")} />
@@ -1797,7 +1801,7 @@ export function SupplyDocumentContent({
         conflict={receiptConflict ? <section className="hca-form-stack" aria-label="Alterações na conferência">
           <Notice>A ficha mudou durante a conferência.</Notice>
           {receiptReference ? <>
-            <DocumentChangeFacts changes={[
+            <ChangeFacts changes={[
               { id: "version", label: "Versão da ficha", before: String(data.version), after: String(receiptReference.version) },
               ...supplyChanges(data, receiptReference),
             ]} />

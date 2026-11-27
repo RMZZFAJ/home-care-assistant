@@ -1,4 +1,5 @@
 import { startFocusProbe, attachFocusProbe } from "./focus-diagnostics";
+import { stockMovement } from "./stock-operation";
 import { expect, test, type Page } from "@playwright/test";
 import { mkdirSync } from "node:fs";
 import { randomUUID } from "node:crypto";
@@ -6,7 +7,7 @@ import {
   stockOriginFixture,
   stockOriginState,
 } from "../integration/stock-origin-fixtures.mjs";
-import { fixtures } from "../integration/v4-fixtures.mjs";
+import { fixtures, rpc, setup } from "../integration/v4-fixtures.mjs";
 import { sql, sqlLiteral } from "../../scripts/test-environment.mjs";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { selectContext } from "./auth-context";
@@ -33,6 +34,57 @@ const sourceUrl = (
   f: Awaited<ReturnType<typeof stockOriginFixture>>,
   id: string,
 ) => `/api/stock/movements/${id}/origin?careRecipientId=${f.patient}`;
+
+test("operação inteira abre pelo histórico do material e devolve o foco da origem granular", async ({ page }, info) => {
+  const f = await setup();
+  const reference = await rpc(f.admin, "family_stock_operation_reference", { p_patient: f.patient, p_products: f.products });
+  const reason = "Reposição conjunta de dois materiais da família.";
+  const receipt = await rpc(f.admin, "commit_family_stock_operation", {
+    p_patient: f.patient, p_action: "inbound", p_reason: reason, p_key: randomUUID(), p_reference: reference.referenceHash,
+    p_lines: f.products.map((productId: string, index: number) => ({ productId, quantity: String(index + 2) })),
+  });
+  const operationId = "family:" + receipt.id;
+
+  await login(page, f.patient);
+  await page.goto(`/estoque?careRecipientId=${f.patient}`);
+  await page.getByRole("button", { name: /^Consultar Material fictício V4 0(?: · Família)?$/ }).click();
+  const material = page.getByRole("dialog", { name: "Material fictício V4 0", exact: true });
+  await material.getByRole("tab", { name: "Histórico", exact: true }).click();
+  const accordion = material.locator(`[data-stock-act="${operationId}"]`);
+  await accordion.locator("summary").click();
+  await expect(accordion.locator("[data-movement-id]")).toHaveCount(1);
+  const opener = accordion.getByRole("button", { name: "Ver detalhes da operação", exact: true });
+
+  const routePattern = "**/api/stock/operations/*?*";
+  await page.route(routePattern, route => route.fulfill({
+    status: 503, json: { error: "Operação temporariamente indisponível" },
+  }), { times: 1 });
+  await opener.click();
+  const failure = page.getByRole("dialog", { name: "Detalhes da operação", exact: true });
+  await expect(failure.getByRole("alert")).toContainText("Operação temporariamente indisponível");
+  await failure.getByRole("button", { name: "Tentar novamente", exact: true }).click();
+
+  const detail = page.getByRole("dialog", { name: "Entrada avulsa", exact: true });
+  const effects = detail.getByRole("region", { name: "Efeito em cada material", exact: true });
+  await expect(effects.getByRole("article")).toHaveCount(2);
+  await expect(detail).toContainText(reason);
+  const itemName = "Material fictício V4 1";
+  const row = effects.getByRole("article").filter({ has: page.getByRole("heading", { name: itemName, exact: true }) });
+  await expect(row).toContainText("Saldo anterior");
+  await expect(row).toContainText("Saldo após");
+  await page.setViewportSize({ width: 360, height: 880 });
+  await audit(page, "E07 operação inteira de estoque");
+  await detail.screenshot({ path: info.outputPath("stock-operation-detail-360.png"), animations: "disabled" });
+
+  const granular = row.getByRole("button", { name: "Detalhes deste item · " + itemName, exact: true });
+  await granular.click();
+  await expect(drawer(page)).toContainText(itemName);
+  await drawer(page).getByRole("button", { name: "Fechar edição", exact: true }).click();
+  await expect(granular).toBeFocused();
+  await detail.getByRole("button", { name: "Voltar", exact: true }).click();
+  await expect(opener).toBeFocused();
+  await expect(accordion).toHaveAttribute("open", "");
+});
 
 test("histórico abre parcela exata, ENT, BAL, consumo e compensação sem perder filtros nem alterar seus fatos", async ({
   page,
@@ -90,12 +142,9 @@ test("histórico abre parcela exata, ENT, BAL, consumo e compensação sem perde
     } else await route.continue();
   });
   // Select by the immutable movement identity without guessing a receipt as a document.
-  const row = history
-    .locator("tbody tr[data-movement-id]")
-    .filter({ has: page.getByText(receiptMovement.id, { exact: true }) });
+  const row = await stockMovement(page, receiptMovement.id);
   const opener = row.getByRole("button", {
-    name: "Consultar origem",
-    exact: true,
+    name: /^Consultar origem ·/,
   });
   await opener.click();
   await expect(
@@ -176,11 +225,9 @@ test("histórico abre parcela exata, ENT, BAL, consumo e compensação sem perde
       expect(origin.document.id).toBe(target);
       expect(origin.document.type).toBe(kind === "bal" ? "BAL" : "ENT");
     }
-    const item = history
-      .locator("tbody tr[data-movement-id]")
-      .filter({ has: page.getByText(movement.id, { exact: true }) });
+    const item = await stockMovement(page, movement.id);
     await item
-      .getByRole("button", { name: "Consultar origem", exact: true })
+      .getByRole("button", { name: /^Consultar origem ·/ })
       .click();
     await expect(
       drawer(page).getByRole("region", {
@@ -199,11 +246,9 @@ test("histórico abre parcela exata, ENT, BAL, consumo e compensação sem perde
   await history
     .getByRole("button", { name: "Aplicar filtros", exact: true })
     .click();
-  const compensation = history
-    .locator("tbody tr[data-movement-id]")
-    .filter({ has: page.getByText(f.compensationId, { exact: true }) });
+  const compensation = await stockMovement(page, f.compensationId);
   await compensation
-    .getByRole("button", { name: "Consultar origem", exact: true })
+    .getByRole("button", { name: /^Consultar origem ·/ })
     .click();
   await expect(
     drawer(page).getByRole("heading", {

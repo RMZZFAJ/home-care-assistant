@@ -1,5 +1,6 @@
 import { selectContext } from "./auth-context";
-import { expect, test, type Page } from "@playwright/test";
+import { confirmationLink } from "./local-mail";
+import { expect, test } from "@playwright/test";
 import { readFileSync } from "node:fs";
 import { randomUUID } from "node:crypto";
 import { patientA, fixturePassword } from "../../scripts/test-constants.mjs";
@@ -9,40 +10,6 @@ import {
 } from "../../scripts/test-environment.mjs";
 
 test.setTimeout(120_000);
-
-async function confirmationLink(page: Page, email: string, subject: string) {
-  let id: string | undefined;
-  await expect
-    .poll(async () => {
-      const response = await page.request.get(
-        "http://127.0.0.1:54324/api/v1/messages",
-      );
-      const body = await response.json();
-      const message = body.messages.find(
-        (item: {
-          ID: string;
-          Subject: string;
-          To: Array<{ Address: string }>;
-        }) =>
-          item.Subject.includes(subject) &&
-          item.To.some((to) => to.Address === email),
-      );
-      id = message?.ID;
-      return Boolean(id);
-    })
-    .toBeTruthy();
-  const message = await (
-    await page.request.get(`http://127.0.0.1:54324/api/v1/message/${id}`)
-  ).json();
-  const link = String(message.HTML)
-    .match(/href="([^"]+)"/)?.[1]
-    .replaceAll("&amp;", "&");
-  if (!link || new URL(link).origin !== "http://127.0.0.1:54321")
-    throw new Error(
-      "Confirmation must target only the local development Auth service.",
-    );
-  return link;
-}
 
 test("convite → cadastro pessoal → confirmação de e-mail → aceite → recuperação de senha", async ({
   page,
@@ -76,8 +43,8 @@ test("convite → cadastro pessoal → confirmação de e-mail → aceite → re
   await expect(page).toHaveURL(/\/login$/);
   await page.goto(invitationUrl);
   await page.getByText("Ainda não tenho conta", { exact: true }).click();
-  await page.getByLabel("Nome", { exact: true }).fill("Pessoa convidada E2E");
-  await page.getByLabel("E-mail do convite", { exact: true }).fill(email);
+  await page.getByRole("textbox", { name: "Nome", exact: true }).fill("Pessoa convidada E2E");
+  await page.getByRole("textbox", { name: "E-mail do convite", exact: true }).fill(email);
   await page.getByLabel("Senha pessoal", { exact: true }).fill(fixturePassword);
   const registered = page.waitForResponse(
     (response) =>
@@ -92,6 +59,7 @@ test("convite → cadastro pessoal → confirmação de e-mail → aceite → re
   await expect(
     page.getByText("Se o cadastro for elegível", { exact: false }),
   ).toBeVisible();
+  await page.getByRole("dialog", { name: "Confira seu e-mail", exact: true }).getByRole("button", { name: "Concluir", exact: true }).click();
   // An unconfirmed identity must not acquire a patient membership.
   const beforeConfirmation = await page.request.post(
     "/api/invitations/accept",
@@ -114,16 +82,13 @@ test("convite → cadastro pessoal → confirmação de e-mail → aceite → re
   await expect(page).toHaveURL(/\/convites\/aceitar$/);
   await page
     .getByRole("button", {
-      name: "Aceitar convite com minha conta",
+      name: "Aceitar convite",
       exact: true,
     })
     .click();
-  await expect(
-    page.getByText("Convite aceito.", { exact: false }),
-  ).toBeVisible();
-  await page
-    .getByRole("link", { name: "Abrir Home Care Assistant", exact: true })
-    .click();
+  await page.getByRole("dialog", { name: "Convite aceito", exact: true }).getByRole("button", { name: "Concluir", exact: true }).click();
+  await page.getByRole("button", { name: "Selecionar residência", exact: true }).click();
+  await page.getByRole("dialog", { name: "Residência selecionada", exact: true }).getByRole("button", { name: "Concluir", exact: true }).click();
   // The header can be ready before the authorized context chooser mounts.
   await expect(
     page.getByRole("heading", { name: "Visão geral", exact: true }),

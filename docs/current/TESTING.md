@@ -250,10 +250,10 @@ no job de banco. Após sua aprovação, Chromium desktop, Pixel 7 e iPhone 13
 executam em jobs isolados, com a mesma stack local e provisionamento Auth
 fictício em cada runner efêmero. Cada projeto mantém todos os seus cenários.
 O check agregado database-and-browser exige sucesso no banco e em todos os
-jobs browser. Chromium,mobile e iOS dividem cada coleção completa em
-shard1/2 e shard2/2,com stack própria e execução serial por runner. O limite
-de40min por job permanece;as partes Chromium cobrem161+160 dos321 casos
-na seleção D3.48,sem remover cenários.
+jobs de navegador. Chromium desktop e Android emulado dividem a seleção
+em dois grupos por projeto. O iOS emulado usa três grupos. Cada grupo tem
+stack própria e roda em série no seu runner. O limite é de 55 minutos por
+grupo Chromium, 70 por grupo WebKit e 40 no job de banco.
 A união das partes precisa cobrir toda a coleção sem interseção. Não há
 exclusão de testes nem uso do Supabase remoto na suíte.
 

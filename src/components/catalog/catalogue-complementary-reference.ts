@@ -1,7 +1,4 @@
 import type { ProductPresentation } from "@/types/catalogue";
-import type { CatalogueScope } from "@/lib/validation/catalogue-preparation";
-import { useScopedRead } from "@/lib/use-scoped-read";
-import { cataloguePreparationUrl } from "./use-catalogue-preparation";
 
 export type MeasurementUnit = {
   id: string;
@@ -18,10 +15,3 @@ export type CatalogueComplementaryReference = {
   presentation: ProductPresentation | null;
   units: MeasurementUnit[] | null;
 };
-
-export function useCatalogueProductReference(scope: CatalogueScope, selection: string, reference: CatalogueComplementaryReference | undefined, attempt: number) {
-  const consult = !!reference && (attempt > 0 || (reference.product?.id ?? "") !== selection);
-  const current = useScopedRead<CatalogueComplementaryReference>(
-    consult ? cataloguePreparationUrl(scope, { selection }) : null, String(attempt));
-  return { ...current, reference: consult ? current.data : reference };
-}

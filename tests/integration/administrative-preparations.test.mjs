@@ -18,22 +18,20 @@ const packet=(args,action,{fields=null,hash=null,draft=null}={})=>({
 const command="administrative_preparation_command";
 const alert=(productId,lowThreshold="5")=>({productId,location:"CARE_TEAM",lowThreshold,criticalThreshold:"2",isEnabled:true});
 
-test("administrative partial fields are private, versioned and discardable without native alert effects",async()=>{
+test("stock and recipient configuration no longer create administrative drafts or effects",async()=>{
   const f=await setup(),args=scope(f.patient,"alertRule"),{reference}=await read(f.admin,args);
   const fields=alert("","em revisão"),initial=packet(args,"save",{fields,hash:reference.hash});
-  const first=await rpc(f.admin,command,initial);
-  assert.deepEqual((await read(f.admin,args)).draft.fields,fields);
-  assert.deepEqual((await read(f.admin,args,null,null,initial.p_key)).receipt,first);
-  const other=await actor("global",f.patient);
-  assert.equal((await read(other,args)).draft,null);
-  assert.equal((await read(other,args,null,null,initial.p_key)).receipt,null);
-  const saves=["7","8"].map(value=>packet(args,"save",{draft:first,fields:{...fields,lowThreshold:value},hash:reference.hash}));
-  const results=await Promise.all(saves.map(save=>f.admin.rpc(command,save)));
-  assert.equal(results.filter(result=>!result.error).length,1);
-  assert.equal(results.find(result=>result.error)?.error.code,"PT409");
-  const latest=(await read(f.admin,args)).draft;
-  assert.equal((await rpc(f.admin,command,packet(args,"discard",{draft:latest}))).state,"discarded");
+  assert.equal((await f.admin.rpc(command,initial)).error?.code,"PT409");
+  assert.equal((await read(f.admin,args)).draft,null);
+  assert.equal((await read(f.admin,args,null,null,initial.p_key)).receipt,null);
+  const recipientArgs=scope(f.patient,"notificationRecipient"),user=fixtures.professional.id;
+  const recipientFields={recipientUserId:user,recipientGroup:"family",channel:"internal",destination:"",isEnabled:true,includeTeamAlerts:true};
+  const recipientReference=(await read(f.admin,recipientArgs,user,"internal")).reference;
+  const saveRecipient=packet(recipientArgs,"save",{fields:recipientFields,hash:recipientReference.hash});
+  assert.equal((await f.admin.rpc(command,saveRecipient)).error?.code,"PT409");
+  assert.equal((await read(f.admin,recipientArgs)).draft,null);
   assert.equal(sql(`select count(*) from public.stock_alert_rules where care_recipient_id=${q(f.patient)};`),"0");
+  assert.equal(sql(`select count(*) from public.recipient_notification_settings where care_recipient_id=${q(f.patient)};`),"0");
 });
 
 test("native alert confirmation and retries share one receipt and retain stale-reference fields",async()=>{
@@ -48,17 +46,16 @@ test("native alert confirmation and retries share one receipt and retain stale-r
   assert.equal((await read(f.admin,args,null,null,intent.p_key)).receipt.id,results[0].id);
 });
 
-test("recipient confirmation preserves own fields and refuses an outdated member eligibility reference",async()=>{
+test("recipient confirmation refuses an outdated member eligibility reference and retains an exact receipt",async()=>{
   const f=await setup(),args=scope(f.patient,"notificationRecipient"),user=fixtures.professional.id;
   const fields={recipientUserId:user,recipientGroup:"family",channel:"internal",destination:"",isEnabled:true,includeTeamAlerts:true};
   const {reference}=await read(f.admin,args,user,"internal");
-  const saved=await rpc(f.admin,command,packet(args,"save",{fields,hash:reference.hash}));
   sql(`update public.care_recipient_memberships set status='revoked' where care_recipient_id=${q(f.patient)} and user_id=${q(user)};`);
-  assert.equal((await f.admin.rpc(command,packet(args,"commit",{fields,hash:reference.hash,draft:saved}))).error?.code,"PT409");
-  assert.deepEqual((await read(f.admin,args)).draft.fields,fields);
+  assert.equal((await f.admin.rpc(command,packet(args,"commit",{fields,hash:reference.hash}))).error?.code,"PT409");
+  assert.equal((await read(f.admin,args)).draft,null);
   sql(`update public.care_recipient_memberships set status='active' where care_recipient_id=${q(f.patient)} and user_id=${q(user)};`);
   const current=(await read(f.admin,args,user,"internal")).reference;
-  const final=packet(args,"commit",{fields,hash:current.hash,draft:saved});
+  const final=packet(args,"commit",{fields,hash:current.hash});
   const result=await rpc(f.admin,command,final);
   assert.deepEqual(await rpc(f.admin,command,final),result);
   assert.equal(result.outcome.userId,user);
@@ -118,4 +115,54 @@ test("global administrative confirmations create proposals and preserve local ap
     (has_function_privilege('authenticated','private.commit_administrative_preparation(uuid,text,text,uuid,jsonb,text,uuid)','execute')),
     (has_table_privilege('authenticated','private.administrative_preparations','select'))
   ) x(allowed) where allowed;`),"0");
+});
+
+const reviewedCommand = "reviewed_membership_command";
+const reviewedReference = (client, args, selection = null) => rpc(client, "reviewed_membership_reference", { ...args, p_selection: selection });
+const membershipScope = (patient, purpose, target, mode = "patient") => ({ p_patient: patient, p_mode: mode, p_purpose: purpose, p_target: target });
+const reviewedPacket = (args, fields, reference) => ({ ...args, p_key: randomUUID(), p_fields: fields, p_reference_hash: reference.hash });
+const recover = packet => ({ ...packet, p_fields: null, p_reference_hash: null });
+
+test("reviewed membership editing rejects stale input, uses one receipt and creates no draft", async () => {
+  const f = await setup();
+  const target = fixtures.professional.id;
+  const args = membershipScope(f.patient, "membership", target);
+  const fields = { userId: target, role: "supervisor", canManageStock: false, canCountStock: true };
+  const reference = await reviewedReference(f.admin, args);
+  const legacy = scope(f.patient, "membership", target);
+  const save = packet(legacy, "save", { fields, hash: reference.hash });
+  assert.equal((await f.admin.rpc(command, save)).error?.code, "PT409");
+  assert.equal((await read(f.admin, legacy)).draft, null);
+
+  const stale = reviewedPacket(args, fields, reference);
+  sql(`update public.care_recipient_memberships set can_count_stock=not can_count_stock where care_recipient_id=${q(f.patient)} and user_id=${q(target)};`);
+  assert.equal((await f.admin.rpc(reviewedCommand, stale)).error?.code, "PT409");
+  const next = reviewedPacket(args, fields, await reviewedReference(f.admin, args));
+  assert.equal((await rpc(f.admin, reviewedCommand, recover(stale))).state, "closed");
+  assert.equal((await rpc(f.admin, reviewedCommand, { ...next, p_key: stale.p_key })).state, "closed");
+  const results = await Promise.all([rpc(f.admin, reviewedCommand, next), rpc(f.admin, reviewedCommand, next)]);
+  assert.deepEqual(results[0], results[1]);
+  assert.equal(results[0].outcome.role, "supervisor");
+  assert.deepEqual(await rpc(f.admin, reviewedCommand, recover(next)), results[0]);
+  assert.equal((await f.admin.rpc(reviewedCommand, { ...next, p_fields: { ...fields, role: "reader" } })).error?.code, "PT409");
+  assert.equal((await f.admin.rpc(reviewedCommand, { ...recover(next), p_target: fixtures.reader.id })).error?.code, "42501");
+  assert.equal((await read(f.admin, legacy)).draft, null);
+});
+
+test("reviewed own revocation recovers only in its original session", async () => {
+  const f = await setup();
+  const args = membershipScope(f.patient, "membershipStatus", fixtures.adminA.id);
+  const intent = reviewedPacket(args, { status: "revoked" }, await reviewedReference(f.admin, args));
+  const environment = getTestEnvironment();
+  const anotherSession = createClient(environment.url, environment.anonKey, { auth: { persistSession: false, autoRefreshToken: false } });
+  assert.ifError((await anotherSession.auth.signInWithPassword({ email: fixtures.adminA.email, password: fixturePassword })).error);
+  assert.ifError((await anotherSession.rpc("select_active_context", { p_patient: f.patient })).error);
+  const receipt = await rpc(f.admin, reviewedCommand, intent);
+  assert.equal(receipt.outcome.status, "revoked");
+  assert.deepEqual(await rpc(f.admin, reviewedCommand, recover(intent)), receipt);
+  assert.equal((await f.admin.rpc(reviewedCommand, { ...recover(intent), p_key: randomUUID() })).error?.code, "42501");
+  assert.equal((await anotherSession.rpc(reviewedCommand, recover(intent))).error?.code, "42501");
+  assert.ifError((await anotherSession.auth.signOut()).error);
+  assert.equal(sql(`select count(*) from private.administrative_preparations where patient_id=${q(f.patient)};`), "0");
+  assert.equal(sql(`select count(*) from private.reviewed_membership_attempts where patient_id=${q(f.patient)};`), "1");
 });

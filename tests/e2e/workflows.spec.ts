@@ -5,6 +5,7 @@ import { expandDocumentMilestones, selectDocumentSection, openDocumentMore, open
 import { generatedPdf } from "./generated-pdf";
 import { confirmArrivalReview, openArrivalReview } from "./purchase-arrival-review";
 import { selectContext } from "./auth-context";
+import { openFlowSuggestions } from "./navigation";
 import { selectDeliveryRecipient } from "./delivery-recipient";
 import { openNavigation } from "./navigation";
 import { expect, test, type Page } from "@playwright/test";
@@ -42,9 +43,7 @@ async function signIn(page: Page, email: string, destination?: string) {
   await expect(
     page.getByRole("heading", { name: "Visão geral", exact: true }),
   ).toBeVisible();
-  await expect(
-    page.getByRole("combobox", { name: "Pessoa assistida", exact: true }),
-  ).toBeVisible();
+  await expect(page.getByLabel("Menu do usuário", { exact: true })).toBeEnabled();
 }
 async function login(page: Page, role = "global", preparedPatient?: string) {
   await signIn(page, fixtures()[role].email);
@@ -186,8 +185,7 @@ async function issueSupply(
       "Pessoa indicada manualmente para receber estes materiais",
     );
   await next(page);
-  if (type === "BAL") await next(page);
-  else await selectMaterialCategory(page);
+  if (type !== "BAL") await selectMaterialCategory(page);
   if (type === "ENT" && requestId) {
     const assessment = page.getByRole("checkbox", { name: `Atende integralmente à necessidade de ${productName}`, exact: true });
     if (fulfillment === "complete") await assessment.check();
@@ -197,9 +195,7 @@ async function issueSupply(
     await page
       .getByRole("checkbox", { name: new RegExp("^" + productName) })
       .check();
-  await page
-    .getByLabel("Quantidade — " + productName, { exact: true })
-    .fill(amount);
+  await page.getByLabel(type === "BAL" ? productName + " · unidade" : "Quantidade — " + productName, { exact: true }).fill(amount);
   for (let step = 0; step < 3; step++) await next(page);
   if (type === "ENT" && requestId)
     await expect(page.getByText(fulfillment === "complete" ? "Atendimento integral previsto" : "Atendimento parcial previsto", { exact: true })).toBeVisible();
@@ -356,6 +352,8 @@ test("REQ → planejamento COM → compra → validação → estoque familiar �
     buffer: png,
   });
   await page.getByRole("button", { name: "Enviar anexo", exact: true }).click();
+  await page.getByRole("dialog", { name: "Anexo disponível", exact: true })
+    .getByRole("button", { name: "Concluir", exact: true }).click();
   await expect(
     page.getByRole("link", { name: "ficha-fisica.png", exact: true }),
   ).toBeVisible();
@@ -722,10 +720,11 @@ test("estoque familiar: revisão, paginação, filtro e correção compensatóri
   await page
     .getByRole("button", { name: "Movimentar estoque familiar", exact: true })
     .click();
-  await page
-    .getByLabel("Operação", { exact: true })
+  const stockEditor = page.getByRole("dialog", { name: "Movimentar estoque familiar", exact: true });
+  await stockEditor
+    .getByRole("combobox", { name: "Operação", exact: true })
     .selectOption("correction_out");
-  await page.getByLabel("Produto", { exact: true }).selectOption(product.id);
+  await stockEditor.getByRole("combobox", { name: "Produto", exact: true }).selectOption(product.id);
   await page.getByLabel("Quantidade", { exact: true }).fill("1");
   await page
     .getByLabel("Movimento original a compensar")
@@ -760,14 +759,9 @@ test("estoque familiar: revisão, paginação, filtro e correção compensatóri
   });
   await page.reload();
   await expect(
-    page
-      .getByRole("row", { name: product.name + " · Família", exact: true })
-      .or(
-        page.getByRole("article", {
-          name: product.name + " · Família",
-          exact: true,
-        }),
-      ),
+    page.getByRole("article").filter({
+      has: page.getByRole("region", { name: product.name + " · Família", exact: true }),
+    }),
   ).toContainText("Inativo");
 });
 
@@ -797,9 +791,8 @@ test("BAL obrigatório reconta após alteração de estoque e preserva versões 
     })
     .click();
   await next(page);
-  await next(page);
   await page
-    .getByLabel("Quantidade — " + product.name, { exact: true })
+    .getByLabel(product.name + " · unidade", { exact: true })
     .fill("1");
   for (let step = 0; step < 3; step++) await next(page);
   await page
@@ -1118,12 +1111,15 @@ test("item extra identificado, múltiplas REQ, scanner e trânsito até o aceite
   await expect(page).toHaveURL(url => url.pathname === "/fichas/" + delivery.id);
   await emitted.getByRole("button", { name: "Acompanhar ficha", exact: true }).click();
   await page.goto("/estoque?careRecipientId=" + patient + "&custody=TRANSIT");
+  const transit = page.getByRole("dialog", { name: "Materiais em trânsito", exact: true });
   await expect(
-    page.getByRole("link", { name: delivery.code, exact: true }),
+    transit.getByRole("button", { name: delivery.code, exact: true }),
   ).toBeVisible();
   await expect(
-    page.getByText("Aguardando conferência", { exact: true }),
+    transit.getByText("Ainda em trânsito", { exact: true }),
   ).toBeVisible();
+  await transit.getByRole("button", { name: "Fechar", exact: true }).click();
+  await expect(transit).toHaveCount(0);
   await logout(page);
   await signIn(page, recipient.email, "/fichas/" + delivery.id);
   await confirmCompleteDeliveryReceipt(page);
@@ -1307,11 +1303,13 @@ test("E06-09 troca de recebedor de ENT direta e cancelamento com consentimento p
   expect(Number(stock.family.confirmed)).toBe(30);
 });
 
-test("Flow exige revisão do autor e confirmação autorizada antes de debitar estoque", async ({
+test("Flow legado mantém a conferência de relatos quando o autor tem somente permissão de declarar", async ({
   page,
 }) => {
   await login(page);
   const { patient, products } = await prepare(page);
+  sql(`insert into public.capability_overrides(care_recipient_id,subject_user,capability,enabled)
+    values(${sqlLiteral(patient)},${sqlLiteral(fixtures().professional.id)},'consumption.team.write',false)`);
   const product = products[0];
   await post(page, "/api/stock/movements", {
     careRecipientId: patient,
@@ -1371,6 +1369,7 @@ test("Flow exige revisão do autor e confirmação autorizada antes de debitar e
       "::jsonb)",
   );
   await page.goto("/consumo?careRecipientId=" + patient);
+  await openFlowSuggestions(page);
   await page
     .getByRole("button", { name: "Conferir sugestão", exact: true })
     .click();
@@ -1379,10 +1378,14 @@ test("Flow exige revisão do autor e confirmação autorizada antes de debitar e
     .getByRole("button", { name: "Revisar e registrar relato", exact: true })
     .click();
   await page
-    .getByRole("dialog")
+    .getByRole("dialog", { name: "Revisão do Flow", exact: true })
     .getByRole("button", { name: "Confirmar relato conferido", exact: true })
     .click();
-  await expect(page.getByRole("dialog")).not.toBeVisible();
+  await expect(page.getByRole("dialog", { name: "Revisão do Flow", exact: true })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Atualizar sugestões", exact: true })).toBeFocused();
+  await page.getByRole("dialog", { name: "Sugestões do WhatsApp", exact: true })
+    .getByRole("button", { name: "Fechar diálogo", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Mais opções de consumo", exact: true })).toBeFocused();
   let stock = (
     await (
       await get(page, "/api/stock/balances?careRecipientId=" + patient)
@@ -1397,8 +1400,9 @@ test("Flow exige revisão do autor e confirmação autorizada antes de debitar e
   expect(reports).toHaveLength(1);
   const report = reports[0];
   const reportRow = page.locator(`[data-consumption-id="${report.id}"]`);
-  await expect(reportRow.locator(".hca-consumption-main strong")).toHaveText("Consumo · Equipe");
-  await expect(reportRow.locator(".hca-consumption-end")).toContainText("Aguardando conferência");
+  await expect(reportRow.getByText("Relato de consumo", { exact: true })).toBeVisible();
+  await expect(reportRow.getByText("Equipe", { exact: true })).toBeVisible();
+  await expect(reportRow.getByText("Aguardando conferência", { exact: true })).toBeVisible();
   expect(report).toMatchObject({
     kind: "consumption",
     location: "CARE_TEAM",
@@ -1420,8 +1424,9 @@ test("Flow exige revisão do autor e confirmação autorizada antes de debitar e
   await decision
     .getByRole("button", { name: "Confirmar consumo e descontar", exact: true })
     .click();
-  await expect(reportRow.locator(".hca-consumption-main strong")).toHaveText("Consumo · Equipe");
-  await expect(reportRow.locator(".hca-consumption-end")).toContainText("Confirmado");
+  await expect(reportRow.getByText("Relato de consumo", { exact: true })).toBeVisible();
+  await expect(reportRow.getByText("Equipe", { exact: true })).toBeVisible();
+  await expect(reportRow.getByText("Confirmado", { exact: true })).toBeVisible();
   stock = (
     await (
       await get(page, "/api/stock/balances?careRecipientId=" + patient)

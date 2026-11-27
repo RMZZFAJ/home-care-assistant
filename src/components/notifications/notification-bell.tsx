@@ -1,32 +1,33 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Popover } from "@base-ui/react/popover";
 import { PopoverPopup } from "@/components/ui/floating";
-import { api } from "@/components/workspace";
 import { Icon } from "@/components/ui/primitives";
 import { documentEventLabel } from "@/lib/notifications/event-labels";
 import { formatBrazilDate } from "@/lib/receipt";
-import { notificationHref,notificationTargetLabel } from "@/lib/notifications/navigation";
 import { useInbox } from "@/lib/notifications/use-inbox";
+import { InboxNoticeDetails } from "./inbox-notice-details";
 
-export function NotificationBell({ patientId, disabled = false }: { patientId?: string; disabled?: boolean }) {
+export function NotificationBell({ patientId, patientName, disabled = false }: { patientId?: string; patientName?: string; disabled?: boolean }) {
   const inbox = useInbox({ patientId, surface: "bell", pageSize: 8, poll: true, paused: disabled });
   const [open, setOpen] = useState(false);
-  const [writeError, setWriteError] = useState("");
+  const [noticeId, setNoticeId] = useState<string | null>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
   const rows = inbox.data?.data ?? [], unread = inbox.data?.unreadCount;
   return (
     <div className="notification-bell">
       <Popover.Root modal="trap-focus" open={open} onOpenChange={setOpen}>
       <Popover.Trigger render={<button className="ui-icon-button"
+        ref={triggerRef}
         type="button"
         disabled={disabled}
         aria-label={
           "Notificações" + (inbox.fresh && unread ? ", " + unread + " não vistas" : "")
         }
         aria-expanded={open}
-        aria-controls="notification-panel"
+        aria-controls={open ? "notification-panel" : undefined}
         onClick={event => event.currentTarget.focus()} />}>
         <Icon name="bell" />
         {inbox.fresh && unread ? (
@@ -47,8 +48,7 @@ export function NotificationBell({ patientId, disabled = false }: { patientId?: 
           {inbox.paused ? <p role="status">Atualizando vínculo…</p> : null}
           {inbox.loading ? <p role="status">Consultando notificações…</p> : null}
           {inbox.error ? <div><p role="alert">{inbox.error}</p><button type="button" className="notification-all" onClick={inbox.refresh}>Consultar notificações novamente</button></div> : null}
-          {writeError ? <p role="alert">{writeError}</p> : null}
-          {rows.length > 0 && !inbox.fresh ? <p className="text-sm text-(--muted)">Última consulta confirmada; aguardando atualização.</p> : null}
+          {rows.length > 0 && !inbox.fresh ? <p className="text-sm text-(--muted)">Última consulta confirmada{inbox.receivedAt ? " em " + formatBrazilDate(inbox.receivedAt) : ""}. Aguardando atualização.</p> : null}
           {inbox.fresh && !rows.length ? (
             <p className="py-5 text-sm text-(--muted)">
               Você está em dia. As próximas atualizações aparecerão aqui.
@@ -60,23 +60,15 @@ export function NotificationBell({ patientId, disabled = false }: { patientId?: 
                   key={row.id}
                   className={!row.seen_at ? "notification-unread" : ""}
                 >
-                  <Link
-                    href={notificationHref(row)}
-                    tabIndex={0}
+                  <button
+                    type="button"
                     onClick={() => {
                       setOpen(false);
-                      setWriteError("");
-                      void api("/api/notifications", { id: row.id }).then(
-                        inbox.refresh,
-                        () =>
-                          setWriteError(
-                            "Não foi possível confirmar a marcação como vista. Consulte novamente para conferir.",
-                          ),
-                      );
+                      setNoticeId(row.id);
                     }}
                   >
                     <strong>
-                      {row.operational_documents?.code ??
+                      {row.reference_code ??
                         "Atualização do paciente"}
                     </strong>
                     <span>
@@ -84,9 +76,8 @@ export function NotificationBell({ patientId, disabled = false }: { patientId?: 
                         row.document_events?.action ?? row.event_key,
                       )}
                     </span>
-                    <time>{formatBrazilDate(row.created_at)}</time>
-                    <span>{notificationTargetLabel(row)}</span>
-                  </Link>
+                    <time dateTime={row.created_at}>{formatBrazilDate(row.created_at)}</time>
+                  </button>
                 </li>
               ))}
             </ul>
@@ -102,6 +93,7 @@ export function NotificationBell({ patientId, disabled = false }: { patientId?: 
         </section>
       </PopoverPopup>
       </Popover.Root>
+      {patientId && noticeId && !disabled ? <InboxNoticeDetails key={noticeId} patientId={patientId} patientName={patientName} noticeId={noticeId} onClose={() => setNoticeId(null)} onUnavailable={inbox.invalidate} finalFocus={triggerRef} markOnOpen /> : null}
     </div>
   );
 }

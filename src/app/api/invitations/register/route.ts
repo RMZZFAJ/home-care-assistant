@@ -5,6 +5,7 @@ import { api, ApiError, readJson } from "@/lib/server/api";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { newPasswordSchema } from "@/lib/validation/password";
 import { appOrigin } from "@/lib/server/app-origin";
+import { invitationToken } from "@/lib/validation/invitation";
 
 export async function POST(request: Request) {
   return api("invitation.register", async () => {
@@ -12,7 +13,7 @@ export async function POST(request: Request) {
       request,
       z
         .object({
-          token: z.string().regex(/^[A-Za-z0-9_-]{43}$/),
+          token: invitationToken,
           email: z.string().trim().email().max(254),
           password: newPasswordSchema,
           fullName: z.string().trim().min(2).max(160),

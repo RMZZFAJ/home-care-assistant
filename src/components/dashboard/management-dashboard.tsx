@@ -13,8 +13,11 @@ import { CriticalStockSummary, RecentDocuments, ShiftSummary } from "./dashboard
 import { WeekSchedule } from "./week-schedule";
 import { PurchaseArrivalReview } from "@/components/documents/purchase-arrival-review";
 import { UnlinkedArrivalAction } from "@/components/documents/unlinked-arrival";
+import { usePresentationMode } from "@/lib/ui/presentation-mode";
+import { DashboardComplements } from "./dashboard-complements";
 
 export function ManagementDashboard({ context, data }: { context: WorkspaceContext; data: DashboardData; }) {
+  const simple = usePresentationMode(context.userId).mode === "simple";
   return <div className="dashboard-v2 family-dashboard">
     <TaskAttention tasks={data.pendingTasks} context={context} />
     <div className="home-quick-actions">
@@ -32,8 +35,12 @@ export function ManagementDashboard({ context, data }: { context: WorkspaceConte
       {data.archivePending > 0 ? <MetricCard label="Conclusões para revisar e arquivar" value={data.archivePending} href="/historico?type=REQ&status=archive_pending" icon="history" action="Revisar conclusões" /> : null}
       {data.criticalStock.length ? <MetricCard label="Saldos abaixo do mínimo" value={data.criticalStock.length} href="/estoque" icon="stock" action="Consultar estoque" /> : null}
     </div>
-    <div className="dashboard-grid"><div className="dashboard-main"><div className="hca-home-tasks"><TaskList title="Suas pendências" tasks={data.pendingTasks} /></div><OpenRequests patientId={context.patient!.id} /></div><aside className="dashboard-aside"><DashboardNotices patientId={context.patient!.id} /><WeekSchedule context={context} /><ShiftSummary data={data} /></aside></div>
+    <div className="dashboard-grid"><div className="dashboard-main"><div className="hca-home-tasks"><TaskList title="Suas pendências" tasks={data.pendingTasks} /></div><OpenRequests patientId={context.patient!.id} /></div>
+      <aside className="dashboard-aside"><DashboardComplements simple={simple} title="Avisos e escala">
+        <DashboardNotices patientId={context.patient!.id} patientName={context.patient!.display_name} /><WeekSchedule context={context} /><ShiftSummary data={data} />
+      </DashboardComplements></aside>
+    </div>
     <CriticalStockSummary data={data} />
-    <RecentDocuments data={data} />
+    <DashboardComplements simple={simple} title="Movimentações do paciente"><RecentDocuments data={data} /></DashboardComplements>
   </div>;
 }

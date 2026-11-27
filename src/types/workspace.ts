@@ -8,6 +8,7 @@ export type PatientContext = {
   hasMembership?: boolean;
   permissions?: Record<string, boolean>;
   capabilities?: Record<string, boolean>;
+  canReportFamilyConsumption?: boolean;
   can_manage_stock?: boolean;
   can_count_stock?: boolean;
 };

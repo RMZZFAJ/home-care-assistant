@@ -18,7 +18,7 @@ const date=(value:string)=>value.split("-").reverse().join("/");
 const when=(value:string|null)=>value?formatBrazilDate(value):"Não preservado";
 const zoned=(value:string|null,zone:string|null)=>zone?formatZonedDate(value,zone):when(value)+" (Brasília; fuso original não preservado)";
 const href=(path:string,patient:string,values:Record<string,string>={})=>path+"?"+new URLSearchParams({careRecipientId:patient,...values});
-export function NotificationReference({read,context,onReport,onStockFilter}:{read:NotificationReferenceRead;context:WorkspaceContext;onReport?:(origin:ReminderOrigin,opener:HTMLElement)=>void;onStockFilter?:(productId:string,location:string)=>void}){
+export function NotificationReference({read,context,onReport,onShortage,onStockFilter}:{read:NotificationReferenceRead;context:WorkspaceContext;onReport?:(origin:ReminderOrigin,opener:HTMLElement)=>void;onShortage?:(origin:ReminderOrigin,opener:HTMLElement)=>void;onStockFilter?:(productId:string,location:string)=>void}){
  const reference=read.reference,patient=context.patient!.id,storageKey=`hca:notice-intent:${context.userId}:${patient}:${reference}`;
  const [pending,setPending]=useState<NoIssuesCommand|null>(()=>{
   if(typeof window==="undefined"||read.area!=="consumption")return null;
@@ -50,7 +50,8 @@ export function NotificationReference({read,context,onReport,onStockFilter}:{rea
    <p>Este lembrete é uma referência de registro. Ele não comprova presença ou execução de um plantão.</p>
    {review?<div className="space-y-3" aria-label="Confira a resposta do lembrete"><h3 className="font-semibold">Confira sua declaração pessoal</h3><p>Sem ocorrências para a referência de {date(target.period)}. Isso não altera estoque, aceite de materiais ou ciência de requisição.</p><div className="hca-toolbar"><ActionButton type="button" disabled={command.busy} onClick={()=>setReview(false)}>Voltar à referência</ActionButton><ActionButton type="button" variant="primary" disabled={command.busy||!target.canAcknowledge} onClick={()=>void send()}>Confirmar ausência de ocorrências</ActionButton></div></div>:<div className="hca-toolbar">
     {target.canAcknowledge?<ActionButton type="button" onClick={()=>setReview(true)}>Declarar que não houve ocorrências</ActionButton>:null}
-    {target.canReport&&onReport?<ActionButton type="button" variant="primary" onClick={event=>onReport({id:target.referenceId,period:target.period,expectedAt:target.expectedAt},event.currentTarget)}>Registrar ocorrência deste lembrete</ActionButton>:null}
+    {target.canReport&&onReport?<ActionButton type="button" variant="primary" onClick={event=>onReport({id:target.referenceId,period:target.period,expectedAt:target.expectedAt},event.currentTarget)}>{onShortage?"Registrar consumo deste lembrete":"Registrar ocorrência deste lembrete"}</ActionButton>:null}
+    {target.canReport&&onShortage?<ActionButton type="button" onClick={event=>onShortage({id:target.referenceId,period:target.period,expectedAt:target.expectedAt},event.currentTarget)}>Avisar falta deste lembrete</ActionButton>:null}
    </div>}
   </>:null}
   <Link className="ui-button ui-button-secondary inline-flex items-center" href={href("/notificacoes",patient)}>Voltar aos avisos deste paciente</Link>

@@ -6,7 +6,7 @@ const returnWindow = 30 * 60 * 1000;
 export type RecentDestination = { userId: string; patientId: string; path: string; at: number; };
 
 /** Navigation eligibility from a new server read; APIs still authorize every operation. */
-export function recentDestinationAllowed(target: RecentDestination, context: ContextData) {
+export function recentDestinationAllowed(target: RecentDestination, context: Pick<ContextData, "userId" | "activeContext" | "patients" | "documentContext">) {
   const patient = context.patients.find(row => row.id === target.patientId && row.hasMembership && row.is_active !== false);
   if (context.userId !== target.userId || !patient || context.activeContext?.mode !== "patient" || context.activeContext.care_recipient_id !== patient.id) return false;
   const url = new URL(target.path, "https://navigation.invalid");
@@ -28,7 +28,6 @@ export function recentDestinationAllowed(target: RecentDestination, context: Con
     "/balancos": ["bal.read"], "/escalas": ["schedule.read.own", "schedule.read.team"],
     "/consumo": ["consumption.report", "consumption.confirm"], "/entregas": ["ent.read"],
     "/configuracoes": ["access.manage"], "/unidades": ["catalog.manage"],
-    "/comprovantes-catalogo": ["catalog.manage"],
     "/fichas": ["req.create", "com.create", "ent.create", "bal.create"],
   };
   if (routeCaps[url.pathname]) return has(...routeCaps[url.pathname]);

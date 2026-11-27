@@ -17,6 +17,61 @@ import {
 const read = (f, client = f.admin) =>
   rpc(client, "schedule_preparation_context", f.scope);
 
+test("resolving an unseen schedule retires the exact revision without touching operational facts", async () => {
+  const f = await fixture("schedule_series_create");
+  const saved = await save(f);
+  const original = packet(f, saved);
+  const resolve = { ...original, p_original_key: original.p_key, p_key: randomUUID() };
+  const before = facts(f);
+
+  assert.equal((await rpc(f.admin, "schedule_preparation_recovery", original)).status, "unknown");
+  assert.equal((await f.pro.client.rpc("resolve_schedule_creation_attempt", resolve)).error?.code, "42501");
+  assert.equal((await f.admin.rpc("resolve_schedule_creation_attempt", {
+    ...resolve, p_body: { ...f.command, body: { ...f.command.body, notes: "Outro preenchimento" } },
+  })).error?.code, "22023");
+  assert.equal((await read(f)).revision, saved.revision);
+
+  const proof = await rpc(f.admin, "resolve_schedule_creation_attempt", resolve);
+  assert.equal(proof.status, "not_applied");
+  assert.equal(proof.reason, "advanced_revision");
+  assert.equal(proof.current.revision, saved.revision + 1);
+  assert.deepEqual(await rpc(f.admin, "resolve_schedule_creation_attempt", resolve), proof);
+  const preserved = await read(f);
+  assert.deepEqual(preserved.content, f.content);
+  assert.equal(preserved.state, "active");
+  assert.equal((await f.admin.rpc("commit_schedule_preparation", original)).error?.code, "PT409");
+  assert.equal(facts(f), before);
+  assert.equal(sql(`select count(*) from public.audit_events where action='private_draft.resolve_attempt' and entity_id=${q(saved.id)}`), "1");
+
+  const replacement = await rpc(f.admin, "commit_schedule_preparation", packet(f, preserved));
+  assert.equal(replacement.receipt.fields.notes, f.fields.notes);
+  assert.equal(JSON.parse(facts(f)).series.length, 1);
+  assert.equal((await rpc(f.admin, "schedule_preparation_recovery", original)).status, "not_applied");
+});
+
+test("resolution racing publication returns the recorded result or prevents publication entirely", async () => {
+  const f = await fixture("schedule_series_create");
+  const saved = await save(f);
+  const original = packet(f, saved);
+  const resolve = { ...original, p_original_key: original.p_key, p_key: randomUUID() };
+  const [publication, proof] = await Promise.all([
+    f.admin.rpc("commit_schedule_preparation", original),
+    rpc(f.admin, "resolve_schedule_creation_attempt", resolve),
+  ]);
+  const authoritative = await rpc(f.admin, "schedule_preparation_recovery", original);
+  assert.equal(proof.status, authoritative.status);
+  if (proof.status === "applied") {
+    assert.ifError(publication.error);
+    assert.deepEqual(proof.confirmation.receipt, publication.data.receipt);
+    assert.equal(JSON.parse(facts(f)).series.length, 1);
+  } else {
+    assert.equal(proof.status, "not_applied");
+    assert.equal(publication.error?.code, "PT409");
+    assert.equal(JSON.parse(facts(f)).series.length, 0);
+  }
+  assert.deepEqual(await rpc(f.admin, "resolve_schedule_creation_attempt", resolve), proof);
+});
+
 test("private own-only proposal preserves the native approval boundary and rejects another professional", async () => {
   const f = await fixture("schedule_series_create"),
     pro = f.pro.client;

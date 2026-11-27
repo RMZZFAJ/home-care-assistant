@@ -1,5 +1,5 @@
 import { test, expect, type Page } from "@playwright/test";
-import { randomUUID } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 import { PDFDocument } from "pdf-lib";
 import { mkdirSync } from "node:fs";
 import { selectDocumentSection } from "./document-sections";
@@ -9,6 +9,17 @@ import { fixturePassword } from "../../scripts/test-constants.mjs";
 import { selectContext } from "./auth-context";
 import { audit } from "./accessibility-audit";
 test.setTimeout(180000);
+
+async function waitForVerificationUploads(required: number) {
+  // Browser projects in the local runner share the self-hosted rate-limit bucket.
+  await expect.poll(() => Number(sql(`select least(
+    4 - coalesce(max(uploads) filter (where subject <> 'global'), 0),
+    12 - coalesce(max(uploads) filter (where subject = 'global'), 0)
+  ) from private.pdf_verification_windows where bucket = floor(extract(epoch from clock_timestamp()) / 60);`)), {
+    timeout: 65_000, intervals: [2_500],
+  }).toBeGreaterThanOrEqual(required);
+}
+
 async function prepare(page: Page) {
   const f = await setup(),
     owner = await actor("family", f.patient),
@@ -51,29 +62,36 @@ async function prepare(page: Page) {
 }
 
 test("L1 verification keeps login in context, separates private authorship and removes details on real revocation", async({page})=>{
-  const f=await prepare(page), code=f.a.row.verificationCode, destination="/verificar?code="+code;
+  const f=await prepare(page), code=f.a.row.verificationCode, origin="/balancos?view=history";
+  const destination="/verificar?" + new URLSearchParams({ code, returnTo: origin });
   expect((await page.request.get("/api/verification/details?code="+code)).status()).toBe(401);
   await page.goto(destination);
   const details=page.getByRole("region",{name:"Detalhes autorizados da emissão",exact:true});
   await expect(details).toBeVisible();
-  await expect(details.getByText("Quem registrou a ficha",{exact:true})).toHaveCount(0);
-  await details.getByRole("link",{name:"Entrar e continuar esta verificação",exact:true}).click();
+  await expect(page.getByText("Quem registrou a ficha",{exact:true})).toHaveCount(0);
+  await details.getByRole("button",{name:/Detalhes da ficha/}).click();
+  await page.getByRole("link",{name:"Entrar e continuar esta verificação",exact:true}).click();
   await page.getByLabel("E-mail",{exact:true}).fill(fixtures.family.email);
   await page.getByLabel("Senha",{exact:true}).fill(fixturePassword);
   await page.getByRole("button",{name:"Entrar",exact:true}).click();
-  await expect(page).toHaveURL(new RegExp("/verificar\\?code="+code+"$"));
-  const useContext=details.getByRole("button",{name:"Usar o contexto autorizado desta emissão",exact:true});
-  await expect.poll(async()=>await useContext.count()+await details.getByText("Quem registrou a ficha",{exact:true}).count()).toBeGreaterThan(0);
-  if(await useContext.isVisible())await useContext.click();
-  await expect(details.getByText("Quem registrou a ficha",{exact:true})).toBeVisible();
-  await expect(details.getByText("Quem gerou este exemplar",{exact:true})).toBeVisible();
-  await expect(details.getByText("Chave da assinatura técnica",{exact:true})).toBeVisible();
+  await expect(page).toHaveURL(url => url.pathname === "/verificar"
+    && url.searchParams.get("code") === code && url.searchParams.get("returnTo") === origin);
+  const sheet=page.getByRole("dialog",{name:"Ficha e responsáveis",exact:true});
+  await details.getByRole("button",{name:/Detalhes da ficha|Ficha e responsáveis/}).click();
+  const access=page.getByRole("button",{name:"Usar o contexto autorizado desta emissão",exact:true});
+  const authorized=page.getByRole("button",{name:"Consultar detalhes",exact:true});
+  await expect(sheet.or(access).or(authorized)).toBeVisible();
+  if(await access.isVisible()) await access.click();
+  else if(await authorized.isVisible()) await authorized.click();
+  await expect(sheet.getByText("Quem registrou a ficha",{exact:true})).toBeVisible();
+  await expect(sheet.getByText("Quem gerou este exemplar",{exact:true})).toBeVisible();
+  await expect(sheet.getByText("Chave da assinatura técnica",{exact:true})).toBeVisible();
   mkdirSync("output/playwright/l1",{recursive:true});
   for(const width of [1440,360,412]){
     await page.setViewportSize({width,height:940});await audit(page,"L1 verification private "+width);
     await page.screenshot({path:`output/playwright/l1/verificacao-${width}.png`,fullPage:true});
   }
-  await details.getByRole("link",{name:"Consultar ficha autorizada",exact:true}).click();
+  await sheet.getByRole("link",{name:"Consultar ficha autorizada",exact:true}).click();
   // Public authorized reading does not silently choose an operational role.
   // Enter the document through the existing explicit context gate.
   await selectContext(page,f.patient);
@@ -84,16 +102,31 @@ test("L1 verification keeps login in context, separates private authorship and r
   await page.goto("/historico?careRecipientId="+f.patient);
   await expect(page.getByText(f.doc.code,{exact:true}).first()).toBeVisible();
   await page.screenshot({path:"output/playwright/l1/historico-412.png",fullPage:true});
-  await page.goto(destination);await expect(details.getByText("Quem registrou a ficha",{exact:true})).toBeVisible();
+  await page.goto(destination);
+  await details.getByRole("button",{name:/Ficha e responsáveis/}).click();
+  await expect(sheet.getByText("Quem registrou a ficha",{exact:true})).toBeVisible();
   sql(`update public.care_recipient_memberships set status='revoked' where care_recipient_id=${sqlLiteral(f.patient)} and user_id=${sqlLiteral(fixtures.family.id)}`);
   await page.evaluate(()=>window.dispatchEvent(new Event("hca:profile-updated")));
   expect((await page.request.get("/api/verification/details?code="+code)).status()).toBe(403);
-  await expect(details.getByText("Quem registrou a ficha",{exact:true})).toHaveCount(0);
+  await expect(sheet.getByText("Quem registrou a ficha",{exact:true})).toHaveCount(0);
+  await sheet.getByRole("button",{name:"Voltar à consulta",exact:true}).click();
   await expect(page.getByRole("region",{name:"Resultado da verificação",exact:true})).toBeVisible();
 });
 test("C-FINAL023 verificação separa falha do serviço de código digitado inválido sem produzir emissão", async ({ page }) => {
   await page.goto("/verificar");
-  const code = page.getByRole("textbox", { name: "Código de verificação", exact: true });
+  await expect(page.getByLabel("Conexão e versão do aplicativo", { exact: true })).toHaveCount(0);
+  mkdirSync("output/playwright/l3", { recursive: true });
+  for (const width of [360, 412]) {
+    await page.setViewportSize({ width, height: 940 });
+    await expect(page.getByRole("heading", { name: "Consulte o código", exact: true })).toBeVisible();
+    await page.screenshot({ path: `output/playwright/l3/verificacao-inicio-${width}.png`, fullPage: true });
+  }
+  const help = page.getByRole("button", { name: "Ajuda", exact: true });
+  await help.click();
+  await expect(page.getByRole("dialog", { name: "Como verificar um documento" })).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(help).toBeFocused();
+  const code = page.getByRole("textbox", { name: "Código do documento", exact: true });
   const submit = page.getByRole("button", { name: "Consultar código", exact: true });
   let reads = 0;
   page.on("request", request => { if (new URL(request.url()).pathname === "/api/verification") reads++; });
@@ -106,23 +139,41 @@ test("C-FINAL023 verificação separa falha do serviço de código digitado inv�
   await expect(page.getByRole("region", { name: "Resultado da verificação", exact: true })).toHaveCount(0);
   await submit.click();
   await expect(page.getByRole("heading", { name: "Emissão não localizada", exact: true })).toBeFocused();
+  await page.getByRole("button", { name: "Alterar", exact: true }).click();
+  await expect(code).toBeFocused();
   await expect(code).toHaveValue(value); await expect(code).toHaveAttribute("aria-invalid", "false"); expect(reads).toBe(2);
-  await page.getByRole("tab", { name: "Conferir PDF", exact: true }).click();
-  const file = page.getByLabel("Arquivo PDF para conferir", { exact: true }), check = page.getByRole("button", { name: "Conferir PDF", exact: true });
+  await page.getByRole("tab", { name: "Tenho o PDF", exact: true }).click();
+  const file = page.getByLabel("Arquivo PDF para conferir", { exact: true }), check = page.getByRole("button", { name: "Verificar arquivo PDF", exact: true });
   const issued = sql("select count(*) from private.pdf_issuances;");
   await file.setInputFiles({ name: "pequeno.pdf", mimeType: "application/pdf", buffer: Buffer.alloc(99) }); await check.click();
   await expect(file).toHaveAttribute("aria-invalid", "true"); await expect(file).toBeFocused(); expect(reads).toBe(2);
   const pdf = await PDFDocument.create(); pdf.addPage();
-  await file.setInputFiles({ name: "exemplar-escolhido.pdf", mimeType: "application/pdf", buffer: Buffer.from(await pdf.save()) });
+  const bytes = Buffer.from(await pdf.save());
+  await file.setInputFiles({ name: "exemplar-escolhido.pdf", mimeType: "application/pdf", buffer: bytes });
   await page.route("**/api/verification**", route => route.fulfill({ status: 503, contentType: "application/json", body: JSON.stringify({ error: "Análise fictícia temporariamente indisponível", code: "READ_UNAVAILABLE" }) }), { times: 1 });
   await check.click(); await expect(page.getByRole("main").getByRole("alert")).toContainText("Análise fictícia temporariamente indisponível");
   await expect(file).toHaveAttribute("aria-invalid", "false");
   expect(await file.evaluate(element => (element as HTMLInputElement).files?.[0]?.name)).toBe("exemplar-escolhido.pdf");
   await expect(page.getByRole("region", { name: "Resultado da verificação", exact: true })).toHaveCount(0);
-  await check.click(); await expect(page.getByRole("region", { name: "Resultado da verificação", exact: true })).toContainText("Sem assinatura incorporada");
-  await expect(file).toHaveAttribute("aria-invalid", "false"); expect(reads).toBe(4); expect(sql("select count(*) from private.pdf_issuances;")).toBe(issued);
+  await page.route("**/api/verification**", route => route.fulfill({ json: {
+    reference: { found: false }, fileReference: { found: false },
+    analysis: { status: "processing_limit", documentSignature: "not_assessed", timestamp: "not_assessed", verification: null, limit: "time" },
+    fileSha256: null, policyStatus: null, referenceOnly: false,
+  } }), { times: 1 });
+  await check.click();
+  const result = page.getByRole("region", { name: "Resultado da verificação", exact: true });
+  await expect(result.getByRole("heading", { name: "A análise não foi concluída", exact: true })).toBeFocused();
+  await expect(result).toContainText("Sem exemplar para comparação");
+  await waitForVerificationUploads(1);
+  const retry = page.waitForResponse(response => new URL(response.url()).pathname === "/api/verification" && response.request().method() === "POST");
+  await result.getByRole("button", { name: "Tentar análise novamente", exact: true }).click();
+  const retried = await retry;
+  expect(retried.status()).toBe(200);
+  expect((await retried.json()).fileSha256).toBe(createHash("sha256").update(bytes).digest("hex"));
+  await expect(result).toContainText("Sem assinatura incorporada");
+  expect(reads).toBe(5); expect(sql("select count(*) from private.pdf_issuances;")).toBe(issued);
   expect((await page.request.get("/api/context")).status()).toBe(401);
-  for (const width of [320, 390, 768, 1440]) { await page.setViewportSize({ width, height: 900 }); await audit(page, "immutable verification read " + width); }
+  for (const width of [320, 360, 412, 768, 1440]) { await page.setViewportSize({ width, height: 900 }); await audit(page, "immutable verification read " + width); }
 });
 
 test("verificação pública resolve QR e código sem conta e discrimina bytes de outra emissão", async ({
@@ -141,6 +192,10 @@ test("verificação pública resolve QR e código sem conta e discrimina bytes d
   await expect(result).toContainText(
     "Envie o arquivo para verificar seus bytes",
   );
+  if (info.project.name === "chromium") {
+    await page.setViewportSize({ width: 360, height: 940 });
+    await result.screenshot({ path: "output/playwright/l3/app-e09-06-codigo-localizado-360.png", animations: "disabled" });
+  }
   expect(
     (
       await page.request.get(
@@ -148,7 +203,9 @@ test("verificação pública resolve QR e código sem conta e discrimina bytes d
       )
     ).status(),
   ).toBe(401);
-  const code = page.getByLabel("Código de verificação", { exact: true });
+  const edit = page.getByRole("button", { name: "Alterar", exact: true });
+  await edit.click();
+  const code = page.getByLabel("Código do documento", { exact: true });
   await code.fill("F".repeat(32));
   await page
     .getByRole("button", { name: "Consultar código", exact: true })
@@ -163,6 +220,7 @@ test("verificação pública resolve QR e código sem conta e discrimina bytes d
   // The result deliberately schedules heading focus. Finish that transition
   // before starting the next edit, then verify the complete formatted value.
   await expect(result.getByRole("heading", { name: "Emissão não localizada", exact: true })).toBeFocused();
+  await edit.click();
   const formattedCode = `HCA-${f.a.row.verificationCode.toLowerCase().match(/.{4}/g)!.join("-")}`;
   await expect(code).toHaveJSProperty("maxLength", 64);
   await code.fill(formattedCode);
@@ -189,30 +247,32 @@ test("verificação pública resolve QR e código sem conta e discrimina bytes d
   await expect(
     result.getByRole("heading", { name: "Emissão localizada", exact: true }),
   ).toBeVisible();
-  await page.getByRole("tab", { name: "Conferir PDF", exact: true }).click();
+  await result.getByRole("button", { name: "Verificar o PDF recebido", exact: true }).click();
   const file = page.getByLabel("Arquivo PDF para conferir", { exact: true });
   await file.setInputFiles({
     name: "outro-exemplar.pdf",
     mimeType: "application/pdf",
     buffer: f.b.bytes,
   });
+  await waitForVerificationUploads(info.project.name === "chromium" ? 3 : 1);
   const uploaded = page.waitForResponse(
     (response) =>
       response.url().includes("/api/verification") &&
       response.request().method() === "POST",
   );
-  await page.getByRole("button", { name: "Conferir PDF", exact: true }).click();
+  const checkFile = page.getByRole("button", { name: "Verificar arquivo PDF", exact: true });
+  await checkFile.click();
   const response = await uploaded;
   expect(response.status(), await response.text()).toBe(200);
   const body = await response.json();
   expect(body.reference).toMatchObject({
     found: true,
     bytesMatch: false,
-    issuanceId: f.a.row.id,
+    verificationCode: f.a.row.verificationCode,
   });
   expect(body.fileReference).toMatchObject({
     found: true,
-    issuanceId: f.b.row.id,
+    verificationCode: f.b.row.verificationCode,
   });
   expect(body.analysis).toMatchObject({
     status: "verified",
@@ -221,6 +281,10 @@ test("verificação pública resolve QR e código sem conta e discrimina bytes d
   const serialized = JSON.stringify(body);
   for (const forbidden of [
     f.patient,
+    f.a.row.id,
+    f.b.row.id,
+    "issuanceId",
+    "trustRevision",
     fixtures.family.email,
     "careRecipientId",
     "requestedName",
@@ -229,33 +293,43 @@ test("verificação pública resolve QR e código sem conta e discrimina bytes d
     "workerToken",
   ])
     expect(serialized.includes(forbidden)).toBe(false);
-  await expect(result).toContainText("Os bytes divergem da emissão consultada");
+  await expect(result).toContainText("Exemplar de outra emissão");
   await expect(result).toContainText("corresponde a outra emissão registrada");
-  await expect(result).toContainText(
-    "Assinatura do documento: criptograficamente íntegra",
-  );
-  await expect(result).toContainText(
-    "Token RFC3161 criptograficamente íntegro",
-  );
+  await expect(result).toContainText("Confirme com o remetente qual emissão deveria ser utilizada.");
+  await expect(result.getByText("Integridade conferida",{exact:true})).toHaveCount(2);
+  await result.getByRole("button",{name:"Ver detalhes da conferência",exact:true}).click();
+  const technical=page.getByRole("dialog",{name:"Detalhes da conferência",exact:true});
+  await expect(technical).toContainText("Token RFC3161 criptograficamente íntegro");
+  await technical.getByRole("button",{name:"Fechar",exact:true}).click();
   if (info.project.name === "chromium") {
+    await result.getByRole("button",{name:"Verificar outro PDF",exact:true}).click();
     await file.setInputFiles({
       name: "exemplar-correto.pdf",
       mimeType: "application/pdf",
       buffer: f.a.bytes,
     });
-    await page
-      .getByRole("button", { name: "Conferir PDF", exact: true })
-      .click();
+    await checkFile.click();
     await expect(result).toContainText(
       "Os bytes coincidem com o exemplar registrado",
     );
+    await result.getByRole("button", { name: "Verificar outro PDF", exact: true }).click();
+    const optional = page.getByLabel("Código do documento · opcional", { exact: true });
+    if (!(await optional.isVisible()))
+      await page.getByText("Também tenho um código", { exact: true }).click();
+    await optional.fill("F".repeat(32));
+    await file.setInputFiles({ name: "exemplar-com-codigo-desconhecido.pdf", mimeType: "application/pdf", buffer: f.a.bytes });
+    await checkFile.click();
+    await expect(result).toContainText("Código informado sem registro");
+    await expect(result).toContainText("Correspondência exata");
+    await expect(result.getByRole("heading", { name: "Emissão identificada pelo arquivo" })).toBeFocused();
   }
+  await result.getByRole("button",{name:"Verificar outro PDF",exact:true}).click();
   await file.setInputFiles({
     name: "excesso.pdf",
     mimeType: "application/pdf",
     buffer: Buffer.alloc(4 * 1024 * 1024 + 1),
   });
-  await page.getByRole("button", { name: "Conferir PDF", exact: true }).click();
+  await checkFile.click();
   await expect(page.getByRole("main").getByRole("alert")).toContainText(
     "entre 100 bytes e 4 MB",
   );
@@ -279,11 +353,11 @@ test("verificação pública resolve QR e código sem conta e discrimina bytes d
   await expect(page).toHaveURL(/\/verificar$/);
   await expect(
     page.getByRole("heading", {
-      name: "Verificar documento",
+      name: "Confira a origem do documento recebido.",
       exact: true,
     }),
   ).toBeVisible();
   await expect(
-    page.getByLabel("Código de verificação", { exact: true }),
+    page.getByLabel("Código do documento", { exact: true }),
   ).toHaveValue("");
 });

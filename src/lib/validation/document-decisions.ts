@@ -3,6 +3,12 @@ import { purchaseCommandBody } from "./purchase-command";
 import { countedDeliveryReceiptBody, deliveryResolutionBody, requestDeliveryNeedBody, supplyCancellationBody } from "./delivery-receipt";
 import { purchaseArrivalBody, requestArrivalCorrection, resubmitArrival } from "./purchase-arrival";
 
+const countPermissionRequest = z.object({ reason: z.string().trim().min(3).max(1000) }).strict();
+const countPermissionDecision = z.discriminatedUnion("approve", [
+  z.object({ approve: z.literal(false), note: z.string().trim().max(1000) }).strict(),
+  z.object({ approve: z.literal(true), note: z.string().trim().max(1000), shiftId: z.uuid(), shiftVersion: z.number().int().positive().max(2147483647) }).strict(),
+]);
+
 export const documentDecisionIntention = z.object({
   domain: z.enum(["requisition", "supply", "transfer", "balance", "balance_workspace", "lifecycle"]),
   action: z.string().min(1).max(80),
@@ -27,12 +33,16 @@ export const documentDecisionIntention = z.object({
     supplyCancellationBody.safeParse(value.body).success, { path: ["body"], message: "Confira o motivo e a confirmação do cancelamento." })
   .refine(value => value.domain !== "lifecycle" ||
     (value.action === "reopen" ? z.object({ reason: z.string().trim().min(3).max(1000) }).strict().safeParse(value.body).success
-      : value.action === "complete" && z.object({ reason: z.string().max(1000).optional() }).strict().safeParse(value.body).success),
+    : value.action === "complete" && z.object({ reason: z.string().max(1000).optional() }).strict().safeParse(value.body).success),
   { path: ["body"], message: "Confira a revisão e a justificativa da ficha." })
   .refine(value => value.domain !== "supply" || value.action !== "request_receipt_correction" || requestArrivalCorrection.safeParse(value.body).success,
     { path: ["body"], message: "Informe o que o autor precisa corrigir." })
   .refine(value => value.domain !== "supply" || value.action !== "resubmit_receipt" || resubmitArrival.safeParse(value.body).success,
-    { path: ["body"], message: "Confira a declaração corrigida." });
+    { path: ["body"], message: "Confira a declaração corrigida." })
+  .refine(value => value.domain !== "balance_workspace" ||
+    (value.action === "request_count_permission" ? value.expectedVersion > 0 && countPermissionRequest.safeParse(value.body).success
+      : value.action !== "decide_count_permission" || value.expectedVersion === 0 && countPermissionDecision.safeParse(value.body).success),
+  { path: ["body"], message: "Confira o pedido e o plantão para autorizar a contagem." });
 export type DocumentDecisionIntention = z.infer<typeof documentDecisionIntention>;
 const receiptBase = { documentId: z.uuid(), key: z.uuid(), recordedAt: z.iso.datetime({ offset: true }) };
 export const documentDecisionReceipt = z.discriminatedUnion("state", [

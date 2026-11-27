@@ -76,7 +76,8 @@ for (const kind of ["REQ", "COM", "ENT", "BAL"] as const) test(`${kind}: somente
     await expect(choice).toContainText("1, unidade");
   }
   await choice.getByRole("button", { name: "Continuar rascunho", exact: true }).click();
-  const input = kind === "REQ" ? page.getByLabel("Observação 1", { exact: true }) : page.getByLabel("Quantidade — Material fictício V4 0", { exact: true });
+  const label = kind === "REQ" ? "Observação 1" : kind === "BAL" ? "Material fictício V4 0 · unidade" : "Quantidade — Material fictício V4 0";
+  const input = page.getByLabel(label, { exact: true });
   const value = kind === "REQ" ? "Último texto salvo discretamente, sem emitir ficha." : "3,";
   await expect(input).toBeEnabled(); await input.fill(value);
   const content = () => JSON.parse(sql(`select content from private.creation_drafts where owner_id=${q(user.id)} and care_recipient_id=${q(f.patient)} and kind=${q(kind)} and state='active'`));

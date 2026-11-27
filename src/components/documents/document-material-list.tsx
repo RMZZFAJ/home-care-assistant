@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
+import { use, useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { z } from "zod";
 import { useWorkspaceState } from "@/components/layout/workspace-context";
 import { ActionButton, TextInput } from "@/components/ui/controls";
@@ -9,11 +9,13 @@ import { normalizeCatalogText } from "@/lib/catalog-match";
 import { formatQuantity } from "@/lib/quantity";
 import { useScopedRead } from "@/lib/use-scoped-read";
 import { consumeMaterialVisit } from "@/lib/documents/material-visit";
-import { documentMaterialSummary, materialPanelSections } from "@/lib/validation/document-material-context";
-import { DocumentMaterialPanel, type LinkedMaterialDocument, type MaterialPanelPosition } from "./document-material-panel";
+import { documentMaterialSummary, materialLinkFilters } from "@/lib/validation/document-material-context";
+import { DocumentMaterialPanel, documentMaterialSections, type LinkedMaterialDocument, type MaterialPanelPosition } from "./document-material-panel";
+import { MaterialVisitProductContext } from "./material-visit-context";
 
 export type DocumentMaterialRow = {
   id: string;
+  productId?: string | null;
   name: string;
   unit: string | null;
   status: string;
@@ -31,19 +33,24 @@ const filters = ["all", "urgent", "pending", "done", "routine"] as const;
 type Filter = typeof filters[number];
 const place = z.object({
   documentId: z.uuid(), patientId: z.uuid(), actorId: z.uuid(),
-  lineId: z.uuid(), section: z.enum(materialPanelSections),
+  lineId: z.uuid(), section: z.enum(documentMaterialSections),
   page: z.number().int().min(1).max(1_000_000), linked: z.object({
     id: z.uuid(), code: z.string().nullable(), type: z.enum(["REQ", "COM", "ENT", "BAL"]),
     kind: z.enum(["REQ", "COM", "ENT", "DEV", "BAL"]).optional(),
   }).nullable(),
   panelScroll: z.number(), pageScroll: z.number(), focusEntry: z.string().optional(),
+  linkFilters: materialLinkFilters.optional(), linkSearchOpen: z.boolean().optional(),
+  movementPage: z.number().int().min(1).max(1_000_000).optional(),
+  expandedMovements: z.array(z.string().min(1).max(250)).max(100).optional(),
+  expandedLinks: z.array(z.uuid()).max(100).optional(),
   filter: z.enum(filters), search: z.string().max(160),
 });
 
 export function DocumentMaterialList({
-  documentId, patientId, revision, active, label, heading, rows, settledLabel, today,
+  documentId, documentCode, patientId, revision, active, label, heading, rows, settledLabel, today,
 }: {
   documentId: string;
+  documentCode: string | null;
   patientId: string;
   revision: string;
   active: boolean;
@@ -54,12 +61,14 @@ export function DocumentMaterialList({
   today: { location: "family" | "team"; label: string };
 }) {
   const actorId = useWorkspaceState().data?.userId;
+  const visitProduct = use(MaterialVisitProductContext);
   const [filter, setFilter] = useState<Filter>("all");
   const [search, setSearch] = useState("");
   const [filterOpen, setFilterOpen] = useState(false);
   const [position, setPosition] = useState<MaterialPanelPosition | null>(null);
   const [epoch, setEpoch] = useState(0);
   const buttonsRef = useRef(new Map<string, HTMLButtonElement>());
+  const focusedVisitLineRef = useRef<string | null>(null);
   const filterButtonRef = useRef<HTMLButtonElement>(null);
   const searchRef = useRef<HTMLInputElement>(null);
   const decode = useCallback((raw: unknown) => {
@@ -79,12 +88,26 @@ export function DocumentMaterialList({
   }
   const materialRows = rows.map(row => {
     const additional = references.get(row.id);
-    return additional ? {
-      ...row, related: [...(row.related ?? []), ...additional.filter(link =>
-        !row.related?.some(previous => previous.document.id === link.document.id))],
-    } : row;
+    return {
+      ...row,
+      productId: row.productId ?? stock.get(row.id)?.productId ?? null,
+      related: additional ? [...(row.related ?? []), ...additional.filter(link =>
+        !row.related?.some(previous => previous.document.id === link.document.id))] : row.related,
+    };
   });
   const selected = position && materialRows.find(row => row.id === position.lineId);
+  const visitLineId = visitProduct ? materialRows.find(row => row.productId === visitProduct)?.id : undefined;
+  useEffect(() => {
+    if (!active || !visitLineId || focusedVisitLineRef.current === visitLineId) return;
+    const frame = requestAnimationFrame(() => {
+      const button = buttonsRef.current.get(visitLineId);
+      if (!button) return;
+      focusedVisitLineRef.current = visitLineId;
+      button.scrollIntoView({ block: "nearest", behavior: "instant" });
+      button.focus({ preventScroll: true });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [active, visitLineId]);
 
   useEffect(() => {
     if (!active) return;
@@ -154,21 +177,24 @@ export function DocumentMaterialList({
       {summary.error ? <div className="hca-v7-material-read-error">
         <p role="status">O saldo atual não pôde ser consultado.</p><ActionButton onClick={summary.refresh}>Atualizar saldo</ActionButton>
       </div> : null}
+      {visitProduct && currentSummary && !visitLineId ? <p role="status">O material de origem está indisponível nesta ficha.</p> : null}
       {visible.length ? <ul aria-label={label}>
         {visible.map(row => {
           const balance = stock.get(row.id)?.[today.location];
           return <li key={row.id} data-material-line-id={row.id}>
             <button type="button" className="hca-v7-material-row" data-urgent={row.urgent || undefined}
+              data-visit-material={row.id === visitLineId || undefined}
               aria-label={`Detalhes de ${row.name}${row.urgent ? " · Urgente" : ""}`}
               aria-describedby={[`material-status-${row.id}`, `material-unit-${row.id}`, `material-facts-${row.id}`,
                 row.statusDetail ? `material-status-detail-${row.id}` : null, row.related?.length ? `material-links-${row.id}` : null].filter(Boolean).join(" ")}
               ref={element => { if (element) buttonsRef.current.set(row.id, element); else buttonsRef.current.delete(row.id); }}
-              onClick={() => setPosition({ lineId: row.id, section: "stock", page: 1, linked: null, panelScroll: 0 })}>
+              onClick={() => setPosition({ lineId: row.id, section: "document", page: 1, linked: null, panelScroll: 0 })}>
               <span className="hca-v7-material-title">
                 <strong>{row.name}</strong>
                 <span className={`ui-badge ui-badge-${row.tone}`} id={`material-status-${row.id}`}>{row.status}</span><Icon name="chevron" width={15} height={15} />
               </span>
               <small className="hca-v7-material-unit" id={`material-unit-${row.id}`}>{row.unit ?? "Unidade não preservada"}</small>
+              {row.id === visitLineId ? <small className="hca-v7-material-unit">Material consultado</small> : null}
               {row.statusDetail ? <small className="hca-v7-material-unit" id={`material-status-detail-${row.id}`}>{row.statusDetail}</small> : null}
               {row.related?.length ? <small className="hca-v7-material-document-codes" id={`material-links-${row.id}`}>
                 <Icon name="link" width={12} height={12} />
@@ -189,7 +215,7 @@ export function DocumentMaterialList({
         }}>Limpar busca</ActionButton> : null}</div>}
     </section>
     {active && selected && position ? <DocumentMaterialPanel
-      row={selected} documentId={documentId} patientId={patientId} revision={readRevision}
+      row={selected} documentId={documentId} documentCode={documentCode} patientId={patientId} revision={readRevision}
       position={position} onPosition={setPosition} onNavigate={saveReturn}
       finalFocus={() => buttonsRef.current.get(selected.id) ?? false} onClose={() => setPosition(null)}
     /> : null}

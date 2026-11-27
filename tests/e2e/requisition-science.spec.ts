@@ -159,28 +159,65 @@ test("P02 preferência pessoal tem revisão em leitura e recupera a mesma escolh
   const f = await setup(), family = await actor("family", f.patient), before = await prefer(family, "manual");
   try {
     await login(page, f.patient); await page.goto("/perfil");
-    await selectProfileSection(page, "notices");
-    const mode = page.getByRole("combobox", { name: "Modalidade pessoal", exact: true }); await expect(mode).toHaveValue("manual"); await mode.selectOption("tacit");
-    await page.getByRole("checkbox", { name: "Confirmo expressamente esta preferência pessoal.", exact: true }).check();
-    await page.getByRole("button", { name: "Revisar preferência", exact: true }).click();
-    const review = page.getByRole("dialog", { name: "Revisar preferência de ciência", exact: true }); await expect(review).toBeVisible();
+    const notices = page.getByRole("tab", { name: "Avisos e aplicativo", exact: true });
+    await expect(page.getByRole("heading", { name: "Identificação", exact: true })).toBeVisible();
+    const readTop = () => notices.evaluate(tab => tab.getBoundingClientRect().top);
+    const readyTop = await readTop();
+    const requestHeld = Promise.withResolvers<void>();
+    const releaseRead = Promise.withResolvers<void>();
+    await page.route("**/api/profile", async route => {
+      if (route.request().method() !== "GET") return route.continue();
+      const response = await route.fetch();
+      requestHeld.resolve();
+      await releaseRead.promise;
+      await route.fulfill({ response });
+    });
+    try {
+      await page.evaluate(() => window.dispatchEvent(new Event("hca:data-changed")));
+      await requestHeld.promise;
+      await expect(page.getByText("Atualizando consulta do perfil…", { exact: true })).toHaveCount(1);
+      expect(await readTop()).toBeCloseTo(readyTop, 0);
+      await selectProfileSection(page, "notices");
+    } finally {
+      releaseRead.resolve();
+      await page.unrouteAll({ behavior: "wait" });
+    }
+    await expect(page.getByText("Atualizando consulta do perfil…", { exact: true })).toHaveCount(0);
+    const edit = page.getByRole("button", { name: "Editar preferência de ciência", exact: true });
+    await edit.click();
+    const editor = page.getByRole("dialog", { name: "Ciência de requisições", exact: true });
+    await expect(editor.getByRole("radio", { name: /^Confirmação manual/ })).toBeChecked();
+    const tacit = editor.getByRole("radio", { name: "Ciência na emissão", exact: true });
+    await expect(tacit).toHaveAccessibleDescription("A ciência poderá ser registrada quando uma requisição elegível for emitida.");
+    await tacit.check();
+    await editor.getByRole("button", { name: "Revisar consentimento", exact: true }).click();
+    const review = page.getByRole("dialog", { name: "Confirmar minha preferência", exact: true }); await expect(review).toBeVisible();
     expect((await rpc(family, "my_requisition_science_preference")).version).toBe(before.version);
-    await expect(review.getByRole("combobox")).toHaveCount(0); await audit(page, "P02 preference readonly confirmation");
-    const payloads: unknown[] = [];
+    await expect(review.getByRole("radio")).toHaveCount(0);
+    await expect(review.getByRole("button", { name: "Confirmar preferência", exact: true })).toBeDisabled();
+    await review.getByRole("checkbox", { name: "Compreendi e concordo com esta forma de registrar minha ciência.", exact: true }).check();
+    await audit(page, "P02 preference readonly confirmation");
+    const payloads: { idempotencyKey: string }[] = [];
     await page.route("**/api/profile/science", async route => {
       if (route.request().method() !== "POST") { await route.continue(); return; }
       payloads.push(route.request().postDataJSON());
       if (payloads.length === 1) { await route.fetch(); await route.abort("failed"); } else await route.continue();
     });
     await review.getByRole("button", { name: "Confirmar preferência", exact: true }).click();
-    await expect(review.getByRole("button", { name: "Recuperar esta preferência", exact: true })).toBeVisible();
-    await review.getByRole("button", { name: "Recuperar esta preferência", exact: true }).click();
-    await expect(review).toHaveCount(0); await expect(mode).toHaveValue("tacit");
+    const outcome = page.getByRole("dialog", { name: "Gravação ainda sem confirmação", exact: true });
+    const recovered = page.waitForResponse(response => new URL(response.url()).searchParams.get("attempt") === payloads[0]?.idempotencyKey);
+    await outcome.getByRole("button", { name: "Conferir resultado", exact: true }).click();
+    expect((await recovered).request().method()).toBe("GET");
     const after = await rpc(family, "my_requisition_science_preference"); expect(after.version).toBe(before.version + 1); expect(after.mode).toBe("tacit");
-    expect(payloads).toHaveLength(2); expect(payloads[0]).toEqual(payloads[1]);
-    await expect(page.getByText("Preferência salva.", { exact: false })).toBeVisible();
-    await page.unroute("**/api/profile/science");
-    await mode.selectOption("manual"); await page.getByRole("button", { name: "Revisar preferência", exact: true }).click(); await review.getByRole("button", { name: "Confirmar preferência", exact: true }).click();
-    await expect(review).toHaveCount(0); expect((await rpc(family, "my_requisition_science_preference")).mode).toBe("manual");
+    expect(payloads).toHaveLength(1);
+    const success = page.getByRole("dialog", { name: "Preferência salva", exact: true });
+    const finish = success.getByRole("button", { name: "Concluir", exact: true });
+    await finish.focus(); await expect(finish).toBeFocused();
+    await finish.press("Enter"); await expect(success).toHaveCount(0);
+    await page.unrouteAll({ behavior: "wait" });
+    await edit.click(); await expect(editor.getByRole("radio", { name: /^Ciência na emissão/ })).toBeChecked();
+    await editor.getByRole("radio", { name: /^Confirmação manual/ }).check();
+    await editor.getByRole("button", { name: "Salvar preferência", exact: true }).click();
+    await expect(success).toBeVisible(); expect((await rpc(family, "my_requisition_science_preference")).mode).toBe("manual");
   } finally { await prefer(family, "manual"); }
 });

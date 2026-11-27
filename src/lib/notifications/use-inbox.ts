@@ -1,29 +1,49 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { api, ApiError } from "@/lib/client/api";
 import { useLiveRevision } from "@/lib/use-live-revision";
-import { parseInboxPage, type InboxPage } from "./inbox";
+import { parseInboxPage, type InboxKind, type InboxPage } from "./inbox";
 
-export function useInbox({ patientId, page = 1, pageSize = 20, unread = false, surface = "center", poll = false, paused = false }: {
+const inboxChanged = "hca:personal-inbox-changed";
+
+export function useInbox({ patientId, page = 1, pageSize = 20, unread = false, surface = "center", kind = null, search = "", tasks = false, poll = false, paused = false }: {
   patientId?: string; page?: number; pageSize?: number; unread?: boolean; surface?: "bell" | "center"; poll?: boolean; paused?: boolean;
+  kind?: InboxKind | null; search?: string; tasks?: boolean;
 }) {
   const live = useLiveRevision(), [attempt, setAttempt] = useState(0);
-  const selection = JSON.stringify([patientId, page, pageSize, unread, surface]);
+  const selection = JSON.stringify([patientId, page, pageSize, unread, surface, kind, search, tasks]);
   const key = JSON.stringify([selection, attempt, live, paused]);
   const [result, setResult] = useState<{ key: string; selection: string; data: InboxPage; receivedAt: string } | null>(null);
   const [failure, setFailure] = useState<{ key: string; selection: string; message: string; unavailable: boolean } | null>(null);
-  const url = "/api/notifications?" + new URLSearchParams({ ...(patientId ? { careRecipientId: patientId } : {}), page: String(page), pageSize: String(pageSize), unread: String(unread), surface });
+  const invalidate = useCallback(() => {
+    if (patientId) window.dispatchEvent(new CustomEvent(inboxChanged, { detail: patientId }));
+  }, [patientId]);
+  const url = "/api/notifications?" + new URLSearchParams({
+    ...(patientId ? { careRecipientId: patientId } : {}), page: String(page), pageSize: String(pageSize), unread: String(unread), surface,
+    ...(kind ? { kind } : {}), ...(search ? { q: search } : {}), ...(tasks ? { tasks: "true" } : {}),
+  });
   useEffect(() => {
     if (!patientId || paused) return;
     const controller = new AbortController();
-    void api<unknown>(url, undefined, controller.signal).then(value => parseInboxPage(value, patientId, { page, pageSize, unread, surface })).then(data => {
+    void api<unknown>(url, undefined, controller.signal).then(value => parseInboxPage(value, patientId, { page, pageSize, unread, surface, kind, search, tasks })).then(data => {
       if (!controller.signal.aborted) { setResult({ key, selection, data, receivedAt: new Date().toISOString() }); setFailure(null); }
     }).catch(reason => {
       if (!controller.signal.aborted) setFailure({ key, selection, message: reason instanceof Error ? reason.message : "Não foi possível consultar as notificações.", unavailable: reason instanceof ApiError && [401, 403, 404, 409].includes(reason.status) });
     });
-    return () => controller.abort();
-  }, [key, selection, url, patientId, paused, page, pageSize, unread, surface]);
+    const clear = (event: Event) => {
+      if (!(event instanceof CustomEvent) || event.detail !== patientId) return;
+      controller.abort();
+      setResult(null);
+      setFailure(null);
+      setAttempt(value => value + 1);
+    };
+    window.addEventListener(inboxChanged, clear);
+    return () => {
+      controller.abort();
+      window.removeEventListener(inboxChanged, clear);
+    };
+  }, [key, selection, url, patientId, paused, page, pageSize, unread, surface, kind, search, tasks]);
   useEffect(() => {
     if (!poll || !patientId || paused) return;
     const update = () => { if (!document.hidden) setAttempt(value => value + 1); };
@@ -44,6 +64,8 @@ export function useInbox({ patientId, page = 1, pageSize = 20, unread = false, s
     loading,
     fresh,
     error: failure?.selection === selection ? failure.message : "",
+    errorKey: failure?.key === key ? failure.key : null,
     refresh: () => setAttempt(value => value + 1),
+    invalidate,
   };
 }

@@ -27,7 +27,8 @@ export default defineConfig({
   },
   webServer: {
     command: "node scripts/start-e2e-server.mjs",
-    url: `${baseURL}/login`,
+    // The login page can render while the local database is still unavailable.
+    url: `${baseURL}/api/runtime`,
     reuseExistingServer: false,
     timeout: 180_000,
   },

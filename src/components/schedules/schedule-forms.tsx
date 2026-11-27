@@ -14,6 +14,7 @@ import {
   initialScheduleType,
   initialScheduleSeries,
   scheduleCreationCommand,
+  scheduleSpecialHoursIssue,
   type ScheduleCreationFields as CreationFields,
 } from "@/lib/schedules/creation";
 import { Notice } from "@/components/workspace";
@@ -34,6 +35,7 @@ export function ScheduleForm({
   creationFields,
   onCreationChange,
   reviewTriggerRef,
+  reviewDisabled = false,
   datesMonth,
   onDatesMonthChange,
 }: {
@@ -47,6 +49,7 @@ export function ScheduleForm({
   creationFields?: CreationFields;
   onCreationChange?: (fields: CreationFields) => void;
   reviewTriggerRef?: RefObject<HTMLButtonElement | null>;
+  reviewDisabled?: boolean;
   datesMonth?: string | null;
   onDatesMonthChange?: (month: string) => void;
 }) {
@@ -56,6 +59,7 @@ export function ScheduleForm({
       : initialScheduleType(editor.kind === "type" ? editor.type : undefined),
   );
   const creation = creationFields ?? localCreation;
+  const timingIssue = scheduleSpecialHoursIssue(creation);
   const changeCreation = onCreationChange ?? setLocalCreation;
   const [creationError, setCreationError] = useState("");
   function submit(event: FormEvent<HTMLFormElement>) {
@@ -126,7 +130,7 @@ export function ScheduleForm({
               Plantões já programados conservam seus intervalos originais.
             </p>
           ) : null}
-          {creationError ? <Notice error>{creationError}</Notice> : null}
+          {timingIssue || creationError ? <Notice error>{timingIssue || creationError}</Notice> : null}
         </>
       ) : null}
       <ActionButton
@@ -134,6 +138,7 @@ export function ScheduleForm({
         id="schedule-review-button"
         variant="primary"
         type="submit"
+        disabled={reviewDisabled || Boolean(timingIssue)}
       >
         Revisar alteração
       </ActionButton>

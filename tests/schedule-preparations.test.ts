@@ -6,6 +6,7 @@ import {
   initialScheduleType,
   scheduleCreationFields,
   scheduleCreationCommand,
+  scheduleSpecialHoursIssue,
 } from "@/lib/schedules/creation";
 import {
   schedulePreparationSaveSchema,
@@ -66,6 +67,20 @@ const fields = {
   duration: "720",
   active: false,
 };
+it("checks special hours on selected civil dates, using the anchor only when it is a shift", () => {
+  const timezone = "America/New_York";
+  const candidate = {
+    ...series, timezone, from: "2100-03-14", until: "2100-03-15", weekdays: [1],
+    residence: { version: 1, timezone, dayStart: "07:00", nightStart: "19:00",
+      period: "day" as const, special: true, specialStart: "02:30", specialEnd: "14:30" },
+  };
+  expect(scheduleSpecialHoursIssue(candidate)).toBeNull();
+  expect(scheduleCreationCommand(candidate)).toMatchObject({ body: { weekdays: [1] } });
+  expect(scheduleSpecialHoursIssue({ ...candidate, recurrence: "dates", dates: ["2100-03-15"] })).toBeNull();
+  expect(scheduleSpecialHoursIssue({ ...candidate, weekdays: [0] })).toContain("existem no fuso");
+  expect(scheduleSpecialHoursIssue({ ...candidate, recurrence: "once" })).toContain("existem no fuso");
+  expect(scheduleSpecialHoursIssue({ ...candidate, until: "2100-03-14" })).toContain("não tem uma ocorrência");
+});
 it.each(["07:00", "07:00:00", "07:00:37"])(
   "keeps a type's native time when editing another field (%s)",
   (starts_local) => {
@@ -243,9 +258,10 @@ describe("preparação de criação de escala", () => {
     expect(initialScheduleType()).toEqual({
       form: "type",
       name: "",
-      start: "07:00",
+      start: "",
       duration: "720",
       active: true,
+      restHours: "",
     });
     expect(
       initialScheduleSeries(workspace, key, false, "2100-03-01"),

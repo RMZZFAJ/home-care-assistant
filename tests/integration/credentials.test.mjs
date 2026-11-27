@@ -65,6 +65,50 @@ test("credential declaration does not force an invented caregiver registration; 
  assert.equal((await f.reviewer.rpc("patient_professional_credential",{p_patient:f.patient,p_subject:f.subject.id})).error?.code,"42501");
 });
 
+test("credential recovery uses the exact scoped reference and settles a missing write", async () => {
+ const f = await credentialFixture(), read = await credentialRead(f);
+ const recover = (client, packet, fields = {}) => client.rpc("professional_credential_review_result", {
+  p_patient: packet.p_patient, p_subject: packet.p_subject, p_expected: packet.p_expected, p_key: packet.p_key, ...fields,
+ });
+ const committed = reviewPacket(f, read, { p_note: "Observação preservada somente no histórico oficial" });
+ const saved = await rpc(f.reviewer, "review_professional_credential", committed);
+ const before = credentialHistory(f);
+ const receipt = await recover(f.reviewer, committed);
+ assert.ifError(receipt.error);
+ assert.deepEqual(receipt.data, {
+  state: "recorded", outcome: { ...saved, replayed: true }, idempotencyKey: committed.p_key,
+  careRecipientId: f.patient, subjectId: f.subject.id, expectedRevision: read.declaration.revision,
+ });
+ assert.equal((await recover(f.reviewer, committed, { p_expected: String(BigInt(read.declaration.revision) + 1n) })).error?.code, "42501");
+ assert.equal((await recover(f.subject.client, committed)).error?.code, "42501");
+ const global = await draftDevice(f.patient, "global");
+ await rpc(global, "select_active_context", { p_patient: null });
+ assert.equal((await recover(global, committed)).error?.code, "42501");
+
+ const missing = reviewPacket(f, read);
+ const closed = await recover(f.reviewer, missing);
+ assert.ifError(closed.error);
+ assert.equal(closed.data.state, "closed");
+ assert.equal(closed.data.outcome, null);
+ assert.deepEqual((await recover(f.reviewer, missing)).data, closed.data);
+ assert.equal((await f.reviewer.rpc("review_professional_credential", missing)).error?.code, "PT410");
+ assert.equal(credentialHistory(f), before);
+
+ const concurrent = reviewPacket(f, read);
+ const [write, recovery] = await Promise.all([
+  f.reviewer.rpc("review_professional_credential", concurrent), recover(f.reviewer, concurrent),
+ ]);
+ assert.ifError(recovery.error);
+ if (recovery.data.state === "recorded") {
+  assert.ifError(write.error);
+  assert.equal(recovery.data.outcome.id, write.data.id);
+  assert.equal(JSON.parse(credentialHistory(f)).length, 2);
+ } else {
+  assert.equal(write.error?.code, "PT410");
+  assert.equal(credentialHistory(f), before);
+ }
+});
+
 test("credential review rechecks membership and Auth session after real lock waits without partial review or audit",async()=>{
  for(const late of [false,true]){
   const f=await credentialFixture(),read=await credentialRead(f),packet=reviewPacket(f,read),before=credentialHistory(f);

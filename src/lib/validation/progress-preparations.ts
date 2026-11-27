@@ -3,6 +3,7 @@ import {
   progressContent,
   publishProgress,
   parseProgressOutcome,
+  progressSubjectType,
   progressConfirmed,
   stagesByDocument,
 } from "./document-progress";
@@ -20,7 +21,7 @@ export const progressDraftNoteSchema = progressContent.extend({
 });
 export const progressPreparationContentSchema = z
   .object({
-    documentType: z.enum(["REQ", "COM", "ENT", "BAL"]),
+    documentType: progressSubjectType,
     note: progressDraftNoteSchema,
   })
   .strict()
@@ -106,7 +107,7 @@ const receiptSchema = z
     actorId: id,
     recordedAt: instant,
     idempotencyKey: id,
-    documentType: z.enum(["REQ", "COM", "ENT", "BAL"]),
+    documentType: progressSubjectType,
     command: publishProgress,
     nativeResult: z.unknown(),
   })

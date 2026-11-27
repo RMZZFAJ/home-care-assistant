@@ -24,7 +24,7 @@ async function open(page: Page, token: string) {
   await page.getByLabel("E-mail", { exact: true }).fill(fixtures.adminB.email);
   await page.getByLabel("Senha", { exact: true }).fill(fixturePassword);
   await page.getByRole("button", { name: "Entrar", exact: true }).click();
-  await expect(page.getByRole("button", { name: "Aceitar convite com minha conta", exact: true })).toBeEnabled();
+  await expect(page.getByRole("button", { name: "Aceitar convite", exact: true })).toBeEnabled();
 }
 
 test("invitation rejects a changed actor and never announces success from a fake200; reload recovers the same choice", async ({ page }) => {
@@ -37,17 +37,17 @@ test("invitation rejects a changed actor and never announces success from a fake
     packets.push(route.request().postDataJSON());
     return fake ? route.fulfill({ status: 200, json: {} }) : route.continue();
   });
-  await page.getByRole("button", { name: "Aceitar convite com minha conta", exact: true }).click();
+  await page.getByRole("button", { name: "Aceitar convite", exact: true }).click();
   const recovery = page.getByRole("button", { name: "Recuperar decisão do convite", exact: true });
   await expect(recovery).toBeEnabled();
-  await expect(page.getByText("Convite aceito.", { exact: false })).toHaveCount(0);
+  await expect(page.getByRole("dialog", { name: "Convite aceito", exact: true })).toHaveCount(0);
   expect(facts(f)).toBe(before);
   await page.reload(); await expect(recovery).toBeEnabled();
   await expect(page.getByRole("button", { name: "Recusar convite", exact: true })).toHaveCount(0);
   await page.getByRole("button", { name: "Consultar resultado sem reenviar", exact: true }).click();
   await expect(recovery).toBeEnabled(); expect(packets).toHaveLength(1); expect(facts(f)).toBe(before);
   fake = false; await recovery.click();
-  await expect(page.getByText("Convite aceito.", { exact: false })).toBeVisible();
+  await expect(page.getByRole("dialog", { name: "Convite aceito", exact: true })).toBeVisible();
   expect(packets).toHaveLength(2); expect(packets[1]).toEqual(packets[0]); expect(members(f)).toBe(1);
   expect(await page.evaluate(() => Object.keys(sessionStorage).filter(key => key.startsWith("hca:invitation-decision:")))).toEqual([]);
 });
@@ -60,10 +60,14 @@ test("invitation decline with a lost response is recovered by its terminal read 
     committed = facts(f); await route.abort("failed");
   });
   await page.getByRole("button", { name: "Recusar convite", exact: true }).click();
+  const review = page.getByRole("dialog", { name: "Recusar convite?", exact: true });
+  expect(posts).toBe(0);
+  await review.getByRole("button", { name: "Recusar convite", exact: true }).click();
   await expect(page.getByRole("button", { name: "Recuperar decisão do convite", exact: true })).toBeEnabled();
   expect(posts).toBe(1); expect(members(f)).toBe(0);
   await page.reload();
-  await expect(page.getByText("Convite recusado. Nenhum vínculo foi concedido.", { exact: true })).toBeVisible();
+  await page.getByRole("dialog", { name: "Convite recusado", exact: true }).getByRole("button", { name: "Concluir", exact: true }).click();
+  await expect(page.getByText("Nenhum vínculo foi criado com este convite.", { exact: true })).toBeVisible();
   await expect(page.getByRole("button", { name: "Recuperar decisão do convite", exact: true })).toHaveCount(0);
   expect(posts).toBe(1); expect(facts(f)).toBe(committed); expect(members(f)).toBe(0);
 });
@@ -78,14 +82,40 @@ test("a late invitation result cannot replace another link or erase its current 
     await held; await route.fulfill({ response });
   });
   try {
-    await page.getByRole("button", { name: "Aceitar convite com minha conta", exact: true }).click(); await sent;
+    await page.getByRole("button", { name: "Aceitar convite", exact: true }).click(); await sent;
     await page.evaluate(token => { location.hash = "token=" + token; }, second.token);
     const summary = page.getByRole("region", { name: "Resumo do vínculo convidado", exact: true });
     await expect(summary).toContainText(sql(`select display_name from public.care_recipients where id=${q(second.patient)};`));
     release();
-    await expect(page.getByRole("button", { name: "Aceitar convite com minha conta", exact: true })).toBeEnabled();
-    await expect(page.getByText("Convite aceito.", { exact: false })).toHaveCount(0);
+    await expect(page.getByRole("button", { name: "Aceitar convite", exact: true })).toBeEnabled();
+    await expect(page.getByRole("dialog", { name: "Convite aceito", exact: true })).toHaveCount(0);
     expect(await page.evaluate(() => sessionStorage.getItem("hca:invitation"))).toBe(second.token);
     expect(members(first)).toBe(1); expect(members(second)).toBe(0);
   } finally { release(); }
+});
+
+test("invitation decision exhausts two recoveries across reload and exposes only safe support details", async ({ page }) => {
+  const f = await invitation(); await open(page, f.token);
+  let posts = 0;
+  await page.route("**/api/invitations/accept", route => { posts++; return route.abort("failed"); });
+  const failure = page.getByRole("dialog", { name: "Não foi possível confirmar a decisão", exact: true });
+  const recover = failure.getByRole("button", { name: "Recuperar decisão do convite", exact: true });
+  await page.getByRole("button", { name: "Aceitar convite", exact: true }).click();
+  await recover.click();
+  await expect(recover).toBeEnabled();
+  await page.reload();
+  await recover.click();
+  await expect(failure).toContainText("Copie os detalhes e avise o responsável pelo sistema.");
+  await expect(recover).toHaveCount(0);
+  await page.reload();
+  await expect(failure.getByRole("button", { name: "Copiar detalhes", exact: true })).toBeVisible();
+  await expect(failure.getByRole("button", { name: "Consultar resultado sem reenviar", exact: true })).toHaveCount(0);
+  await failure.getByText("Ajuda para resolver", { exact: true }).click();
+  const diagnostic = failure.locator("pre");
+  await expect(diagnostic).toContainText("Tentativas de recuperação: 2");
+  await expect(diagnostic).toContainText("Instante:");
+  await expect(diagnostic).not.toContainText(f.token);
+  await expect(diagnostic).not.toContainText(fixtures.adminB.email);
+  expect(posts).toBe(3);
+  expect(members(f)).toBe(0);
 });

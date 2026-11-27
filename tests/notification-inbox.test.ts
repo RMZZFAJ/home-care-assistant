@@ -2,8 +2,9 @@ import { describe, expect, it } from "vitest";
 import { parseInboxPage } from "@/lib/notifications/inbox";
 
 const patient = "10000000-0000-4000-8000-000000000001", other = "10000000-0000-4000-8000-000000000002";
-const empty = { data: [], total: 0, unreadCount: 0, page: 1, pageSize: 20, unread: false, surface: "center", availability: "ready", careRecipientId: patient };
-const row = { id: "20000000-0000-4000-8000-000000000001", care_recipient_id: patient, document_id: null, requisition_id: null, event_key: null, silent: false, state: "delivered", channel: "internal", seen_at: null, created_at: "2026-11-07T02:47:19.123456+00:00", operational_documents: null, document_events: null };
+const query = { page: 1, pageSize: 20, unread: false, surface: "center", kind: null, tasks: false, search: "" } as const;
+const empty = { ...query, data: [], total: 0, unreadCount: 0, actionCount: 0, availability: "ready", careRecipientId: patient };
+const row = { id: "20000000-0000-4000-8000-000000000001", care_recipient_id: patient, document_id: null, requisition_id: null, event_key: null, silent: false, state: "delivered", channel: "internal", seen_at: null, created_at: "2026-11-07T02:47:19.123456+00:00", operational_documents: null, document_events: null, reference_code: null, task: null };
 describe("notification read results", () => {
   it("distinguishes a confirmed empty patient inbox from a required context", () => {
     expect(parseInboxPage(empty, patient).availability).toBe("ready");
@@ -24,9 +25,9 @@ describe("notification read results", () => {
     expect(() => parseInboxPage({ ...empty, data: [row, row], total: 2 }, patient)).toThrow();
   });
   it.each([
-    { page: 2 }, { pageSize: 8 }, { unread: true }, { surface: "bell" },
+    { page: 2 }, { pageSize: 8 }, { unread: true }, { surface: "bell" }, { tasks: true }, { kind: "BAL" }, { search: "ciência" },
   ])("binds the result to the requested page and filters: %j", difference => {
-    expect(() => parseInboxPage({ ...empty, ...difference }, patient, { page: 1, pageSize: 20, unread: false, surface: "center" })).toThrow();
+    expect(() => parseInboxPage({ ...empty, ...difference }, patient, query)).toThrow();
   });
   it("accepts a last page and an out-of-range confirmed empty page", () => {
     expect(parseInboxPage({ ...empty, page: 6, data: [row], total: 101 }, patient).data).toHaveLength(1);
@@ -36,5 +37,7 @@ describe("notification read results", () => {
     expect(() => parseInboxPage({ ...empty, unread: true, data: [{ ...row, seen_at: row.created_at }], total: 1 }, patient)).toThrow();
     expect(() => parseInboxPage({ ...empty, surface: "bell", data: [{ ...row, silent: true }], total: 1 }, patient)).toThrow();
     expect(parseInboxPage({ ...empty, unread: true, data: [{ ...row, silent: true }], total: 1, unreadCount: 50 }, patient).unreadCount).toBe(50);
+    expect(() => parseInboxPage({ ...empty, tasks: true, data: [row], total: 1, actionCount: 1 }, patient)).toThrow();
+    expect(() => parseInboxPage({ ...empty, kind: "REQ", data: [row], total: 1 }, patient)).toThrow();
   });
 });

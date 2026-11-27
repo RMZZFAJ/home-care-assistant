@@ -1,175 +1,122 @@
 "use client";
-import { TableFrame } from "@/components/ui/table-frame";
-import Link from "next/link";
-import { ActionButton, DataTable, DataTableBody, DataTableCell, DataTableHead, DataTableHeading, DataTableRow, TextInput } from "@/components/ui/controls";
-import { useEffect, useState } from "react";
-import {
-  api,
-  buttonClass,
-  can,
-  Notice,
-  Workspace,
-  type WorkspaceContext,
-} from "../workspace";
 
-import { Icon, EmptyState } from "@/components/ui/primitives";
+import { useState } from "react";
+import { RecordDrawer } from "@/components/forms/record-drawer";
+import { ActionButton, DefinitionGrid, LoadingIndicator, TextInput } from "@/components/ui/controls";
+import { FeedbackBanner } from "@/components/ui/feedback";
+import { Icon } from "@/components/ui/icon";
+import { EmptyState } from "@/components/ui/primitives";
+import { can, Workspace, type WorkspaceContext } from "@/components/workspace";
+import { normalizeCatalogText } from "@/lib/catalog-match";
+import { useScopedRead } from "@/lib/use-scoped-read";
 import type { CatalogProduct } from "@/types/documents";
-import { PresentationManagement } from "./presentation-management";
 import type { MeasurementUnit } from "./catalogue-complementary-reference";
-import { UnitPreparationEditor } from "./unit-preparation-editor";
+import { PresentationManagement } from "./presentation-management";
+import { ReviewedCatalogueFeedback, useReviewedCatalogueOperation } from "./reviewed-catalogue-operation";
+import { unitDimensions, UnitPreparationEditor } from "./unit-preparation-editor";
+import "../admin/residence-administration.css";
+
+const unitPurposes = ["unit_create", "unit_configure"] as const;
+const pageSize = 15;
 
 export function UnitConsole() {
-  return (
-    <Workspace title="Unidades e apresentações">
-      {(context) => (
-        <Units key={JSON.stringify([context.userId, context.activeContext?.mode, context.patient?.id])} context={context} />
-      )}
-    </Workspace>
-  );
+  return <Workspace title="Unidades e apresentações" eyebrow="Organização da residência">
+    {context => <Units key={JSON.stringify([context.userId, context.activeContext?.mode, context.patient?.id])} context={context} />}
+  </Workspace>;
 }
-function Units({ context }: { context: WorkspaceContext }) {
-  const globalMode =
-    context.activeContext?.mode === "global" &&
-    context.globalAdministrationAllowed === true;
-  const [search, setSearch] = useState("");
-  const [loaded, setLoaded] = useState(false);
-  const [editor, setEditor] = useState<{
-    mode: "unit" | "precision";
-    opener: HTMLElement;
-  } | null>(null);
-  const [units, setUnits] = useState<MeasurementUnit[]>([]);
-  const [products, setProducts] = useState<CatalogProduct[]>([]);
-  const [attempt, setAttempt] = useState(0);
-  const [error, setError] = useState("");
-  const [message, setMessage] = useState("");
-  useEffect(() => {
-    const controller = new AbortController();
-    Promise.all([
-      api<{ data: MeasurementUnit[] }>("/api/units", undefined, controller.signal),
-      context.patient && !globalMode
-        ? api<{ data: CatalogProduct[] }>(
-            "/api/catalog?careRecipientId=" + context.patient.id,
-            undefined,
-            controller.signal,
-          )
-        : Promise.resolve({ data: [] }),
-    ])
-      .then(([u, p]) => {
-        if (controller.signal.aborted) return;
-        setLoaded(true);
-        setUnits(u.data);
-        setProducts(p.data);
-      })
-      .catch((reason) => {
-        if (!controller.signal.aborted) setError(reason.message);
-      });
-    return () => controller.abort();
-  }, [context.patient, attempt, globalMode]);
-  const writable = globalMode || can(context, "catalog.manage");
-  const matches = units.filter(unit => (unit.name + " " + unit.code)
-    .toLocaleLowerCase("pt-BR").includes(search.toLocaleLowerCase("pt-BR")));
-  return (
-    <div className="space-y-5">
-      {error ? <Notice error>{error}</Notice> : null}
-      {message ? <Notice>{message}</Notice> : null}
-      <section>
-        <div className="hca-section-heading">
-          <div>
-            <h2>Unidades disponíveis</h2>
-            <p className="hca-field-hint">
-              Unidades base e precisão dos produtos.
-            </p>
-          </div>
-          <div className="hca-toolbar">
-            <Link className={buttonClass} href="/comprovantes-catalogo">Comprovantes do catálogo</Link>
-            {globalMode || can(context, "catalog.manage") ? (
-              <ActionButton
-                variant="primary"
 
-                onClick={(event) =>
-                  setEditor({ mode: "unit", opener: event.currentTarget })
-                }
-              >{<Icon name="plus" />}
-                Nova unidade
-              </ActionButton>
-            ) : null}
-            {context.patient && can(context, "catalog.manage") ? (
-              <ActionButton
-                onClick={(event) =>
-                  setEditor({
-                    mode: "precision",
-                    opener: event.currentTarget,
-                  })
-                }
-              >
-                Configurar unidade e precisão
-              </ActionButton>
-            ) : null}
-          </div>
-        </div>
-        <div className="hca-toolbar">
-          <TextInput
-            type="search"
-            leading={<Icon name="search" />}
-            aria-label="Pesquisar unidades"
-            value={search}
-            onChange={controlEvent => { const controlValue = controlEvent.currentTarget.value; return setSearch(controlValue); }}
-            placeholder="Nome ou código"
-          />
-        </div>
-        {!loaded && !error ? <Notice>Carregando unidades…</Notice> : null}
-        <TableFrame label="Unidades base">
-          <DataTable className="hca-table hca-mobile-records" aria-label="Unidades base">
-            <DataTableHead>
-              <DataTableRow>
-                <DataTableHeading>Unidade</DataTableHeading>
-                <DataTableHeading>Precisão</DataTableHeading>
-                <DataTableHeading>Âmbito</DataTableHeading>
-              </DataTableRow>
-            </DataTableHead>
-            <DataTableBody>
-              {matches
-                .map((unit) => (
-                  <DataTableRow key={unit.id}>
-                    <DataTableCell>
-                      <strong>{unit.name}</strong>
-                      <small className="hca-cell-secondary">{unit.code}</small>
-                    </DataTableCell>
-                    <DataTableCell data-label="Precisão">{unit.decimals} casa(s)</DataTableCell>
-                    <DataTableCell data-label="Âmbito">
-                      {unit.care_recipient_id ? "Paciente" : "Global"}
-                    </DataTableCell>
-                  </DataTableRow>
-                ))}
-            </DataTableBody>
-          </DataTable>
-          {loaded && !matches.length ? (
-            <EmptyState title={units.length ? "Nenhuma unidade encontrada" : "Nenhuma unidade disponível"} />
-          ) : null}
-        </TableFrame>
-      </section>
-      {editor ? <UnitPreparationEditor
-        key={editor.mode}
-        scope={{
-          patientId: globalMode ? null : context.patient?.id ?? null,
-          mode: globalMode ? "global" : "patient",
-          purpose: editor.mode === "unit" ? "unit_create" : "unit_configure",
-          targetId: null,
-        }}
-        userId={context.userId}
-        opener={editor.opener}
-        products={products}
-        writable={writable}
-        onClose={() => setEditor(null)}
-        onSaved={result => { setMessage(result); setAttempt(value => value + 1); }}
-      /> : null}
-      {context.patient && !globalMode ? (
-        <PresentationManagement
-          userId={context.userId}
-          patientId={context.patient.id}
-          writable={can(context, "catalog.manage")}
-        />
-      ) : null}
-    </div>
-  );
+function precisionLabel(decimals: number) {
+  return decimals === 1 ? "1 casa decimal" : decimals + " casas decimais";
+}
+
+function dimensionLabel(dimension: string) {
+  return unitDimensions[dimension as keyof typeof unitDimensions] ?? dimension;
+}
+
+function Units({ context }: { context: WorkspaceContext }) {
+  const global = context.activeContext?.mode === "global" && context.globalAdministrationAllowed === true;
+  const mode = global ? "global" : "patient";
+  const patientId = global ? null : context.patient?.id ?? null;
+  const writable = global || Boolean(patientId && can(context, "catalog.manage"));
+  const units = useScopedRead<{ data: MeasurementUnit[] }>("/api/units");
+  const products = useScopedRead<{ data: CatalogProduct[] }>(patientId && writable ? "/api/catalog?careRecipientId=" + patientId : null);
+  const operation = useReviewedCatalogueOperation(context.userId, { patientId, mode }, unitPurposes);
+  const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
+  const [revision, setRevision] = useState(0);
+  const [detail, setDetail] = useState<{ unit: MeasurementUnit; opener: HTMLElement } | null>(null);
+  const [editor, setEditor] = useState<{ purpose: (typeof unitPurposes)[number]; opener: HTMLElement } | null>(null);
+  const matching = (units.data?.data ?? []).filter(unit =>
+    (unit.care_recipient_id === null || unit.care_recipient_id === patientId)
+    && normalizeCatalogText(unit.name + " " + unit.code).includes(normalizeCatalogText(search)));
+  const totalPages = Math.max(1, Math.ceil(matching.length / pageSize));
+  const currentPage = Math.min(page, totalPages);
+  const open = (purpose: (typeof unitPurposes)[number], opener: HTMLElement) => { setRevision(0); setEditor({ purpose, opener }); };
+  const refreshReference = () => setRevision(value => value + 1);
+  const canOpenPrecision = patientId && writable && products.data && !operation.blocked;
+
+  return <div className="hca-residence-admin">
+    <p className="hca-residence-admin-subtitle">Defina como identificar e contar cada material.</p>
+    <section className="hca-residence-admin-section hca-residence-rules" aria-labelledby="measurement-units-heading">
+      <header><h2 id="measurement-units-heading">Unidades disponíveis</h2>
+        {writable ? <ActionButton compact disabled={operation.blocked} onClick={event => open("unit_create", event.currentTarget)}><Icon name="plus" />Nova unidade</ActionButton> : null}
+      </header>
+      <div className="hca-notice-rules-filter hca-catalogue-filter-search">
+        <TextInput type="search" leading={<Icon name="search" />} aria-label="Pesquisar unidades" placeholder="Buscar nome ou código"
+          value={search} onChange={event => { setSearch(event.currentTarget.value); setPage(1); }} />
+      </div>
+      {units.loading ? <div className="hca-residence-rules-empty"><LoadingIndicator label="Consultando unidades" /></div> : null}
+      {units.error ? <div className="hca-residence-rules-empty"><FeedbackBanner tone="error">{units.error}
+        <ActionButton onClick={units.refresh}>Consultar unidades novamente</ActionButton>
+      </FeedbackBanner></div> : null}
+      <div>{matching.slice((currentPage - 1) * pageSize, currentPage * pageSize).map(unit => <button key={unit.id} type="button" className="hca-guide-row"
+        onClick={event => setDetail({ unit, opener: event.currentTarget })}>
+        <span className="hca-guide-row-icon"><Icon name="box" /></span>
+        <span className="hca-guide-row-label"><strong>{unit.name}</strong><small>{dimensionLabel(unit.dimension)} · {precisionLabel(unit.decimals)} · {unit.care_recipient_id ? "Residência" : "Global"}</small></span>
+        <Icon name="chevron" width={15} height={15} />
+      </button>)}</div>
+      {units.data && !units.loading && !units.error && !matching.length ? <div className="hca-residence-rules-empty">
+        <EmptyState title={search ? "Nenhuma unidade encontrada" : "Nenhuma unidade disponível"} />
+      </div> : null}
+      {totalPages > 1 ? <nav aria-label="Páginas das unidades" className="hca-pagination">
+        <ActionButton disabled={currentPage <= 1} onClick={() => setPage(currentPage - 1)}>Anterior</ActionButton>
+        <span>Página {currentPage} de {totalPages}</span>
+        <ActionButton disabled={currentPage >= totalPages} onClick={() => setPage(currentPage + 1)}>Próxima</ActionButton>
+      </nav> : null}
+      {patientId && writable ? <div>
+        <button type="button" className="hca-guide-row" disabled={!canOpenPrecision} onClick={event => open("unit_configure", event.currentTarget)}>
+          <span className="hca-guide-row-icon"><Icon name="settings" /></span>
+          <span className="hca-guide-row-label"><strong>Precisão de um material</strong><small>Unidade de controle e casas decimais</small></span><Icon name="chevron" width={15} height={15} />
+        </button>
+        {products.error ? <FeedbackBanner tone="error">{products.error}<ActionButton onClick={products.refresh}>Consultar materiais novamente</ActionButton></FeedbackBanner> : null}
+      </div> : null}
+    </section>
+    {patientId ? <PresentationManagement userId={context.userId} patientId={patientId} writable={writable} /> : null}
+    <p className="hca-residence-admin-note"><Icon name="history" width={16} height={16} />O fator descreve uma embalagem. Movimentos já registrados preservam a equivalência usada na ocasião.</p>
+    {detail ? <RecordDrawer title="Unidade de medida" subtitle={detail.unit.name} kicker="Organização da residência" headingIcon="box"
+      onClose={() => setDetail(null)} trackChanges={false} restoreFocusTo={detail.opener}
+      popupClassName="hca-preference-sheet hca-residence-settings-sheet" footer={close => <>
+        <ActionButton onClick={close}>Voltar</ActionButton>
+        {canOpenPrecision ? <ActionButton onClick={() => open("unit_configure", detail.opener)}>Precisão de um material</ActionButton> : null}
+      </>}>
+      <div className="hca-form-stack">
+        <DefinitionGrid items={[
+          { label: "Código", value: detail.unit.code },
+          { label: "Dimensão", value: dimensionLabel(detail.unit.dimension) },
+          { label: "Precisão", value: precisionLabel(detail.unit.decimals) },
+          { label: "Âmbito", value: detail.unit.care_recipient_id ? "Esta residência" : "Unidade global" },
+        ]} />
+        <p className="hca-residence-admin-note"><Icon name="history" width={16} height={16} />Cadastros e movimentos existentes preservam suas referências.</p>
+      </div>
+    </RecordDrawer> : null}
+    {editor && writable ? <UnitPreparationEditor key={editor.purpose}
+      scope={{ patientId, mode, purpose: editor.purpose, targetId: null }}
+      products={products.data?.data ?? []} opener={editor.opener} onClose={() => setEditor(null)}
+      operation={operation} revision={revision} refreshReference={refreshReference} /> : null}
+    <ReviewedCatalogueFeedback operation={operation} showPending={!editor || !writable}
+      onFinish={result => {
+        if (result.state === "recorded") { setEditor(null); units.refresh(); products.refresh(); }
+      }}
+      onReview={editor && writable ? () => { operation.closeFailure(); refreshReference(); } : undefined} />
+  </div>;
 }

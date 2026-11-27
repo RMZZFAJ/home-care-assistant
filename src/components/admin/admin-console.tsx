@@ -2,7 +2,7 @@
 
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useRef, useState, type RefObject } from "react";
 import { useCommandIntent } from "@/lib/client/use-command-intent";
 import { ApiError } from "@/lib/client/api";
 import { governanceCommandConfirmed } from "@/lib/validation/governance";
@@ -17,16 +17,9 @@ import {
   Workspace,
   type WorkspaceContext,
 } from "@/components/workspace";
-import {
-  NotificationSettings,
-  NotificationQueue,
-} from "./notification-settings";
-import { formatBrazilDate } from "@/lib/receipt";
-import { Field, RoleSelect, text, type Row } from "./admin-fields";
-import { administrativeOutcomeText } from "./administrative-preparation-editor";
+import { NotificationQueue } from "./notification-settings";
+import { type Row } from "./admin-fields";
 import type { AdministrativeOutcome } from "@/lib/validation/administrative-preparation";
-import { AlertSettings } from "./alert-settings";
-import { PatientRegistration } from "./patient-registration";
 import {
   AdministrationNavigation,
   administrationAreas,
@@ -37,6 +30,10 @@ import { GlobalAccounts } from "./global-accounts";
 import { AuditHistory } from "./audit-history";
 import { useLiveRevision } from "@/lib/use-live-revision";
 import { OperationsConsole } from "./operations-console";
+import { ResidenceAdministration, ResidenceAdministrationUnavailable } from "./residence-administration";
+import { Icon } from "@/components/ui/icon";
+import { InvitationManagement } from "./invitation-management";
+import { PeopleNavigation } from "./people-navigation";
 import "./administration.css";
 
 type Section =
@@ -44,52 +41,73 @@ type Section =
   | "catalog"
   | "memberships"
   | "invitations"
-  | "alerts"
   | "audit"
   | "import"
   | "profiles"
-  | "notificationRecipients"
   | "notifications"
   | "operations";
-type AdministrativeResult = { data?: unknown; invitationUrl?: string; pendingApproval?: boolean };
+type AdministrativeResult = { data?: unknown; pendingApproval?: boolean };
 type AdministrativeIntent = { payload: Row; success: string; refreshContext: boolean };
 const labels: Record<Section, string> = {
   patient: "Paciente",
   catalog: "Catálogo",
   memberships: "Vínculos",
   invitations: "Convites",
-  alerts: "Alertas",
   audit: "Auditoria",
   import: "Importação histórica",
   profiles: "Contas globais",
-  notificationRecipients: "Destinatários",
   notifications: "Notificações",
-  operations: "Monitoramento e suporte",
+  operations: "Central técnica",
 };
 export function AdminConsole() {
   const params = useSearchParams();
+  const section = params.get("section");
+  const technical = section === "operations";
+  const people = section === "memberships" || section === "invitations";
+  const catalogue = section === "catalog";
+  const catalogueHeadingRef = useRef<HTMLHeadingElement>(null);
+  const overview = !section || section === "patient" || !Object.hasOwn(labels, section);
+  const administrativeCapabilities = ["access.manage", "catalog.manage", "audit.read"];
   return (
     <Workspace
-      title="Administração"
+      title={technical ? "Central técnica" : people ? "Pessoas e convites" : catalogue ? "Catálogo" : "Administração"}
+      eyebrow={technical ? "Administração global" : people || catalogue ? "Organização da residência" : undefined}
       administration
-      administrationCapabilities={[
-        "access.manage",
-        "catalog.manage",
-        "audit.read",
-      ]}
-      administrationReadRecovery={params.get("section") === "catalog"}
+      administrationCapabilities={administrativeCapabilities}
+      administrationReadRecovery={section === "catalog"}
+      administrationUnavailable={overview ? <ResidenceAdministrationUnavailable /> : undefined}
+      heading={overview ? context => {
+        const global = context.activeContext?.mode === "global" && context.globalAdministrationAllowed;
+        const available = global || administrativeCapabilities.some(capability => can(context, capability));
+        return <>
+          {global && context.patient ? <div className="hca-residence-admin-banner"><Icon name="info" />
+            <p><strong>Atuação administrativa</strong> As propostas locais dependem da decisão de outro administrador do paciente.</p>
+          </div> : null}
+          <div className="page-heading hca-residence-admin-heading"><div>
+            <p className="eyebrow">{available ? "Organização da residência" : "Home Care Assistant"}</p>
+            <h1>{available ? "Administração" : "Acesso à residência"}</h1>
+            {available ? <p className="hca-residence-admin-subtitle">Organize o acesso e o trabalho da residência.</p> : null}
+          </div></div>
+        </>;
+      } : catalogue ? () => <div className="page-heading hca-residence-admin-heading"><div>
+        <p className="eyebrow">Organização da residência</p><h1 ref={catalogueHeadingRef} tabIndex={-1}>Catálogo</h1>
+        <p className="hca-residence-admin-subtitle">Materiais desta residência, sempre identificados por tipo.</p>
+      </div></div> : undefined}
     >
-      {(context) => (
+      {(context) => overview ? <ResidenceAdministration
+        key={`${context.userId}:${context.patient?.id ?? "global"}:${context.activeContext?.mode}:${section ?? "overview"}`}
+        context={context} initialEdit={section === "patient"} /> : (
         <PatientAdmin
           key={(context.patient?.id ?? "global") + ":" + (params.get("section") ?? "overview")}
           context={context}
+          catalogueHeadingRef={catalogueHeadingRef}
         />
       )}
     </Workspace>
   );
 }
 
-function PatientAdmin({ context }: { context: WorkspaceContext }) {
+function PatientAdmin({ context, catalogueHeadingRef }: { context: WorkspaceContext; catalogueHeadingRef: RefObject<HTMLHeadingElement | null> }) {
   const globalMode =
     context.activeContext?.mode === "global" &&
     context.globalAdministrationAllowed === true;
@@ -104,12 +122,10 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
     administrationAreas(context).some((area) => area.section === section);
   const [rows, setRows] = useState<Row[]>([]);
   const [directory, setDirectory] = useState<Row[]>([]);
-  const [catalog, setCatalog] = useState<Row[]>([]);
-  const [editing, setEditing] = useState<Row | null>(null);
   const [page, setPage] = useState(1);
   const [notificationTotal, setNotificationTotal] = useState(0);
   const [loading, setLoading] = useState(
-    !["patient", "import", "overview", "audit", "operations", "catalog", "profiles"].includes(section),
+    !["patient", "import", "overview", "audit", "operations", "catalog", "profiles", "invitations"].includes(section),
   );
   const command = useCommandIntent<Row, AdministrativeResult>(governanceCommandConfirmed);
   const intentRef = useRef<AdministrativeIntent | null>(null);
@@ -117,7 +133,6 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
   const versionRef = useRef<number | null>(null);
   const [versionAttempt, setVersionAttempt] = useState(0);
   const [conflict, setConflict] = useState(false);
-  const [confirmationRevision, setConfirmationRevision] = useState(0);
   const [localBusy, setLocalBusy] = useState(false);
   const busy = localBusy || command.busy || command.uncertain || conflict;
   const [error, setError] = useState("");
@@ -127,7 +142,6 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
   const [queueReadRevision,setQueueReadRevision]=useState(-1);
   const queueRefreshing=section==="notifications"&&queueReadRevision!==queueRevision;
   const [message, setMessage] = useState("");
-  const [invitationUrl, setInvitationUrl] = useState("");
   const [report, setReport] = useState<unknown>(null);
   const [importText, setImportText] = useState("");
   const [importReviewed, setImportReviewed] = useState(false);
@@ -142,7 +156,7 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
   }, [globalMode, patientId, versionAttempt]);
   const load = useCallback(
     (signal?: AbortSignal) => {
-      if (!allowed || ["patient", "import", "overview", "audit", "operations", "catalog", "profiles"].includes(section))
+      if (!allowed || ["patient", "import", "overview", "audit", "operations", "catalog", "profiles", "invitations"].includes(section))
         return Promise.resolve();
       const sequence = ++loadSequenceRef.current;
       const query = new URLSearchParams({ section });
@@ -155,7 +169,7 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
           undefined,
           signal,
         ),
-        ["memberships", "notificationRecipients"].includes(section)
+        section === "memberships"
           ? api<{ data: Row[] }>(
               section === "memberships" && globalMode
                 ? "/api/admin?section=profiles"
@@ -164,20 +178,12 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
               signal,
             )
           : Promise.resolve({ data: [] as Row[] }),
-        section === "alerts"
-          ? api<{ data: Row[] }>(
-              `/api/catalog?careRecipientId=${patientId}&includeInactive=true`,
-              undefined,
-              signal,
-            )
-          : Promise.resolve({ data: [] as Row[] }),
       ]).then(
-        ([result, people, products]) => {
+        ([result, people]) => {
           if (signal?.aborted || sequence !== loadSequenceRef.current) return;
           setRows(result.data ?? []);
           setNotificationTotal(result.total ?? 0);
           setDirectory(people.data);
-          setCatalog(products.data);
           setLoading(false);
           setReadError("");
           setReadDenied(false);
@@ -206,9 +212,6 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
   }, [load, queueRevision]);
   async function confirmed(result: AdministrativeResult, packet: AdministrativeIntent) {
     setMessage(result.pendingApproval ? "Proposta global registrada. Um administrador local distinto deve aprovar em Permissões, comunicação e regras." : packet.success);
-    setEditing(null);
-    setConfirmationRevision(value => value + 1);
-    if (result.invitationUrl) setInvitationUrl(result.invitationUrl);
     if (packet.payload.action === "historicalImport") setReport(result.data);
     intentRef.current = null;
     // A failing read after this point cannot make the completed command uncertain.
@@ -217,8 +220,7 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
     return result;
   }
   function preparationConfirmed(outcome: AdministrativeOutcome) {
-    setMessage(["alerts", "notificationRecipients"].includes(section) ? "" : administrativeOutcomeText(outcome));
-    setConfirmationRevision(value => value + 1);
+    setMessage("");
     void (async () => {
       if (outcome.kind==="local" && ["membership","membershipStatus"].includes(outcome.action)) await context.refresh();
       await load();
@@ -239,7 +241,6 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
     setLocalBusy(true);
     setError("");
     setMessage("");
-    setInvitationUrl("");
     try {
       const isNotification = ["retry", "process"].includes(
         String(payload.action),
@@ -268,19 +269,6 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
       setLocalBusy(false);
     }
   }
-  function handle(
-    event: FormEvent<HTMLFormElement>,
-    makePayload: (data: FormData) => Row,
-    success = "Alteração salva e auditada.",
-    refresh = false,
-  ) {
-    event.preventDefault();
-    void execute(
-      makePayload(new FormData(event.currentTarget)),
-      success,
-      refresh,
-    );
-  }
   if (!allowed && section !== "catalog")
     return (
       <Notice error>Seu vínculo não autoriza esta área administrativa.</Notice>
@@ -296,32 +284,13 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
           permanecer autorizada.
         </Notice>
       ) : null}
-      <p className="text-sm text-(--muted)">
+      {section !== "catalog" && section !== "operations" && section !== "memberships" && section !== "invitations" && <p className="text-sm text-(--muted)">
         {globalMode
           ? "Administração global e por paciente."
           : "Todas as alterações desta área se limitam ao paciente selecionado."}
-      </p>
-      <AdministrationNavigation
-        context={context}
-        section={section === "overview" ? null : section}
-      />
-      {section === "catalog" && allowed ? (
-        <Link className={buttonClass} href="/unidades">
-          Unidades e apresentações / scanner
-        </Link>
-      ) : null}
-      {section === "catalog" && patientId ? (
-        <Link className={buttonClass} href={"/comprovantes-catalogo?" + new URLSearchParams({
-          [globalMode ? "paciente" : "careRecipientId"]: patientId,
-        })}>
-          Comprovantes do catálogo
-        </Link>
-      ) : null}
-      {section === "memberships" && patientId ? (
-        <Link className={buttonClass} href="/configuracoes?area=people">
-          Permissões e alterações com dupla aprovação
-        </Link>
-      ) : null}
+      </p>}
+      {section === "catalog" ? null : patientId && (section === "memberships" || section === "invitations") ? <PeopleNavigation patientId={patientId} area={section} globalMode={globalMode} /> :
+        <AdministrationNavigation context={context} section={section === "overview" ? null : section} />}
       {error && (
         <Notice error>
           {error}
@@ -333,160 +302,40 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
       {message && <Notice>{message}</Notice>}
       {readError ? <Notice error>{readError} <button type="button" className={buttonClass} onClick={() => void load()}>Atualizar seção</button></Notice> : null}
       {recovery}
-      {invitationUrl && (
-        <section className={panelClass}>
-          <h2 className="font-bold">Link de convite</h2>
-          <p className="mt-2 text-sm">
-            Copie e compartilhe este link com a pessoa convidada. Nenhum e-mail
-            foi enviado automaticamente.
-          </p>
-          <label className="mt-3 block text-sm">
-            Link
-            <input
-              readOnly
-              value={invitationUrl}
-              className={inputClass}
-              onFocus={(event) => event.target.select()}
-            />
-          </label>
-        </section>
-      )}
       {loading && section !== "overview" && (
         <Notice>Carregando {labels[section].toLowerCase()}…</Notice>
       )}
       {queueRefreshing&&!loading?<Notice>Atualizando fila de notificações…</Notice>:null}
       <fieldset disabled={busy} hidden={readDenied} className="min-w-0 space-y-5">
-        {section === "patient" && (
-          <PatientRegistration
-            destinations={administrationAreas(context).filter(area => ["memberships", "catalog", "alerts"].includes(area.section)).map(area => ({ href: `/admin?section=${area.section}&careRecipientId=${patientId}`, title: area.title }))}
-            patient={context.patient}
-            globalMode={globalMode}
-            creating={Boolean(editing)}
-            onToggle={() => setEditing(editing ? null : {})}
-            handle={handle}
-          />
-        )}
         {section === "catalog" && patientId ? (
-          <CatalogueManagement
+          <><CatalogueManagement
             key={JSON.stringify([context.userId, patientId, globalMode])}
             userId={context.userId}
             globalMode={globalMode}
             writable={allowed}
             patientId={patientId}
-            onIdentitySaved={async (message) => {
-              setMessage(message);
-              if (allowed) await load();
-            }}
-          />
+            headingRef={catalogueHeadingRef}
+          /><div className="hca-form-stack">
+            <AdministrationNavigation context={context} section="catalog" />
+          </div></>
         ) : null}
-        {section === "memberships" && patientId ? (
+        {section === "memberships" && patientId && !readDenied ? (
           <MembershipManagement
+            key={JSON.stringify([context.userId, patientId, globalMode])}
             userId={context.userId} globalMode={globalMode} onConfirmed={preparationConfirmed}
             credentialReviewAllowed={!globalMode}
             mayRegularize={can(context, "ent.regularize")}
-            confirmationRevision={confirmationRevision}
             rows={rows}
             directory={directory}
             patientId={patientId}
+            patientName={context.patient?.display_name ?? "Residência"}
           />
         ) : null}
-        {section === "invitations" && (
-          <>
-            <section className={panelClass}>
-              <h2 className="mb-4 font-bold">Convidar para este paciente</h2>
-              <form
-                className="grid gap-4 sm:grid-cols-2"
-                onSubmit={(event) =>
-                  handle(
-                    event,
-                    (data) => ({
-                      action: "invitation",
-                      email: data.get("email"),
-                      role: data.get("role"),
-                      canManageStock: data.get("role") === "admin",
-                      canCountStock: false,
-                    }),
-                    "Convite criado. Compartilhe o link exibido abaixo.",
-                  )
-                }
-              >
-                <Field
-                  name="email"
-                  label="E-mail do convidado"
-                  type="email"
-                  required
-                />
-                <RoleSelect />
-                <p className="text-xs leading-5 text-(--muted)">
-                  As capacidades efetivas seguem a função e as regras deste
-                  paciente.
-                </p>
-                <button className={primaryClass} type="submit">
-                  Criar convite
-                </button>
-              </form>
-            </section>
-            <section className={panelClass}>
-              <h2 className="font-bold">Convites</h2>
-              <ul className="mt-3 space-y-3">
-                {rows.map((row) => (
-                  <li
-                    key={text(row, "id")}
-                    className="rounded-lg border border-(--line) p-3"
-                  >
-                    <p className="font-semibold">{text(row, "email")}</p>
-                    <p className="mt-1 text-sm">
-                      {text(row, "status")} · expira{" "}
-                      {row.expires_at
-                        ? formatBrazilDate(text(row, "expires_at"))
-                        : "conforme configuração"}
-                    </p>
-                    <div className="mt-3 flex gap-3">
-                      <button
-                        className={buttonClass}
-                        onClick={() =>
-                          void execute(
-                            {
-                              action: "resendInvitation",
-                              invitationId: row.id,
-                            },
-                            "Novo link de convite gerado.",
-                          )
-                        }
-                      >
-                        Reemitir link
-                      </button>
-                      <button
-                        className={buttonClass}
-                        onClick={() =>
-                          void execute(
-                            {
-                              action: "revokeInvitation",
-                              invitationId: row.id,
-                            },
-                            "Convite revogado.",
-                          )
-                        }
-                      >
-                        Revogar
-                      </button>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-              {!loading && rows.length === 0 && (
-                <p className="mt-3 text-sm">Nenhum convite.</p>
-              )}
-            </section>
-          </>
-        )}
-        {section === "notificationRecipients" && (
-          <NotificationSettings
-            rows={rows}
-            members={directory}
-            patientId={patientId!} userId={context.userId} globalMode={globalMode} onConfirmed={preparationConfirmed}
-          />
-        )}
+        {section === "invitations" && patientId ? <InvitationManagement key={patientId + ":" + (params.get("invitationId") ?? "")}
+          patientId={patientId} userId={context.userId} initialInvitationId={params.get("invitationId")} /> : null}
+        {(section === "memberships" || section === "invitations") && patientId ? <Link className={buttonClass} href={`/admin?careRecipientId=${patientId}`} prefetch={false}>
+          <Icon name="back" />Voltar à administração
+        </Link> : null}
         {section === "notifications" && (
           <>
             <NotificationQueue
@@ -528,11 +377,8 @@ function PatientAdmin({ context }: { context: WorkspaceContext }) {
             )}
           </>
         )}
-        {section === "alerts" && (
-          <AlertSettings rows={rows} products={catalog} patientId={patientId!} userId={context.userId} globalMode={globalMode} onConfirmed={preparationConfirmed} />
-        )}
         {section === "audit" ? <AuditHistory patientId={patientId!} /> : null}
-        {section === "operations" && globalMode ? <OperationsConsole key={context.userId} /> : null}
+        {section === "operations" && globalMode ? <OperationsConsole key={context.userId} actorId={context.userId} /> : null}
         {section === "import" && (
           <section className={panelClass}>
             <h2 className="font-bold">Importar protocolos físicos 1–11</h2>

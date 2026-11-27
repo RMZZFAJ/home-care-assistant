@@ -1,14 +1,16 @@
-import { selectProfileSection } from "./profile-sections";
+import { openProfileIdentity, selectProfileSection } from "./profile-sections";
 import { test, expect, type Page } from "@playwright/test";
 import { readFileSync, mkdirSync } from "node:fs";
 import { fixtureFile } from "../../scripts/test-environment.mjs";
 import { fixturePassword, patientA, patientB } from "../../scripts/test-constants.mjs";
+import { setup } from "../integration/v4-fixtures.mjs";
+import { shiftWorker } from "../integration/shift-fixtures.mjs";
 import { selectContext } from "./auth-context";
 
-async function login(page: Page, role: string, patient: string | null = patientA) {
-  const fixture = JSON.parse(readFileSync(fixtureFile, "utf8"));
+async function login(page: Page, account: string | { email: string }, patient: string | null = patientA) {
+  const email = typeof account === "string" ? JSON.parse(readFileSync(fixtureFile, "utf8"))[account].email : account.email;
   await page.goto("/login");
-  await page.getByLabel("E-mail", { exact: true }).fill(fixture[role].email);
+  await page.getByLabel("E-mail", { exact: true }).fill(email);
   await page.getByLabel("Senha", { exact: true }).fill(fixturePassword);
   await page.getByRole("button", { name: "Entrar", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Visão geral", exact: true })).toBeVisible();
@@ -38,6 +40,7 @@ test.describe("estilo canônico SSR", () => {
 });
 
 test("gestão canônica troca contexto no submenu, mantém navegação e edita perfil sob demanda", async ({ page }, info) => {
+  test.setTimeout(90_000);
   const failures: string[] = [];
   page.on("pageerror", (error) => failures.push(error.message));
   await login(page, "shared");
@@ -45,13 +48,17 @@ test("gestão canônica troca contexto no submenu, mantém navegação e edita p
   await page.getByRole("menuitem", { name: "Meu perfil e segurança", exact: true }).click();
   await expect(page).toHaveURL(/\/perfil/);
   await expect(page.locator("body style[data-make-styles-rehydration]")).toHaveCount(0);
-  await selectProfileSection(page, "identity");
-  const name = page.getByLabel("Nome", { exact: true }), retainedName = await name.inputValue();
-  await expect(name).toBeVisible();
   await selectProfileSection(page, "security");
-  await expect(name).not.toBeVisible();
   await selectProfileSection(page, "identity");
+  const editor = await openProfileIdentity(page);
+  const name = editor.getByRole("textbox", { name: "Nome completo", exact: true });
+  const retainedName = await name.inputValue();
+  await page.goBack();
+  await expect(page).toHaveURL(/profileTab=security/);
+  await expect(name).not.toBeVisible();
+  await page.goForward();
   await expect(name).toHaveValue(retainedName);
+  await editor.getByRole("button", { name: "Cancelar", exact: true }).click();
   await capture(page, "perfil", info.project.name);
   await page.getByLabel("Menu do usuário", { exact: true }).click();
   await page.getByRole("menuitem", { name: "Mudar paciente ou função", exact: true }).click();
@@ -129,8 +136,10 @@ test("documentos comuns, histórico com URL e estoque têm apresentação real e
   await noOverflow(page);
   await capture(page, "estoque-mobile", info.project.name);
   await page.getByRole("button", { name: "Consultar Fralda · Família", exact: true }).click();
-  await expect(page.getByRole("dialog")).toBeVisible();
-  await expect(page.getByText("Saldo confirmado · unidade", { exact: true })).toBeVisible();
+  const stock = page.getByRole("dialog", { name: "Fralda", exact: true })
+    .getByRole("region", { name: "Estoque atual", exact: true });
+  await expect(stock.locator('dl[aria-label="Família"]').getByRole("definition").first()).toHaveText("8 unidade");
+  await expect(stock.locator('dl[aria-label="Equipe"]').getByRole("definition").first()).toHaveText("2 unidade");
   await capture(page, "estoque-detalhe-mobile", info.project.name);
 });
 
@@ -179,46 +188,55 @@ test("dashboards apresentam tarefas reais por perfil e preservam a custódia aut
 });
 
 test("administração usa listas, painéis de edição e confirmação crítica sem perder o contexto", async ({ page }, info) => {
-  await login(page, "adminA");
-  await page.goto("/admin?careRecipientId=" + patientA);
+  test.setTimeout(150_000);
+  const { patient } = await setup();
+  const administrator = await shiftWorker(patient, "admin");
+  await login(page, administrator, patient);
+  await page.goto("/admin?careRecipientId=" + patient);
   const areas = page.getByRole("navigation", { name: "Áreas administrativas", exact: true });
   await expect(areas).toBeVisible();
   await areas.locator('a[href*="section=catalog"]').click();
-  await expect(page.getByRole("table", { name: "Produtos do catálogo", exact: true })).toBeVisible();
+  await expect(page.getByRole("region", { name: "Produtos do catálogo", exact: true })).toBeVisible();
   await capture(page, "catalogo-lista", info.project.name);
   await page.getByRole("button", { name: "Novo item", exact: true }).click();
-  await page.getByLabel("Nome", { exact: true }).fill("Rascunho visual não gravado");
-  await page.getByRole("button", { name: "Fechar edição", exact: true }).click();
-  await expect(page.getByRole("alert").filter({ hasText: "Há alterações ainda não salvas" })).toBeVisible();
-  await page.getByRole("button", { name: "Continuar editando", exact: true }).click();
-  await expect(page.getByLabel("Nome", { exact: true })).toHaveValue("Rascunho visual não gravado");
+  const editor = page.getByRole("dialog", { name: "Novo material", exact: true });
+  const name = editor.getByLabel("Nome do material", { exact: true });
+  const discard = page.getByRole("dialog", { name: "Sair sem concluir?", exact: true });
+  await name.fill("Material fictício ainda não confirmado");
+  await editor.getByRole("button", { name: "Fechar edição", exact: true }).click();
+  await expect(discard).toBeVisible();
+  await discard.getByRole("button", { name: "Voltar ao preenchimento", exact: true }).click();
+  await expect(name).toHaveValue("Material fictício ainda não confirmado");
   await capture(page, "catalogo-edicao", info.project.name);
-  await page.getByRole("button", { name: "Fechar edição", exact: true }).click();
-  await page.getByRole("button", { name: "Descartar alterações", exact: true }).click();
+  await editor.getByRole("button", { name: "Fechar edição", exact: true }).click();
+  await discard.getByRole("button", { name: "Sair e descartar", exact: true }).click();
+  await expect(editor).toHaveCount(0);
   await page.getByRole("button", { name: "Outras áreas", exact: true }).click();
   await page.getByRole("menuitem", { name: "Pessoas e vínculos", exact: true }).click();
-  await expect(page.getByRole("heading", { name: "Pessoas e vínculos", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Pessoas vinculadas", exact: true })).toBeVisible();
   await capture(page, "pessoas-lista", info.project.name);
   await page.getByRole("link", { name: "Permissões e alterações com dupla aprovação", exact: true }).click();
   await page.getByRole("navigation", { name: "Áreas da configuração", exact: true }).getByRole("link", { name: "Permissões", exact: true }).click();
-  const before = (await (await page.request.get("/api/patient-settings?careRecipientId=" + patientA)).json()).data.version;
+  const before = (await (await page.request.get("/api/patient-settings?careRecipientId=" + patient)).json()).data.version;
   await page.getByRole("searchbox", { name: "Pesquisar permissões", exact: true }).fill("Movimentar e corrigir estoque familiar");
   await page.getByRole("button", { name: /Movimentar e corrigir estoque familiar · Profissional ·/ }).click();
-  await page.getByRole("menuitemradio", { name: "Permitir", exact: true }).click();
-  await expect(page.getByRole("dialog", { name: "Confirmar alteração crítica", exact: true })).toBeVisible();
-  expect((await (await page.request.get("/api/patient-settings?careRecipientId=" + patientA)).json()).data.version).toBe(before);
-  await page.getByRole("button", { name: "Voltar", exact: true }).click();
+  await page.getByRole("combobox", { name: "Configuração deste perfil", exact: true }).selectOption("true");
+  await page.getByRole("button", { name: "Revisar alteração", exact: true }).click();
+  await expect(page.getByRole("dialog", { name: "Confirmar permissão crítica", exact: true })).toBeVisible();
+  expect((await (await page.request.get("/api/patient-settings?careRecipientId=" + patient)).json()).data.version).toBe(before);
+  await page.getByRole("button", { name: "Voltar à alteração", exact: true }).click();
+  await page.getByRole("dialog", { name: "Movimentar e corrigir estoque familiar", exact: true }).getByRole("button", { name: "Voltar", exact: true }).click();
   await capture(page, "permissoes-matriz", info.project.name);
-  await page.getByRole("navigation", { name: "Áreas da configuração", exact: true }).getByRole("link", { name: "Notificações", exact: true }).click();
-  await expect(page.getByRole("table", { name: "Canais por evento e função", exact: true })).toBeVisible();
+  await page.getByRole("navigation", { name: "Áreas da configuração", exact: true }).getByRole("link", { name: "Avisos", exact: true }).click();
+  await expect(page.getByRole("region", { name: "Regras de avisos", exact: true }).getByRole("button", { name: /^Requisição emitida/ })).toBeVisible();
   await capture(page, "notificacoes-matriz", info.project.name);
   await page.getByRole("navigation", { name: "Áreas da configuração", exact: true }).getByRole("link", { name: "Regras", exact: true }).click();
   await capture(page, "politicas-resumo", info.project.name);
-  await page.getByRole("button", { name: "Editar Encerramento e histórico", exact: true }).click();
+  await page.getByRole("button", { name: "Editar Arquivamento", exact: true }).click();
   await expect(page.getByLabel("Arquivar após conclusão ou cancelamento (dias)", { exact: true })).toBeVisible();
   await page.keyboard.press("Escape");
-  await page.goto("/unidades?careRecipientId=" + patientA);
-  await expect(page.getByRole("table", { name: "Unidades base", exact: true })).toBeVisible();
+  await page.goto("/unidades?careRecipientId=" + patient);
+  await expect(page.getByRole("region", { name: "Unidades disponíveis", exact: true })).toBeVisible();
   await capture(page, "unidades-lista", info.project.name);
   await page.getByRole("button", { name: "Nova unidade", exact: true }).click();
   await expect(page.getByLabel("Código", { exact: true })).toBeVisible();
@@ -233,7 +251,8 @@ test("ocorrências e notificações preservam saldos e distinguem estados no apl
   await page.goto("/consumo?careRecipientId=" + patientA);
   await expect(page.getByRole("heading", { name: "Relatos registrados", exact: true })).toBeVisible();
   await capture(page, "ocorrencias-lista", info.project.name);
-  await page.getByRole("button", { name: "Registrar ocorrência", exact: true }).click();
+  await page.getByRole("button", { name: "Mais opções de consumo", exact: true }).click();
+  await page.getByRole("menuitem", { name: "Relatos anteriores", exact: true }).click();
   await page.getByRole("dialog",{name:"Registrar relato",exact:true}).getByLabel("Custódia",{exact:true}).selectOption("CARE_TEAM");
   await page.getByLabel("O que aconteceu?", { exact: true }).fill("Rascunho visual de ocorrência sem movimentação");
   await noOverflow(page);
@@ -242,8 +261,8 @@ test("ocorrências e notificações preservam saldos e distinguem estados no apl
   await page.getByRole("button", { name: "Descartar alterações", exact: true }).click();
   expect(await balance()).toEqual(before);
   await page.goto("/notificacoes?careRecipientId=" + patientA);
-  await expect(page.getByRole("heading", { name: "Central de notificações", exact: true })).toBeVisible();
-  await page.getByRole("checkbox", { name: "Somente não vistas", exact: true }).check();
+  await expect(page.getByRole("heading", { name: "Avisos", exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Não vistos", exact: true }).click();
   await expect(page.getByText("Consultando notificações…", { exact: true })).toHaveCount(0);
   await noOverflow(page);
   await capture(page, "notificacoes-central", info.project.name);

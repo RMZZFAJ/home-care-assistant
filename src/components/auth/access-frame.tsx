@@ -4,8 +4,20 @@ import { Icon } from "@/components/ui/primitives";
 import "./access-frame.css";
 
 type AccessStep = "login" | "recovery" | "invitation";
-export function PublicHeader({ label = "Acesso pessoal" }: { label?: string }) {
-  return <header className="hca-access-header"><Link href="/" className="app-brand" aria-label="Home Care Assistant — início"><span><Icon name="home" /></span><strong>Home Care Assistant<small>Organização do cuidado em casa</small></strong></Link><span className="hca-access-header-label">{label}</span></header>;
+export function PublicHeader({ label = "Acesso pessoal", verification }: {
+  label?: string;
+  verification?: { onStart: () => void; help: ReactNode };
+}) {
+  return <header className="hca-access-header">
+    {verification ? <button type="button" className="app-brand" aria-label="Início da verificação" onClick={verification.onStart}>
+      <span><Icon name="heart" width={22} height={22} /></span>
+      <strong>Home Care<small>Assistant</small></strong>
+    </button> : <Link href="/" className="app-brand" aria-label="Home Care Assistant — início">
+      <span><Icon name="home" /></span>
+      <strong>Home Care Assistant<small>Organização do cuidado em casa</small></strong>
+    </Link>}
+    {verification?.help ?? <span className="hca-access-header-label">{label}</span>}
+  </header>;
 }
 
 /** Public journeys share the model's frame without exposing private navigation. */

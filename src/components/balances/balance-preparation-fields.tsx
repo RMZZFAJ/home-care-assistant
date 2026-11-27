@@ -1,21 +1,23 @@
 "use client";
 import {
   ActionButton,
+  ActionLink,
   CheckboxField,
   FormField,
   SelectField,
   TextAreaField,
   TextInput,
 } from "@/components/ui/controls";
+import { Notice } from "@/components/workspace";
 import { SearchSelect } from "@/components/ui/search-select";
 import { useState, type RefObject } from "react";
-import { formatZonedDate } from "@/lib/schedules/time";
+import { formatZonedDate, localMinute } from "@/lib/schedules/time";
 import type { BalancePreparationPurpose } from "@/lib/forms/balance-preparation-purposes";
 import type {
   BalancePreparationFields as Values,
   BalancePreparationReference,
 } from "@/lib/validation/balance-preparations";
-import { DeferralFacts } from "./balance-deferral-facts";
+import { DeferralAssignmentFacts, DeferralFacts } from "./balance-deferral-facts";
 import { weekDays } from "./balance-forms";
 const timezones = [
   "America/Sao_Paulo",
@@ -37,7 +39,9 @@ export function BalancePreparationFields({
   onReview,
   canReview,
   allowDeferral,
+  canReadSchedule,
   reasonRef,
+  requiresReason,
   error,
 }: {
   purpose: BalancePreparationPurpose;
@@ -48,7 +52,9 @@ export function BalancePreparationFields({
   onReview: () => void;
   canReview: boolean;
   allowDeferral: boolean;
+  canReadSchedule: boolean;
   reasonRef: RefObject<HTMLTextAreaElement | null>;
+  requiresReason: boolean;
   error?: string;
 }) {
   const [now] = useState(() => Date.now());
@@ -87,6 +93,10 @@ export function BalancePreparationFields({
     person = (data?.professionals ?? []).find(
       (p) => p.id === values.professionalId,
     );
+  const needsLaterShift = purpose === "defer" || purpose === "request_deferral";
+  const noDestination = Boolean(reference && a && needsLaterShift && !targets.length);
+  const agendaQuery = noDestination && canReadSchedule && reference ? new URLSearchParams({ careRecipientId: reference.patientId }) : null;
+  if (agendaQuery && a && zone) agendaQuery.set("day", localMinute(a.starts_at, zone).slice(0, 10));
   const label = (t: (typeof targets)[number]) =>
     `${t.professional_name} · ${t.type_name} · ${fmt(t.starts_at)} → ${fmt(t.ends_at)}`;
   const decisionAvailable =
@@ -106,11 +116,12 @@ export function BalancePreparationFields({
       {purpose === "configure" ? (
         <>
           <CheckboxField
+            role="switch"
             name="enabled"
-            label="Processamento automático neste paciente"
+            label="Balanços programados"
             checked={values.enabled === "true"}
             onChange={(e) =>
-              onChange({ enabled: String(e.currentTarget.checked) })
+              onChange({ enabled: String(e.currentTarget.checked), reason: "" })
             }
           />
           <p>
@@ -156,7 +167,7 @@ export function BalancePreparationFields({
                 .filter((t) => t.is_active)
                 .map((t) => (
                   <option key={t.id} value={t.id}>
-                    {t.name} · {t.starts_local.slice(0, 5)} ·{" "}
+                    {t.name} · {t.rest_hours == null ? t.starts_local.slice(0, 5) + " · " : ""}
                     {t.duration_minutes / 60}h
                   </option>
                 ))}
@@ -222,11 +233,9 @@ export function BalancePreparationFields({
           </FormField>
         </>
       ) : null}
-      {purpose === "defer" || purpose === "request_deferral" ? (
+      {needsLaterShift ? (
         <>
-          <p>
-            Plantão atual: {fmt(a?.starts_at)} até {fmt(a?.ends_at)}.
-          </p>
+          {a ? <DeferralAssignmentFacts assignment={a} timezone={zone} /> : null}
           <p>
             {purpose === "request_deferral"
               ? "O adiamento depende de aprovação familiar. A pendência e o prazo originais continuam válidos até a decisão."
@@ -270,7 +279,13 @@ export function BalancePreparationFields({
       {purpose === "assign" ||
       purpose === "defer" ||
       purpose === "request_deferral" ? (
-        <>
+        noDestination ? (
+          <Notice>
+            <strong>Não há outro plantão disponível</strong>
+            <p>Peça à família que cadastre um plantão elegível. O pedido precisa indicar quem fará a contagem e quando.</p>
+            {agendaQuery ? <ActionLink href={`/escalas?${agendaQuery}`}>Ver agenda</ActionLink> : null}
+          </Notice>
+        ) : <>
           <FormField
             label="Plantão de destino"
             required
@@ -325,22 +340,42 @@ export function BalancePreparationFields({
           ) : null}
         </>
       ) : null}
-      <FormField
-        label="Justificativa"
-        required
-        error={error}
-        helpText={`${(values.reason ?? "").length}/1000 caracteres. Motivo próprio; não substitui o motivo da solicitação original.`}
-      >
-        <TextAreaField
-          ref={reasonRef}
-          name="reason"
-          value={values.reason ?? ""}
-          onChange={(e) => onChange({ reason: e.currentTarget.value })}
+      {purpose === "configure" ? (
+        <FormField
+          label="Observação (opcional)"
+          helpText="Acrescente um detalhe que ajude a entender a rotina de contagem."
+        >
+          <TextAreaField
+            ref={requiresReason ? undefined : reasonRef}
+            name="observation"
+            value={values.observation ?? ""}
+            onChange={(e) => onChange({ observation: e.currentTarget.value })}
+            maxLength={1000}
+          />
+        </FormField>
+      ) : null}
+      {requiresReason && (!noDestination || values.reason) ? (
+        <FormField
+          label="Justificativa"
           required
-          minLength={3}
-          maxLength={1000}
-        />
-      </FormField>
+          error={error}
+          helpText={
+            purpose === "configure"
+              ? "Explique por que a programação será pausada."
+              : `${(values.reason ?? "").length}/1000 caracteres. Motivo próprio; não substitui o motivo da solicitação original.`
+          }
+        >
+          <TextAreaField
+            ref={reasonRef}
+            name="reason"
+            value={values.reason ?? ""}
+            onChange={(e) => onChange({ reason: e.currentTarget.value })}
+            required
+            minLength={3}
+            maxLength={1000}
+          />
+        </FormField>
+      ) : null}
       <ActionButton
         variant="primary"
         type="submit"

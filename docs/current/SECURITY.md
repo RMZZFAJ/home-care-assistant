@@ -102,6 +102,21 @@ Helpers internos não são executáveis livremente. Funções privilegiadas têm
 search_path controlado. Serviço não possui DML público geral: usa a allowlist
 de RPCs de worker, evidências e webhook. Toda nova função exige grant próprio.
 
+Exceções de permissão são vinculadas à pessoa na residência. O banco revalida
+vínculo, versão e confirmação individual antes de ampliar o acesso. O perfil
+inteiro só pode receber permissões dentro da elegibilidade da função.
+`access.manage` exige sessão com a garantia de autenticação administrativa
+e contexto local. A aplicação impede autoelevação, preserva um administrador
+local com poderes efetivos e registra a mudança anterior e posterior.
+Decisões independentes e atribuições físicas preservam seus próprios requisitos.
+
+A exceção de contagem vale para BAL facultativo. Na programação vigente,
+contar continua exigindo plantão válido e atribuição da própria pessoa.
+O autor do pedido de adiamento depende de decisão de outra pessoa.
+No consumo, leitura coletiva do estoque familiar não autoriza relato nessa
+custódia fora das funções de família e administração. A exceção exige
+confirmação individual no relato e leitura vigente da custódia familiar.
+
 Ledger e eventos confirmados são imutáveis para clientes. Saldo vem de
 movimentos transacionais não negativos. SHA-256 compara conteúdo canônico;
 não é assinatura assimétrica nem proteção contra administradores do banco.
@@ -148,17 +163,31 @@ exigem autenticação recente. Telefone usado em aceite WhatsApp deriva do
 telefone confirmado no Auth. Dados de perfil ou do navegador não comprovam
 posse de telefone. Tokens já emitidos expiram conforme a política do Auth.
 
+O diálogo de sessão recente usa a senha somente em contas com acesso por
+e-mail e senha sem fator adicional verificado. Em contas com MFA ou provedor
+externo, o fluxo retorna à entrada pelo método da conta. O servidor só
+adota a nova sessão após validar a identidade e reaplicar o contexto
+autorizado. O fluxo de contato exige confirmação do Auth e recusa enviar
+pedidos de e-mail ou SMS quando a configuração permitir confirmação
+automática. O Google depende tanto da configuração do aplicativo como da
+habilitação do provedor.
+
 A política de novas senhas respeita o limite do bcrypt configurado no Auth,
 inclusive tamanho em bytes; o aplicativo não calcula hashes de credenciais.
+A confirmação da senha atual usa uma sessão provisória descartada no
+servidor. A alteração usa a sessão original e conserva o nível de
+autenticação já verificado. Quando existe fator confirmado, alterar senha
+e solicitar o encerramento das outras sessões exige AAL2.
 A referência é o
 [código oficial do Auth](https://github.com/supabase/auth/blob/master/internal/api/password.go).
 OAuth, confirmação de e-mail e SMS reais exigem configuração e teste próprios.
 
 TOTP usa exclusivamente os contratos oficiais Supabase Auth. Após cadastrar e
 confirmar um fator, operações administrativas exigem AAL2. Token AAL1, fator
-apenas iniciado ou sessão revogada não satisfazem a exigência. O QR privado
-não
-entra em logs, documentação ou artefatos versionados.
+apenas iniciado ou sessão revogada não satisfazem a exigência. A remoção do
+autenticador usa confirmação de código e confirmação explícita do método.
+O QR privado fica no cadastro em curso, fora de logs, documentação ou
+artefatos versionados.
 
 ## WhatsApp e Flows
 

@@ -2,6 +2,7 @@ import { confirmDecisionAndReconcile } from "./l1-decision-policy";
 import { selectDocumentSection } from "./document-sections";
 import { generatedPdf } from "./generated-pdf";
 import { test, expect, type Page } from "@playwright/test";
+import { finishBalanceMaterials } from "./balance-wizard-stages";
 import { createHash } from "node:crypto";
 import { mkdirSync, writeFileSync } from "node:fs";
 import {
@@ -92,7 +93,7 @@ test("BAL reconto preserva Juliana, transfere a Sheila no mesmo plantão e conci
   await login(page, fixtures.family.email, f.patient);
   await page.goto("/fichas/" + f.document.id);
   await expect(page.getByRole("region", { name: "Próximo passo sugerido", exact: true })).toContainText("Acompanhar as revisões do balanço");
-  await selectDocumentSection(page, "workflow");
+  await selectDocumentSection(page, "counts");
   await page
     .getByRole("link", { name: "Designar reconto", exact: true })
     .click();
@@ -158,7 +159,7 @@ test("BAL reconto preserva Juliana, transfere a Sheila no mesmo plantão e conci
   await action(page, "Consultar acompanhamento atual").click();
   await expect(editor(page)).toHaveCount(0);
   await expect(
-    page.getByRole("heading", { name: "Programação do balanço", exact: true }),
+    page.getByRole("heading", { name: "Previstos", exact: true }),
   ).toBeFocused();
   const second = await substitute(f),
     current = await workspace(second.client, f.patient);
@@ -180,6 +181,7 @@ test("BAL reconto preserva Juliana, transfere a Sheila no mesmo plantão e conci
     await expect(
       counter.getByRole("heading", { name: "Balanço de estoque", exact: true }),
     ).toBeVisible();
+    await counter.getByRole("button", { name: "Iniciar contagem", exact: true }).click();
     const catalogue = (
       await (
         await counter.request.get("/api/catalog?careRecipientId=" + f.patient)
@@ -192,6 +194,7 @@ test("BAL reconto preserva Juliana, transfere a Sheila no mesmo plantão e conci
       await expect(field).toHaveValue("");
       await field.fill(product.id === f.products[0] ? "1" : "0");
     }
+    await finishBalanceMaterials(counter);
     await expect(
       counter.getByLabel("Observações da contagem", { exact: true }),
     ).toHaveValue("");
@@ -242,7 +245,7 @@ test("BAL reconto preserva Juliana, transfere a Sheila no mesmo plantão e conci
     `update public.capability_overrides set enabled=true where care_recipient_id=${sqlLiteral(f.patient)} and subject_user=${sqlLiteral(fixtures.family.id)} and capability='bal.approve.family';`,
   );
   await page.goto("/fichas/" + f.document.id);
-  await selectDocumentSection(page, "workflow");
+  await selectDocumentSection(page, "reviews");
   await page
     .getByRole("button", { name: "Revisão da família", exact: true })
     .click();
@@ -269,7 +272,9 @@ test("BAL reconto preserva Juliana, transfere a Sheila no mesmo plantão e conci
   await page.getByRole("button", { name: "Aplicar contagem pelo grupo familiar", exact: true }).click();
   const application = page.getByRole("dialog", { name: "Aplicar contagem ao estoque", exact: true });
   await application.getByRole("button", { name: "Confirmar aplicação da contagem", exact: true }).click();
-  await expect(application).toHaveCount(0);
+  const applied = page.getByRole("dialog", { name: "Contagem aplicada", exact: true });
+  await expect(applied).toContainText(f.document.code);
+  await applied.getByRole("button", { name: "Concluir", exact: true }).click();
   const document = (
     await (await page.request.get("/api/documents/" + f.document.id)).json()
   ).data as SupplyDocument;
@@ -497,7 +502,7 @@ test("BAL reconto sem contador mostra recuperação, preserva motivo no conflito
   await action(page, "Consultar acompanhamento atual").click();
   await expect(editor(page)).toHaveCount(0);
   await expect(
-    page.getByRole("heading", { name: "Programação do balanço", exact: true }),
+    page.getByRole("heading", { name: "Previstos", exact: true }),
   ).toBeFocused();
   await expect(recovery).toHaveCount(0);
 });

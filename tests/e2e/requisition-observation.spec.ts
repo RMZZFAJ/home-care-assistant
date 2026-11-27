@@ -109,11 +109,23 @@ test("E04-03 revisa materiais solicitados durante o preenchimento sem descartar 
   await consult.click();
   const earlierDocument = page.getByRole("dialog", { name: earlierCode, exact: true });
   await expect(earlierDocument).toBeVisible();
-  await earlierDocument.getByRole("button", { name: "Voltar à origem", exact: true }).click();
-  await expect(consult).toBeFocused();
+  const justification = first.getByLabel("Motivo para manter", { exact: true });
+  await page.clock.install();
+  await page.clock.pauseAt(new Date(Date.now() + 500));
+  try {
+    await earlierDocument.getByRole("button", { name: "Voltar à origem", exact: true }).press("Enter");
+    await expect(earlierDocument).toHaveCount(0);
+    await expect(consult).toBeFocused();
+    await justification.focus();
+    await expect(justification).toBeFocused();
+    await page.clock.runFor(32);
+    await expect(justification).toBeFocused();
+  } finally {
+    await page.clock.resume();
+  }
   await expect(first.getByRole("button", { name: "Manter na ficha", exact: true })).toBeDisabled();
   const reason = "A equipe precisa de reposição adicional.";
-  await first.getByLabel("Motivo para manter", { exact: true }).fill(reason);
+  await justification.fill(reason);
   await first.getByRole("button", { name: "Manter na ficha", exact: true }).click();
 
   const second = page.getByRole("dialog", { name: "Quer manter Compressa fictícia nesta requisição?" });
@@ -503,7 +515,7 @@ test("observação REQ preserva 0, 7, desconhecido, vazio e horários ao retomar
     const fullValue = observed ? `${line.currentStock} ${line.unit} (observado)` : shortValue;
     await expect(material.locator(".hca-v7-material-facts > span").filter({ hasText: "Informado na REQ" }).locator("b")).toHaveText(shortValue);
     await material.click();
-    const panel = page.getByRole("dialog").filter({ has: page.getByRole("heading", { name: "Em acompanhamento nesta ficha", exact: true }) });
+    const panel = page.getByRole("dialog").filter({ has: page.getByRole("heading", { name: "Material nesta ficha", exact: true }) });
     await expect(panel.getByText("Informado nesta REQ", { exact: true }).locator("..")).toContainText(fullValue);
     await expect(panel.getByText("Registro no rascunho (horário do dispositivo):", { exact: false }).first()).toBeVisible();
     await panel.getByRole("button", { name: "Voltar à ficha", exact: true }).click();

@@ -15,9 +15,16 @@ async function widths(page:Page,label:string){for(const width of [320,390,768,14
 test("aviso localiza o plantão futuro no fuso próprio, evento BAL e alerta sem criar nova obrigação",async({page})=>{
  const f=await referenceFixture(),before=reminderState(f);await login(page,f);
  await page.goto(path("/notificacoes",f,f.scheduleRef));
- // A notification's stored reference, not its creation day, selects the agenda.
- const destination=path("/escalas",f,f.scheduleRef);const link=page.locator(`a[href="${destination}"]`).first();
- await expect(link).toBeVisible();await link.click();
+ const inbox = await page.request.get("/api/notifications?careRecipientId=" + f.patient + "&q=Plantão+alterado");
+ expect(inbox.ok()).toBe(true);
+ const scheduleNotice = (await inbox.json()).data.find((row: { reminder_id?: string }) => row.reminder_id === f.scheduleRef);
+ expect(scheduleNotice).toBeTruthy();
+ const row = page.getByRole("region", { name: "Acompanhamento pessoal", exact: true }).locator(`li[data-notification-id="${scheduleNotice.id}"]`);
+ await row.getByRole("button", { name: "Ver aviso de Plantão alterado", exact: true }).click();
+ const detail = page.getByRole("dialog", { name: "Plantão alterado", exact: true });
+ await detail.getByRole("button", { name: "Abrir escalas e plantões", exact: true }).click();
+ await expect(page).toHaveURL(url => url.pathname === "/escalas" && url.searchParams.get("careRecipientId") === f.patient &&
+   url.searchParams.get("ref") === f.scheduleRef && url.searchParams.get("refKind") === "reminder");
  await expect(page.getByLabel("Data de referência",{exact:true})).toHaveValue(f.day);await expect(card(page)).toContainText("Alteração fictícia para referência individual");
  await expect(card(page)).toContainText("America/Manaus");await expect(card(page)).toContainText("Referência atual autorizada");await widths(page,"D3 exact future schedule");
  await page.goto(path("/balancos",f,f.balanceRef));await expect(card(page).getByRole("heading",{name:"Atribuição indicada pelo aviso",exact:true})).toBeVisible();await widths(page,"D3 BAL event reference");
@@ -41,10 +48,30 @@ test("lembrete pessoal exige revisão e recupera sem ocorrências após recarga 
 });
 test("ocorrência mantém origem e equipe congeladas, recupera resposta perdida e abre o relato vinculado",async({page})=>{
  const f=await personalReminderFixture(),before=JSON.parse(reminderState(f)),text="Falta fictícia vinculada ao lembrete "+randomUUID(),packets:Record<string,unknown>[]=[];await login(page,f);await page.goto(path("/consumo",f,f.reminder));
- await card(page).getByRole("button",{name:"Registrar ocorrência deste lembrete",exact:true}).click();const drawer=page.getByRole("dialog",{name:"Registrar relato",exact:true});await expect(drawer.getByRole("region",{name:"Origem preservada do relato",exact:true})).toBeVisible();await expect(drawer.getByLabel("Custódia",{exact:true})).toBeDisabled();await drawer.getByLabel("Tipo",{exact:true}).selectOption("shortage");await drawer.getByLabel("O que aconteceu?",{exact:true}).fill(text);await drawer.getByRole("button",{name:"Revisar relato",exact:true}).click();
- await page.route("**/api/consumption/preparations/commit",async route=>{if(route.request().method()!=="POST")return route.continue();packets.push(route.request().postDataJSON());if(packets.length===1){const response=await route.fetch();expect(response.ok(),await response.text()).toBe(true);return route.abort("failed");}return route.continue();});
- await drawer.getByRole("button",{name:"Registrar relato sem desconto",exact:true}).click();await drawer.getByRole("button",{name:"Recuperar tentativa",exact:true}).click();await expect(drawer).toHaveCount(0);expect(packets).toHaveLength(2);expect(packets[1]).toEqual(packets[0]);expect(packets[0]).toMatchObject({command:{reminderId:f.reminder,location:"CARE_TEAM"}});
- const after=JSON.parse(reminderState(f));expect(after.reports).toHaveLength(1);expect(after.reports[0]).toMatchObject({source_reminder_id:f.reminder,body:text,status:"reported"});expect(after.stock).toEqual(before.stock);
+ await expect(card(page).getByRole("button",{name:"Registrar consumo deste lembrete",exact:true})).toBeVisible();
+ await card(page).getByRole("button",{name:"Avisar falta deste lembrete",exact:true}).click();
+ const drawer=page.getByRole("dialog",{name:"Avisar falta à família",exact:true});
+ await expect(drawer.getByRole("region",{name:"Origem preservada do relato",exact:true})).toContainText("Estoque da equipe");
+ await expect(drawer.getByLabel("Custódia",{exact:true})).toHaveCount(0);
+ await drawer.getByLabel("Mensagem para a família",{exact:true}).fill(text);
+ await page.route("**/api/consumption/records",async route=>{
+  if(route.request().method()!=="POST")return route.continue();
+  packets.push(route.request().postDataJSON());
+  const response=await route.fetch();expect(response.ok(),await response.text()).toBe(true);
+  return route.abort("failed");
+ });
+ await drawer.getByRole("button",{name:"Enviar aviso",exact:true}).click();
+ const recovered=page.waitForResponse(response=>{
+  const url=new URL(response.url());
+  return url.pathname==="/api/consumption/records" && response.request().method()==="GET"
+   && url.searchParams.get("idempotencyKey")===packets[0]?.idempotencyKey;
+ });
+ await drawer.getByRole("button",{name:"Conferir resultado",exact:true}).click();
+ expect((await recovered).ok()).toBe(true);
+ await expect(drawer).toHaveCount(0);
+ expect(packets).toHaveLength(1);
+ expect(packets[0]).toMatchObject({action:"shortage",reminderId:f.reminder});
+ const after=JSON.parse(reminderState(f));expect(after.reports).toHaveLength(1);expect(after.reports[0]).toMatchObject({source_reminder_id:f.reminder,body:text,location:"CARE_TEAM",status:"communicated"});expect(after.stock).toEqual(before.stock);
  await expect(page.getByRole("region",{name:"Detalhe do relato",exact:true})).toContainText(text);await page.getByRole("link",{name:"Consultar lembrete de origem",exact:true}).click();await expect(card(page)).toContainText("1 relato(s) vinculado(s)");await card(page).getByRole("link",{name:/Relato de falta/}).click();await expect(page.getByRole("region",{name:"Detalhe do relato",exact:true})).toContainText(text);await page.getByRole("link",{name:"Consultar lembrete de origem",exact:true}).click();await expect(card(page)).toContainText("Lembrete de registro de ocorrências");await widths(page,"D3 linked personal occurrence");
  const all=card(page).getByRole("link",{name:"Consultar todos os relatos deste lembrete",exact:true});await all.click();await expect(page).toHaveURL(new RegExp("sourceReminder="+f.reminder));await expect(page.getByText(text,{exact:true})).toBeVisible();
 });
