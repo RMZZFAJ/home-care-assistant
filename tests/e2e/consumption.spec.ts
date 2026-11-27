@@ -944,6 +944,8 @@ test("relato anterior ao centésimo é acessível por referência e por todas as
     .getByRole("button", { name: "Voltar à lista", exact: true })
     .click();
   await expect(page).not.toHaveURL(/ref=/);
+  await expect(detail(page)).toHaveCount(0);
+  await expect(page.getByRole("heading", { name: "Relatos registrados", exact: true })).toBeFocused();
   await expect(
     page.getByRole("button", { name: "Faltas", exact: true }),
   ).toHaveAttribute("aria-pressed", "true");
@@ -952,13 +954,16 @@ test("relato anterior ao centésimo é acessível por referência e por todas as
   const filters = page.getByRole("button", { name: "Filtrar relatos", exact: true });
   const filterPanel = page.getByRole("dialog", { name: "Filtrar registros", exact: true });
   const openFilters = async () => {
-    if (info.project.use.hasTouch) await filters.focus();
+    if (info.project.use.hasTouch) {
+      // Move focus off the text field before measuring and delivering the touch.
+      await filters.evaluate(button => button.focus({ preventScroll: true }));
+      await expect(filters).toBeFocused();
+    }
     await pressWorkspaceControl(page, filters);
     await expect(filterPanel).toBeVisible();
   };
   const search = page.getByRole("textbox", { name: "Buscar relato ou material", exact: true });
   await search.fill("Relato fictício preservado para decisão");
-  await search.press("Tab");
   await openFilters();
   const viewport = page.viewportSize();
   for (const width of [360, 412]) {
