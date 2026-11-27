@@ -23,15 +23,16 @@ export async function pressWorkspaceControl(page: Page, control: Locator) {
       const { left, top, right, bottom } = element.getBoundingClientRect();
       const x = (Math.max(left, 0) + Math.min(right, innerWidth)) / 2;
       const y = (top + bottom) / 2;
-      if (element.contains(document.elementFromPoint(x, y)))
+      const hit = document.elementFromPoint(x, y);
+      if (element.contains(hit))
         return { x: x - left - element.clientLeft, y: y - top - element.clientTop };
 
-      // WebKit can align a sticky control under the bottom bar when scrolling it into view.
+      // WebKit can align a control behind the fixed navigation or document action button.
       const header = document.querySelector(".app-header")?.getBoundingClientRect();
       const navigation = document.querySelector(".hca-bottom-navigation")?.getBoundingClientRect();
       const topEdge = header?.height ? Math.max(0, header.bottom) : 0;
       const bottomEdge = navigation?.height ? Math.min(innerHeight, navigation.top) : innerHeight;
-      if (y < topEdge || y >= bottomEdge) {
+      if (y < topEdge || y >= bottomEdge || hit?.closest(".hca-document-fab")) {
         window.scrollBy({ top: y - (topEdge + bottomEdge) / 2, behavior: "instant" });
       }
       return null;

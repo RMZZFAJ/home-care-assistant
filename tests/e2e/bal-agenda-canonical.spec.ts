@@ -183,8 +183,12 @@ test("06.3 agenda canonical records retain overnight dates,timezone and native e
     await page.emulateMedia({ forcedColors: "none", reducedMotion: "no-preference" });
     await page.getByLabel("Visualização", { exact: true }).selectOption("day");
     const actions = row.getByRole("button", { name: /^Ações do plantão de / });
-    await actions.focus(); await actions.press("Enter");
+    await actions.focus();
+    await expect(actions).toBeFocused();
+    await expect(actions).toBeEnabled();
+    await actions.press("Enter");
     const picker = page.getByRole("dialog", { name: /^Plantão de / });
+    await expect(picker).toBeVisible();
     await expect(picker.getByRole("button", { name: "Encerrar próximos plantões", exact: true })).toHaveCount(0);
     await picker.getByRole("button", { name: "Trocar profissional", exact: true }).click();
     const dialog = page.getByRole("dialog", { name: "Trocar profissional", exact: true }); await expect(dialog).toBeVisible();

@@ -62,11 +62,18 @@ test("document list rejects malformed totals without presenting an empty or losi
 
 async function traverse(page: Page, order: string[]) {
   const collected: string[] = [];
-  const observed = () => links(page).evaluateAll(nodes => nodes.map(node => new URL((node as HTMLAnchorElement).href).pathname.split("/").at(-1)));
+  const observed = () => links(page).evaluateAll(nodes => nodes.map(node => {
+    const { pathname } = new URL((node as HTMLAnchorElement).href);
+    return pathname.slice(pathname.lastIndexOf("/") + 1);
+  }));
   const navigation = page.getByRole("navigation", { name: "Páginas do histórico", exact: true });
   for (let offset = 0; offset < order.length; offset += 20) {
-    await expect.poll(observed).toEqual(order.slice(offset, offset + 20));
-    collected.push(...await observed() as string[]);
+    let snapshot: string[] = [];
+    await expect.poll(async () => {
+      snapshot = await observed();
+      return snapshot;
+    }).toEqual(order.slice(offset, offset + 20));
+    collected.push(...snapshot);
     if (offset + 20 < order.length) await navigation.getByRole("button", { name: "Próxima", exact: true }).click();
     else await expect(navigation.getByRole("button", { name: "Próxima", exact: true })).toBeDisabled();
   }
