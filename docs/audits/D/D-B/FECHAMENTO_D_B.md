@@ -277,6 +277,28 @@ catálogo, histórico de material, agenda, sino e contingências. O índice de
 contingências estava vazio para a conta de homologação. A consulta trouxe
 22 referências de REQ com versão. Sem sessão, o endpoint respondeu 401.
 
+## CI de 01708749 e correções nos testes de catálogo e COM
+
+Windows, Linux, instalação limpa, replay e 911 integrações passaram. A
+execução de navegador teve 1.858 casos aprovados de primeira e dois na
+retentativa do Playwright. A recuperação do catálogo, os filtros de consumo
+e a recuperação do Push passaram na primeira tentativa em iOS. O GitHub
+executou o workflow uma vez. [CI de 01708749](https://github.com/RMZZFAJ/home-care-assistant/actions/runs/45931684378).
+
+- **Cadastro e inativação no iOS.** Na captura, o campo de nome estava vazio
+  e a revisão ainda não estava aberta. O teste aguarda o foco, digita o nome
+  e confere seu valor antes da revisão. A confirmação continua exigindo a
+  resposta do servidor e a leitura do mesmo material após inativação.
+- **Conversão da COM no Android.** O teste abre Materiais pelo endereço
+  da seção. Confere a quantidade da emissão anterior, o recibo e a ausência
+  de crédito duplicado. O toque nas abas continua coberto pelos testes de
+  navegação das fichas.
+
+Passaram seis execuções dirigidas do cadastro e três da conversão em
+Chromium, Android e iOS/WebKit, sem retentativas. Relatórios em
+`output/playwright/pr8-017-catalogue-ready/` e
+`output/playwright/pr8-017-presentation-direct/`.
+
 ## Condições para o merge
 
 - **Revisão e decisões.** As discussões publicadas foram triadas. A correção

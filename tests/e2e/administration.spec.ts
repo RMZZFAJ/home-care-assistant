@@ -1,7 +1,7 @@
 import { selectDocumentSection } from "./document-sections";
 import { pressWorkspaceControl } from "./workspace-controls";
 import { selectContext } from "./auth-context";
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Locator, type Page } from "@playwright/test";
 import { mkdirSync, readFileSync } from "node:fs";
 import { randomUUID } from "node:crypto";
 import { fixturePassword } from "../../scripts/test-constants.mjs";
@@ -118,7 +118,13 @@ test.describe("administração integrada no ambiente local", () => {
     const finalName = `${originalName} revisado`;
     await section(page, patientId, "Catálogo");
     await page.getByRole("button", { name: "Novo item", exact: true }).click();
-    await page.getByLabel("Nome do material", { exact: true }).fill(originalName);
+    const creation = page.getByRole("dialog", { name: "Novo material", exact: true });
+    const initialName = creation.getByRole("textbox", { name: "Nome do material", exact: true });
+    await expect(initialName).toBeEditable();
+    await initialName.focus();
+    await expect(initialName).toBeFocused();
+    await initialName.pressSequentially(originalName);
+    await expect(initialName).toHaveValue(originalName);
     await page
       .getByRole("combobox", { name: "Tipo de material", exact: true })
       .selectOption("higiene");
@@ -126,23 +132,28 @@ test.describe("administração integrada no ambiente local", () => {
     await page
       .getByLabel("Nomes alternativos", { exact: true })
       .fill("Material auxiliar, Apoio operacional");
-    const record = async (action: "Adicionar material" | "Salvar cadastro", result: string) => {
-      await page.getByRole("button", { name: "Revisar material", exact: true }).click();
-      const saved = page.waitForResponse(response => new URL(response.url()).pathname === "/api/admin/catalogue-actions" && response.request().method() === "POST");
-      await page.getByRole("dialog", { name: action + "?", exact: true }).getByRole("button", { name: action, exact: true }).click();
-      const response = await saved;
+    const record = async (editor: Locator, name: string, action: "Adicionar material" | "Salvar cadastro", result: string) => {
+      await expect(editor.getByRole("textbox", { name: "Nome do material", exact: true })).toHaveValue(name);
+      await editor.getByRole("button", { name: "Revisar material", exact: true }).press("Enter");
+      const confirmation = page.getByRole("dialog", { name: action + "?", exact: true });
+      await expect(confirmation).toBeVisible();
+      const [response] = await Promise.all([
+        page.waitForResponse(response => new URL(response.url()).pathname === "/api/admin/catalogue-actions" && response.request().method() === "POST"),
+        confirmation.getByRole("button", { name: action, exact: true }).press("Enter"),
+      ]);
       expect(response.ok()).toBe(true);
       await page.getByRole("dialog", { name: result, exact: true }).getByRole("button", { name: "Concluir", exact: true }).click();
       return response.json();
     };
-    const created = await record("Adicionar material", "Material adicionado");
+    const created = await record(creation, originalName, "Adicionar material", "Material adicionado");
     expect(created).toMatchObject({ state: "recorded", purpose: "create" });
     const productId = created.outcome.productId as string;
     expect(productId).toBeTruthy();
-    await expect(page.getByRole("dialog", { name: "Novo material", exact: true })).toBeHidden();
+    await expect(creation).toBeHidden();
     await page.locator("[data-product-id]").filter({ hasText: originalName }).click();
     await page.getByRole("dialog", { name: originalName, exact: true }).getByRole("button", { name: /^Editar cadastro/ }).click();
-    await expect(page.getByRole("dialog", { name: "Editar material", exact: true })).toBeVisible();
+    const edition = page.getByRole("dialog", { name: "Editar material", exact: true });
+    await expect(edition).toBeVisible();
     await expect(
       page.getByLabel("Nomes alternativos", {
         exact: true,
@@ -152,9 +163,9 @@ test.describe("administração integrada no ambiente local", () => {
     await page
       .getByLabel("Nomes alternativos", { exact: true })
       .fill("Material auxiliar revisado, Apoio operacional");
-    await record("Salvar cadastro", "Cadastro atualizado");
+    await record(edition, finalName, "Salvar cadastro", "Cadastro atualizado");
     const material = page.getByRole("dialog", { name: finalName, exact: true });
-    await expect(page.getByRole("dialog", { name: "Editar material", exact: true })).toHaveCount(0);
+    await expect(edition).toHaveCount(0);
     await pressWorkspaceControl(page, material.getByRole("button", { name: /^Situação e sucessor/ }));
     const identity = page.getByRole("dialog", { name: "Situação do material", exact: true });
     await expect(identity).toBeVisible();

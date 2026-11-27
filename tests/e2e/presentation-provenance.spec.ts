@@ -1,5 +1,4 @@
 import { selectMaterialCategory } from "./material-category";
-import { selectDocumentSection } from "./document-sections";
 import { generatedPdf } from "./generated-pdf";
 import { expect, test, type Page } from "@playwright/test";
 import { mkdirSync, writeFileSync } from "node:fs";
@@ -402,8 +401,8 @@ test("conversão emitida mantém dois pacotes de dez após fator doze e recupera
       `select sum(quantity)::text from public.stock_movements where care_recipient_id=${sqlLiteral(f.patient)} and reference_type='purchase_receipt';`,
     ),
   ).toBe("20.000000");
-  await page.goto("/fichas/" + id);
-  await selectDocumentSection(page, "materials");
+  await page.goto(`/fichas/${id}?documentTab=materials`);
+  await expect(page.getByRole("tab", { name: "Materiais", exact: true })).toHaveAttribute("aria-selected", "true");
   const material = document.lines[0].name_snapshot;
   await page.getByRole("button", { name: "Detalhes de " + material, exact: true }).click();
   const details = page.getByRole("dialog", { name: material, exact: true });
