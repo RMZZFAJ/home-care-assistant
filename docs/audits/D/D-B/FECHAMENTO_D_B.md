@@ -160,14 +160,25 @@ de uma tentativa. Relatório em `output/playwright/d-b-pr8-local-mobile/`.
   [Emissão](../../../../tests/integration/pdf-issuance.test.mjs)
   e [verificação pública](../../../../tests/integration/public-pdf-verification.test.mjs).
 
-**Confirmação de vínculo em E12-06.** A comparação a 360 e 412 px mostrou
-o painel de conferência legível atrás da confirmação. O diálogo usa a
-sobreposição compartilhada também quando está sobre o painel. A revisão do
-registro e a justificativa aparecem na confirmação. O teste passou de
-primeira em Chromium, Android e iOS/WebKit, incluindo a recusa da referência
-desatualizada e a recuperação do vínculo sem repetir o ato. Capturas em
-`output/playwright/l4/` e relatório em
-`output/playwright/l4-link-confirmation-final/`.
+**Confirmação de vínculo em E12-06.** As capturas em 360 e 412 px
+confirmaram o cabeçalho legível acima da sobreposição, o painel de
+conferência desfocado no WebKit e os botões no rodapé em uma linha.
+A confirmação reutiliza o diálogo compartilhado, com o ícone informativo
+no cabeçalho e o ícone de conclusão na ação principal. A revisão do
+registro e a justificativa acrescentam os dados necessários ao vínculo
+real. Voltar à conferência conserva a justificativa.
+
+O teste do vínculo passou em Chromium, Android e iOS/WebKit. O caso
+verifica a recusa da referência desatualizada e a recuperação sem
+repetir o ato. O teste adjacente de declaração com anexo confirmou
+também a acessibilidade do diálogo e a preservação dos fatos físicos.
+Na rodada com trace, o caso adjacente atingiu o limite de tempo no
+iOS durante a captura final, depois das verificações do vínculo. O
+reteste isolado passou no iOS com a configuração de trace da CI.
+O ajuste é local e dispensa migrations. Capturas em
+`output/playwright/l4/`. Registros em
+`output/playwright/l4-link-mobile-parity-final.log` e
+`output/playwright/l4-link-mobile-parity-ios-recheck.log`.
 
 ### Contratos de L1 a L3 exercitados no candidato
 

@@ -70,7 +70,8 @@ export function ContingencyDecision({
   const mayOpenWorkflow = can(context, workflow.capability);
   const queryHref = workflow.path + "?" + new URLSearchParams({ careRecipientId: dossier.patientId });
   const openPanel = !busy && !pending && panel;
-  const confirmPanel = openPanel === "comparison" && !referenceChanged && !evidence && !stale && conflict !== "dossier";
+  const confirmationTarget = openPanel === "comparison" && !referenceChanged && !evidence && !stale && conflict !== "dossier"
+    ? target : null;
 
   function confirm() {
     if (locked || reason[mode].trim().length < 3) return;
@@ -83,7 +84,8 @@ export function ContingencyDecision({
   }
 
   return <RecordDrawer title="Conferir os fatos" kicker="Contingência física" headingIcon="checklist"
-    popupClassName="hca-guide-topic-sheet hca-contingency-editor" restoreFocusTo={opener} onClose={onClose}
+    popupClassName={confirmationTarget ? "hca-guide-topic-sheet hca-contingency-editor hca-contingency-editor-under-confirmation" : "hca-guide-topic-sheet hca-contingency-editor"}
+    restoreFocusTo={opener} onClose={onClose}
     busy={busy} uncertainOutcome={pending} exitDialog hasUnsavedChanges={Boolean(reason.link || reason.clarify || target)}
     footer={requestClose => <>
       <ActionButton onClick={requestClose} disabled={busy}>Voltar</ActionButton>
@@ -181,16 +183,17 @@ export function ContingencyDecision({
         <p className="hca-contingency-hint">Confira a justificativa e escolha novamente o registro digital com base nos fatos atuais.</p>
       </div>
     </Dialog>}
-    {confirmPanel && target && <Dialog open title="Vincular esta referência?" headingIcon="info" showNestedBackdrop onClose={() => setPanel(null)}
+    {confirmationTarget && <Dialog open title="Vincular esta referência?" headingIcon="info" showNestedBackdrop
+      popupClassName="hca-contingency-link-confirmation" onClose={() => setPanel(null)}
       footer={<>
-        <ActionButton onClick={() => setPanel(null)}>Voltar à conferência</ActionButton>
-        <ActionButton variant="primary" disabled={locked} onClick={confirm}>Confirmar vínculo</ActionButton>
+        <ActionButton onClick={() => setPanel(null)}>Voltar</ActionButton>
+        <ActionButton variant="primary" disabled={locked} onClick={confirm}><Icon name="check" />Confirmar vínculo</ActionButton>
       </>}>
       <DefinitionGrid items={[
         { label: "Declaração", value: dossier.content.knownReference ?? dossier.id },
-        { label: "Registro digital", value: target.label },
+        { label: "Registro digital", value: confirmationTarget.label },
         { label: "Quem confere", value: context.fullName },
-        { label: "Revisão do registro", value: target.version },
+        { label: "Revisão do registro", value: confirmationTarget.version },
         { label: "Justificativa", value: reason.link, wide: true },
       ]} />
       <p className="hca-contingency-hint"><Icon name="info" width={16} />O vínculo preserva os dois registros, sem repetir estoque, recebimento ou ciência.</p>

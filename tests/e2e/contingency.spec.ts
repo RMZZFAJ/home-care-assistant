@@ -384,10 +384,21 @@ test('E12-06 reselects the current digital revision and recovers a lost link con
  const confirm=confirmation.getByRole('button',{name:'Confirmar vínculo',exact:true});
  await expect(confirm).toBeVisible();
  const confirmationBackdrop=page.locator('.hca-overlay').filter({has:confirmation}).locator(':scope > .hca-modal-backdrop');
+ const dossierBackdrop=page.locator('.hca-overlay')
+  .filter({has:page.locator('.hca-contingency-dossier-under-review')}).locator(':scope > .hca-modal-backdrop');
+ const reviewPanel=page.locator('.hca-contingency-editor');
  await expect(confirmationBackdrop).toBeVisible();
- await expect(confirmationBackdrop).toHaveCSS('backdrop-filter','blur(3px)');
- await expect(confirmationBackdrop).toHaveCSS('top','0px');
+ await expect(confirmationBackdrop).toHaveCSS('position','fixed');
+ await expect(confirmationBackdrop).toHaveCSS('top','58px');
+ await expect(dossierBackdrop).toHaveCSS('top','58px');
+ await expect(reviewPanel).toHaveCSS('filter','blur(3px)');
  await captureContingency(page,`contingency-link-confirmation-${info.project.name}`);
+ await confirmation.getByRole('button',{name:'Voltar',exact:true}).click();
+ await expect(confirmation).toBeHidden();
+ await expect(reviewPanel).toHaveCSS('filter','none');
+ await expect(decision.getByRole('textbox',{name:'Justificativa da vinculação',exact:true})).toHaveValue(reason);
+ await review.click();
+ await expect(confirm).toBeVisible();
  sql('update public.operational_documents set version = version + 1 where id='+q(req.id));
  const before=facts(f.patient);
  await confirm.click();

@@ -4535,6 +4535,12 @@ mantém o cabeçalho global, as abas e diálogos compartilhados. O build,
 quatro testes unitários, ESLint dirigido, Markdown e a verificação das
 migrations históricas passaram.
 
+A revisão local seguinte comparou a confirmação de vínculo com a v2 em
+360 e 412 px. O cabeçalho fica legível acima da sobreposição e o painel
+de conferência aparece desfocado atrás do diálogo. A revisão, a
+justificativa e a possibilidade de voltar à conferência são mantidas no
+fluxo real. [Comparação e validação](FECHAMENTO_D_B.md#execução-e-lacunas-por-lote).
+
 ### E12-07 — Central técnica e decisões
 
 - A Central técnica segue a v2 com o seletor de ambiente, os cartões de

@@ -59,6 +59,54 @@
 .hca-contingency-summary { padding-bottom: 12px; border-bottom: 1px solid var(--hca-line); }
 .hca-contingency-hint { display: flex; align-items: flex-start; gap: 8px; color: var(--hca-muted); font-size: 13px; }
 .hca-contingency-hint > svg { flex: none; margin-top: 3px; }
+
+.hca-overlay:has(.hca-contingency-link-confirmation) > :is(.hca-modal-backdrop, .hca-modal-viewport),
+.hca-overlay:has(.hca-contingency-dossier-under-review) > .hca-modal-backdrop {
+  position: fixed;
+  inset: var(--app-header-height) 0 0;
+}
+.hca-overlay:has(.hca-contingency-link-confirmation) > .hca-modal-backdrop { backdrop-filter: none; }
+.hca-overlay:has(.hca-contingency-link-confirmation) > .hca-modal-viewport { padding: clamp(12px, 4vw, 20px); }
+/* WebKit can miss the drawer when backdrop-filter samples across the dialog portals. */
+.hca-contingency-editor-under-confirmation { filter: blur(3px); }
+.hca-contingency-link-confirmation { width: min(390px, 100%); max-height: 100%; border-radius: 17px; }
+.hca-contingency-link-confirmation > :is(.hca-modal-head, .hca-modal-footer) { background: #f8faf8; }
+.hca-contingency-link-confirmation > .hca-modal-head {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 9px;
+  padding: 13px 15px;
+}
+.hca-contingency-link-confirmation .hca-modal-heading-icon {
+  display: grid;
+  place-items: center;
+  width: 33px;
+  height: 34px;
+  border: 1px solid var(--hca-line);
+  border-radius: 9px;
+  background: var(--hca-tint);
+  color: var(--hca-teal);
+}
+.hca-contingency-link-confirmation .hca-modal-head > .hca-control-icon {
+  width: 36px;
+  min-width: 36px;
+  min-height: 36px;
+}
+.hca-contingency-link-confirmation > .hca-modal-content { padding: 17px 15px; }
+.hca-contingency-link-confirmation .hca-contingency-hint {
+  margin: 12px 0 0;
+  padding-top: 12px;
+  border-top: 1px solid var(--hca-line);
+}
+.hca-contingency-link-confirmation > .hca-modal-footer { padding-inline: 15px; }
+.hca-contingency-link-confirmation > .hca-modal-footer > button {
+  gap: 6px;
+  min-width: 0;
+  padding-inline: 8px;
+  white-space: normal;
+}
+.hca-contingency-link-confirmation > .hca-modal-footer > button > svg { flex: none; width: 14px; height: 14px; }
 .hca-contingency-editor-card, .hca-contingency-disclosure {
   border: 1px solid var(--hca-line);
   border-radius: 12px;
@@ -83,6 +131,10 @@
 .hca-contingency-known { display: grid; gap: 4px; min-width: 0; font-size: 13px; }
 
 @media (max-width: 850px) {
+  .hca-overlay:has(.hca-contingency-link-confirmation) > :is(.hca-modal-backdrop, .hca-modal-viewport),
+  .hca-overlay:has(.hca-contingency-dossier-under-review) > .hca-modal-backdrop {
+    inset-block-start: 58px;
+  }
   .hca-drawer-viewport > :is(.hca-contingency-editor, .hca-contingency-dossier).hca-guide-topic-sheet {
     max-height: min(92dvh, 740px);
   }
