@@ -1,7 +1,9 @@
 # Documentação do Home Care Assistant
 
-Para conferir a entrega e retomar a auditoria, comece pelo
-[fechamento A–D da PR 7](audits/FECHAMENTO_PR7.md).
+O [quadro de fechamento de D-B](audits/D/D-B/FECHAMENTO_D_B.md) reúne a
+validação da PR 8 e as decisões para D-C. O
+[fechamento A–D da PR 7](audits/FECHAMENTO_PR7.md) registra a integração
+de L1 e L2 e o início da continuidade.
 
 **UI/UX vigente:**[Modelo Integral](ui-ux/CANONICAL_MODEL.md), aprovado
 em 09/11/2026, substitui Fluent e a direção visual anterior. Aplicar a todos
@@ -48,7 +50,8 @@ não autorizada permanece OWNER-DEFERRED. Produção NO-GO.
 
 **Histórico e planejamento.** A/B registram o diagnóstico. C conserva o
 projeto integrado pela PR 6. D-A registra D0–D2. D-B reúne a execução de
-D3–D5 e L1/L2, com validação conjunta e homologação ainda pendentes.
+D3–D5 e L1–L4, com as condições de integração e homologação registradas
+no quadro de fechamento.
 
 <!-- c-table:start -->
 

@@ -134,14 +134,31 @@ Os testes verificaram buscas e tarefas, revogação após listar o aviso,
 resposta perdida após publicar a programação e encerramento recuperável
 de uma tentativa. Relatório em `output/playwright/d-b-pr8-local-mobile/`.
 
-**Documentos.** DOC-A está implementado no escopo aprovado de aparência e
-geração. DOC-B tem os complementos de BAL, COM, DEV, cancelamento e vínculos.
-DOC-C.2–5 e o escopo técnico de DOC-D estão integrados. DOC-C.1 continua
-adiado. A amostra em aparelho, a impressão, a leitura do PDF com tecnologia
-assistiva e a conferência humana fazem parte da homologação. A assinatura
-técnica e a TSA interna aprovadas têm evidências próprias. A confiança de
-terceiro e a assinatura pessoal ficam em seus respectivos escopos.
-[Especificação documental][pdf] e [política de custódia][signing].
+**Documentos.** A [especificação aprovada][pdf] e a
+[política de custódia][signing] governam estes pontos.
+
+- **DOC-A.** A Ficha usa a composição V16. As verificações cobrem o
+  conteúdo congelado, a autoria, o recorte autorizado e a emissão no
+  navegador. [Formato](../../../../tests/integration/approved-pdf-format.test.mjs)
+  e [emissão de REQ](../../../../tests/e2e/approved-requisition-pdf.spec.ts).
+- **DOC-B.** Os complementos preservam os fatos de BAL, COM, ENT e DEV,
+  os atos de cancelamento, a ciência e os vínculos. Os casos incluem
+  perda de leitura, concorrência de reserva e preservação do saldo aplicado.
+  [Atos e verificações](PDF_LIFECYCLE.md#histórico--doc-b4)
+  e [fidelidade](../../../../tests/integration/pdf-fidelity.test.mjs).
+- **DOC-C.** A Ficha Ampliada e o relatório de auditoria usam V17. Os
+  testes cobrem o período no fuso declarado, a autorização específica de
+  cada complemento e a revogação de referências. A simplificação
+  DOC-C.1 permanece adiada. [Complemento executivo](OWNER_EXECUTION_SUPPLEMENT.txt)
+  e [modalidades](../../../../tests/integration/pdf-modes.test.mjs).
+- **DOC-D.** A emissão, a recuperação, o acervo e a verificação dos bytes
+  usam o pipeline de assinatura técnica e TSA interna. Os testes cobrem
+  reserva única, recusa sem evidência de Storage e revogação antes de
+  finalizar. Aparelho, impressão, tecnologia assistiva e conferência
+  humana seguem na homologação. A confiança de terceiro, a assinatura
+  pessoal e a guarda operacional têm escopos próprios.
+  [Emissão](../../../../tests/integration/pdf-issuance.test.mjs)
+  e [verificação pública](../../../../tests/integration/public-pdf-verification.test.mjs).
 
 **Confirmação de vínculo em E12-06.** A comparação a 360 e 412 px mostrou
 o painel de conferência legível atrás da confirmação. O diálogo usa a
@@ -151,6 +168,21 @@ primeira em Chromium, Android e iOS/WebKit, incluindo a recusa da referência
 desatualizada e a recuperação do vínculo sem repetir o ato. Capturas em
 `output/playwright/l4/` e relatório em
 `output/playwright/l4-link-confirmation-final/`.
+
+### Contratos de L1 a L3 exercitados no candidato
+
+Os casos abaixo passaram no job de banco de `56432679`. Eles verificaram
+efeitos e limites dos contratos usados por L4. A comparação visual e os
+percursos de navegador têm evidências próprias no registro dos lotes.
+[Integração de 56432679](https://github.com/RMZZFAJ/home-care-assistant/actions/runs/45970030787/job/140407945091).
+
+| Área | Resultado verificado |
+| --- | --- |
+| REQ e ciência | Receber quantidade menor manteve a REQ aberta até nova avaliação da família. A reconciliação de acessos simultâneos preservou ciência e estoque. [REQ](../../../../tests/integration/l1-journeys.test.mjs) e [acessos](../../../../tests/integration/document-access-windows.test.mjs). |
+| COM e ENT | A COM aceitou a delegação individual da família e recusou identidades sem autoridade local. A parcela pendente permaneceu disponível para validação e gerou um crédito. Na ENT, a revogação retirou a ação de revisão independente. [COM](../../../../tests/integration/purchase-expectation.test.mjs) e [ENT](../../../../tests/integration/delivery-regularization-boundaries.test.mjs). |
+| BAL, consumo e agenda | O comentário na revisão de BAL preservou as notas da contagem. Registro e correção de consumo obedeceram às concessões individuais e compensaram o saldo uma vez. A configuração de horários respeitou a autoridade do paciente, as versões e o comprovante. [BAL](../../../../tests/integration/bal-review.test.mjs), [consumo](../../../../tests/integration/team-consumption.test.mjs) e [agenda](../../../../tests/integration/schedule-residence-hours.test.mjs). |
+| Catálogo e avisos | A edição conservou saldo, unidade e identidade do material. O histórico aplicou o escopo do paciente. A permissão vigente sobre o destino governou as páginas, a contagem, o detalhe e a marcação como visto. [Edição](../../../../tests/integration/catalogue-preparations.test.mjs), [histórico](../../../../tests/integration/catalogue-material-history.test.mjs) e [avisos](../../../../tests/integration/inbox-notice-authority.test.mjs). |
+| Residência e contingência | Confirmações concorrentes da criação resultaram em um cadastro e um comprovante. O vínculo de contingência preservou os fatos físicos, e dois revisores concorrentes deixaram uma única decisão oficial. [Residência](../../../../tests/integration/preparation-guides.test.mjs) e [contingência](../../../../tests/integration/contingency.test.mjs). |
 
 ## Revisão da PR 8
 
@@ -166,7 +198,8 @@ A discussão seguinte sobre a quantidade no resumo de rascunho foi
 respondida e resolvida. O componente usa a função local de formatação,
 que retorna “Quantidade pendente” para um valor ausente. A leitura de
 relatos oficiais tem outro contrato. As 46 discussões em linha estão
-resolvidas. [Resposta sobre a quantidade][review-draft-quantity].
+resolvidas, conforme consulta do GitHub no commit `56432679`.
+[Resposta sobre a quantidade][review-draft-quantity].
 
 Entre os 20 encerramentos anteriores estão o filtro e a versão do
 arquivamento, a volta ao histórico e o foco, a recuperação da admissão BAL,
@@ -364,6 +397,162 @@ casos dirigidos passaram de primeira em Chromium e iOS/WebKit após as
 correções, com build de produção e lint dirigido aprovados. Relatório em
 `output/playwright/pr8-8b6-failure-repairs/`.
 
+## CI de 82842f71 e retentativas de navegador
+
+Linux, Windows, instalação limpa, reaplicação das migrations e os 911
+testes de integração passaram. Os sete jobs de navegador concluíram com
+1.863 casos aprovados. Foram 1.859 na primeira execução e quatro na
+retentativa do Playwright. O GitHub executou o workflow uma vez. O
+resultado agregado e o gate do SonarCloud passaram.
+[CI de 82842f71](https://github.com/RMZZFAJ/home-care-assistant/actions/runs/45959577729).
+
+| Job | Primeira execução | Retentativa aprovada |
+| --- | ---: | --- |
+| Chromium 1 | 311 | 0 |
+| Chromium 2 | 309 | 1, preferência pessoal P02 |
+| Android 1 | 310 | 1, continuação recusada da lista de relatos |
+| Android 2 | 309 | 1, aprovação de parcela em COM |
+| iOS 1 | 209 | 0 |
+| iOS 2 | 207 | 0 |
+| iOS 3 | 204 | 1, reiteração de aviso de falta |
+
+- **Perfil.** A retentativa ocorreu na seleção de **Avisos e aplicativo**.
+  Com a consulta em segundo plano retida, o teste reproduziu um
+  deslocamento vertical de aproximadamente 66 px. A atualização passa
+  a ser anunciada ao leitor de tela sem deslocar as abas. A primeira
+  consulta ainda mostra o aviso de carregamento.
+- **Lista de relatos.** O teste recebeu o 403 simulado e a captura
+  mostrou a lista preenchida. O código descarta o resultado de uma
+  continuação quando uma nova atualização a substitui. O caso controla
+  as invalidações concorrentes durante as respostas simuladas e continua
+  exigindo a limpeza da lista, a revogação real de leitura e a
+  preservação dos registros. O cenário de resposta atrasada segue
+  verificando a troca de filtros.
+- **COM.** No segundo acesso, a captura mostrou **Conferir chegadas**
+  disponível na visão geral. O teste usa esse caminho para a conferência
+  e mantém a escolha de **Materiais** no acesso da família. A validação
+  da parcela, o estoque e o recibo anterior continuam cobertos.
+- **Aviso de falta.** O diálogo não estava aberto na captura da
+  primeira tentativa. O caso aguarda o foco inicial do cabeçalho do relato e
+  usa o controle de toque que verifica o alvo fora da navegação fixa.
+  Quantidade, vinculação ao relato e saldo continuam cobertos.
+
+Os 15 testes dirigidos passaram de primeira em Chromium, Android e
+iOS/WebKit, com build de produção e lint dos arquivos alterados. A
+rodada local incluiu o ajuste visual de contingência que está em commit
+separado. Relatório em `output/playwright/pr8-828-browser-fixes/`.
+As correções foram publicadas em `56432679` na PR 8.
+[CI de 56432679](https://github.com/RMZZFAJ/home-care-assistant/actions/runs/45970030787).
+
+Linux, Windows e banco passaram nesse SHA. A integração registrou
+911 testes aprovados, sem falhas, cancelamentos ou casos pulados.
+
+O SonarCloud aprovou esse commit. A consulta da PR retornou zero
+apontamentos novos abertos ou confirmados. A Vercel confirmou o Preview
+desse SHA como Ready. O manifesto, o service worker e os quatro arquivos
+públicos responderam com 200. A revisão do worker coincide com o cálculo
+feito sobre 845 arquivos do commit publicado.
+[Preview de 56432679](https://vercel.com/rmzzfajs-projects/home-care-assistant/3B5iRi9iNToyhfMwhwGcf38Qqz8R).
+
+### Resultado dos navegadores em 56432679
+
+O GitHub concluiu o workflow na primeira execução. Os sete jobs de
+navegador e o agregado passaram. Dos 1.863 testes de navegador, 1.859
+passaram de primeira e quatro passaram na retentativa do Playwright.
+Perfil, lista de relatos, aprovação de parcela em COM e reiteração de
+aviso de falta passaram já na primeira tentativa nos jobs em que haviam
+falhado antes.
+
+- **Chromium 1, agenda.** O seletor de ações permanecia fechado após
+  Enter. O teste aguarda o foco e a disponibilidade do acionador e
+  confirma a abertura antes de verificar as ações. A contraprova com
+  leitura atrasada continua exigindo o bloqueio temporário.
+- **Android 1, histórico.** A coleção final omitiu uma página com 20
+  registros. O teste agora acumula os IDs da mesma leitura que verificou
+  a ordem naquela página.
+- **iOS 1, PDF de doação.** O botão flutuante da ficha cobriu o alvo da
+  aba Arquivos. A navegação do teste reposiciona o alvo antes de enviar
+  o toque. A emissão, a assinatura e o conteúdo do PDF continuam cobertos.
+- **iOS 3, parcelas de COM.** Após recuperar a consulta, o filtro
+  permaneceu em 101 após o clique. O teste aguarda o retorno de foco da
+  atualização, usa o controle de toque e verifica que a busca ficou vazia
+  antes de comparar a primeira página. A auditoria de acessibilidade a
+  320 px parte do topo, com todas as regras ativas.
+
+Os quatro cenários foram validados em Chromium, Android e iOS/WebKit. A
+primeira rodada local aprovou 11 casos. Em Android, a auditoria de COM
+mediu o campo de materiais parcialmente coberto pelo cabeçalho fixo
+durante a rolagem. A rodada dirigida após o ajuste aprovou o caso de
+parcelas nos três perfis, sem retentativas. Artefatos em
+`output/playwright/pr8-564-browser-fixes/` e
+`output/playwright/pr8-564-purchase-parcels-final/`.
+
+### Avisos de instalação da CI
+
+A instalação de `56432679` registrou 12 ocorrências reportadas pelo npm,
+incluindo dependências afetadas indiretamente. O lockfile publicado
+continha `minimatch@10.2.6` em ESLint e TypeScript ESLint e
+`re2js@2.8.6` em Markdownlint. Ambas as cadeias entram como dependências
+de desenvolvimento. [Aviso de minimatch](https://github.com/advisories/GHSA-g3hv-75wg-m249),
+[aviso de re2js](https://github.com/advisories/GHSA-gg6h-894w-4m9c) e
+[auditoria do npm](https://docs.npmjs.com/cli/audit/).
+
+ESLint passou a `10.15.0`, TypeScript ESLint a `8.74.0` e
+Markdownlint CLI2 a `0.24.2`. O lockfile passou a resolver
+`minimatch@11.0.9` e `re2js@2.9.1`. A comparação manteve as entradas de
+produção. A instalação limpa local com scripts de ciclo de vida
+desabilitados reportou zero vulnerabilidades. ESLint, Markdown e o
+verificador das 84 migrations históricas passaram.
+
+Os quatro ajustes dos testes e a atualização das ferramentas foram
+publicados em `effbd935`. A CI e o job agregado passaram na primeira
+execução do workflow.
+[CI de effbd935](https://github.com/RMZZFAJ/home-care-assistant/actions/runs/45983780325).
+
+O registro npm retornou zero avisos para as versões do lockfile
+publicado. As validações de Linux e Windows passaram na CI, ambas com
+zero vulnerabilidades na instalação, 166 arquivos de testes aprovados e
+as 84 migrations históricas preservadas. O job de banco passou na
+instalação limpa, na reaplicação das migrations e nos 911 testes de
+integração. Nos sete jobs de navegador, 1.862 testes passaram de
+primeira e um de iOS passou na retentativa do Playwright. Agenda,
+histórico, PDF de doação e parcelas de COM passaram de primeira nos
+grupos em que haviam precisado de retentativa. O teste de anexo de
+contingência também passou de primeira nos três perfis.
+
+Na nova retentativa, o relatório de iOS 1 mostra a lista de relatos e
+o texto de busca preenchido. Após voltar do detalhe, o primeiro toque
+em **Filtrar relatos** não abriu o diálogo. A paginação dos 102 registros
+já havia sido confirmada. A captura e o contexto estão no
+[job de iOS 1](https://github.com/RMZZFAJ/home-care-assistant/actions/runs/45983780325/job/140466436183).
+
+A falha não reapareceu em cinco execuções locais com o teste original em
+WebKit. O ajuste aguarda a retirada do detalhe e o foco restaurado na
+lista. A abertura por toque aguarda o foco no botão sem rolar a tela nessa
+etapa. Continuam cobertos o toque, a paginação, a busca e os filtros.
+O teste ajustado passou duas vezes em cada perfil (Chromium, Android e
+iOS/WebKit), sem retentativas, com build de produção, tipos e lint.
+Relatórios locais em `output/playwright/pr8-effbd-consumption-baseline.log`
+e `output/playwright/pr8-effbd-consumption-fixed.log`.
+
+O ajuste do teste de relatos foi publicado em `b0fd4fbd`. Ubuntu, Windows
+e banco passaram nesse commit, com 166 arquivos de testes em cada sistema
+e 911 integrações. Os sete grupos do Playwright aprovaram os 1.863
+testes na primeira tentativa. O caso do filtro de relatos passou em
+Chromium, Android e iOS. O job agregado também passou. O GitHub executou
+o workflow uma vez. O SonarCloud e o check do Preview passaram. A
+[CI de b0fd4fbd](https://github.com/RMZZFAJ/home-care-assistant/actions/runs/45996460517)
+reúne a validação do candidato, incluindo os resultados de navegador.
+
+A Vercel confirmou o Preview e
+o SonarCloud aprovou o commit com zero apontamentos novos abertos ou
+confirmados. O manifesto, o service worker e os quatro arquivos públicos
+offline responderam com 200. A revisão do worker,
+`ba732f0198b2cb5d07a3d565`, coincidiu com o cálculo feito sobre 845
+arquivos da árvore publicada.
+[Preview de effbd935](https://vercel.com/rmzzfajs-projects/home-care-assistant/3YvdXagPKeYRnJJEeYMLVu7kA2ip)
+e [SonarCloud][sonar].
+
 ## Condições para o merge
 
 - **Revisão e decisões.** As discussões publicadas foram triadas. A correção
@@ -383,6 +572,12 @@ correções, com build de produção e lint dirigido aprovados. Relatório em
   [job de banco][db-ci]. `17739c93` passou com as quatro retentativas
   descritas acima. `01708749` reúne as correções dos testes.
   [CI de 01708749][ci-017].
+  `82842f71` e `56432679` passaram com quatro retentativas cada. Todos
+  os casos corrigidos entre esses commits passaram na primeira tentativa
+  de `56432679`. `effbd935` passou com uma retentativa em iOS 1. O
+  histórico acima identifica os casos e os respectivos logs.
+  O candidato publicado `b0fd4fbd` passou com 1.863 testes de navegador
+  na primeira tentativa e sem nova execução do workflow.
 
 - **Qualidade do código.** O SonarCloud aprovou o gate de `e783f6c5`, com
   0,9% de duplicação no código novo. A consulta encontrou três apontamentos
@@ -393,23 +588,51 @@ correções, com build de produção e lint dirigido aprovados. Relatório em
   três testes de perfil, ciência e MFA passaram em Chromium sem retentativa.
   A análise de `ff786c9d` passou e a consulta do código novo retornou zero
   apontamentos em aberto.
+  O gate de `b0fd4fbd` passou com 0,9% de duplicação no código novo.
+  A consulta da PR retornou zero apontamentos novos abertos ou confirmados.
   O gate e a lista de apontamentos devem ser renovados para o SHA final.
   A revisão abrangente da duplicação continua adiada. [SonarCloud][sonar] e
   [triagem Sonar][quality].
 
-- **Banco local e remoto.** 385 migrations no repositório, desenvolvimento local
-  nesse baseline e as mesmas 385 versões registradas no Supabase compartilhado
-  de testes, até `20261124232228`. As 23 de L4 foram aplicadas. Nenhuma
-  pendência de versão foi identificada. A correção desta revisão usa o contrato
-  vigente. Reconciliar novamente caso entre migration depois desse
-  levantamento. [Registro dos ambientes][execution].
+- **Banco local e remoto.** A comparação de `b0fd4fbd` com o histórico do
+  Supabase compartilhado de testes confirmou as mesmas 385 versões, até
+  `20261124232228`. As 23 de L4 estão aplicadas. O desenvolvimento local
+  usa esse baseline. [Registro dos ambientes][execution].
 
-- **Preview autenticado.** Em `01708749`, a Vercel confirmou Ready. A conta
-  sintética consultou runtime, participantes, catálogo, histórico, agenda,
-  preferências, sino, guias e contingências. O índice de contingências estava
-  vazio. A consulta retornou 22 referências de REQ com versões positivas e
-  respondeu 401 sem sessão. A conta encerrou a sessão ao final. Repetir a
-  verificação no SHA escolhido para merge. [Preview de 01708749][preview-017].
+- **Preview autenticado.** Em `b0fd4fbd`, a residência fictícia foi
+  consultada por uma conta administradora e uma familiar. A matriz e a
+  consulta individual retornaram os mesmos 48 códigos e indicadores de
+  criticidade. A família recebeu 403 ao consultar outra pessoa. Uma
+  consulta sem sessão recebeu 401. As duas contas consultaram perfil,
+  preferências, central, sino e guias. A administradora também consultou
+  catálogo, histórico e contingências. As 22 referências de REQ
+  apresentaram versões positivas. As sessões foram encerradas. Essa
+  rodada confirmou leituras. Revisão e vínculo foram exercitados no
+  ambiente local.
+  O runtime retornou `ready`, com protocolo 1 e esquema 2. O manifesto,
+  o service worker e os quatro arquivos offline foram conferidos. O
+  worker entregou a revisão `ba732f0198b2cb5d07a3d565`. Os arquivos que
+  determinam essa revisão coincidem com os do candidato anterior.
+  [Preview de b0fd4fbd](https://vercel.com/rmzzfajs-projects/home-care-assistant/9ixuhYV7GcjH1aR5tddrAAe9yjWZ).
+
+  Os Previews anteriores também passaram pelas consultas dirigidas.
+  [Preview de effbd935](https://vercel.com/rmzzfajs-projects/home-care-assistant/3YvdXagPKeYRnJJEeYMLVu7kA2ip)
+  e [Preview de 56432679](https://vercel.com/rmzzfajs-projects/home-care-assistant/3B5iRi9iNToyhfMwhwGcf38Qqz8R).
+
+  Em `82842f71`, a Vercel confirmou Ready. Os
+  48 códigos e seus indicadores de criticidade coincidiram entre a matriz
+  e a consulta individual. A conta familiar recebeu 403 ao consultar outra
+  pessoa. As duas sessões fictícias foram encerradas. O manifesto e os
+  quatro arquivos públicos do modo offline passaram pela conferência. A
+  revisão do service worker foi recalculada a partir da árvore do commit
+  publicado e coincidiu com a revisão entregue pela Vercel.
+  [Preview de 82842f71](https://vercel.com/rmzzfajs-projects/home-care-assistant/DbN2FyPGfcYVoFTkNzxDNddWi68t).
+
+  No Preview de `01708749`, a conta sintética consultou participantes,
+  catálogo, histórico, agenda, preferências, sino, guias e contingências.
+  A lista retornou 22 referências de REQ com versões positivas. A consulta
+  sem sessão recebeu 401. Repetir a verificação no SHA escolhido para merge.
+  [Preview de 01708749][preview-017].
 
 - **Saúde e desempenho.** Em 27/11, o Advisor de saúde retornou zero avisos.
   Houve 12 eventos informativos do Realtime nos logs das últimas 24 h. Três
@@ -420,10 +643,12 @@ correções, com build de produção e lint dirigido aprovados. Relatório em
   equivalente. A prontidão operacional ainda depende da medição representativa
   de acesso e revogação. [Monitoramento][monitoring].
 
-- **Matriz e plano de integração.** A etapa 19 permanece em execução.
-  Reconciliar `D-B-AC-028` a `D-B-AC-030`, as evidências de DOC-A/B/C/D e as
-  reservas aceitas. Confirmar a decisão de merge e conferir o SHA da `master`,
-  o deploy publicado, a consulta autenticada e a compatibilidade do banco.
+- **Matriz e plano de integração.** A etapa 19 permanece em execução. As
+  migrations, as leituras no Preview e a CI foram conferidas em `b0fd4fbd`.
+  O fechamento depende da composição do candidato final e do encaminhamento
+  das decisões abertas. Após a decisão de merge, conferir o SHA da
+  `master`, a publicação, a consulta autenticada e a compatibilidade do
+  banco.
 
 Em 27/11, o domínio de produção ainda servia a `master` em `fab595c7`,
 com o schema de teste já adiantado. Nesse intervalo, o vínculo da contingência

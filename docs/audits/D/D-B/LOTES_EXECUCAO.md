@@ -3878,6 +3878,12 @@ Os 180 estados dos 27 cenários renderizaram nas larguras de 360 e
 412 px ao percorrer o laboratório offline. O aceite no produto requer
 comparações das superfícies com os dados e contratos reais.
 
+O [fechamento de D-B](FECHAMENTO_D_B.md#condições-para-o-merge) reúne
+as evidências de CI, SonarCloud e Preview do candidato publicado.
+Os registros abaixo preservam as comparações por cenário e o estado de
+cada ambiente na data de cada incremento. A aplicação das 23 migrations
+de L4 consta no [registro do Supabase remoto](#aplicação-remota-de-l4-e-retestes-de-ci).
+
 ### Publicação e ambientes no início de L4
 
 - A branch `feat/phase-d-continuation` inicia L4 em `1ba95e4c`, no

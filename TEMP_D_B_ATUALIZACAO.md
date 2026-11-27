@@ -8,6 +8,18 @@ O [fechamento A–D da PR 7](docs/audits/FECHAMENTO_PR7.md) reúne os critérios
 e as pendências para a próxima etapa. Este acompanhamento conserva o
 histórico dos incrementos de D-B.
 
+**27/11 — Última CI concluída.** O commit `56432679` passou em Linux, Windows,
+na integração de banco e no SonarCloud. Os sete jobs de navegador
+passaram, com quatro retentativas registradas.
+O Preview confirmou as leituras de L4 com contas fictícias, incluindo a
+matriz de permissões e a negativa de acesso da família. As 46 discussões em
+linha estão resolvidas. [Evidências e pendências atuais](docs/audits/D/D-B/FECHAMENTO_D_B.md#condições-para-o-merge).
+
+**27/11 — Candidato da PR 8.** `effbd935` reúne os quatro ajustes de teste
+e a atualização das ferramentas de lint. Linux, Windows e banco passaram,
+com zero vulnerabilidades na instalação. Os navegadores seguem em execução.
+[CI de effbd935](https://github.com/RMZZFAJ/home-care-assistant/actions/runs/45983780325).
+
 **26/11 — Resultado da CI da revisão.** A CI de `4fc30699` aprovou banco,
 Linux e Windows. Dois testes falharam nas duas tentativas em iOS, e quatro
 testes passaram em retentativa. SonarCloud e Preview passaram nesse mesmo
